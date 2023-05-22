@@ -26,7 +26,7 @@ class RLCA(nn.Module):
         self.masked = masked
         if self.masked:
             self.register_buffer("mask", self.MakeMask(self.latent_len, max_len).unsqueeze(0).unsqueeze(0))
-            self.register_buffer("LenInputsMask",max_len)
+            self.LenInputsMask = max_len
             # self.mask.shape = (1, 1, latent_len, max_len)
 
     def forward(self,x_Latent,x_Input):
@@ -48,16 +48,17 @@ class RLCA(nn.Module):
                 self.LenInputsMask = input_len
             mask = self.mask
             # mask.shape = (1, 1, latent_len, input_len)
-            RSA = self.RelativeSelfAttention(Q, Kt, Ert, self.d_head, V, input_len,Mask=mask)
+            RSA = self.RelativeSelfAttention(Q, Kt, Ert, V, input_len,Mask=mask)
         else:
-            RSA = self.RelativeSelfAttention(Q, Kt, Ert, self.d_head, V, input_len)
+            RSA = self.RelativeSelfAttention(Q, Kt, Ert, V, input_len)
         # RSA.shape = (batch_size, num_heads, latent_len, d_head)
 
         Concat = RSA.transpose(1,2).reshape(batch_size,self.latent_len,-1)
         # Concat.shape = (batch_size, latent_len, d_model)
         return self.dropout(Concat)
 
-    def RelativeCrossAttention(self,Q, Kt, Ert, Dh, V, input_len Mask=None):
+    def RelativeCrossAttention(self,Q, Kt, Ert, V, input_len Mask=None):
+        Dh = self.d_head
         # Ert.shape = (d_head, 2*latent_len-1)
         QEr = torch.matmul(Q, Ert)
         # QEr.shape = (batch_size, num_heads, latent_len, 2*latent_len-1)

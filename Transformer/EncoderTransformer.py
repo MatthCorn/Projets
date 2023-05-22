@@ -1,5 +1,5 @@
 import torch.nn as nn
-from Transformer.RelativeMultiHeadAttention import RMHSA
+from Transformer.RelativeMultiHeadSelfAttention import RMHSA
 from Transformer.EasyFeedForward import FeedForward
 
 class EncoderLayer(nn.Module):

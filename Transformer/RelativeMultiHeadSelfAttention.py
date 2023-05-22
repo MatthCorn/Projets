@@ -49,9 +49,9 @@ class RMHSA(nn.Module):
         if self.masked:
             mask = self.mask[:, :, :seq_len, :seq_len]
             # mask.shape = (1, 1, seq_len, seq_len)
-            RSA = self.RelativeSelfAttention(Q, Kt, Ert, self.d_head, V, Mask=mask)
+            RSA = self.RelativeSelfAttention(Q, Kt, Ert, V, Mask=mask)
         else:
-            RSA = self.RelativeSelfAttention(Q, Kt, Ert, self.d_head, V)
+            RSA = self.RelativeSelfAttention(Q, Kt, Ert, V)
         # RSA.shape = (batch_size, num_heads, seq_len, d_head)
 
         Concat = RSA.transpose(1,2).reshape(batch_size,seq_len,-1)
@@ -75,7 +75,8 @@ class RMHSA(nn.Module):
         # Srel.shape = (batch_size, num_heads, seq_len, seq_len)
         return Srel
 
-    def RelativeSelfAttention(self,Q, Kt, Ert, Dh, V, Mask=None):
+    def RelativeSelfAttention(self,Q, Kt, Ert, V, Mask=None):
+        Dh = self.d_head
         # Ert.shape = (d_head, 2*seq_len-1)
         QEr = torch.matmul(Q, Ert)
         # QEr.shape = (batch_size, num_heads, seq_len, 2*seq_len-1)
