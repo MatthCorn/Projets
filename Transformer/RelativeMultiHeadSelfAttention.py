@@ -6,21 +6,22 @@ import time
 
 #Relative Multi-Head Self Attention
 class RMHSA(nn.Module):
-    def __init__(self, d_model, num_heads, max_len=64, dropout=0.1, masked=True):
+    def __init__(self, d_model, d_att, num_heads, max_len=64, dropout=0.1, masked=True):
         super().__init__()
-        d_head, remainder = divmod(d_model, num_heads)
+        d_head, remainder = divmod(d_att, num_heads)
         if remainder:
             raise ValueError(
                 "incompatible `d_model` and `num_heads`"
             )
         self.max_len = max_len
         self.d_model = d_model
+        self.d_att = d_att
         self.d_head = d_head
         self.num_heads = num_heads
-        self.key = nn.Linear(d_model, d_model)
-        self.value = nn.Linear(d_model, d_model)
-        self.query = nn.Linear(d_model, d_model)
-        self.finalLinear = nn.Linear(d_model,d_model)
+        self.key = nn.Linear(d_model, d_att)
+        self.value = nn.Linear(d_model, d_att)
+        self.query = nn.Linear(d_model, d_att)
+        self.finalLinear = nn.Linear(d_att,d_model)
         self.dropout = nn.Dropout(dropout)
         self.Er = nn.Parameter(torch.randn(2*max_len-1, d_head))
         self.masked = masked

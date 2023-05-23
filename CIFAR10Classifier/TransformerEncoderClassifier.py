@@ -5,6 +5,8 @@ import torch
 import torch.nn as nn
 import pickle
 
+local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
+# local = r'C:\Users\Matthieu\Documents\Python\Projets'
 def unpickle(file):
     with open(file, 'rb') as fo:
         dict = pickle.load(fo, encoding='bytes')
@@ -23,7 +25,7 @@ def PlotImage(i,data):
     plt.show()
 
 def LoadBatch(i,device):
-    dict = unpickle(r'C:\Users\Matthieu\Documents\Python\Projets\CIFAR10Classifier\data_batch_' + str(i))
+    dict = unpickle(local + r'\CIFAR10Classifier\data_batch_' + str(i))
     data = torch.tensor(dict[b'data'])
     # data.shape = (BatchSize,3*dimx*dimy)
     BatchSize, temp = data.shape
@@ -34,7 +36,7 @@ def LoadBatch(i,device):
     return data.to(device,torch.float32), MakeLabelSet(dict[b'labels']).to(device,torch.float32)
 
 def LoadValidation(device):
-    dict = unpickle(r'C:\Users\Matthieu\Documents\Python\Projets\CIFAR10Classifier\test_batch')
+    dict = unpickle(local + r'\CIFAR10Classifier\test_batch')
     data = torch.tensor(dict[b'data'])
     # data.shape = (BatchSize,3*dimx*dimy)
     BatchSize, temp = data.shape
@@ -54,9 +56,9 @@ d_out = 10
 class ClassifierTransformer(nn.Module):
     def __init__(self):
         super().__init__()
-        self.FirstEncoder = EncoderLayer(d_model, num_heads, WidthsFeedForward=[100,100], max_len=80, MHADropout=0.1, FFDropout=0.05, masked=False)
-        self.SecondEncoder = EncoderLayer(d_model, num_heads, WidthsFeedForward=[100, 100], max_len=80, MHADropout=0.1, FFDropout=0.05, masked=False)
-        self.ThirdEncoder = EncoderLayer(d_model, num_heads, WidthsFeedForward=[100, 100], max_len=80, MHADropout=0.1, FFDropout=0.05, masked=False)
+        self.FirstEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=80, MHADropout=0.1, FFDropout=0.05, masked=False)
+        self.SecondEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=80, MHADropout=0.1, FFDropout=0.05, masked=False)
+        self.ThirdEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=80, MHADropout=0.1, FFDropout=0.05, masked=False)
         self.DimDownScaler = FeedForward(d_model, 16, widths=[16], dropout=0.05)
         self.FinalClassifier = FeedForward(seq_len*16, 10, widths=[128,32], dropout=0.05)
 
@@ -83,7 +85,7 @@ N = ClassifierTransformer().to(device)
 
 MiniBatchs = [list(range(100*k,100*(k+1))) for k in range(10)]
 
-optimizer = torch.optim.Adam(N.parameters(),weight_decay = 0.05)
+optimizer = torch.optim.Adam(N.parameters(),weight_decay = 0.0001)
 
 ErrorTrainingSet = []
 AccuracyValidationSet = []
@@ -91,8 +93,9 @@ ValidationImageSet, ValidationLabels = LoadValidation(device=torch.device('cpu')
 
 LittleBatchs = [list(range(1000*k,1000*(k+1))) for k in range(10)]
 
-for i in range(100):
+for i in range(50):
     print('i = ' + str(i))
+    CurrentError = 0
     for j in range(1,6):
         BatchData, BatchLabels = LoadBatch(j,device=torch.device('cpu'))
         for LittleBatch in LittleBatchs:
@@ -103,12 +106,17 @@ for i in range(100):
                 err = torch.norm(N(data[MiniBatch]) - labels[MiniBatch])
                 err.backward()
                 optimizer.step()
-            ErrorTrainingSet.append(float(err))
-    # AccuracyValidationSet.append(float(1 - torch.count_nonzero(torch.argmax(N(ValidationImageSet.to(device)),dim=1)-ValidationLabels.to(device))/len(ValidationLabels.to(device))))
-
+                CurrentError += float(err)
+    ErrorTrainingSet.append(CurrentError)
+    if i % 5 == 0:
+        Err = 0
+        for LittleBatch in LittleBatchs:
+            data, labels = ValidationImageSet[LittleBatch].to(device), ValidationLabels[LittleBatch].to(device)
+            Err += torch.count_nonzero(torch.argmax(N(data), dim=1) - labels)
+        AccuracyValidationSet.append(float(1 - Err / len(ValidationLabels)))
 
 fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
-# ax1.plot(AccuracyValidationSet); ax1.set_title("Précision sur l'ensemble de validation")
+ax1.plot(AccuracyValidationSet); ax1.set_title("Précision sur l'ensemble de validation")
 ax2.plot(ErrorTrainingSet); ax2.set_title("Erreur sur l'ensemble de test")
 ax3.plot(torch.norm(N.FirstEncoder.MultiHeadAttention.Er,dim=1).cpu().detach().numpy()); ax3.set_title("Norme de Er sur le premier encodeur")
 ax4.plot(torch.norm(N.SecondEncoder.MultiHeadAttention.Er,dim=1).cpu().detach().numpy()); ax4.set_title("Norme de Er sur le second encodeur")
