@@ -5,8 +5,8 @@ import torch
 import torch.nn as nn
 import pickle
 
-local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
-# local = r'C:\Users\Matthieu\Documents\Python\Projets'
+# local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
+local = r'C:\Users\Matthieu\Documents\Python\Projets'
 def unpickle(file):
     with open(file, 'rb') as fo:
         dict = pickle.load(fo, encoding='bytes')
@@ -59,8 +59,8 @@ class ClassifierTransformer(nn.Module):
         self.FirstEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=80, MHADropout=0.1, FFDropout=0.05, masked=False)
         self.SecondEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=80, MHADropout=0.1, FFDropout=0.05, masked=False)
         self.ThirdEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=80, MHADropout=0.1, FFDropout=0.05, masked=False)
-        self.DimDownScaler = FeedForward(d_model, 16, widths=[16], dropout=0.05)
-        self.FinalClassifier = FeedForward(seq_len*16, 10, widths=[128,32], dropout=0.05)
+        self.DimDownScaler = FeedForward(d_model, 32, widths=[64], dropout=0.05)
+        self.FinalClassifier = FeedForward(seq_len*32, 10, widths=[256,64,32], dropout=0.05)
 
     def forward(self,x):
         # x.shape = (batch_size, seq_len, d_model)
@@ -93,7 +93,7 @@ ValidationImageSet, ValidationLabels = LoadValidation(device=torch.device('cpu')
 
 LittleBatchs = [list(range(1000*k,1000*(k+1))) for k in range(10)]
 
-for i in range(50):
+for i in range(300):
     print('i = ' + str(i))
     CurrentError = 0
     for j in range(1,6):
