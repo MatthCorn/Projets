@@ -1,5 +1,3 @@
-import torch
-import torch.nn.functional as F
 import torch.nn as nn
 from Transformer.RelativeMultiHeadSelfAttention import RMHSA
 from Transformer.EasyFeedForward import FeedForward
@@ -25,3 +23,7 @@ class EncoderLayer(nn.Module):
         x_latent = self.SelfAttentionLayer(x_Latent=self.LatentLayerNorm3(x_latent), x_Input=self.InputLayerNorm2(x_input)) + x_latent
         x_latent = x_latent + self.MLP2(self.LatentLayerNorm2(x_latent))
         return x_latent
+
+class EncoderIO(nn.Module):
+    def __init__(self):
+        super().__init__()

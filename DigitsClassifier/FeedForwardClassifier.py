@@ -3,17 +3,19 @@ import matplotlib.pyplot as plt
 import idx2numpy
 import torch
 
+local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
+# local = r'C:\Users\Matthieu\Documents\Python\Projets'
 def MakeLabelSet(x):
     out = torch.zeros(x.shape[0],10)
     for i in range(len(x)):
         out[i,int(x[i])] = 1
     return out
 
-TrainingImageSet = torch.tensor(idx2numpy.convert_from_file(r'C:\Users\Matthieu\Documents\Python\Projets\Projets\DigitsClassifier\train-images.idx3-ubyte')).reshape(60000,-1).to(torch.float32)
-TrainingLabels = torch.tensor(idx2numpy.convert_from_file(r'C:\Users\Matthieu\Documents\Python\Projets\Projets\DigitsClassifier\train-labels.idx1-ubyte')).to(torch.int)
+TrainingImageSet = torch.tensor(idx2numpy.convert_from_file(local + r'\DigitsClassifier\train-images.idx3-ubyte')).reshape(60000,-1).to(torch.float32)
+TrainingLabels = torch.tensor(idx2numpy.convert_from_file(local + r'\DigitsClassifier\train-labels.idx1-ubyte')).to(torch.int)
 TrainingLabelSet = MakeLabelSet(TrainingLabels)
-ValidationImageSet = torch.tensor(idx2numpy.convert_from_file(r'C:\Users\Matthieu\Documents\Python\Projets\Projets\DigitsClassifier\t10k-images.idx3-ubyte')).reshape(10000,-1).to(torch.float32)
-ValidationLabels = torch.tensor(idx2numpy.convert_from_file(r'C:\Users\Matthieu\Documents\Python\Projets\Projets\DigitsClassifier\t10k-labels.idx1-ubyte')).to(torch.int)
+ValidationImageSet = torch.tensor(idx2numpy.convert_from_file(local + r'\DigitsClassifier\t10k-images.idx3-ubyte')).reshape(10000,-1).to(torch.float32)
+ValidationLabels = torch.tensor(idx2numpy.convert_from_file(local + r'\DigitsClassifier\t10k-labels.idx1-ubyte')).to(torch.int)
 ValidationLabelSet = MakeLabelSet(ValidationLabels)
 
 d_in = 784
@@ -47,3 +49,7 @@ for i in range(200):
     AccuracyValidationSet.append(float(1 - torch.count_nonzero(torch.argmax(N(ValidationImageSet),dim=1)-ValidationLabels)/len(ValidationLabels)))
 
 print(sum(p.numel() for p in N.parameters() if p.requires_grad))
+fig, ((ax1, ax2)) = plt.subplots(2, 1)
+ax1.plot(AccuracyValidationSet); ax1.set_title("Précision sur l'ensemble de validation")
+ax2.plot(ErrorTrainingSet); ax2.set_title("Erreur sur l'ensemble de test")
+fig.show()
