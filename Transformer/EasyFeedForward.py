@@ -3,7 +3,7 @@ import torch.nn.functional as F
 
 # Customizable Feed-Forward Network in terms of number of layer and their widths
 class FeedForward(nn.Module):
-    def __init__(self, d_in, d_out, widths = [512], dropout = 0.1):
+    def __init__(self, d_in, d_out, widths=[512], dropout=0.1):
         super().__init__()
         # self.linears lists all linear layers of the network
         self.linears = nn.ModuleList()
