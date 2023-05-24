@@ -86,7 +86,7 @@ ValidationImageSet, ValidationLabels = LoadValidation(device=torch.device('cpu')
 
 LittleBatchs = [list(range(1000*k,1000*(k+1))) for k in range(10)]
 
-for i in range(30):
+for i in range(100):
     print('i = ' + str(i))
     CurrentError = 0
     for j in range(1,6):
