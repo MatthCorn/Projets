@@ -24,12 +24,14 @@ class RLCA(nn.Module):
         self.query = nn.Linear(d_latent, d_att)
         self.finalLinear = nn.Linear(d_att, d_latent)
         self.dropout = nn.Dropout(dropout)
-        self.Er = nn.Parameter(torch.randn(2*latent_len-1, d_att))
+        self.Er = nn.Parameter(torch.randn(2*latent_len-1, d_head))
         self.masked = masked
         if self.masked:
             self.register_buffer("mask", self.MakeMask(self.latent_len, max_len).unsqueeze(0).unsqueeze(0))
             self.LenInputsMask = max_len
             # self.mask.shape = (1, 1, latent_len, max_len)
+        self.previousInputLen = max_len
+        self.register_buffer("ConvDistrib", self.Weight(M=max_len, sigma=1.5))
 
     def forward(self, x_latent, x_input):
         # x_input.shape = (batch_size, input_len, d_input)
@@ -37,11 +39,11 @@ class RLCA(nn.Module):
         # x_latent.shape = (batch_size, latent_len, d_latent)
         # OR
         # x_latent.shape = (1, latent_len, d_latent)
-        Kt = self.key(x_latent).reshape(batch_size, input_len, self.num_heads, -1).permute(0, 2, 3, 1)
+        Kt = self.key(x_input).reshape(batch_size, input_len, self.num_heads, -1).permute(0, 2, 3, 1)
         # Kt.shape = (batch_size, num_heads, d_head, input_len)
         V = self.value(x_input).reshape(batch_size, input_len, self.num_heads, -1).transpose(1, 2)
         # V.shape = (batch_size, num_heads, input_len, d_head)
-        Q = self.query(x_input).reshape(-1, self.latent_len, self.num_heads, self.d_head).transpose(1, 2)
+        Q = self.query(x_latent).reshape(-1, self.latent_len, self.num_heads, self.d_head).transpose(1, 2)
         # Q.shape = (batch_size, num_heads, latent_len, d_head)
         # OR
         # Q.shape = (1, num_heads, latent_len, d_head)
@@ -50,8 +52,9 @@ class RLCA(nn.Module):
         # Ert.shape = (d_head, 2*latent_len-1)
         if self.masked:
             if self.LenInputsMask != input_len:
-                self.mask = self.Make_Mask(input_len)
+                self.register_buffer("mask", self.MakeMask(self.latent_len, max_len).unsqueeze(0).unsqueeze(0).to(self.Er.device))
                 self.LenInputsMask = input_len
+
             mask = self.mask
             # mask.shape = (1, 1, latent_len, input_len)
             RCA = self.RelativeCrossAttention(Q, Kt, Ert, V, input_len, Mask=mask)
@@ -73,8 +76,10 @@ class RLCA(nn.Module):
         # OR
         # QEr.shape = (1, num_heads, latent_len, 2*latent_len-1)
         # V.shape = (batch_size, num_heads, input_len, d_head)
+        if self.previousInputLen != input_len:
+            self.register_buffer("ConvDistrib", self.Weight(M=input_len, sigma=1.5).to(self.Er.device))
+            self.previousInputLen = input_len
 
-        ConvDistrib = self.Weight(M=input_len, sigma=1.5)
         # ConvDistrib.shape = (latent_len, 2*latent_len-1, input_len)
 
         QEr = QEr.unsqueeze(dim=-2)
@@ -85,7 +90,7 @@ class RLCA(nn.Module):
         # Here we want the i-th vector of QEr (shape = (1, 2*latent_len-1)) to be multiplied with the i-th matrix of ConvDistrib (shape = (2*latent_len-1, input_len)),
         # i in [1; latent_len], in order to get a matrix of the shape (latent_len, input_len)
 
-        Srel = torch.matmul(QEr,ConvDistrib)
+        Srel = torch.matmul(QEr,self.ConvDistrib)
         # Srel.shape = (batch_size, num_heads, latent_len, 1, input_len)
         # OR
         # Srel.shape = (1, num_heads, latent_len, 1, input_len)
@@ -106,6 +111,10 @@ class RLCA(nn.Module):
         # out.shape = (batch_size, num_heads, latent_len, d_head)
         return out
 
+    def to(self,device):
+        super().to(device)
+        self.device = device
+
     def Make_Mask(self, M):
         N = self.latent_len
         mat = torch.zeros((N,M))
@@ -123,3 +132,11 @@ class RLCA(nn.Module):
                     mat[i,k,j] = -(k-(i-j*N/M))**2/sigma
         mat = torch.softmax(mat, dim=1)
         return mat
+
+class test(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.register_buffer('bob',torch.tensor([1.]))
+
+    def remake(self):
+        self.register_buffer('bob', torch.tensor([1.]))

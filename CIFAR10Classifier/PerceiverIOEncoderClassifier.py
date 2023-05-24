@@ -5,8 +5,8 @@ import torch
 import torch.nn as nn
 import pickle
 
-# local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
-local = r'C:\Users\Matthieu\Documents\Python\Projets'
+local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
+# local = r'C:\Users\Matthieu\Documents\Python\Projets'
 def unpickle(file):
     with open(file, 'rb') as fo:
         dict = pickle.load(fo, encoding='bytes')
@@ -42,11 +42,12 @@ def LoadValidation(device):
     seq_len = int((temp/3) ** 0.5)
     data = data.reshape(BatchSize,3,seq_len,seq_len)
     data = data.permute(0,2,3,1)
-    data = data.reshape(BatchSize,seq_len,-1)
+    data = data.reshape(BatchSize,-1,seq_len)
     return data.to(device,torch.float32), torch.tensor(dict[b'labels']).to(device)
 
 d_latent = 32
 d_att = 32
+d_input = 32
 num_heads = 4
 # d_head = d_model/num_heads = 8
 input_len = 96
@@ -60,9 +61,9 @@ class ClassifierTransformer(nn.Module):
         self.Encoder = EncoderIO(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len)
         self.FinalClassifier = FeedForward(d_in=latent_len*d_latent, d_out=10, widths=[256, 64, 32], dropout=0.05)
 
-    def forward(self, x_input):
+    def forward(self, x):
         # x_input.shape = (batch_size, input_len, d_input)
-        y = self.Encoder(x_latent=self.x_latent, x_input=x_input)
+        y = self.Encoder(x)
         # y.shape = (batch_size, latent_len, d_latent)
         batch_size, _, _ = y.shape
         y = y.reshape(batch_size, -1)
@@ -107,11 +108,9 @@ for i in range(30):
             Err += torch.count_nonzero(torch.argmax(N(data), dim=1) - labels)
         AccuracyValidationSet.append(float(1 - Err / len(ValidationLabels)))
 
-fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
+fig, ((ax1, ax2)) = plt.subplots(2, 1)
 ax1.plot(AccuracyValidationSet); ax1.set_title("Précision sur l'ensemble de validation")
 ax2.plot(ErrorTrainingSet); ax2.set_title("Erreur sur l'ensemble de test")
-ax3.plot(torch.norm(N.FirstEncoder.MultiHeadAttention.Er,dim=1).cpu().detach().numpy()); ax3.set_title("Norme de Er sur le premier encodeur")
-ax4.plot(torch.norm(N.SecondEncoder.MultiHeadAttention.Er,dim=1).cpu().detach().numpy()); ax4.set_title("Norme de Er sur le second encodeur")
 plt.show()
 
 print(sum(p.numel() for p in N.parameters() if p.requires_grad))

@@ -29,7 +29,7 @@ class EncoderIO(nn.Module):
     def __init__(self, d_latent, d_input, d_att, num_heads, latent_len=16, SelfAttentionDepth=4,
                  WidthsFeedForward=[64], max_len=64, ADropout=0.1, FFDropout=0.1, masked=False):
         super().__init__()
-        self.xLatentInit = nn.parameter(torch.normal(mean=torch.zeros(1,latent_len, d_latent)))
+        self.xLatentInit = nn.parameter.Parameter(torch.normal(mean=torch.zeros(1,latent_len, d_latent)))
         self.LatentLayerNormCA = nn.LayerNorm(d_latent)
         self.InputLayerNorm = nn.LayerNorm(d_input)
         self.CrossAttention = RLCA(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len, max_len=max_len, dropout=ADropout, masked=masked)
@@ -44,7 +44,7 @@ class EncoderIO(nn.Module):
                                                          FeedForward(d_in=d_latent, d_out=d_latent, widths=WidthsFeedForward, dropout=FFDropout)]))
 
     def forward(self, x_input):
-        x_latent = self.xLatentInit + self.CrossAttention(x_Latent=self.LatentLayerNormCA(self.xLatentInit), x_Input=self.InputLayerNorm(x_input))
+        x_latent = self.xLatentInit + self.CrossAttention(x_latent=self.LatentLayerNormCA(self.xLatentInit), x_input=self.InputLayerNorm(x_input))
         x_latent = x_latent + self.MLP(self.LatentLayerNormMLP(x_latent))
         for [LayerNormAtt, SelfAttention, LayerNormMLP, MLP] in self.ListSelfAttention:
             x_latent = x_latent + SelfAttention(LayerNormAtt(x_latent))
