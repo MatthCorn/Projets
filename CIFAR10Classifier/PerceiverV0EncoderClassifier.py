@@ -68,8 +68,8 @@ d_out = 10
 class ClassifierTransformer(nn.Module):
     def __init__(self):
         super().__init__()
-        # self.xLatentInit = nn.parameter.Parameter(torch.normal(mean=torch.zeros(1, latent_len, d_latent)))
-        self.register_buffer("xLatentInit", torch.zeros(1, latent_len, d_latent))
+        self.xLatentInit = nn.parameter.Parameter(torch.normal(mean=torch.zeros(1, latent_len, d_latent)))
+        # self.register_buffer("xLatentInit", torch.zeros(1, latent_len, d_latent))
         self.EncoderLayer1 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len)
         self.EncoderLayer2 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len)
         self.EncoderLayer3 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len)
@@ -102,7 +102,7 @@ ErrorTrainingSet = []
 AccuracyValidationSet = []
 ValidationImageSet, ValidationLabels = LoadValidation(device=torch.device('cpu'))
 
-LittleBatchs = [list(range(1000*k, 1000*(k+1))) for k in range(10)]
+LittleBatchs = [list(range(500*k, 500*(k+1))) for k in range(20)]
 
 for i in range(20):
     print('i = ' + str(i))
