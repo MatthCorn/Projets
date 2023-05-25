@@ -43,10 +43,17 @@ class EncoderIO(nn.Module):
                                                          nn.LayerNorm(d_latent),
                                                          FeedForward(d_in=d_latent, d_out=d_latent, widths=WidthsFeedForward, dropout=FFDropout)]))
 
-    def forward(self, x_input):
-        x_latent = self.xLatentInit + self.CrossAttention(x_latent=self.LatentLayerNormCA(self.xLatentInit), x_input=self.InputLayerNorm(x_input))
-        x_latent = x_latent + self.MLP(self.LatentLayerNormMLP(x_latent))
-        for [LayerNormAtt, SelfAttention, LayerNormMLP, MLP] in self.ListSelfAttention:
-            x_latent = x_latent + SelfAttention(LayerNormAtt(x_latent))
-            x_latent = x_latent + x_latent + MLP(LayerNormMLP(x_latent))
+    def forward(self, x_input, mode=None):
+        if mode == 'Transformer':
+            x_latent = self.LatentLayerNormCA(x_input + self.CrossAttention(x_latent=x_input, x_input=x_input))
+            x_latent = self.LatentLayerNormMLP(x_latent + self.MLP(x_latent))
+            for [LayerNormAtt, SelfAttention, LayerNormMLP, MLP] in self.ListSelfAttention:
+                x_latent = LayerNormAtt(x_latent + SelfAttention(x_latent))
+                x_latent = LayerNormMLP(x_latent + x_latent + MLP(x_latent))
+        else:
+            x_latent = self.xLatentInit + self.CrossAttention(x_latent=self.LatentLayerNormCA(self.xLatentInit), x_input=self.InputLayerNorm(x_input))
+            x_latent = x_latent + self.MLP(self.LatentLayerNormMLP(x_latent))
+            for [LayerNormAtt, SelfAttention, LayerNormMLP, MLP] in self.ListSelfAttention:
+                x_latent = x_latent + SelfAttention(LayerNormAtt(x_latent))
+                x_latent = x_latent + MLP(LayerNormMLP(x_latent))
         return x_latent

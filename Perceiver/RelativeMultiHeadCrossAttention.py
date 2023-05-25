@@ -111,9 +111,6 @@ class RLCA(nn.Module):
         # out.shape = (batch_size, num_heads, latent_len, d_head)
         return out
 
-    def to(self,device):
-        super().to(device)
-        self.device = device
 
     def Make_Mask(self, M):
         N = self.latent_len
@@ -132,11 +129,3 @@ class RLCA(nn.Module):
                     mat[i,k,j] = -(k-(i-j*N/M))**2/sigma
         mat = torch.softmax(mat, dim=1)
         return mat
-
-class test(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.register_buffer('bob',torch.tensor([1.]))
-
-    def remake(self):
-        self.register_buffer('bob', torch.tensor([1.]))

@@ -32,7 +32,7 @@ def LoadBatch(i,device):
     seq_len = int((temp/3) ** 0.5)
     data = data.reshape(BatchSize,3,seq_len,seq_len)
     data = data.permute(0,2,3,1)
-    data = data.reshape(BatchSize,3*seq_len,-1)
+    data = data.reshape(BatchSize,seq_len,-1)
     return data.to(device,torch.float32), MakeLabelSet(dict[b'labels']).to(device,torch.float32)
 
 def LoadValidation(device):
@@ -43,32 +43,35 @@ def LoadValidation(device):
     seq_len = int((temp/3) ** 0.5)
     data = data.reshape(BatchSize,3,seq_len,seq_len)
     data = data.permute(0,2,3,1)
-    data = data.reshape(BatchSize,3*seq_len,-1)
+    data = data.reshape(BatchSize,seq_len,-1)
     return data.to(device,torch.float32), torch.tensor(dict[b'labels']).to(device)
 
-d_latent = 32
-d_att = 32
-d_input = 32
-num_heads = 4
+d_latent = 96
+d_att = 96
+d_input = 96
+num_heads = 12
 # d_head = d_model/num_heads = 8
-input_len = 96
-latent_len = 48
-max_len = 64
-d_out = 10
+input_len = 16
+latent_len = 32
+max_len = 32
 
 class ClassifierTransformer(nn.Module):
     def __init__(self):
         super().__init__()
-        self.Encoder = EncoderIO(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len)
-        self.FinalClassifier = FeedForward(d_in=latent_len*d_latent, d_out=10, widths=[256, 64, 32], dropout=0.05)
+        self.Encoder = EncoderIO(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len, SelfAttentionDepth=2)
+        self.DimDownScaler = FeedForward(d_latent, 32, widths=[64], dropout=0.05)
+        self.FinalClassifier = FeedForward(d_in=latent_len*32, d_out=10, widths=[256, 64, 32], dropout=0.05)
 
     def forward(self, x):
         # x_input.shape = (batch_size, input_len, d_input)
+        # y = self.Encoder(x, mode='Transformer')
         y = self.Encoder(x)
         # y.shape = (batch_size, latent_len, d_latent)
+        y = self.DimDownScaler(y)
+        # y.shape = (batch_size, latent_len, 32)
         batch_size, _, _ = y.shape
         y = y.reshape(batch_size, -1)
-        # y.shape = (batch_size, latent_len*d_latent)
+        # y.shape = (batch_size, latent_len*32)
         y = self.FinalClassifier(y)
         # y.shape = (batch_size, 10)
         return y
@@ -79,7 +82,7 @@ N = ClassifierTransformer().to(device)
 
 MiniBatchs = [list(range(100*k,100*(k+1))) for k in range(10)]
 
-optimizer = torch.optim.Adam(N.parameters(),weight_decay = 0.0001)
+optimizer = torch.optim.Adam(N.parameters(), weight_decay=0.0001)
 
 ErrorTrainingSet = []
 AccuracyValidationSet = []
@@ -91,7 +94,7 @@ for i in range(20):
     print('i = ' + str(i))
     CurrentError = 0
     for j in range(1,6):
-        BatchData, BatchLabels = LoadBatch(j,device=torch.device('cpu'))
+        BatchData, BatchLabels = LoadBatch(j, device=torch.device('cpu'))
         for LittleBatch in LittleBatchs:
             data, labels = BatchData[LittleBatch].to(device), BatchLabels[LittleBatch].to(device)
             for MiniBatch in MiniBatchs:
