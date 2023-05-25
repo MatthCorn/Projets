@@ -1,12 +1,12 @@
-from Transformer.EncoderTransformer import EncoderLayer
+from Perceiver.EncoderPerceiver import EncoderLayer
 from Transformer.EasyFeedForward import FeedForward
 import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import pickle
 
-# local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
-local = r'C:\Users\Matthieu\Documents\Python\Projets'
+local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
+# local = r'C:\Users\Matthieu\Documents\Python\Projets'
 def unpickle(file):
     with open(file, 'rb') as fo:
         dict = pickle.load(fo, encoding='bytes')
@@ -19,27 +19,28 @@ def MakeLabelSet(x):
     return out
 
 def PlotImage(i,data):
-    im = torch.tensor(data[i]).reshape(3,32,32)
+    im = data[i].reshape(3,32,32)
     im = im.permute(1,2,0)
     plt.imshow(im.numpy())
     plt.show()
 
-def LoadBatch(i,device):
+def LoadBatch(i,device,config=None):
     dict = unpickle(local + r'\CIFAR10Classifier\data_batch_' + str(i))
     data = torch.tensor(dict[b'data'])
     # data.shape = (BatchSize,3*dimx*dimy)
     BatchSize, temp = data.shape
     seq_len = int((temp/3) ** 0.5)
-    data = data.reshape(BatchSize,3,seq_len,seq_len)
+    data = data.reshape(BatchSize, 3, seq_len, seq_len)
     data = data.transpose(1, 2)
     if config != None:
-        data = data.reshape(BatchSize, 3 * seq_len, -1)
-    else:
         data = data.reshape(BatchSize, -1, 3 * seq_len)
-    # data.shape = (batch_size, seq_len, d_model)
+    else:
+        data = data.reshape(BatchSize, 3*seq_len, -1)
+    # data.shape = (batch_size, input_len, d_input)
     return data.to(device,torch.float32), MakeLabelSet(dict[b'labels']).to(device,torch.float32)
 
-def LoadValidation(device, config=None):
+
+def LoadValidation(device,config=None):
     dict = unpickle(local + r'\CIFAR10Classifier\test_batch')
     data = torch.tensor(dict[b'data'])
     # data.shape = (BatchSize,3*dimx*dimy)
@@ -47,42 +48,44 @@ def LoadValidation(device, config=None):
     seq_len = int((temp/3) ** 0.5)
     data = data.reshape(BatchSize,3,seq_len,seq_len)
     data = data.transpose(1, 2)
-    if config != None:
-        data = data.reshape(BatchSize, 3 * seq_len, -1)
-    else:
+    if config != None :
         data = data.reshape(BatchSize, -1, 3 * seq_len)
-    # data.shape = (batch_size, seq_len, d_model)
+    else:
+        data = data.reshape(BatchSize, 3 * seq_len, -1)
+    # data.shape = (batch_size, input_len, d_input)
     return data.to(device,torch.float32), torch.tensor(dict[b'labels']).to(device)
 
-d_model = 96
-num_heads = 12
+d_latent = 32
+d_att = 32
+d_input = 32
+num_heads = 4
 # d_head = d_model/num_heads = 8
-seq_len = 32
+input_len = 96
+latent_len = 48
 max_len = 64
 d_out = 10
 
 class ClassifierTransformer(nn.Module):
     def __init__(self):
         super().__init__()
-        self.FirstEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=80, MHADropout=0.1, FFDropout=0.05, masked=False)
-        self.SecondEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=80, MHADropout=0.1, FFDropout=0.05, masked=False)
-        self.ThirdEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=80, MHADropout=0.1, FFDropout=0.05, masked=False)
-        self.DimDownScaler = FeedForward(d_model, 32, widths=[64], dropout=0.05)
-        self.FinalClassifier = FeedForward(seq_len*32, 10, widths=[256,64,32], dropout=0.05)
+        # self.xLatentInit = nn.parameter.Parameter(torch.normal(mean=torch.zeros(1, latent_len, d_latent)))
+        self.register_buffer("xLatentInit", torch.zeros(1, latent_len, d_latent))
+        self.EncoderLayer1 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len)
+        self.EncoderLayer2 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len)
+        self.EncoderLayer3 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len)
+        self.FinalClassifier = FeedForward(d_in=d_latent, d_out=10, widths=[16], dropout=0.05)
 
-    def forward(self,x):
-        # x.shape = (batch_size, seq_len, d_model)
-        y = self.FirstEncoder(x)
-        # y.shape = (batch_size, seq_len, d_model)
-        y = self.SecondEncoder(y)
-        # y.shape = (batch_size, seq_len, d_model)
-        y = self.ThirdEncoder(y)
-        # y.shape = (batch_size, seq_len, d_model)
-        y = self.DimDownScaler(y)
-        # y.shape = (batch_size, seq_len, 16)
-        batch_size, _, _ = y.shape
-        y = y.reshape(batch_size, -1)
-        # y.shape = (batch_size, seq_len*16)
+    def forward(self, x_input):
+        x_latent = self.xLatentInit
+        # x_latent.shape = (1, latent_len, d_latent)
+        # x_input.shape = (batch_size, input_len, d_input)
+        x_latent = self.EncoderLayer1(x_input=x_input, x_latent=x_latent)
+        # x_latent.shape = (batch_size, latent_len, d_latent)
+        x_latent = self.EncoderLayer2(x_input=x_input, x_latent=x_latent)
+        # x_latent.shape = (batch_size, latent_len, d_latent)
+        x_latent = self.EncoderLayer3(x_input=x_input, x_latent=x_latent)
+        y = torch.mean(x_latent, dim=1)
+        # y.shape = (batch_size, d_latent)
         y = self.FinalClassifier(y)
         # y.shape = (batch_size, 10)
         return y
@@ -91,21 +94,21 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 N = ClassifierTransformer().to(device)
 
-MiniBatchs = [list(range(100*k,100*(k+1))) for k in range(10)]
+MiniBatchs = [list(range(100*k, 100*(k+1))) for k in range(10)]
 
-optimizer = torch.optim.Adam(N.parameters(),weight_decay = 0.0001)
+optimizer = torch.optim.Adam(N.parameters(), weight_decay=0.0001)
 
 ErrorTrainingSet = []
 AccuracyValidationSet = []
 ValidationImageSet, ValidationLabels = LoadValidation(device=torch.device('cpu'))
 
-LittleBatchs = [list(range(1000*k,1000*(k+1))) for k in range(10)]
+LittleBatchs = [list(range(1000*k, 1000*(k+1))) for k in range(10)]
 
-for i in range(300):
+for i in range(20):
     print('i = ' + str(i))
     CurrentError = 0
     for j in range(1,6):
-        BatchData, BatchLabels = LoadBatch(j,device=torch.device('cpu'))
+        BatchData, BatchLabels = LoadBatch(j, device=torch.device('cpu'))
         for LittleBatch in LittleBatchs:
             data, labels = BatchData[LittleBatch].to(device), BatchLabels[LittleBatch].to(device)
             for MiniBatch in MiniBatchs:
@@ -123,11 +126,9 @@ for i in range(300):
             Err += torch.count_nonzero(torch.argmax(N(data), dim=1) - labels)
         AccuracyValidationSet.append(float(1 - Err / len(ValidationLabels)))
 
-fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
+fig, ((ax1, ax2)) = plt.subplots(2, 1)
 ax1.plot(AccuracyValidationSet); ax1.set_title("Précision sur l'ensemble de validation")
 ax2.plot(ErrorTrainingSet); ax2.set_title("Erreur sur l'ensemble de test")
-ax3.plot(torch.norm(N.FirstEncoder.MultiHeadAttention.Er,dim=1).cpu().detach().numpy()); ax3.set_title("Norme de Er sur le premier encodeur")
-ax4.plot(torch.norm(N.SecondEncoder.MultiHeadAttention.Er,dim=1).cpu().detach().numpy()); ax4.set_title("Norme de Er sur le second encodeur")
 plt.show()
 
 print(sum(p.numel() for p in N.parameters() if p.requires_grad))

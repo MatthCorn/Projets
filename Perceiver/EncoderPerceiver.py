@@ -19,9 +19,9 @@ class EncoderLayer(nn.Module):
         self.MLP2 = FeedForward(d_in=d_latent, d_out=d_latent, widths=WidthsFeedForward, dropout=FFDropout)
 
     def forward(self, x_input, x_latent):
-        x_latent = self.CrossAttentionLayer(x_Latent=self.LatentLayerNorm1(x_latent), x_Input=self.InputLayerNorm1(x_input)) + x_latent
+        x_latent = self.CrossAttentionLayer(x_latent=self.LatentLayerNorm1(x_latent), x_input=self.InputLayerNorm1(x_input)) + x_latent
         x_latent = x_latent + self.MLP1(self.LatentLayerNorm2(x_latent))
-        x_latent = self.SelfAttentionLayer(x_Latent=self.LatentLayerNorm3(x_latent), x_Input=self.InputLayerNorm2(x_input)) + x_latent
+        x_latent = self.SelfAttentionLayer(self.LatentLayerNorm3(x_latent)) + x_latent
         x_latent = x_latent + self.MLP2(self.LatentLayerNorm2(x_latent))
         return x_latent
 

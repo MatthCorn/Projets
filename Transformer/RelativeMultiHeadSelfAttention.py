@@ -61,7 +61,6 @@ class RMHSA(nn.Module):
         # out.shape = (batch_size, seq_len, d_model)
         return self.dropout(out)
 
-    # This is much more efficient than PersonalSkew when dimensions go numberous and/or high
     def NotSkew(self,QEr):
         # QEr.shape = (batch_size, num_heads, seq_len, 2*seq_len-1)
         padded_1 = F.pad(QEr, (0, 1))

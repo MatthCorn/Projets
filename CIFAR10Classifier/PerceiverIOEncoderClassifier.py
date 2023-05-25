@@ -19,31 +19,40 @@ def MakeLabelSet(x):
     return out
 
 def PlotImage(i,data):
-    im = torch.tensor(data[i]).reshape(3,32,32)
+    im = data[i].reshape(3,32,32)
     im = im.permute(1,2,0)
     plt.imshow(im.numpy())
     plt.show()
 
-def LoadBatch(i,device):
+def LoadBatch(i,device,config=None):
     dict = unpickle(local + r'\CIFAR10Classifier\data_batch_' + str(i))
     data = torch.tensor(dict[b'data'])
     # data.shape = (BatchSize,3*dimx*dimy)
     BatchSize, temp = data.shape
     seq_len = int((temp/3) ** 0.5)
-    data = data.reshape(BatchSize,3,seq_len,seq_len)
-    data = data.permute(0,2,3,1)
-    data = data.reshape(BatchSize,3*seq_len,-1)
+    data = data.reshape(BatchSize, 3, seq_len, seq_len)
+    data = data.transpose(1, 2)
+    if config != None:
+        data = data.reshape(BatchSize, -1, 3 * seq_len)
+    else:
+        data = data.reshape(BatchSize, 3*seq_len, -1)
+    # data.shape = (batch_size, input_len, d_input)
     return data.to(device,torch.float32), MakeLabelSet(dict[b'labels']).to(device,torch.float32)
 
-def LoadValidation(device):
+
+def LoadValidation(device,config=None):
     dict = unpickle(local + r'\CIFAR10Classifier\test_batch')
     data = torch.tensor(dict[b'data'])
     # data.shape = (BatchSize,3*dimx*dimy)
     BatchSize, temp = data.shape
     seq_len = int((temp/3) ** 0.5)
     data = data.reshape(BatchSize,3,seq_len,seq_len)
-    data = data.permute(0,2,3,1)
-    data = data.reshape(BatchSize,3*seq_len,-1)
+    data = data.transpose(1, 2)
+    if config != None :
+        data = data.reshape(BatchSize, -1, 3 * seq_len)
+    else:
+        data = data.reshape(BatchSize, 3 * seq_len, -1)
+    # data.shape = (batch_size, input_len, d_input)
     return data.to(device,torch.float32), torch.tensor(dict[b'labels']).to(device)
 
 d_latent = 32
@@ -59,16 +68,15 @@ d_out = 10
 class ClassifierTransformer(nn.Module):
     def __init__(self):
         super().__init__()
-        self.Encoder = EncoderIO(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len)
-        self.FinalClassifier = FeedForward(d_in=latent_len*d_latent, d_out=10, widths=[256, 64, 32], dropout=0.05)
+        self.Encoder = EncoderIO(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len, SelfAttentionDepth=4)
+        self.FinalClassifier = FeedForward(d_in=d_latent, d_out=10, widths=[16], dropout=0.05)
 
     def forward(self, x):
         # x_input.shape = (batch_size, input_len, d_input)
         y = self.Encoder(x)
         # y.shape = (batch_size, latent_len, d_latent)
-        batch_size, _, _ = y.shape
-        y = y.reshape(batch_size, -1)
-        # y.shape = (batch_size, latent_len*d_latent)
+        y = torch.mean(y, dim=1)
+        # y.shape = (batch_size, d_latent)
         y = self.FinalClassifier(y)
         # y.shape = (batch_size, 10)
         return y
@@ -77,21 +85,21 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 N = ClassifierTransformer().to(device)
 
-MiniBatchs = [list(range(100*k,100*(k+1))) for k in range(10)]
+MiniBatchs = [list(range(100*k, 100*(k+1))) for k in range(10)]
 
-optimizer = torch.optim.Adam(N.parameters(),weight_decay = 0.0001)
+optimizer = torch.optim.Adam(N.parameters(), weight_decay=0.0001)
 
 ErrorTrainingSet = []
 AccuracyValidationSet = []
 ValidationImageSet, ValidationLabels = LoadValidation(device=torch.device('cpu'))
 
-LittleBatchs = [list(range(1000*k,1000*(k+1))) for k in range(10)]
+LittleBatchs = [list(range(1000*k, 1000*(k+1))) for k in range(10)]
 
-for i in range(200):
+for i in range(100):
     print('i = ' + str(i))
     CurrentError = 0
     for j in range(1,6):
-        BatchData, BatchLabels = LoadBatch(j,device=torch.device('cpu'))
+        BatchData, BatchLabels = LoadBatch(j, device=torch.device('cpu'))
         for LittleBatch in LittleBatchs:
             data, labels = BatchData[LittleBatch].to(device), BatchLabels[LittleBatch].to(device)
             for MiniBatch in MiniBatchs:
