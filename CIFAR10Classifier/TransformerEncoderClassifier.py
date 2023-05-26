@@ -24,7 +24,7 @@ def PlotImage(i,data):
     plt.imshow(im.numpy())
     plt.show()
 
-def LoadBatch(i,device):
+def LoadBatch(i,device,config=None):
     dict = unpickle(local + r'\CIFAR10Classifier\data_batch_' + str(i))
     data = torch.tensor(dict[b'data'])
     # data.shape = (BatchSize,3*dimx*dimy)

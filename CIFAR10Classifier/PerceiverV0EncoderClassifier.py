@@ -5,8 +5,8 @@ import torch
 import torch.nn as nn
 import pickle
 
-local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
-# local = r'C:\Users\Matthieu\Documents\Python\Projets'
+# local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
+local = r'C:\Users\Matthieu\Documents\Python\Projets'
 def unpickle(file):
     with open(file, 'rb') as fo:
         dict = pickle.load(fo, encoding='bytes')
@@ -61,19 +61,22 @@ d_input = 32
 num_heads = 4
 # d_head = d_model/num_heads = 8
 input_len = 96
-latent_len = 48
+latent_len = 32
 max_len = 64
 d_out = 10
 
 class ClassifierTransformer(nn.Module):
     def __init__(self):
         super().__init__()
-        self.xLatentInit = nn.parameter.Parameter(torch.normal(mean=torch.zeros(1, latent_len, d_latent)))
-        # self.register_buffer("xLatentInit", torch.zeros(1, latent_len, d_latent))
+        # self.xLatentInit = nn.parameter.Parameter(torch.normal(mean=torch.zeros(1, latent_len, d_latent)))
+        self.register_buffer("xLatentInit", torch.zeros(1, latent_len, d_latent))
         self.EncoderLayer1 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len)
         self.EncoderLayer2 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len)
         self.EncoderLayer3 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len)
-        self.FinalClassifier = FeedForward(d_in=d_latent, d_out=10, widths=[16], dropout=0.05)
+        self.EncoderLayer4 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len)
+        self.EncoderLayer5 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len)
+        self.FinalClassifier = FeedForward(latent_len*d_latent, 10, widths=[256, 64, 32], dropout=0.05)
+        # self.FinalClassifier = FeedForward(d_in=d_latent, d_out=10, widths=[16], dropout=0.05)
 
     def forward(self, x_input):
         x_latent = self.xLatentInit
@@ -84,8 +87,13 @@ class ClassifierTransformer(nn.Module):
         x_latent = self.EncoderLayer2(x_input=x_input, x_latent=x_latent)
         # x_latent.shape = (batch_size, latent_len, d_latent)
         x_latent = self.EncoderLayer3(x_input=x_input, x_latent=x_latent)
-        y = torch.mean(x_latent, dim=1)
-        # y.shape = (batch_size, d_latent)
+        x_latent = self.EncoderLayer4(x_input=x_input, x_latent=x_latent)
+        x_latent = self.EncoderLayer5(x_input=x_input, x_latent=x_latent)
+        batch_size, _, _ = x_latent.shape
+        y = x_latent.reshape(batch_size, -1)
+        # y.shape = (batch_size, seq_len*16)
+        # y = torch.mean(x_latent, dim=1)
+        # # y.shape = (batch_size, d_latent)
         y = self.FinalClassifier(y)
         # y.shape = (batch_size, 10)
         return y
@@ -94,9 +102,9 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 N = ClassifierTransformer().to(device)
 
-MiniBatchs = [list(range(100*k, 100*(k+1))) for k in range(10)]
+MiniBatchs = [list(range(100*k, 100*(k+1))) for k in range(5)]
 
-optimizer = torch.optim.Adam(N.parameters(), weight_decay=0.0001)
+optimizer = torch.optim.Adam(N.parameters(),weight_decay=1e-6)
 
 ErrorTrainingSet = []
 AccuracyValidationSet = []
@@ -104,7 +112,7 @@ ValidationImageSet, ValidationLabels = LoadValidation(device=torch.device('cpu')
 
 LittleBatchs = [list(range(500*k, 500*(k+1))) for k in range(20)]
 
-for i in range(20):
+for i in range(100):
     print('i = ' + str(i))
     CurrentError = 0
     for j in range(1,6):
