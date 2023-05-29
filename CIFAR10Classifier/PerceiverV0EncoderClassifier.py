@@ -1,72 +1,19 @@
 from Perceiver.EncoderPerceiver import EncoderLayer
 from Transformer.EasyFeedForward import FeedForward
+from CIFAR10Classifier.Config import config
 import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
-import pickle
 
-# local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
-local = r'C:\Users\Matthieu\Documents\Python\Projets'
-def unpickle(file):
-    with open(file, 'rb') as fo:
-        dict = pickle.load(fo, encoding='bytes')
-    return dict
+local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
+# local = r'C:\Users\Matthieu\Documents\Python\Projets'
 
-def MakeLabelSet(x):
-    out = torch.zeros(len(x),10)
-    for i in range(len(x)):
-        out[i,int(x[i])] = 1
-    return out
+LocalConfig = config(config=2)
+LocalConfig.AddParam(d_latent=32, d_att=32, num_heads=4, latent_len=32, max_len=64, d_out=10)
 
-def PlotImage(i,data):
-    im = data[i].reshape(3,32,32)
-    im = im.permute(1,2,0)
-    plt.imshow(im.numpy())
-    plt.show()
-
-def LoadBatch(i,device,config=None):
-    dict = unpickle(local + r'\CIFAR10Classifier\data_batch_' + str(i))
-    data = torch.tensor(dict[b'data'])
-    # data.shape = (BatchSize,3*dimx*dimy)
-    BatchSize, temp = data.shape
-    seq_len = int((temp/3) ** 0.5)
-    data = data.reshape(BatchSize, 3, seq_len, seq_len)
-    data = data.transpose(1, 2)
-    if config != None:
-        data = data.reshape(BatchSize, -1, 3 * seq_len)
-    else:
-        data = data.reshape(BatchSize, 3*seq_len, -1)
-    # data.shape = (batch_size, input_len, d_input)
-    return data.to(device,torch.float32), MakeLabelSet(dict[b'labels']).to(device,torch.float32)
-
-
-def LoadValidation(device,config=None):
-    dict = unpickle(local + r'\CIFAR10Classifier\test_batch')
-    data = torch.tensor(dict[b'data'])
-    # data.shape = (BatchSize,3*dimx*dimy)
-    BatchSize, temp = data.shape
-    seq_len = int((temp/3) ** 0.5)
-    data = data.reshape(BatchSize,3,seq_len,seq_len)
-    data = data.transpose(1, 2)
-    if config != None :
-        data = data.reshape(BatchSize, -1, 3 * seq_len)
-    else:
-        data = data.reshape(BatchSize, 3 * seq_len, -1)
-    # data.shape = (batch_size, input_len, d_input)
-    return data.to(device,torch.float32), torch.tensor(dict[b'labels']).to(device)
-
-d_latent = 32
-d_att = 32
-d_input = 32
-num_heads = 4
-# d_head = d_model/num_heads = 8
-input_len = 96
-latent_len = 32
-max_len = 64
-d_out = 10
-
-class ClassifierTransformer(nn.Module):
-    def __init__(self):
+class ClassifierPerceiver(nn.Module):
+    def __init__(self, d_latent=LocalConfig.d_latent, d_input=LocalConfig.d_input, d_att=LocalConfig.d_att,
+                 num_heads=LocalConfig.num_heads, latent_len=LocalConfig.latent_len):
         super().__init__()
         # self.xLatentInit = nn.parameter.Parameter(torch.normal(mean=torch.zeros(1, latent_len, d_latent)))
         self.register_buffer("xLatentInit", torch.zeros(1, latent_len, d_latent))
@@ -100,15 +47,15 @@ class ClassifierTransformer(nn.Module):
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-N = ClassifierTransformer().to(device)
+N = ClassifierPerceiver().to(device)
 
 MiniBatchs = [list(range(100*k, 100*(k+1))) for k in range(5)]
 
-optimizer = torch.optim.Adam(N.parameters(),weight_decay=1e-6)
+optimizer = torch.optim.Adam(N.parameters(), weight_decay=1e-6)
 
 ErrorTrainingSet = []
 AccuracyValidationSet = []
-ValidationImageSet, ValidationLabels = LoadValidation(device=torch.device('cpu'))
+ValidationImageSet, ValidationLabels = LocalConfig.LoadValidation(local)
 
 LittleBatchs = [list(range(500*k, 500*(k+1))) for k in range(20)]
 
@@ -116,7 +63,7 @@ for i in range(100):
     print('i = ' + str(i))
     CurrentError = 0
     for j in range(1,6):
-        BatchData, BatchLabels = LoadBatch(j, device=torch.device('cpu'))
+        BatchData, BatchLabels = LocalConfig.LoadBatch(j, local)
         for LittleBatch in LittleBatchs:
             data, labels = BatchData[LittleBatch].to(device), BatchLabels[LittleBatch].to(device)
             for MiniBatch in MiniBatchs:

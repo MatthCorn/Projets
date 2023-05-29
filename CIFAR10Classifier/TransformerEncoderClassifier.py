@@ -1,76 +1,26 @@
 from Transformer.EncoderTransformer import EncoderLayer
 from Transformer.EasyFeedForward import FeedForward
+from CIFAR10Classifier.Config import config
 import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
-import pickle
 
-# local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
-local = r'C:\Users\Matthieu\Documents\Python\Projets'
-def unpickle(file):
-    with open(file, 'rb') as fo:
-        dict = pickle.load(fo, encoding='bytes')
-    return dict
+local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
+# local = r'C:\Users\Matthieu\Documents\Python\Projets'
 
-def MakeLabelSet(x):
-    out = torch.zeros(len(x),10)
-    for i in range(len(x)):
-        out[i,int(x[i])] = 1
-    return out
-
-def PlotImage(i,data):
-    im = torch.tensor(data[i]).reshape(3,32,32)
-    im = im.permute(1,2,0)
-    plt.imshow(im.numpy())
-    plt.show()
-
-def LoadBatch(i,device,config=None):
-    dict = unpickle(local + r'\CIFAR10Classifier\data_batch_' + str(i))
-    data = torch.tensor(dict[b'data'])
-    # data.shape = (BatchSize,3*dimx*dimy)
-    BatchSize, temp = data.shape
-    seq_len = int((temp/3) ** 0.5)
-    data = data.reshape(BatchSize,3,seq_len,seq_len)
-    data = data.transpose(1, 2)
-    if config != None:
-        data = data.reshape(BatchSize, 3 * seq_len, -1)
-    else:
-        data = data.reshape(BatchSize, -1, 3 * seq_len)
-    # data.shape = (batch_size, seq_len, d_model)
-    return data.to(device,torch.float32), MakeLabelSet(dict[b'labels']).to(device,torch.float32)
-
-def LoadValidation(device, config=None):
-    dict = unpickle(local + r'\CIFAR10Classifier\test_batch')
-    data = torch.tensor(dict[b'data'])
-    # data.shape = (BatchSize,3*dimx*dimy)
-    BatchSize, temp = data.shape
-    seq_len = int((temp/3) ** 0.5)
-    data = data.reshape(BatchSize,3,seq_len,seq_len)
-    data = data.transpose(1, 2)
-    if config != None:
-        data = data.reshape(BatchSize, 3 * seq_len, -1)
-    else:
-        data = data.reshape(BatchSize, -1, 3 * seq_len)
-    # data.shape = (batch_size, seq_len, d_model)
-    return data.to(device,torch.float32), torch.tensor(dict[b'labels']).to(device)
-
-d_model = 96
-num_heads = 12
-# d_head = d_model/num_heads = 8
-seq_len = 32
-max_len = 64
-d_out = 10
+LocalConfig = config(config=0) # config=# 1 bug !
+LocalConfig.AddParam(d_att=LocalConfig.d_input, max_len=64, d_out=10)
 
 class ClassifierTransformer(nn.Module):
-    def __init__(self):
+    def __init__(self, d_model=LocalConfig.d_input, num_heads=LocalConfig.num_heads, seq_len=LocalConfig.latent_len):
         super().__init__()
         self.FirstEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=80, MHADropout=0.1, FFDropout=0.05, masked=False)
         self.SecondEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=80, MHADropout=0.1, FFDropout=0.05, masked=False)
         self.ThirdEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=80, MHADropout=0.1, FFDropout=0.05, masked=False)
         self.DimDownScaler = FeedForward(d_model, 32, widths=[64], dropout=0.05)
-        self.FinalClassifier = FeedForward(seq_len*32, 10, widths=[256,64,32], dropout=0.05)
+        self.FinalClassifier = FeedForward(seq_len*32, 10, widths=[256, 64, 32], dropout=0.05)
 
-    def forward(self,x):
+    def forward(self, x):
         # x.shape = (batch_size, seq_len, d_model)
         y = self.FirstEncoder(x)
         # y.shape = (batch_size, seq_len, d_model)
@@ -93,11 +43,11 @@ N = ClassifierTransformer().to(device)
 
 MiniBatchs = [list(range(100*k,100*(k+1))) for k in range(10)]
 
-optimizer = torch.optim.Adam(N.parameters(),weight_decay = 0.0001)
+optimizer = torch.optim.Adam(N.parameters(), weight_decay=0.0001)
 
 ErrorTrainingSet = []
 AccuracyValidationSet = []
-ValidationImageSet, ValidationLabels = LoadValidation(device=torch.device('cpu'))
+ValidationImageSet, ValidationLabels = LocalConfig.LoadValidation(local)
 
 LittleBatchs = [list(range(1000*k,1000*(k+1))) for k in range(10)]
 
@@ -105,7 +55,7 @@ for i in range(300):
     print('i = ' + str(i))
     CurrentError = 0
     for j in range(1,6):
-        BatchData, BatchLabels = LoadBatch(j,device=torch.device('cpu'))
+        BatchData, BatchLabels = LocalConfig.LoadBatch(j, local)
         for LittleBatch in LittleBatchs:
             data, labels = BatchData[LittleBatch].to(device), BatchLabels[LittleBatch].to(device)
             for MiniBatch in MiniBatchs:
