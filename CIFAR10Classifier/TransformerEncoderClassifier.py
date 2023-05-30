@@ -14,9 +14,9 @@ LocalConfig.AddParam(d_att=LocalConfig.d_input, max_len=64, d_out=10)
 class ClassifierTransformer(nn.Module):
     def __init__(self, d_model=LocalConfig.d_input, num_heads=LocalConfig.num_heads, seq_len=LocalConfig.input_len):
         super().__init__()
-        self.FirstEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=100, MHADropout=0.1, FFDropout=0.05, masked=False)
-        self.SecondEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=100, MHADropout=0.1, FFDropout=0.05, masked=False)
-        self.ThirdEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=100, MHADropout=0.1, FFDropout=0.05, masked=False)
+        self.FirstEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=seq_len, MHADropout=0.1, FFDropout=0.05, masked=False)
+        self.SecondEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=seq_len, MHADropout=0.1, FFDropout=0.05, masked=False)
+        self.ThirdEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=seq_len, MHADropout=0.1, FFDropout=0.05, masked=False)
         self.DimDownScaler = FeedForward(d_model, 32, widths=[64], dropout=0.05)
         self.FinalClassifier = FeedForward(seq_len*32, 10, widths=[256, 64, 32], dropout=0.05)
 

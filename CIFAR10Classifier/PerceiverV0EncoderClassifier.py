@@ -1,3 +1,5 @@
+import filelock
+
 from Perceiver.EncoderPerceiver import EncoderLayer
 from Transformer.EasyFeedForward import FeedForward
 from CIFAR10Classifier.Config import config
@@ -8,12 +10,12 @@ import torch.nn as nn
 local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
 # local = r'C:\Users\Matthieu\Documents\Python\Projets'
 
-LocalConfig = config(config=2)
+LocalConfig = config(config=0)
 LocalConfig.AddParam(d_latent=32, d_att=32, num_heads=4, latent_len=32, max_len=64, d_out=10)
 
 class ClassifierPerceiver(nn.Module):
     def __init__(self, d_latent=LocalConfig.d_latent, d_input=LocalConfig.d_input, d_att=LocalConfig.d_att,
-                 num_heads=LocalConfig.num_heads, latent_len=LocalConfig.latent_len):
+                 num_heads=LocalConfig.num_heads, latent_len=LocalConfig.latent_len, CEloss=False):
         super().__init__()
         # self.xLatentInit = nn.parameter.Parameter(torch.normal(mean=torch.zeros(1, latent_len, d_latent)))
         self.register_buffer("xLatentInit", torch.zeros(1, latent_len, d_latent))
@@ -23,6 +25,10 @@ class ClassifierPerceiver(nn.Module):
         self.EncoderLayer4 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len)
         self.EncoderLayer5 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len)
         self.FinalClassifier = FeedForward(latent_len*d_latent, 10, widths=[256, 64, 32], dropout=0.05)
+        self.CEloss = CEloss
+        if self.CEloss:
+            # In case of using Cross-Entropy type loss function
+            self.SoftMax = nn.Softmax(dim=-1)
         # self.FinalClassifier = FeedForward(d_in=d_latent, d_out=10, widths=[16], dropout=0.05)
 
     def forward(self, x_input):
@@ -43,15 +49,19 @@ class ClassifierPerceiver(nn.Module):
         # # y.shape = (batch_size, d_latent)
         y = self.FinalClassifier(y)
         # y.shape = (batch_size, 10)
+        if self.CEloss:
+            # In case of using Cross-Entropy type loss function
+            y = self.SoftMax(y)
         return y
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-N = ClassifierPerceiver().to(device)
+N = ClassifierPerceiver(CEloss=True).to(device)
 
 MiniBatchs = [list(range(100*k, 100*(k+1))) for k in range(5)]
 
-optimizer = torch.optim.Adam(N.parameters(), weight_decay=1e-6)
+optimizer = torch.optim.Adam(N.parameters(), weight_decay=1e-9)
+loss = nn.CrossEntropyLoss()
 
 ErrorTrainingSet = []
 AccuracyValidationSet = []
@@ -59,7 +69,7 @@ ValidationImageSet, ValidationLabels = LocalConfig.LoadValidation(local)
 
 LittleBatchs = [list(range(500*k, 500*(k+1))) for k in range(20)]
 
-for i in range(100):
+for i in range(30):
     print('i = ' + str(i))
     CurrentError = 0
     for j in range(1,6):
@@ -69,7 +79,8 @@ for i in range(100):
             for MiniBatch in MiniBatchs:
 
                 optimizer.zero_grad()
-                err = torch.norm(N(data[MiniBatch]) - labels[MiniBatch])
+                err = loss(N(data[MiniBatch]), labels[MiniBatch])
+                # err = torch.norm(N(data[MiniBatch]) - labels[MiniBatch])
                 err.backward()
                 optimizer.step()
                 CurrentError += float(err)

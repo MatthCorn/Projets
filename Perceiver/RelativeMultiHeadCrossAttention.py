@@ -6,7 +6,7 @@ import torch.nn.functional as F
 
 #Relative Latent Cross Attention
 class RLCA(nn.Module):
-    def __init__(self, d_latent, d_input, d_att, num_heads, latent_len=32, max_len=64, dropout=0.1, masked=True):
+    def __init__(self, d_latent, d_input, d_att, num_heads, latent_len=32, max_len=64, dropout=0.1, masked=True, relative=True):
         super().__init__()
         d_head, remainder = divmod(d_att, num_heads)
         if remainder:
@@ -24,7 +24,9 @@ class RLCA(nn.Module):
         self.query = nn.Linear(d_latent, d_att)
         self.finalLinear = nn.Linear(d_att, d_latent)
         self.dropout = nn.Dropout(dropout)
-        self.Er = nn.Parameter(torch.randn(2*latent_len-1, d_head))
+        self.relative = relative
+        if self.relative:
+            self.Er = nn.Parameter(torch.randn(2*latent_len-1, d_head))
         self.masked = masked
         if self.masked:
             self.register_buffer("mask", self.MakeMask(self.latent_len, max_len).unsqueeze(0).unsqueeze(0))
@@ -47,9 +49,12 @@ class RLCA(nn.Module):
         # Q.shape = (batch_size, num_heads, latent_len, d_head)
         # OR
         # Q.shape = (1, num_heads, latent_len, d_head)
+        Ert = None
+        if self.relative:
+            Ert = self.Er.transpose(0, 1)
+            # Ert.shape = (d_head, 2*latent_len-1)
 
-        Ert = self.Er.transpose(0, 1)
-        # Ert.shape = (d_head, 2*latent_len-1)
+        mask = None
         if self.masked:
             if self.LenInputsMask != input_len:
                 self.register_buffer("mask", self.MakeMask(self.latent_len, max_len).unsqueeze(0).unsqueeze(0).to(self.Er.device))
@@ -57,9 +62,8 @@ class RLCA(nn.Module):
 
             mask = self.mask
             # mask.shape = (1, 1, latent_len, input_len)
-            RCA = self.RelativeCrossAttention(Q, Kt, Ert, V, input_len, Mask=mask)
-        else:
-            RCA = self.RelativeCrossAttention(Q, Kt, Ert, V, input_len)
+
+        RCA = self.RelativeCrossAttention(Q, Kt, Ert, V, input_len, Mask=mask)
         # RCA.shape = (batch_size, num_heads, latent_len, d_head)
 
         Concat = RCA.transpose(1,2).reshape(batch_size,self.latent_len,-1)
@@ -70,38 +74,44 @@ class RLCA(nn.Module):
 
     def RelativeCrossAttention(self, Q, Kt, Ert, V, input_len, Mask=None):
         Dh = self.d_head
-        # Ert.shape = (d_head, 2*latent_len-1)
-        QEr = torch.matmul(Q, Ert)
-        # QEr.shape = (batch_size, num_heads, latent_len, 2*latent_len-1)
-        # OR
-        # QEr.shape = (1, num_heads, latent_len, 2*latent_len-1)
-        # V.shape = (batch_size, num_heads, input_len, d_head)
-        if self.previousInputLen != input_len:
-            self.register_buffer("ConvDistrib", self.Weight(M=input_len, sigma=1.5).to(self.Er.device))
-            self.previousInputLen = input_len
-
-        # ConvDistrib.shape = (latent_len, 2*latent_len-1, input_len)
-
-        QEr = QEr.unsqueeze(dim=-2)
-        # QEr.shape = (batch_size, num_heads, latent_len, 1, 2*latent_len-1)
-        # OR
-        # QEr.shape = (1, num_heads, latent_len, 1, 2*latent_len-1)
-
-        # Here we want the i-th vector of QEr (shape = (1, 2*latent_len-1)) to be multiplied with the i-th matrix of ConvDistrib (shape = (2*latent_len-1, input_len)),
-        # i in [1; latent_len], in order to get a matrix of the shape (latent_len, input_len)
-
-        Srel = torch.matmul(QEr,self.ConvDistrib)
-        # Srel.shape = (batch_size, num_heads, latent_len, 1, input_len)
-        # OR
-        # Srel.shape = (1, num_heads, latent_len, 1, input_len)
-        Srel = Srel.squeeze(dim=-2)
-        # Srel.shape = (batch_size, num_heads, latent_len, input_len)
-        # OR
-        # Srel.shape = (1, num_heads, latent_len, input_len)
 
         QKt = torch.matmul(Q, Kt)
         # QKt.shape = (batch_size, num_heads, latent_len, input_len)
-        Attention = (QKt + Srel) / math.sqrt(Dh)
+
+        if Ert is not None:
+            # Ert.shape = (d_head, 2*latent_len-1)
+            QEr = torch.matmul(Q, Ert)
+            # QEr.shape = (batch_size, num_heads, latent_len, 2*latent_len-1)
+            # OR
+            # QEr.shape = (1, num_heads, latent_len, 2*latent_len-1)
+            # V.shape = (batch_size, num_heads, input_len, d_head)
+            if self.previousInputLen != input_len:
+                self.register_buffer("ConvDistrib", self.Weight(M=input_len, sigma=1.5).to(self.Er.device))
+                self.previousInputLen = input_len
+
+            # ConvDistrib.shape = (latent_len, 2*latent_len-1, input_len)
+
+            QEr = QEr.unsqueeze(dim=-2)
+            # QEr.shape = (batch_size, num_heads, latent_len, 1, 2*latent_len-1)
+            # OR
+            # QEr.shape = (1, num_heads, latent_len, 1, 2*latent_len-1)
+
+            # Here we want the i-th vector of QEr (shape = (1, 2*latent_len-1)) to be multiplied with the i-th matrix of ConvDistrib (shape = (2*latent_len-1, input_len)),
+            # i in [1; latent_len], in order to get a matrix of the shape (latent_len, input_len)
+
+            Srel = torch.matmul(QEr, self.ConvDistrib)
+            # Srel.shape = (batch_size, num_heads, latent_len, 1, input_len)
+            # OR
+            # Srel.shape = (1, num_heads, latent_len, 1, input_len)
+            Srel = Srel.squeeze(dim=-2)
+            # Srel.shape = (batch_size, num_heads, latent_len, input_len)
+            # OR
+            # Srel.shape = (1, num_heads, latent_len, input_len)
+
+
+            Attention = (QKt + Srel) / math.sqrt(Dh)
+        else:
+            Attention = QKt / math.sqrt(Dh)
         # Attention.shape = (batch_size, num_heads, latent_len, input_len)
         if Mask is not None:
             # Mask.shape = (1, 1, latent_len, input_len)
@@ -114,18 +124,18 @@ class RLCA(nn.Module):
 
     def Make_Mask(self, M):
         N = self.latent_len
-        mat = torch.zeros((N,M))
+        mat = torch.zeros((N, M))
         for i in range(N):
             for j in range(M):
-                mat[i,j] = i/N >= j/M
+                mat[i, j] = i/N >= j/M
         return mat
 
     def Weight(self, M, sigma):
         N = self.latent_len
-        mat = torch.zeros((N,2*N-1,M))
+        mat = torch.zeros((N, 2*N-1, M))
         for i in range(N):
             for j in range(M):
                 for k in range(2*N-1):
-                    mat[i,k,j] = -(k-(i-j*N/M))**2/sigma
+                    mat[i, k, j] = -(k-(i-j*N/M))**2/sigma
         mat = torch.softmax(mat, dim=1)
         return mat
