@@ -6,16 +6,18 @@ from Perceiver.RelativeMultiHeadCrossAttention import RLCA
 
 class EncoderLayer(nn.Module):
     def __init__(self, d_latent, d_input, d_att, num_heads, latent_len=16, WidthsFeedForward=[64],
-                 max_len=64, ADropout=0.1, FFDropout=0.1, masked=False):
+                 max_len=64, ADropout=0.1, FFDropout=0.1, masked=False, relative=True):
         super().__init__()
         self.LatentLayerNorm1 = nn.LayerNorm(d_latent)
         self.InputLayerNorm1 = nn.LayerNorm(d_input)
-        self.CrossAttentionLayer = RLCA(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len, max_len=max_len, dropout=ADropout, masked=masked)
+        self.CrossAttentionLayer = RLCA(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len,
+                                        max_len=max_len, dropout=ADropout, masked=masked, relative=relative)
         self.LatentLayerNorm2 = nn.LayerNorm(d_latent)
         self.MLP1 = FeedForward(d_in=d_latent, d_out=d_latent, widths=WidthsFeedForward, dropout=FFDropout)
         self.LatentLayerNorm3 = nn.LayerNorm(d_latent)
         self.InputLayerNorm2 = nn.LayerNorm(d_input)
-        self.SelfAttentionLayer = RMHSA(d_model=d_latent, d_att=d_att, num_heads=num_heads, max_len=max_len, dropout=ADropout, masked=masked)
+        self.SelfAttentionLayer = RMHSA(d_model=d_latent, d_att=d_att, num_heads=num_heads, max_len=max_len,
+                                        dropout=ADropout, masked=masked, relative=relative)
         self.MLP2 = FeedForward(d_in=d_latent, d_out=d_latent, widths=WidthsFeedForward, dropout=FFDropout)
 
     def forward(self, x_input, x_latent):
@@ -26,20 +28,24 @@ class EncoderLayer(nn.Module):
         return x_latent
 
 class EncoderIO(nn.Module):
-    def __init__(self, d_latent, d_input, d_att, num_heads, latent_len=16, SelfAttentionDepth=4,
+    def __init__(self, d_latent, d_input, d_att, num_heads, latent_len=16, SelfAttentionDepth=4, relative=True,
                  WidthsFeedForward=[64], max_len=64, ADropout=0.1, FFDropout=0.1, masked=False):
         super().__init__()
-        self.xLatentInit = nn.parameter.Parameter(torch.normal(mean=torch.zeros(1,latent_len, d_latent)))
+        if relative:
+            self.register_buffer("xLatentInit", torch.zeros(1, latent_len, d_latent))
+        else:
+            self.xLatentInit = nn.parameter.Parameter(torch.normal(mean=torch.zeros(1, latent_len, d_latent)))
         self.LatentLayerNormCA = nn.LayerNorm(d_latent)
         self.InputLayerNorm = nn.LayerNorm(d_input)
-        self.CrossAttention = RLCA(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len, max_len=max_len, dropout=ADropout, masked=masked)
+        self.CrossAttention = RLCA(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads,
+                                   latent_len=latent_len, max_len=max_len, dropout=ADropout, masked=masked, relative=relative)
         self.LatentLayerNormMLP = nn.LayerNorm(d_latent)
         self.MLP = FeedForward(d_in=d_latent, d_out=d_latent, widths=WidthsFeedForward, dropout=FFDropout)
         self.ListSelfAttention = nn.ModuleList()
 
         for i in range(SelfAttentionDepth):
             self.ListSelfAttention.append(nn.ModuleList([nn.LayerNorm(d_latent),
-                                                         RMHSA(d_model=d_latent, d_att=d_att, num_heads=num_heads, max_len=max_len, dropout=ADropout, masked=masked),
+                                                         RMHSA(d_model=d_latent, d_att=d_att, num_heads=num_heads, max_len=max_len, dropout=ADropout, masked=masked, relative=relative),
                                                          nn.LayerNorm(d_latent),
                                                          FeedForward(d_in=d_latent, d_out=d_latent, widths=WidthsFeedForward, dropout=FFDropout)]))
 

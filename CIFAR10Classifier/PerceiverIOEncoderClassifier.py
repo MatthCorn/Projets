@@ -13,10 +13,10 @@ LocalConfig.AddParam(d_latent=32, d_att=32, num_heads=4, latent_len=32, max_len=
 
 
 class ClassifierPerceiver(nn.Module):
-    def __init__(self, d_latent=LocalConfig.d_latent, d_input=LocalConfig.d_input, d_att=LocalConfig.d_att,
-                 num_heads=LocalConfig.num_heads, latent_len=LocalConfig.latent_len, d_out=LocalConfig.d_out):
+    def __init__(self, d_latent=LocalConfig.d_latent, d_input=LocalConfig.d_input, d_att=LocalConfig.d_att, relative=True,
+                 latent_len=LocalConfig.latent_len, d_out=LocalConfig.d_out, num_heads=LocalConfig.num_heads):
         super().__init__()
-        self.Encoder = EncoderIO(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len, SelfAttentionDepth=4)
+        self.Encoder = EncoderIO(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len, SelfAttentionDepth=4, relative=relative)
         self.FinalClassifier = FeedForward(d_in=d_latent, d_out=d_out, widths=[16], dropout=0.05)
 
     def forward(self, x):

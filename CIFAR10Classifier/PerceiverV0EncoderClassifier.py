@@ -15,20 +15,18 @@ LocalConfig.AddParam(d_latent=32, d_att=32, num_heads=4, latent_len=32, max_len=
 
 class ClassifierPerceiver(nn.Module):
     def __init__(self, d_latent=LocalConfig.d_latent, d_input=LocalConfig.d_input, d_att=LocalConfig.d_att,
-                 num_heads=LocalConfig.num_heads, latent_len=LocalConfig.latent_len, CEloss=False):
+                 num_heads=LocalConfig.num_heads, latent_len=LocalConfig.latent_len, relative=True):
         super().__init__()
-        # self.xLatentInit = nn.parameter.Parameter(torch.normal(mean=torch.zeros(1, latent_len, d_latent)))
-        self.register_buffer("xLatentInit", torch.zeros(1, latent_len, d_latent))
-        self.EncoderLayer1 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len)
-        self.EncoderLayer2 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len)
-        self.EncoderLayer3 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len)
-        self.EncoderLayer4 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len)
-        self.EncoderLayer5 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len)
+        if relative:
+            self.register_buffer("xLatentInit", torch.zeros(1, latent_len, d_latent))
+        else :
+            self.xLatentInit = nn.parameter.Parameter(torch.normal(mean=torch.zeros(1, latent_len, d_latent)))
+        self.EncoderLayer1 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len, relative=relative)
+        self.EncoderLayer2 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len, relative=relative)
+        self.EncoderLayer3 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len, relative=relative)
+        self.EncoderLayer4 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len, relative=relative)
+        self.EncoderLayer5 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len, relative=relative)
         self.FinalClassifier = FeedForward(latent_len*d_latent, 10, widths=[256, 64, 32], dropout=0.05)
-        self.CEloss = CEloss
-        if self.CEloss:
-            # In case of using Cross-Entropy type loss function
-            self.SoftMax = nn.Softmax(dim=-1)
         # self.FinalClassifier = FeedForward(d_in=d_latent, d_out=10, widths=[16], dropout=0.05)
 
     def forward(self, x_input):
@@ -49,14 +47,11 @@ class ClassifierPerceiver(nn.Module):
         # # y.shape = (batch_size, d_latent)
         y = self.FinalClassifier(y)
         # y.shape = (batch_size, 10)
-        if self.CEloss:
-            # In case of using Cross-Entropy type loss function
-            y = self.SoftMax(y)
         return y
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-N = ClassifierPerceiver(CEloss=True).to(device)
+N = ClassifierPerceiver().to(device)
 
 MiniBatchs = [list(range(100*k, 100*(k+1))) for k in range(5)]
 
