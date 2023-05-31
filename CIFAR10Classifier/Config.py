@@ -29,7 +29,7 @@ class config():
             self.d_input = 3
             self.input_len = 1024
 
-    def LoadBatch(self, i, local, device=torch.device('cpu')):
+    def LoadBatch(self, i, local, device=torch.device('cpu'), type=torch.float32):
         dict = unpickle(local + r'\CIFAR10Classifier\data_batch_' + str(i))
         data = torch.tensor(dict[b'data'])
         # data.shape = (BatchSize,3*n*n)
@@ -41,9 +41,9 @@ class config():
             data = data.transpose(2, 3)
         data = data.reshape(BatchSize, self.input_len, self.d_input)
         # data.shape = (batch_size, input_len, d_input)
-        return data.to(device, torch.float32), MakeLabelSet(dict[b'labels']).to(device, torch.float32)
+        return data.to(device, torch.float16), MakeLabelSet(dict[b'labels']).to(device, type)
 
-    def LoadValidation(self, local, device=torch.device('cpu')):
+    def LoadValidation(self, local, device=torch.device('cpu'), type=torch.float32):
         dict = unpickle(local + r'\CIFAR10Classifier\test_batch')
         data = torch.tensor(dict[b'data'])
         # data.shape = (BatchSize,3*n*n)
@@ -55,7 +55,7 @@ class config():
             data = data.transpose(2, 3)
         data = data.reshape(BatchSize, self.input_len, self.d_input)
         # data.shape = (batch_size, input_len, d_input)
-        return data.to(device, torch.float32), torch.tensor(dict[b'labels']).to(device)
+        return data.to(device, type), torch.tensor(dict[b'labels']).to(device)
 
 
     def PlotImage(self, i, data):

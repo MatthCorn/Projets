@@ -31,11 +31,12 @@ class ClassifierPerceiver(nn.Module):
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-N = ClassifierPerceiver().to(device)
+N = ClassifierPerceiver(relative=True).to(device)
 
 MiniBatchs = [list(range(100*k, 100*(k+1))) for k in range(10)]
 
 optimizer = torch.optim.Adam(N.parameters(), weight_decay=0.0001)
+loss = nn.CrossEntropyLoss()
 
 ErrorTrainingSet = []
 AccuracyValidationSet = []
@@ -53,7 +54,8 @@ for i in range(100):
             for MiniBatch in MiniBatchs:
 
                 optimizer.zero_grad()
-                err = torch.norm(N(data[MiniBatch]) - labels[MiniBatch])
+                err = loss(N(data[MiniBatch]), labels[MiniBatch])
+                # err = torch.norm(N(data[MiniBatch]) - labels[MiniBatch])
                 err.backward()
                 optimizer.step()
                 CurrentError += float(err)

@@ -10,7 +10,7 @@ import torch.nn as nn
 local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
 # local = r'C:\Users\Matthieu\Documents\Python\Projets'
 
-LocalConfig = config(config=0)
+LocalConfig = config(config=1)
 LocalConfig.AddParam(d_latent=32, d_att=32, num_heads=4, latent_len=32, max_len=64, d_out=10)
 
 class ClassifierPerceiver(nn.Module):
@@ -50,25 +50,26 @@ class ClassifierPerceiver(nn.Module):
         return y
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+type = torch.float16
 
-N = ClassifierPerceiver().to(device)
+N = ClassifierPerceiver(relative=True).to(device, type)
 
-MiniBatchs = [list(range(100*k, 100*(k+1))) for k in range(5)]
+MiniBatchs = [list(range(100*k, 100*(k+1))) for k in range(1)]
 
 optimizer = torch.optim.Adam(N.parameters(), weight_decay=1e-9)
 loss = nn.CrossEntropyLoss()
 
 ErrorTrainingSet = []
 AccuracyValidationSet = []
-ValidationImageSet, ValidationLabels = LocalConfig.LoadValidation(local)
+ValidationImageSet, ValidationLabels = LocalConfig.LoadValidation(local, type=type)
 
-LittleBatchs = [list(range(500*k, 500*(k+1))) for k in range(20)]
+LittleBatchs = [list(range(100*k, 100*(k+1))) for k in range(100)]
 
 for i in range(30):
     print('i = ' + str(i))
     CurrentError = 0
     for j in range(1,6):
-        BatchData, BatchLabels = LocalConfig.LoadBatch(j, local)
+        BatchData, BatchLabels = LocalConfig.LoadBatch(j, local, type=type)
         for LittleBatch in LittleBatchs:
             data, labels = BatchData[LittleBatch].to(device), BatchLabels[LittleBatch].to(device)
             for MiniBatch in MiniBatchs:

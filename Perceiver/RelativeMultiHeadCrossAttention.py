@@ -57,7 +57,7 @@ class RLCA(nn.Module):
         mask = None
         if self.masked:
             if self.LenInputsMask != input_len:
-                self.register_buffer("mask", self.MakeMask(self.latent_len, max_len).unsqueeze(0).unsqueeze(0).to(self.Er.device))
+                self.register_buffer("mask", self.MakeMask(self.latent_len, input_len).unsqueeze(0).unsqueeze(0).to(self.Er.device, self.Er.dtype))
                 self.LenInputsMask = input_len
 
             mask = self.mask
@@ -66,7 +66,7 @@ class RLCA(nn.Module):
         RCA = self.RelativeCrossAttention(Q, Kt, Ert, V, input_len, Mask=mask)
         # RCA.shape = (batch_size, num_heads, latent_len, d_head)
 
-        Concat = RCA.transpose(1,2).reshape(batch_size,self.latent_len,-1)
+        Concat = RCA.transpose(1,2).reshape(batch_size, self.latent_len, -1)
         # Concat.shape = (batch_size, latent_len, d_att)
         out = self.finalLinear(Concat)
         # out.shape = (batch_size, seq_len, d_latent)
@@ -86,7 +86,7 @@ class RLCA(nn.Module):
             # QEr.shape = (1, num_heads, latent_len, 2*latent_len-1)
             # V.shape = (batch_size, num_heads, input_len, d_head)
             if self.previousInputLen != input_len:
-                self.register_buffer("ConvDistrib", self.Weight(M=input_len, sigma=1.5).to(self.Er.device))
+                self.register_buffer("ConvDistrib", self.Weight(M=input_len, sigma=1.5).to(self.Er.device, self.Er.dtype))
                 self.previousInputLen = input_len
 
             # ConvDistrib.shape = (latent_len, 2*latent_len-1, input_len)
