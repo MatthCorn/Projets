@@ -7,10 +7,10 @@ import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 
-local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
-# local = r'C:\Users\Matthieu\Documents\Python\Projets'
+# local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
+local = r'C:\Users\Matthieu\Documents\Python\Projets'
 
-LocalConfig = config(config=1)
+LocalConfig = config(config=2)
 LocalConfig.AddParam(d_latent=32, d_att=32, num_heads=4, latent_len=32, max_len=64, d_out=10)
 
 class ClassifierPerceiver(nn.Module):
@@ -24,8 +24,8 @@ class ClassifierPerceiver(nn.Module):
         self.EncoderLayer1 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len, relative=relative)
         self.EncoderLayer2 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len, relative=relative)
         self.EncoderLayer3 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len, relative=relative)
-        self.EncoderLayer4 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len, relative=relative)
-        self.EncoderLayer5 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len, relative=relative)
+        # self.EncoderLayer4 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len, relative=relative)
+        # self.EncoderLayer5 = EncoderLayer(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len, relative=relative)
         self.FinalClassifier = FeedForward(latent_len*d_latent, 10, widths=[256, 64, 32], dropout=0.05)
         # self.FinalClassifier = FeedForward(d_in=d_latent, d_out=10, widths=[16], dropout=0.05)
 
@@ -38,8 +38,8 @@ class ClassifierPerceiver(nn.Module):
         x_latent = self.EncoderLayer2(x_input=x_input, x_latent=x_latent)
         # x_latent.shape = (batch_size, latent_len, d_latent)
         x_latent = self.EncoderLayer3(x_input=x_input, x_latent=x_latent)
-        x_latent = self.EncoderLayer4(x_input=x_input, x_latent=x_latent)
-        x_latent = self.EncoderLayer5(x_input=x_input, x_latent=x_latent)
+        # x_latent = self.EncoderLayer4(x_input=x_input, x_latent=x_latent)
+        # x_latent = self.EncoderLayer5(x_input=x_input, x_latent=x_latent)
         batch_size, _, _ = x_latent.shape
         y = x_latent.reshape(batch_size, -1)
         # y.shape = (batch_size, seq_len*16)
@@ -50,7 +50,7 @@ class ClassifierPerceiver(nn.Module):
         return y
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-type = torch.float16
+type = torch.float32
 
 N = ClassifierPerceiver(relative=True).to(device, type)
 
@@ -73,7 +73,6 @@ for i in range(30):
         for LittleBatch in LittleBatchs:
             data, labels = BatchData[LittleBatch].to(device), BatchLabels[LittleBatch].to(device)
             for MiniBatch in MiniBatchs:
-
                 optimizer.zero_grad()
                 err = loss(N(data[MiniBatch]), labels[MiniBatch])
                 # err = torch.norm(N(data[MiniBatch]) - labels[MiniBatch])
