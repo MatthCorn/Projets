@@ -1,12 +1,14 @@
 from Perceiver.EncoderPerceiver import EncoderIO
 from Transformer.EasyFeedForward import FeedForward
-from CIFAR10Classifier.Config import config
+from CIFAR10Classifier.Config import config, MakeLabelSet
 import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
+from tqdm import tqdm
+torch.set_float32_matmul_precision('high')
 
-# local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
-local = r'C:\Users\Matthieu\Documents\Python\Projets'
+local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
+# local = r'C:\Users\Matthieu\Documents\Python\Projets'
 
 LocalConfig = config(config=2)
 LocalConfig.AddParam(d_latent=32, d_att=32, num_heads=4, latent_len=32, max_len=64, d_out=10)
@@ -30,7 +32,7 @@ class ClassifierPerceiver(nn.Module):
         return y
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-type = torch.float32
+type = torch.float16
 
 N = ClassifierPerceiver(relative=True).to(device, type)
 
@@ -45,7 +47,7 @@ ValidationImageSet, ValidationLabels = LocalConfig.LoadValidation(local, type=ty
 
 LittleBatchs = [list(range(1000*k, 1000*(k+1))) for k in range(10)]
 
-for i in range(50):
+for i in tqdm(range(10)):
     print('i = ' + str(i))
     CurrentError = 0
     for j in range(1,6):
@@ -56,7 +58,7 @@ for i in range(50):
 
                 optimizer.zero_grad()
                 err = loss(N(data[MiniBatch]), labels[MiniBatch])
-                # err = torch.norm(N(data[MiniBatch]) - labels[MiniBatch])
+                # err = torch.norm(N(data[MiniBatch]) - MakeLabelSet(labels[MiniBatch]))
                 err.backward()
                 optimizer.step()
                 CurrentError += float(err)

@@ -41,7 +41,7 @@ class config():
             data = data.transpose(2, 3)
         data = data.reshape(BatchSize, self.input_len, self.d_input)
         # data.shape = (batch_size, input_len, d_input)
-        return data.to(device, type), MakeLabelSet(dict[b'labels']).to(device, type)
+        return data.to(device, type), torch.tensor(dict[b'labels']).to(device)
 
     def LoadValidation(self, local, device=torch.device('cpu'), type=torch.float32):
         dict = unpickle(local + r'\CIFAR10Classifier\test_batch')
