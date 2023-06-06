@@ -4,10 +4,11 @@ from CIFAR10Classifier.Config import config, MakeLabelSet
 import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
+from torch.cuda.amp import GradScaler
 from tqdm import tqdm
 
-local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
-# local = r'C:\Users\Matthieu\Documents\Python\Projets'
+# local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
+local = r'C:\Users\Matthieu\Documents\Python\Projets'
 
 LocalConfig = config(config=1)
 LocalConfig.AddParam(d_att=LocalConfig.d_input, max_len=64, d_out=10)
@@ -39,45 +40,52 @@ class ClassifierTransformer(nn.Module):
         return y
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+type = torch.float16
 
 N = ClassifierTransformer().to(device)
 
-MiniBatchs = [list(range(100*k,100*(k+1))) for k in range(10)]
+MiniBatchs = [list(range(100*k, 100*(k+1))) for k in range(5)]
 
-optimizer = torch.optim.Adam(N.parameters(), weight_decay=0.0001)
+optimizer = torch.optim.Adam(N.parameters(), weight_decay=1e-5)
+scaler = GradScaler()
+loss = nn.CrossEntropyLoss()
 
 ErrorTrainingSet = []
 AccuracyValidationSet = []
 ValidationImageSet, ValidationLabels = LocalConfig.LoadValidation(local)
 
-LittleBatchs = [list(range(1000*k,1000*(k+1))) for k in range(10)]
+LittleBatchs = [list(range(500*k, 500*(k+1))) for k in range(20)]
 
-for i in tqdm(range(300)):
+for i in tqdm(range(1)):
     CurrentError = 0
-    for j in range(1,6):
+    for j in range(1, 6):
         BatchData, BatchLabels = LocalConfig.LoadBatch(j, local)
         for LittleBatch in LittleBatchs:
             data, labels = BatchData[LittleBatch].to(device), BatchLabels[LittleBatch].to(device)
             for MiniBatch in MiniBatchs:
-
+                with torch.autocast(device_type='cuda', dtype=type):
+                    out = N(data[MiniBatch])
+                    err = loss(out, labels[MiniBatch])
+                    # err = torch.norm(N(data[MiniBatch]) - MakeLabelSet(labels[MiniBatch]))
+                scaler.scale(err).backward()
+                scaler.step(optimizer)
+                scaler.update()
                 optimizer.zero_grad()
-                err = torch.norm(N(data[MiniBatch]) - MakeLabelSet(labels[MiniBatch]))
-                err.backward()
-                optimizer.step()
                 CurrentError += float(err)
     ErrorTrainingSet.append(CurrentError)
     if i % 5 == 0:
         Err = 0
         for LittleBatch in LittleBatchs:
             data, labels = ValidationImageSet[LittleBatch].to(device), ValidationLabels[LittleBatch].to(device)
-            Err += torch.count_nonzero(torch.argmax(N(data), dim=1) - labels)
+            with torch.autocast(device_type='cuda', dtype=type):
+                Err += torch.count_nonzero(torch.argmax(N(data), dim=1) - labels)
         AccuracyValidationSet.append(float(1 - Err / len(ValidationLabels)))
 
 fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
 ax1.plot(AccuracyValidationSet); ax1.set_title("Précision sur l'ensemble de validation")
 ax2.plot(ErrorTrainingSet); ax2.set_title("Erreur sur l'ensemble de test")
-ax3.plot(torch.norm(N.FirstEncoder.MultiHeadAttention.Er,dim=1).cpu().detach().numpy()); ax3.set_title("Norme de Er sur le premier encodeur")
-ax4.plot(torch.norm(N.SecondEncoder.MultiHeadAttention.Er,dim=1).cpu().detach().numpy()); ax4.set_title("Norme de Er sur le second encodeur")
+ax3.plot(torch.norm(N.FirstEncoder.MultiHeadAttention.Er, dim=1).cpu().detach().numpy()); ax3.set_title("Norme de Er sur le premier encodeur")
+ax4.plot(torch.norm(N.SecondEncoder.MultiHeadAttention.Er, dim=1).cpu().detach().numpy()); ax4.set_title("Norme de Er sur le second encodeur")
 plt.show()
 
 print(sum(p.numel() for p in N.parameters() if p.requires_grad))

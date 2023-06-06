@@ -7,8 +7,8 @@ import torch.nn as nn
 from torch.cuda.amp import GradScaler
 from tqdm import tqdm
 
-local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
-# local = r'C:\Users\Matthieu\Documents\Python\Projets'
+# local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
+local = r'C:\Users\Matthieu\Documents\Python\Projets'
 
 LocalConfig = config(config=1)
 LocalConfig.AddParam(d_latent=32, d_att=32, num_heads=4, latent_len=32, max_len=64, d_out=10)
@@ -52,7 +52,7 @@ class ClassifierPerceiver(nn.Module):
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 type = torch.float16
 
-N = ClassifierPerceiver(relative=True).to(device)
+N = ClassifierPerceiver(relative=False).to(device)
 
 MiniBatchs = [list(range(100*k, 100*(k+1))) for k in range(5)]
 
@@ -74,7 +74,8 @@ for i in tqdm(range(30)):
             data, labels = BatchData[LittleBatch].to(device), BatchLabels[LittleBatch].to(device)
             for MiniBatch in MiniBatchs:
                 with torch.autocast(device_type='cuda', dtype=type):
-                    err = loss(N(data[MiniBatch]), labels[MiniBatch])
+                    out = N(data[MiniBatch])
+                    err = loss(out, labels[MiniBatch])
                     # err = torch.norm(N(data[MiniBatch]) - MakeLabelSet(labels[MiniBatch]))
                 scaler.scale(err).backward()
                 scaler.step(optimizer)
