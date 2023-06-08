@@ -11,8 +11,7 @@ def MakeLabelSet(x):
     out = torch.zeros(len(x), 10)
     for i in range(len(x)):
         out[i, int(x[i])] = 1
-    return out
-
+    return out.to(x.device)
 class config():
     def __init__(self, config=0):
         self.config = config

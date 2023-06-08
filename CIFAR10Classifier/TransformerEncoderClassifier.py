@@ -59,7 +59,7 @@ ValidationImageSet, ValidationLabels = LocalConfig.LoadValidation(local)
 
 LittleBatchs = [list(range(500*k, 500*(k+1))) for k in range(20)]
 
-for i in tqdm(range(15)):
+for i in tqdm(range(50)):
     CurrentError = 0
     AccErr = 0
     for j in range(1, 6):
@@ -69,8 +69,8 @@ for i in tqdm(range(15)):
             for MiniBatch in MiniBatchs:
                 with torch.autocast(device_type='cuda', dtype=type):
                     out = N(data[MiniBatch])
-                    err = loss(out, labels[MiniBatch])
-                    # err = torch.norm(N(data[MiniBatch]) - MakeLabelSet(labels[MiniBatch]))
+                    # err = loss(out, labels[MiniBatch])
+                    err = torch.norm(N(data[MiniBatch]) - MakeLabelSet(labels[MiniBatch]))
                     AccErr += torch.count_nonzero(torch.argmax(out, dim=1) - labels[MiniBatch])
                 scaler.scale(err).backward()
                 scaler.step(optimizer)
@@ -88,7 +88,8 @@ for i in tqdm(range(15)):
             for MiniBatch in MiniBatchs:
                 with torch.autocast(device_type='cuda', dtype=type):
                     out = N(data[MiniBatch])
-                    Err += 6*float(loss(out, labels[MiniBatch]))
+                    # Err += 6*float(loss(out, labels[MiniBatch]))
+                    Err += 6*float(torch.norm(N(data[MiniBatch]) - MakeLabelSet(labels[MiniBatch])))
                     AccErr += torch.count_nonzero(torch.argmax(out, dim=1) - labels[MiniBatch])
         AccuracyValidationSet.append(float(1 - AccErr / len(ValidationLabels)))
         ErrorValidationSet.append(Err)
@@ -100,7 +101,6 @@ ax2.plot(ErrorTrainingSet, 'r', label="Ensemble d'entrainement"); ax2.plot(Valid
 ax2.set_title("Evolution de l'erreur à minimiser"); ax2.set_xlabel('Epoch'), ax2.set_ylabel('Erreur')
 ax3.plot(torch.norm(N.FirstEncoder.MultiHeadAttention.Er, dim=1).cpu().detach().numpy()); ax3.set_title("Norme de Er sur le premier encodeur")
 ax4.plot(torch.norm(N.SecondEncoder.MultiHeadAttention.Er, dim=1).cpu().detach().numpy()); ax4.set_title("Norme de Er sur le second encodeur")
-plt.legend()
 plt.show()
 
 print(sum(p.numel() for p in N.parameters() if p.requires_grad))
