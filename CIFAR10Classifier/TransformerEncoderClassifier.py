@@ -11,14 +11,14 @@ local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
 # local = r'C:\Users\Matthieu\Documents\Python\Projets'
 
 LocalConfig = config(config=0)
-LocalConfig.AddParam(d_att=LocalConfig.d_input, max_len=64, d_out=10, num_heads=4)
+LocalConfig.AddParam(d_att=LocalConfig.d_input, max_len=64, d_out=10, num_heads=1)
 
 class ClassifierTransformer(nn.Module):
     def __init__(self, d_model=LocalConfig.d_input, num_heads=LocalConfig.num_heads, seq_len=LocalConfig.input_len):
         super().__init__()
         self.FirstEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=seq_len, MHADropout=0.1, FFDropout=0.05, masked=False)
-        self.SecondEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=seq_len, MHADropout=0.1, FFDropout=0.05, masked=False)
-        self.ThirdEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=seq_len, MHADropout=0.1, FFDropout=0.05, masked=False)
+        # self.SecondEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=seq_len, MHADropout=0.1, FFDropout=0.05, masked=False)
+        # self.ThirdEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=seq_len, MHADropout=0.1, FFDropout=0.05, masked=False)
         self.DimDownScaler = FeedForward(d_model, 32, widths=[64], dropout=0.05)
         self.FinalClassifier = FeedForward(seq_len*32, 10, widths=[256, 64, 32], dropout=0.05)
 
@@ -26,10 +26,10 @@ class ClassifierTransformer(nn.Module):
         # x.shape = (batch_size, seq_len, d_model)
         y = self.FirstEncoder(x)
         # y.shape = (batch_size, seq_len, d_model)
-        y = self.SecondEncoder(y)
-        # y.shape = (batch_size, seq_len, d_model)
-        y = self.ThirdEncoder(y)
-        # y.shape = (batch_size, seq_len, d_model)
+        # y = self.SecondEncoder(y)
+        # # y.shape = (batch_size, seq_len, d_model)
+        # y = self.ThirdEncoder(y)
+        # # y.shape = (batch_size, seq_len, d_model)
         y = self.DimDownScaler(y)
         # y.shape = (batch_size, seq_len, 32)
         batch_size, _, _ = y.shape
@@ -40,7 +40,7 @@ class ClassifierTransformer(nn.Module):
         return y
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-type = torch.float32
+type = torch.float16
 
 N = ClassifierTransformer().to(device)
 
@@ -59,7 +59,7 @@ ValidationImageSet, ValidationLabels = LocalConfig.LoadValidation(local)
 
 LittleBatchs = [list(range(500*k, 500*(k+1))) for k in range(20)]
 
-for i in tqdm(range(50)):
+for i in tqdm(range(15)):
     CurrentError = 0
     AccErr = 0
     for j in range(1, 6):
@@ -100,7 +100,7 @@ ax1.set_title("Evolution de la précision"); ax1.set_xlabel('Epoch'); ax1.set_yl
 ax2.plot(ErrorTrainingSet, 'r', label="Ensemble d'entrainement"); ax2.plot(ValidationEpoch, ErrorValidationSet, 'b', label='Ensemble de validation');
 ax2.set_title("Evolution de l'erreur à minimiser"); ax2.set_xlabel('Epoch'), ax2.set_ylabel('Erreur')
 ax3.plot(torch.norm(N.FirstEncoder.MultiHeadAttention.Er, dim=1).cpu().detach().numpy()); ax3.set_title("Norme de Er sur le premier encodeur")
-ax4.plot(torch.norm(N.SecondEncoder.MultiHeadAttention.Er, dim=1).cpu().detach().numpy()); ax4.set_title("Norme de Er sur le second encodeur")
+# ax4.plot(torch.norm(N.SecondEncoder.MultiHeadAttention.Er, dim=1).cpu().detach().numpy()); ax4.set_title("Norme de Er sur le second encodeur")
 plt.show()
 
 print(sum(p.numel() for p in N.parameters() if p.requires_grad))

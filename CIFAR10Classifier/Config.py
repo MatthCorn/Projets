@@ -12,6 +12,7 @@ def MakeLabelSet(x):
     for i in range(len(x)):
         out[i, int(x[i])] = 1
     return out.to(x.device)
+
 class config():
     def __init__(self, config=0):
         self.config = config
@@ -36,6 +37,8 @@ class config():
         n = int((temp / 3) ** 0.5)
         data = data.reshape(BatchSize, 3, n, n)
         data = data.transpose(1, 2)
+        if self.config == 0:
+            data = (data - 128) / 128
         if self.config == 2:
             data = data.transpose(2, 3)
         data = data.reshape(BatchSize, self.input_len, self.d_input)
@@ -50,6 +53,8 @@ class config():
         n = int((temp / 3) ** 0.5)
         data = data.reshape(BatchSize, 3, n, n)
         data = data.transpose(1, 2)
+        if self.config == 0:
+            data = (data - 128) / 128
         if self.config == 2:
             data = data.transpose(2, 3)
         data = data.reshape(BatchSize, self.input_len, self.d_input)
