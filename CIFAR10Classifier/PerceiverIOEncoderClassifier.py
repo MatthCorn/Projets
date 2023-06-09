@@ -36,45 +36,61 @@ type = torch.float16
 
 N = ClassifierPerceiver(relative=True).to(device)
 
-MiniBatchs = [list(range(100*k, 100*(k+1))) for k in range(10)]
+MiniBatchs = [list(range(100*k, 100*(k+1))) for k in range(5)]
 
-optimizer = torch.optim.Adam(N.parameters(), weight_decay=1e-9)
+optimizer = torch.optim.Adam(N.parameters(), weight_decay=1e-6, lr=3e-5)
 scaler = GradScaler()
 loss = nn.CrossEntropyLoss()
 
 ErrorTrainingSet = []
+AccuracyTrainingSet = []
+ErrorValidationSet = []
 AccuracyValidationSet = []
+ValidationEpoch = []
 ValidationImageSet, ValidationLabels = LocalConfig.LoadValidation(local)
 
-LittleBatchs = [list(range(1000*k, 1000*(k+1))) for k in range(10)]
+LittleBatchs = [list(range(500*k, 500*(k+1))) for k in range(20)]
 
-for i in tqdm(range(16)):
+for i in tqdm(range(100)):
     CurrentError = 0
-    for j in range(1,6):
+    AccErr = 0
+    for j in range(1, 6):
         BatchData, BatchLabels = LocalConfig.LoadBatch(j, local)
         for LittleBatch in LittleBatchs:
             data, labels = BatchData[LittleBatch].to(device), BatchLabels[LittleBatch].to(device)
             for MiniBatch in MiniBatchs:
                 with torch.autocast(device_type='cuda', dtype=type):
-                    err = loss(N(data[MiniBatch]), labels[MiniBatch])
+                    out = N(data[MiniBatch])
+                    err = loss(out, labels[MiniBatch])
                     # err = torch.norm(N(data[MiniBatch]) - MakeLabelSet(labels[MiniBatch]))
+                    AccErr += torch.count_nonzero(torch.argmax(out, dim=1) - labels[MiniBatch])
                 scaler.scale(err).backward()
                 scaler.step(optimizer)
                 scaler.update()
                 optimizer.zero_grad()
                 CurrentError += float(err)
     ErrorTrainingSet.append(CurrentError)
-    if i % 5 == 0:
+    AccuracyTrainingSet.append(float(1 - AccErr / (6*len(BatchLabels))))
+    if i % 1 == 0:
+        ValidationEpoch.append(i)
+        AccErr = 0
         Err = 0
         for LittleBatch in LittleBatchs:
             data, labels = ValidationImageSet[LittleBatch].to(device), ValidationLabels[LittleBatch].to(device)
-            with torch.autocast(device_type='cuda', dtype=type):
-                Err += torch.count_nonzero(torch.argmax(N(data), dim=1) - labels)
-        AccuracyValidationSet.append(float(1 - Err / len(ValidationLabels)))
+            for MiniBatch in MiniBatchs:
+                with torch.autocast(device_type='cuda', dtype=type):
+                    out = N(data[MiniBatch])
+                    Err += 6*float(loss(out, labels[MiniBatch]))
+                    # Err += 6*float(torch.norm(N(data[MiniBatch]) - MakeLabelSet(labels[MiniBatch])))
+                    AccErr += torch.count_nonzero(torch.argmax(out, dim=1) - labels[MiniBatch])
+        AccuracyValidationSet.append(float(1 - AccErr / len(ValidationLabels)))
+        ErrorValidationSet.append(Err)
 
 fig, ((ax1, ax2)) = plt.subplots(2, 1)
-ax1.plot(AccuracyValidationSet); ax1.set_title("Précision sur l'ensemble de validation")
-ax2.plot(ErrorTrainingSet); ax2.set_title("Erreur sur l'ensemble de test")
+ax1.plot(ValidationEpoch, AccuracyValidationSet, 'b', label='Ensemble de validation'); ax1.plot(AccuracyTrainingSet, 'r', label="Ensemble d'entrainement");
+ax1.set_title("Evolution de la précision"); ax1.set_xlabel('Epoch'); ax1.set_ylabel('Précision (%)')
+ax2.plot(ErrorTrainingSet, 'r', label="Ensemble d'entrainement"); ax2.plot(ValidationEpoch, ErrorValidationSet, 'b', label='Ensemble de validation');
+ax2.set_title("Evolution de l'erreur à minimiser"); ax2.set_xlabel('Epoch'), ax2.set_ylabel('Erreur')
 plt.show()
 
 print(sum(p.numel() for p in N.parameters() if p.requires_grad))

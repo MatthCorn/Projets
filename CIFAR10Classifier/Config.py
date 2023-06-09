@@ -37,7 +37,7 @@ class config():
         n = int((temp / 3) ** 0.5)
         data = data.reshape(BatchSize, 3, n, n)
         data = data.transpose(1, 2)
-        if self.config == 0:
+        if self.normalized:
             data = (data - 128) / 128
         if self.config == 2:
             data = data.transpose(2, 3)
@@ -53,7 +53,7 @@ class config():
         n = int((temp / 3) ** 0.5)
         data = data.reshape(BatchSize, 3, n, n)
         data = data.transpose(1, 2)
-        if self.config == 0:
+        if self.normalized:
             data = (data - 128) / 128
         if self.config == 2:
             data = data.transpose(2, 3)
@@ -70,13 +70,16 @@ class config():
         plt.imshow(im.numpy())
         plt.show()
 
-    def AddParam(self, d_latent=32, d_att=32, num_heads=4, latent_len=32, max_len=64, d_out=10):
+    def AddParam(self, d_latent=32, d_att=32, num_heads=4, latent_len=32, max_len=64, d_out=10, normalized=False):
         self.d_latent = d_latent
         self.d_att = d_att
         self.num_heads = num_heads
+        if self.config == 2:
+            self.num_heads = 1
         self.latent_len = latent_len
         self.max_len = max_len
         self.d_out = d_out
+        self.normalized = normalized
 
 
 
