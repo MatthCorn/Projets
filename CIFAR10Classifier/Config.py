@@ -16,6 +16,7 @@ def MakeLabelSet(x):
 class config():
     def __init__(self, config=0):
         self.config = config
+        self.normalized = False
         # La séquence est de la forme c_1, c_2, c_3, ..., c_i, ... où c_i est le vecteur avec la colonne de pixels i rouge, puis la verte, puis la bleue
         if (config == 0) or (config == 3):
             self.d_input = 96
@@ -62,7 +63,12 @@ class config():
             data = (data - 128) / 128
         if self.config == 2:
             data = data.transpose(2, 3)
-        data = data.reshape(BatchSize, self.input_len, self.d_input)
+        if (self.config == 3) or (self.config == 4):
+            data = data.transpose(1, 3)
+            data = data.reshape(BatchSize, self.d_input, self.input_len)
+            data = data.transpose(1, 2)
+        else:
+            data = data.reshape(BatchSize, self.input_len, self.d_input)
         # data.shape = (batch_size, input_len, d_input)
         return data.to(device, type), torch.tensor(dict[b'labels']).to(device)
 
@@ -85,7 +91,3 @@ class config():
         self.max_len = max_len
         self.d_out = d_out
         self.normalized = normalized
-
-
-
-
