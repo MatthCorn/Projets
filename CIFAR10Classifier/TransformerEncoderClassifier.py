@@ -10,8 +10,8 @@ from tqdm import tqdm
 local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
 # local = r'C:\Users\Matthieu\Documents\Python\Projets'
 
-LocalConfig = config(config=0)
-LocalConfig.AddParam(d_att=LocalConfig.d_input, max_len=64, d_out=10, num_heads=4, normalized=False)
+LocalConfig = config(config=4)
+LocalConfig.AddParam(d_att=LocalConfig.d_input, max_len=100, d_out=10, num_heads=4, normalized=False)
 
 class ClassifierTransformer(nn.Module):
     def __init__(self, num_enc=2, d_model=LocalConfig.d_input, num_heads=LocalConfig.num_heads, seq_len=LocalConfig.input_len):

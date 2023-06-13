@@ -22,7 +22,7 @@ class config():
             self.d_input = 96
             self.input_len = 32
         # La séquence est de la forme c_1, c_2, c_3, ..., c_3i, c_3i+1, c_3i+2 ... où c_3i+k est la colonne de pixels i rouge(k=1), verte(k=2) ou bleue(k=2)
-        if (config == 1) or (config == 3):
+        if (config == 1) or (config == 4):
             self.d_input = 32
             self.input_len = 96
         # La séquence est de la forme c_1, c_2, c_3, ..., c_n*i+j, ... où c_n*i+j est le pixel (i,j) de dim 3 (RGB)
