@@ -50,7 +50,7 @@ N = ClassifierPerceiver(relative=True, num_enc=3).to(device)
 
 MiniBatchs = [list(range(100*k, 100*(k+1))) for k in range(5)]
 
-optimizer = torch.optim.Adam(N.parameters(), weight_decay=1e-4, lr=1e-4)
+optimizer = torch.optim.Adam(N.parameters(), weight_decay=1e-4, lr=3e-5)
 scaler = GradScaler()
 loss = nn.CrossEntropyLoss()
 

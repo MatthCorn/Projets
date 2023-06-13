@@ -17,11 +17,11 @@ class config():
     def __init__(self, config=0):
         self.config = config
         # La séquence est de la forme c_1, c_2, c_3, ..., c_i, ... où c_i est le vecteur avec la colonne de pixels i rouge, puis la verte, puis la bleue
-        if config == 0:
+        if (config == 0) or (config == 3):
             self.d_input = 96
             self.input_len = 32
         # La séquence est de la forme c_1, c_2, c_3, ..., c_3i, c_3i+1, c_3i+2 ... où c_3i+k est la colonne de pixels i rouge(k=1), verte(k=2) ou bleue(k=2)
-        if config == 1:
+        if (config == 1) or (config == 3):
             self.d_input = 32
             self.input_len = 96
         # La séquence est de la forme c_1, c_2, c_3, ..., c_n*i+j, ... où c_n*i+j est le pixel (i,j) de dim 3 (RGB)
@@ -41,7 +41,12 @@ class config():
             data = (data - 128) / 128
         if self.config == 2:
             data = data.transpose(2, 3)
-        data = data.reshape(BatchSize, self.input_len, self.d_input)
+        if (self.config == 3) or (self.config == 4):
+            data = data.transpose(1, 3)
+            data = data.reshape(BatchSize, self.d_input, self.input_len)
+            data = data.transpose(1, 2)
+        else:
+            data = data.reshape(BatchSize, self.input_len, self.d_input)
         # data.shape = (batch_size, input_len, d_input)
         return data.to(device, type), torch.tensor(dict[b'labels']).to(device)
 
