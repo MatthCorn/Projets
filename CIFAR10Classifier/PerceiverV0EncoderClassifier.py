@@ -7,11 +7,11 @@ import torch.nn as nn
 from torch.cuda.amp import GradScaler
 from tqdm import tqdm
 
-local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
-# local = r'C:\Users\Matthieu\Documents\Python\Projets'
+# local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
+local = r'C:\Users\Matthieu\Documents\Python\Projets'
 
-LocalConfig = config(config=0)
-LocalConfig.AddParam(d_latent=96, d_att=96, num_heads=4, latent_len=32, max_len=32, d_out=10, normalized=False)
+LocalConfig = config(config=3)
+LocalConfig.AddParam(d_latent=32, d_att=32, num_heads=4, latent_len=32, max_len=32, d_out=10, normalized=False)
 
 class ClassifierPerceiver(nn.Module):
     def __init__(self, num_enc=2, d_latent=LocalConfig.d_latent, d_input=LocalConfig.d_input, d_att=LocalConfig.d_att,
@@ -44,13 +44,13 @@ class ClassifierPerceiver(nn.Module):
         return y
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-type = torch.float16
+type = torch.float32
 
 N = ClassifierPerceiver(relative=True, num_enc=3).to(device)
 
 MiniBatchs = [list(range(100*k, 100*(k+1))) for k in range(5)]
 
-optimizer = torch.optim.Adam(N.parameters(), weight_decay=1e-4, lr=3e-5)
+optimizer = torch.optim.Adam(N.parameters(), weight_decay=1e-4, lr=1e-4)
 scaler = GradScaler()
 loss = nn.CrossEntropyLoss()
 

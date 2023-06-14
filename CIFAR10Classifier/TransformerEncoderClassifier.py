@@ -7,8 +7,8 @@ import torch.nn as nn
 from torch.cuda.amp import GradScaler
 from tqdm import tqdm
 
-local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
-# local = r'C:\Users\Matthieu\Documents\Python\Projets'
+# local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
+local = r'C:\Users\Matthieu\Documents\Python\Projets'
 
 LocalConfig = config(config=3)
 LocalConfig.AddParam(d_att=LocalConfig.d_input, max_len=100, d_out=10, num_heads=4, normalized=True)
@@ -44,7 +44,7 @@ N = ClassifierTransformer(num_enc=2).to(device)
 
 MiniBatchs = [list(range(100*k, 100*(k+1))) for k in range(5)]
 
-optimizer = torch.optim.Adam(N.parameters(), weight_decay=1e-6, lr=1e-4)
+optimizer = torch.optim.Adam(N.parameters(), weight_decay=1e-6, lr=3e-4)
 scaler = GradScaler()
 loss = nn.CrossEntropyLoss()
 
