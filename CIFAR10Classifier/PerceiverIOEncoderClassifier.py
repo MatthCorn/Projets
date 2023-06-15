@@ -10,8 +10,8 @@ from tqdm import tqdm
 local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
 # local = r'C:\Users\Matthieu\Documents\Python\Projets'
 
-LocalConfig = config(config=0)
-LocalConfig.AddParam(d_latent=32, d_att=32, num_heads=4, latent_len=32, max_len=64, d_out=10)
+LocalConfig = config(config=2)
+LocalConfig.AddParam(d_latent=8, d_att=8, num_heads=1, latent_len=32, max_len=64, d_out=10)
 
 
 class ClassifierPerceiver(nn.Module):

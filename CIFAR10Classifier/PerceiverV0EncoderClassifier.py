@@ -7,11 +7,11 @@ import torch.nn as nn
 from torch.cuda.amp import GradScaler
 from tqdm import tqdm
 
-# local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
-local = r'C:\Users\Matthieu\Documents\Python\Projets'
+local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
+# local = r'C:\Users\Matthieu\Documents\Python\Projets'
 
-LocalConfig = config(config=3)
-LocalConfig.AddParam(d_latent=32, d_att=32, num_heads=4, latent_len=32, max_len=32, d_out=10, normalized=False)
+LocalConfig = config(config=2)
+LocalConfig.AddParam(d_latent=10, d_att=10, num_heads=1, latent_len=64, max_len=32, d_out=10, normalized=True)
 
 class ClassifierPerceiver(nn.Module):
     def __init__(self, num_enc=2, d_latent=LocalConfig.d_latent, d_input=LocalConfig.d_input, d_att=LocalConfig.d_att,
@@ -44,9 +44,9 @@ class ClassifierPerceiver(nn.Module):
         return y
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-type = torch.float32
+type = torch.float16
 
-N = ClassifierPerceiver(relative=True, num_enc=3).to(device)
+N = ClassifierPerceiver(relative=True, num_enc=2).to(device)
 
 MiniBatchs = [list(range(100*k, 100*(k+1))) for k in range(5)]
 
