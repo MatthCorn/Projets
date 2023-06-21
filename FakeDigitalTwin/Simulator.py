@@ -3,8 +3,8 @@ class DigitalTwin():
         self.AntPulses = AntPulses
         self.CurrentPulses = []
         self.TimeId = -1
-        self.LevelStartingTime = 0
-        self.LevelEndingTime = 0
+        self.PlatformStartingTime = 0
+        self.PlatformEndingTime = 0
 
     def forward(self):
         if self.TimeId == -1:
@@ -17,29 +17,29 @@ class DigitalTwin():
     def initialization(self):
         self.TimeId += 1
         self.CurrentPulses.append(self.AntPulses[self.TimeId])
-        self.LevelStartingTime = self.CurrentPulses[0]['TOA']
+        self.PlatformStartingTime = self.CurrentPulses[0]['TOA']
 
         # TOE : Time of ending
         TOEList = [el['TOA'] + el['LI'] for el in self.CurrentPulses]
         minTOE = min(TOEList)
         if minTOE < self.AntPulses[self.TimeId + 1]['TOA']:
             # un palier commence car une impulsion se termine
-            self.LevelEndingTime = minTOE
-            self.LevelProcessing()
+            self.PlatformEndingTime = minTOE
+            self.PlatformProcessing()
             del(self.CurrentPulses[TOEList.index(minTOE)])
         else:
             # un palier commence car une impulsion arrive
-            self.LevelEndingTime = self.AntPulses[self.TimeId + 1]['TOA']
-            self.LevelProcessing()
+            self.PlatformEndingTime = self.AntPulses[self.TimeId + 1]['TOA']
+            self.PlatformProcessing()
             self.TimeId += 1
             self.CurrentPulses.append(self.AntPulses[self.TimeId])
         self.forward()
 
     def step(self):
+        self.PlatformStartingTime = self.PlatformEndingTime
         if self.CurrentPulses == []:
-            self.LevelStartingTime = self.LevelEndingTime
-            self.LevelEndingTime = self.AntPulses[self.TimeId + 1]['TOA']
-            self.LevelProcessing()
+            self.PlatformEndingTime = self.AntPulses[self.TimeId + 1]['TOA']
+            self.PlatformProcessing()
             self.TimeId += 1
             self.CurrentPulses.append(self.AntPulses[self.TimeId])
         else:
@@ -48,13 +48,20 @@ class DigitalTwin():
             minTOE = min(TOEList)
             if minTOE < self.AntPulses[self.TimeId + 1]['TOA']:
                 # un palier commence car une impulsion se termine
-                self.LevelEndingTime = minTOE
-                self.LevelProcessing()
+                self.PlatformEndingTime = minTOE
+                self.PlatformProcessing()
                 del(self.CurrentPulses[TOEList.index(minTOE)])
-            else:
+            elif minTOE > self.AntPulses[self.TimeId + 1]['TOA']:
                 # un palier commence car une impulsion arrive
-                self.LevelEndingTime = self.AntPulses[self.TimeId + 1]['TOA']
-                self.LevelProcessing()
+                self.PlatformEndingTime = self.AntPulses[self.TimeId + 1]['TOA']
+                self.PlatformProcessing()
+                self.TimeId += 1
+                self.CurrentPulses.append(self.AntPulses[self.TimeId])
+            else :
+                # un palier commence car une impulsion se termine ET une impulsion arrive EN MEME TEMPS
+                self.PlatformEndingTime = minTOE
+                self.PlatformProcessing()
+                del (self.CurrentPulses[TOEList.index(minTOE)])
                 self.TimeId += 1
                 self.CurrentPulses.append(self.AntPulses[self.TimeId])
         self.forward()
@@ -62,20 +69,24 @@ class DigitalTwin():
     def termination(self):
         if self.CurrentPulses==[]:
             return None
+        self.PlatformStartingTime = self.PlatformEndingTime
         # TOE : Time of ending
         TOEList = [el['TOA'] + el['LI'] for el in self.CurrentPulses]
         minTOE = min(TOEList)
 
         # un palier commence car une impulsion se termine
-        self.LevelEndingTime = minTOE
-        self.LevelProcessing()
+        self.PlatformEndingTime = minTOE
+        self.PlatformProcessing()
         del (self.CurrentPulses[TOEList.index(minTOE)])
 
         self.forward()
 
-    def LevelProcessing(self):
+    def PlatformProcessing(self):
         # ne pas utiliser self.TimeId sinon risque de bug
-        print(self.CurrentPulses)
+        print('starting time :', self.PlatformStartingTime)
+        print('curent pulses :', self.CurrentPulses)
+        print('ending time :', self.PlatformEndingTime)
+        print('\n')
         None
 
 
