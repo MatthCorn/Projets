@@ -1,4 +1,5 @@
 from FakeDigitalTwin.Trackers import Tracker
+from FakeDigitalTwin.Platform import Platform, Processor
 class DigitalTwin():
     def __init__(self, AntPulses, NbMaxTrackers=4):
         self.AntPulses = AntPulses
