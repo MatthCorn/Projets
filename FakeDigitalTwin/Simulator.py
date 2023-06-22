@@ -1,10 +1,18 @@
+from FakeDigitalTwin.Trackers import Tracker
 class DigitalTwin():
-    def __init__(self, AntPulses):
+    def __init__(self, AntPulses, NbMaxTrackers=4):
         self.AntPulses = AntPulses
         self.CurrentPulses = []
+        self.LevelThreshold = 0
         self.TimeId = -1
         self.PlatformStartingTime = 0
         self.PlatformEndingTime = 0
+
+        # Making trackers to follow the pulses through the platforms
+        self.FreeTrackers = []
+        for i in range(NbMaxTrackers):
+            self.FreeTrackers.append(Tracker(id=str(i), parent=self))
+        self.TakenTrackers = []
 
     def forward(self):
         if self.TimeId == -1:
