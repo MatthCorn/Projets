@@ -17,7 +17,7 @@ class Platform():
         return self.Pulses==[]
 
 class Processor():
-    def __init__(self, FreqThreshold=10, Fe=500, MaxAgeTracker=10, FreqSensibility=10):
+    def __init__(self, FreqThreshold=10, Fe=500, MaxAgeTracker=10, FreqSensibility=0):
         self.FreqThreshold = FreqThreshold
         self.FreqSensibility = FreqSensibility
         self.Fe = Fe
@@ -27,6 +27,7 @@ class Processor():
     def Interaction(self, Platform):
         # Si deux impulsions ont des fréquences repliées proches, on supprime celle de plus bas niveau
         Platform.VisiblePulses = Platform.Pulses.copy()
+        return None
         for Pulse in Platform.VisiblePulses:
             FreqRep = Pulse.GetFreq(Platform.StartingTime) % self.Fe
             for OtherPulse in Platform.VisiblePulses:
@@ -38,8 +39,13 @@ class Processor():
     def Correlation(self, Platform, Trackers):
         FreqTrackers = np.array([tracker.FreqCur for tracker in Trackers])
         LevelTrackers = np.array([tracker.Level for tracker in Trackers])
-        FreqPulses = np.array([pulse.GetFreq(Platform.StartingTime) for pulse in Platform.VisiblePulses])
+        P = Platform.VisiblePulses
+        ST = Platform.StartingTime
+        ET = Platform.EndingTime
+        FreqPulses = np.array([pulse.GetFreq(Platform.StartingTime) for pulse in P])
         Comp = np.abs(np.expand_dims(FreqTrackers, axis=0)-np.expand_dims(FreqPulses, axis=1)) < self.FreqThreshold
+        Available = np.array([Tracker.IsTaken for Tracker in Trackers])
+        Comp = Comp * Available
 
 
         Id = list(np.argmax(Comp*np.expand_dims(LevelTrackers, axis=0), axis=1))

@@ -97,7 +97,9 @@ class DigitalTwin():
         # ne pas utiliser self.TimeId sinon risque de bug
         print('starting time :', self.Platform.StartingTime)
         print('curent pulses :', self.Platform.Pulses)
+        print('visible pulses :', self.Platform.VisiblePulses)
         print('ending time :', self.Platform.EndingTime)
+        print('trackers:', [el for el in self.Trackers if el.IsTaken])
         print('\n')
         None
 
@@ -106,3 +108,4 @@ if __name__=='__main__':
     AntP = [Pulse(TOA=5*k, LI=k) for k in range(1, 10)]
     DT = DigitalTwin(AntP)
     DT.forward()
+    print(DT.PDWs)

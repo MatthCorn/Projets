@@ -7,8 +7,10 @@ class Tracker():
         self.IsTaken = False
         self.FreqCur = -float('inf')
         self.Level = 0
+        self.TOA = 0
         self.TOE = -1
         self.flags = []
+        self.Histogram = []
 
     def Open(self, Id, TOA=None, flag=[]):
         # L'implémentation de l'histogramme ne permet pas de savoir quelles impulsions sont présentes dans le mesureur
@@ -68,6 +70,9 @@ class Tracker():
         # return None
         PDW = {'TOA': self.TOA, 'LI': self.TOE - self.TOA, 'FreqMin': self.FreqMin, 'FreqMax': self.FreqMax, 'flags': self.flags}
         return PDW
+
+    def __repr__(self):
+        return '(Tracker : Taken={} ; TOA={} ; TOE={} ; Histogram={} ; Freq={})'.format(self.IsTaken, self.TOA, self.TOE, self.Histogram, self.FreqCur)
 class Pulse():
     def __init__(self, FreqStart=0, FreqEnd=0, TOA=0, LI=0, Level=0):
         self.FreqStart = FreqStart
