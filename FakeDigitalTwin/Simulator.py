@@ -1,4 +1,4 @@
-from FakeDigitalTwin.Trackers import Tracker
+from FakeDigitalTwin.Trackers import Tracker, Pulse
 from FakeDigitalTwin.Platform import Platform, Processor
 class DigitalTwin():
     def __init__(self, AntPulses, NbMaxTrackers=4):
@@ -10,7 +10,10 @@ class DigitalTwin():
         # Making trackers to follow the pulses through the platforms
         self.Trackers = []
         for i in range(NbMaxTrackers):
-            self.Trackers.append(Tracker(Id=str(i), parent=self))
+            self.Trackers.append(Tracker(Id=str(i), parent=self, MaxAge=1))
+
+        self.Processor = Processor()
+        self.PDWs = []
 
     def forward(self):
         if self.TimeId == -1:
@@ -23,19 +26,19 @@ class DigitalTwin():
     def initialization(self):
         self.TimeId += 1
         self.Platform.AddPulse(self.AntPulses[self.TimeId])
-        self.Platform.StartingTime = self.Platform.Pulses[0]['TOA']
+        self.Platform.StartingTime = self.Platform.Pulses[0].TOA
 
         # TOE : Time of ending
-        TOEList = [el['TOA'] + el['LI'] for el in self.Platform.Pulses]
+        TOEList = [Pulse.TOA + Pulse.LI for Pulse in self.Platform.Pulses]
         minTOE = min(TOEList)
-        if minTOE < self.AntPulses[self.TimeId + 1]['TOA']:
+        if minTOE < self.AntPulses[self.TimeId + 1].TOA:
             # un palier commence car une impulsion se termine
             self.Platform.EndingTime = minTOE
             self.PlatformProcessing()
             self.Platform.DelPulse(TOEList.index(minTOE))
         else:
             # un palier commence car une impulsion arrive
-            self.Platform.EndingTime = self.AntPulses[self.TimeId + 1]['TOA']
+            self.Platform.EndingTime = self.AntPulses[self.TimeId + 1].TOA
             self.PlatformProcessing()
             self.TimeId += 1
             self.Platform.AddPulse(self.AntPulses[self.TimeId])
@@ -44,22 +47,22 @@ class DigitalTwin():
     def step(self):
         self.Platform.StartingTime = self.Platform.EndingTime
         if self.Platform.IsEmpty():
-            self.Platform.EndingTime = self.AntPulses[self.TimeId + 1]['TOA']
+            self.Platform.EndingTime = self.AntPulses[self.TimeId + 1].TOA
             self.PlatformProcessing()
             self.TimeId += 1
             self.Platform.AddPulse(self.AntPulses[self.TimeId])
         else:
             # TOE : Time of ending
-            TOEList = [el['TOA'] + el['LI'] for el in self.Platform.Pulses]
+            TOEList = [Pulse.TOA + Pulse.LI for Pulse in self.Platform.Pulses]
             minTOE = min(TOEList)
-            if minTOE < self.AntPulses[self.TimeId + 1]['TOA']:
+            if minTOE < self.AntPulses[self.TimeId + 1].TOA:
                 # un palier commence car une impulsion se termine
                 self.Platform.EndingTime = minTOE
                 self.PlatformProcessing()
                 self.Platform.DelPulse(TOEList.index(minTOE))
-            elif minTOE > self.AntPulses[self.TimeId + 1]['TOA']:
+            elif minTOE > self.AntPulses[self.TimeId + 1].TOA:
                 # un palier commence car une impulsion arrive
-                self.Platform.EndingTime = self.AntPulses[self.TimeId + 1]['TOA']
+                self.Platform.EndingTime = self.AntPulses[self.TimeId + 1].TOA
                 self.PlatformProcessing()
                 self.TimeId += 1
                 self.Platform.AddPulse(self.AntPulses[self.TimeId])
@@ -77,7 +80,7 @@ class DigitalTwin():
             return None
         self.Platform.StartingTime = self.Platform.EndingTime
         # TOE : Time of ending
-        TOEList = [el['TOA'] + el['LI'] for el in self.Platform.Pulses]
+        TOEList = [Pulse.TOA + Pulse.LI for Pulse in self.Platform.Pulses]
         minTOE = min(TOEList)
 
         # un palier commence car une impulsion se termine
@@ -88,6 +91,9 @@ class DigitalTwin():
         self.forward()
 
     def PlatformProcessing(self):
+        # On laisse cette fonction le temps de tester
+        self.Processor.RunPlatform(self.Platform, self.Trackers)
+
         # ne pas utiliser self.TimeId sinon risque de bug
         print('starting time :', self.Platform.StartingTime)
         print('curent pulses :', self.Platform.Pulses)
@@ -97,6 +103,6 @@ class DigitalTwin():
 
 
 if __name__=='__main__':
-    AntP = [{'TOA': 5 * k, 'LI': k} for k in range(1, 10)]
+    AntP = [Pulse(TOA=5*k, LI=k) for k in range(1, 10)]
     DT = DigitalTwin(AntP)
     DT.forward()

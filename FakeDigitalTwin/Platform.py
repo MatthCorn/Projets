@@ -1,8 +1,9 @@
 import numpy as np
 
 class Platform():
-    def __init__(self, Pulses=[], StartingTime=0, EndingTime=0):
-        self.Pulses = Pulses
+    def __init__(self, StartingTime=0, EndingTime=0):
+        self.Pulses = []
+        self.VisiblePulses = []
         self.StartingTime = StartingTime
         self.EndingTime = EndingTime
 
@@ -25,18 +26,19 @@ class Processor():
     # Cette fonction supprime les impulsions qui doivent l'être suite à leurs interaction sur un palier
     def Interaction(self, Platform):
         # Si deux impulsions ont des fréquences repliées proches, on supprime celle de plus bas niveau
-        for Pulse in Platform.Pulses:
-            FreqRep = Pulse.Freq % self.Fe
-            for OtherPulse in Platform.Pulses:
+        Platform.VisiblePulses = Platform.Pulses.copy()
+        for Pulse in Platform.VisiblePulses:
+            FreqRep = Pulse.GetFreq(Platform.StartingTime) % self.Fe
+            for OtherPulse in Platform.VisiblePulses:
                 if OtherPulse != Pulse:
-                    FreqRepOther = OtherPulse.Freq % self.Fe
+                    FreqRepOther = OtherPulse.GetFreq(Platform.StartingTime) % self.Fe
                     if (abs(FreqRep-FreqRepOther) < self.FreqSensibility) and (Pulse.Level > OtherPulse.Level):
-                        Platform.DelPulse(Platform.Pulses.index(OtherPulse))
+                        Platform.DelPulse(Platform.VisiblePulses.index(OtherPulse))
 
     def Correlation(self, Platform, Trackers):
         FreqTrackers = np.array([tracker.FreqCur for tracker in Trackers])
         LevelTrackers = np.array([tracker.Level for tracker in Trackers])
-        FreqPulses = np.array([pulse.GetFreq(Platform.StartingTime) for pulse in Platform.Pulses])
+        FreqPulses = np.array([pulse.GetFreq(Platform.StartingTime) for pulse in Platform.VisiblePulses])
         Comp = np.abs(np.expand_dims(FreqTrackers, axis=0)-np.expand_dims(FreqPulses, axis=1)) < self.FreqThreshold
 
 
@@ -47,8 +49,9 @@ class Processor():
         return Id
 
     def RunPlatform(self, Platform, Trackers):
+        self.Interaction(Platform)
         Id = self.Correlation(Platform, Trackers)
-        for i in range(len(Platform.Pulses)):
+        for i in range(len(Platform.VisiblePulses)):
             if Id[i] is False:
                 # Si l'impulsion d'indice "i" ne corrèle avec aucun mesureur
                 # On essaie d'ouvrir un mesureur
@@ -59,6 +62,7 @@ class Processor():
 
             else:
                 # Sinon on met à jour le mesureur
-                self.Trackers[Id].Update(Id=i)
-        for Tracker in self.Trackers:
-            Tracker.CheckAge()
+                Trackers[Id[i]].Update(Id=i)
+        for Tracker in Trackers:
+            if Tracker.IsTaken:
+                Tracker.Check(Platform)
