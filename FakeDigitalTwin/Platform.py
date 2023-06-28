@@ -17,7 +17,7 @@ class Platform():
         return self.Pulses==[]
 
 class Processor():
-    def __init__(self, FreqThreshold=10, Fe=500, MaxAgeTracker=10, FreqSensibility=0):
+    def __init__(self, FreqThreshold=1.5, Fe=500, MaxAgeTracker=10, FreqSensibility=1):
         self.FreqThreshold = FreqThreshold
         self.FreqSensibility = FreqSensibility
         self.Fe = Fe
@@ -67,7 +67,7 @@ class Processor():
                         break
 
             else:
-                # Sinon on met à jour le mesureur
+                # Sinon on met à jour le mesureur (pas les fréquences min et max car le mesureur peut encore être coupé si il est trop long)
                 Trackers[Id[i]].Update(Id=i)
         for Tracker in Trackers:
             if Tracker.IsTaken:

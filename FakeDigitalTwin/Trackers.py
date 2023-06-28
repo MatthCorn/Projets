@@ -1,5 +1,5 @@
 class Tracker():
-    def __init__(self, Id, MaxAge, HoldingTime=1, parent=None):
+    def __init__(self, Id, MaxAge, HoldingTime=3, parent=None):
         self.id = Id
         self.MaxAge = MaxAge
         self.HoldingTime = HoldingTime
@@ -28,9 +28,9 @@ class Tracker():
             # On ajoute le flag "troncature avant"
             self.flags.add('TroncAv')
         self.TOE = self.parent.Platform.EndingTime
-        self.FreqMin = min(self.parent.Platform.VisiblePulses[Id].GetFreq(self.TOE), self.parent.Platform.VisiblePulses[Id].GetFreq(self.TOA))
+        self.FreqMin = self.parent.Platform.VisiblePulses[Id].GetFreq(self.TOA)
         self.FreqCur = self.parent.Platform.VisiblePulses[Id].GetFreq(self.TOE)
-        self.FreqMax = max(self.parent.Platform.VisiblePulses[Id].GetFreq(self.TOE), self.parent.Platform.VisiblePulses[Id].GetFreq(self.TOA))
+        self.FreqMax = self.parent.Platform.VisiblePulses[Id].GetFreq(self.TOA)
         self.Level = self.parent.Platform.VisiblePulses[Id].Level
         return True
 
@@ -45,26 +45,42 @@ class Tracker():
         platform = self.parent.Platform
         self.TOE = platform.EndingTime
         CurrentFreq = platform.VisiblePulses[Id].GetFreq(self.TOE)
-        self.FreqMin = min(self.FreqMin, CurrentFreq)
         self.FreqCur = CurrentFreq
-        self.FreqMax = max(self.FreqMax, CurrentFreq)
 
     def Check(self, platform):
         # Si la platform est vide, tous les mesureurs sont fermés
         if platform.IsEmpty():
             self.Release()
+            return None
 
         # On vérifie que le mesureur n'est pas ouvert depuis trop longtemps
-        Age = self.TOA - self.TOE
+        Age = self.TOE - self.TOA
         if Age > self.MaxAge:
             self.TOE = self.TOA + self.MaxAge
+
+            # On met à jour les fréquences min et max
+            Id = self.Histogram[-1]
+            CurrentFreq = platform.VisiblePulses[Id].GetFreq(self.TOE)
+            self.FreqMin = min(self.FreqMin, CurrentFreq)
+            self.FreqMax = max(self.FreqMax, CurrentFreq)
+
             self.Release(flag='CW')
-            self.Open(Id=self.Histogram[-1], TOA=self.TOE, flag='CW')
+            self.Open(Id=Id, TOA=self.TOE, flag=['CW'])
+            self.Check(platform)
+            return None
 
         # On vérifie que le mesureur n'a pas perdu la trace de son impulsion
         if platform.EndingTime - self.TOE > self.HoldingTime:
             self.Release()
             self.TOE = platform.EndingTime
+            return None
+
+        # Sinon on peut mettre à jour les fréquences min et max
+        Id = self.Histogram[-1]
+        CurrentFreq = platform.VisiblePulses[Id].GetFreq(self.TOE)
+        self.FreqMin = min(self.FreqMin, CurrentFreq)
+        self.FreqMax = max(self.FreqMax, CurrentFreq)
+        return None
 
     def Emission(self):
         # return None
@@ -88,7 +104,7 @@ class Pulse():
         return (self.FreqStart*(TOE-t) + self.FreqEnd*(t-TOA))/self.LI
 
     def __str__(self):
-        return '(TOA={}, LI={})'.format(self.TOA, self.LI)
+        return '(TOA={}, LI={}, FreqStart={}, FreqEnd={})'.format(self.TOA, self.LI, self.FreqStart, self.FreqEnd)
 
     def __repr__(self):
-        return '(Pulse : TOA={} ; LI={})'.format(self.TOA, self.LI)
+        return '(Pulse : TOA={} ; LI={} ; FreqStart={} ; FreqEnd={})'.format(self.TOA, self.LI, self.FreqStart, self.FreqEnd)

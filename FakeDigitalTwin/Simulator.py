@@ -10,7 +10,7 @@ class DigitalTwin():
         # Making trackers to follow the pulses through the platforms
         self.Trackers = []
         for i in range(NbMaxTrackers):
-            self.Trackers.append(Tracker(Id=str(i), parent=self, MaxAge=1))
+            self.Trackers.append(Tracker(Id=str(i), parent=self, MaxAge=5))
 
         self.Processor = Processor()
         self.PDWs = []
@@ -77,6 +77,7 @@ class DigitalTwin():
 
     def termination(self):
         if self.Platform.IsEmpty():
+            self.PlatformProcessing()
             return None
         self.Platform.StartingTime = self.Platform.EndingTime
         # TOE : Time of ending
@@ -100,12 +101,14 @@ class DigitalTwin():
         print('visible pulses :', self.Platform.VisiblePulses)
         print('ending time :', self.Platform.EndingTime)
         print('trackers:', [el for el in self.Trackers if el.IsTaken])
+        print('PDWs:', self.PDWs)
         print('\n')
         None
 
 
 if __name__=='__main__':
-    AntP = [Pulse(TOA=5*k, LI=k) for k in range(1, 10)]
+    import numpy as np
+    AntP = [Pulse(TOA=1, LI=16, FreqStart=10, FreqEnd=12), Pulse(TOA=27, LI=12, FreqStart=9, FreqEnd=6)]
+    # AntP = [Pulse(TOA=5*k, LI=k, FreqStart=np.random.randint(7, 13), FreqEnd=np.random.randint(7, 13)) for k in range(4, 13)]
     DT = DigitalTwin(AntP)
     DT.forward()
-    print(DT.PDWs)
