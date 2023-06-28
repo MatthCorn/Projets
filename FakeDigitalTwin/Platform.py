@@ -13,18 +13,32 @@ class Platform():
     def DelPulse(self, Id):
         del(self.Pulses[Id])
 
+    def DelVisiblePulse(self, Id):
+        del(self.VisiblePulses[Id])
+
     def IsEmpty(self):
         return self.Pulses==[]
 
 class Processor():
-    def __init__(self, FreqThreshold=1.5, Fe=500, MaxAgeTracker=10, FreqSensibility=1):
+    def __init__(self, FreqThreshold=1.5, Fe=500, MaxAgeTracker=10, FreqSensibility=1, SaturationThreshold=5):
         self.FreqThreshold = FreqThreshold
         self.FreqSensibility = FreqSensibility
         self.Fe = Fe
         self.MaxAgeTracker = MaxAgeTracker
+        self.SaturationThreshold = SaturationThreshold
 
     # Cette fonction supprime les impulsions qui doivent l'être suite à leurs interaction sur un palier
     def Interaction(self, Platform):
+        # Si le palier est vide, on n'a rien à faire
+        if Platform.IsEmpty():
+            Platform.VisiblePulses = []
+            return None
+
+        # Si l'impulsion de plus haut niveau dépasse le seuil de saturation, elle est la seule conservée
+        IdLvlMax = np.argmax([Pulse.Level for Pulse in Platform.Pulses])
+        if Platform.Pulses[IdLvlMax].Level > self.SaturationThreshold:
+            Platform.VisiblePulses = [Platform.Pulses[IdLvlMax]]
+            return None
         # Si deux impulsions ont des fréquences repliées proches, on supprime celle de plus bas niveau
         Platform.VisiblePulses = Platform.Pulses.copy()
         return None
@@ -34,15 +48,12 @@ class Processor():
                 if OtherPulse != Pulse:
                     FreqRepOther = OtherPulse.GetFreq(Platform.StartingTime) % self.Fe
                     if (abs(FreqRep-FreqRepOther) < self.FreqSensibility) and (Pulse.Level > OtherPulse.Level):
-                        Platform.DelPulse(Platform.VisiblePulses.index(OtherPulse))
+                        Platform.DelVisiblePulse(Platform.VisiblePulses.index(OtherPulse))
 
     def Correlation(self, Platform, Trackers):
         FreqTrackers = np.array([tracker.FreqCur for tracker in Trackers])
         LevelTrackers = np.array([tracker.Level for tracker in Trackers])
-        P = Platform.VisiblePulses
-        ST = Platform.StartingTime
-        ET = Platform.EndingTime
-        FreqPulses = np.array([pulse.GetFreq(Platform.StartingTime) for pulse in P])
+        FreqPulses = np.array([pulse.GetFreq(Platform.StartingTime) for pulse in Platform.VisiblePulses])
         Comp = np.abs(np.expand_dims(FreqTrackers, axis=0)-np.expand_dims(FreqPulses, axis=1)) < self.FreqThreshold
         Available = np.array([Tracker.IsTaken for Tracker in Trackers])
         Comp = Comp * Available
