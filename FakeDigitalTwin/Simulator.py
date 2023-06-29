@@ -108,7 +108,13 @@ class DigitalTwin():
 
 if __name__ == '__main__':
     import numpy as np
-    # AntP = [Pulse(TOA=1, LI=16, FreqStart=10, FreqEnd=12, Level=1), Pulse(TOA=27, LI=12, FreqStart=9, FreqEnd=6, Level=1)]
-    AntP = [Pulse(TOA=5*k, LI=k, FreqStart=np.random.randint(7, 13), FreqEnd=np.random.randint(7, 13), Level=5.5*np.random.random()) for k in range(4, 13)]
+    import scipy as sp
+    # AntP = [Pulse(TOA=1, LI=16, FreqStart=10, FreqEnd=12, Level=1), Pulse(TOA=7, LI=12, FreqStart=9, FreqEnd=6, Level=1)]
+    # AntP = [Pulse(TOA=5*k, LI=k, FreqStart=np.random.randint(7, 13), FreqEnd=np.random.randint(7, 13), Level=5.5*np.random.random()) for k in range(4, 13)]
+
+    # On se donne un scénario de 1000 unité de temps
+    # Le temps de maintien max est de tmax unité de temps, on veut que 99% des impulsions soit moins longues
+    tmax = sp.stats.gamma.ppf(0.99, a=2, scale=1)
+    AntP = [Pulse(TOA=1000*np.random.random(), LI=np.random.gamma(shape=2, scale=1))]
     DT = DigitalTwin(AntP)
     DT.forward()

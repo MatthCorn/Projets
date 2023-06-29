@@ -41,7 +41,6 @@ class Processor():
             return None
         # Si deux impulsions ont des fréquences repliées proches, on supprime celle de plus bas niveau
         Platform.VisiblePulses = Platform.Pulses.copy()
-        return None
         for Pulse in Platform.VisiblePulses:
             FreqRep = Pulse.GetFreq(Platform.StartingTime) % self.Fe
             for OtherPulse in Platform.VisiblePulses:
@@ -53,7 +52,7 @@ class Processor():
     def Correlation(self, Platform, Trackers):
         FreqTrackers = np.array([tracker.FreqCur for tracker in Trackers])
         LevelTrackers = np.array([tracker.Level for tracker in Trackers])
-        FreqPulses = np.array([pulse.GetFreq(Platform.StartingTime) for pulse in Platform.VisiblePulses])
+        FreqPulses = np.array([pulse.GetFreq(Platform.StartingTime) for pulse in Platform.Pulses])
         Comp = np.abs(np.expand_dims(FreqTrackers, axis=0)-np.expand_dims(FreqPulses, axis=1)) < self.FreqThreshold
         Available = np.array([Tracker.IsTaken for Tracker in Trackers])
         Comp = Comp * Available
@@ -66,20 +65,25 @@ class Processor():
         return Id
 
     def RunPlatform(self, Platform, Trackers):
+        # On crée la liste des impulsions visibles sur le palier
         self.Interaction(Platform)
-        Id = self.Correlation(Platform, Trackers)
-        for i in range(len(Platform.VisiblePulses)):
-            if Id[i] is False:
-                # Si l'impulsion d'indice "i" ne corrèle avec aucun mesureur
-                # On essaie d'ouvrir un mesureur
-                for Tracker in Trackers:
-                    if Tracker.Open(Id=i):
-                        # on arrête d'essayer d'ouvrir les mesureurs si on arrive à en ouvrir un
-                        break
 
-            else:
-                # Sinon on met à jour le mesureur (pas les fréquences min et max car le mesureur peut encore être coupé si il est trop long)
-                Trackers[Id[i]].Update(Id=i)
+        # On crée la liste de corrélation entre les mesureurs et TOUTES les impulsions du palier
+        Id = self.Correlation(Platform, Trackers)
+        for i in range(len(Platform.Pulses)):
+            if Platform.Pulses[i] in Platform.VisiblePulses:
+                # Si l'impulsion d'indice "i" est visible
+                if Id[i] is False:
+                    # Si l'impulsion d'indice "i" ne corrèle avec aucun mesureur
+                    # On essaie d'ouvrir un mesureur
+                    for Tracker in Trackers:
+                        if Tracker.Open(Id=i):
+                            # on arrête d'essayer d'ouvrir les mesureurs si on arrive à en ouvrir un
+                            break
+
+                else:
+                    # Sinon on met à jour le mesureur (pas les fréquences min et max car le mesureur peut encore être coupé si il est trop long)
+                    Trackers[Id[i]].Update(Id=i)
         for Tracker in Trackers:
             if Tracker.IsTaken:
                 Tracker.Check(Platform)
