@@ -114,7 +114,19 @@ if __name__ == '__main__':
 
     # On se donne un scénario de 1000 unité de temps
     # Le temps de maintien max est de tmax unité de temps, on veut que 99% des impulsions soit moins longues
-    tmax = sp.stats.gamma.ppf(0.99, a=2, scale=1)
+    # tmax = sp.stats.gamma.ppf(0.99, a=2, scale=1)
     AntP = [Pulse(TOA=1000*np.random.random(), LI=np.random.gamma(shape=2, scale=1))]
     DT = DigitalTwin(AntP)
     DT.forward()
+
+    import numpy as np
+    t_max = 2
+    scale = 1
+    frac = 1
+    while frac > 0.1:
+        scale *= 0.99
+        np_gamma = np.random.gamma(shape=2, scale=scale, size=10000)
+        frac = sum(np_gamma > t_max)/10000
+        print(scale)
+        print(frac)
+        print('\n')
