@@ -1,10 +1,8 @@
 from FakeDigitalTwin.Trackers import Tracker, Pulse
 from FakeDigitalTwin.Platform import Platform, Processor
 class DigitalTwin():
-    def __init__(self, AntPulses, NbMaxTrackers=4):
-        self.AntPulses = AntPulses
+    def __init__(self, NbMaxTrackers=4, FreqThreshold=1.5, Fe=500, MaxAgeTracker=10, FreqSensibility=1, SaturationThreshold=5):
         self.Platform = Platform()
-        self.LevelThreshold = 0
         self.TimeId = -1
 
         # Making trackers to follow the pulses through the platforms
@@ -12,10 +10,13 @@ class DigitalTwin():
         for i in range(NbMaxTrackers):
             self.Trackers.append(Tracker(Id=str(i), parent=self, MaxAge=5))
 
-        self.Processor = Processor()
+        self.Processor = Processor(FreqThreshold=FreqThreshold, Fe=Fe, MaxAgeTracker=MaxAgeTracker,
+                                   FreqSensibility=FreqSensibility, SaturationThreshold=SaturationThreshold)
         self.PDWs = []
 
-    def forward(self):
+    def forward(self, AntPulses):
+        if self.AntPulses is None:
+            self.AntPulses = AntPulses
         if self.TimeId == -1:
             self.initialization()
         elif self.TimeId < len(self.AntPulses)-1:
@@ -92,41 +93,23 @@ class DigitalTwin():
         self.forward()
 
     def PlatformProcessing(self):
-        # On laisse cette fonction le temps de tester
         self.Processor.RunPlatform(self.Platform, self.Trackers)
 
-        # ne pas utiliser self.TimeId sinon risque de bug
-        print('starting time :', self.Platform.StartingTime)
-        print('curent pulses :', self.Platform.Pulses)
-        print('visible pulses :', self.Platform.VisiblePulses)
-        print('ending time :', self.Platform.EndingTime)
-        print('trackers:', [el for el in self.Trackers if el.IsTaken])
-        print('PDWs:', self.PDWs)
-        print('\n')
-        None
+        # print('starting time :', self.Platform.StartingTime)
+        # print('curent pulses :', self.Platform.Pulses)
+        # print('visible pulses :', self.Platform.VisiblePulses)
+        # print('ending time :', self.Platform.EndingTime)
+        # print('trackers:', [el for el in self.Trackers if el.IsTaken])
+        # print('PDWs:', self.PDWs)
+        # print('\n')
 
 
 if __name__ == '__main__':
     import numpy as np
     import scipy as sp
     # AntP = [Pulse(TOA=1, LI=16, FreqStart=10, FreqEnd=12, Level=1), Pulse(TOA=7, LI=12, FreqStart=9, FreqEnd=6, Level=1)]
-    # AntP = [Pulse(TOA=5*k, LI=k, FreqStart=np.random.randint(7, 13), FreqEnd=np.random.randint(7, 13), Level=5.5*np.random.random()) for k in range(4, 13)]
+    AntP = [Pulse(TOA=5*k, LI=k, FreqStart=np.random.randint(7, 13), FreqEnd=np.random.randint(7, 13), Level=5.5*np.random.random()) for k in range(4, 13)]
 
-    # On se donne un scénario de 1000 unité de temps
-    # Le temps de maintien max est de tmax unité de temps, on veut que 99% des impulsions soit moins longues
-    # tmax = sp.stats.gamma.ppf(0.99, a=2, scale=1)
-    AntP = [Pulse(TOA=1000*np.random.random(), LI=np.random.gamma(shape=2, scale=1))]
-    DT = DigitalTwin(AntP)
-    DT.forward()
+    DT = DigitalTwin()
+    DT.forward(AntPulses=AntP)
 
-    import numpy as np
-    t_max = 2
-    scale = 1
-    frac = 1
-    while frac > 0.1:
-        scale *= 0.99
-        np_gamma = np.random.gamma(shape=2, scale=scale, size=10000)
-        frac = sum(np_gamma > t_max)/10000
-        print(scale)
-        print(frac)
-        print('\n')
