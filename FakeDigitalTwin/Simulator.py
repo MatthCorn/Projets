@@ -2,6 +2,7 @@ from FakeDigitalTwin.Trackers import Tracker, Pulse
 from FakeDigitalTwin.Platform import Platform, Processor
 class DigitalTwin():
     def __init__(self, NbMaxTrackers=4, FreqThreshold=1.5, Fe=500, MaxAgeTracker=10, FreqSensibility=1, SaturationThreshold=5):
+        self.AntPulses = None
         self.Platform = Platform()
         self.TimeId = -1
 
@@ -43,7 +44,7 @@ class DigitalTwin():
             self.PlatformProcessing()
             self.TimeId += 1
             self.Platform.AddPulse(self.AntPulses[self.TimeId])
-        self.forward()
+        self.forward(self.AntPulses)
 
     def step(self):
         self.Platform.StartingTime = self.Platform.EndingTime
@@ -74,7 +75,7 @@ class DigitalTwin():
                 self.Platform.DelPulse(TOEList.index(minTOE))
                 self.TimeId += 1
                 self.Platform.AddPulse(self.AntPulses[self.TimeId])
-        self.forward()
+        self.forward(self.AntPulses)
 
     def termination(self):
         if self.Platform.IsEmpty():
@@ -90,26 +91,25 @@ class DigitalTwin():
         self.PlatformProcessing()
         self.Platform.DelPulse(TOEList.index(minTOE))
 
-        self.forward()
+        self.forward(self.AntPulses)
 
     def PlatformProcessing(self):
         self.Processor.RunPlatform(self.Platform, self.Trackers)
 
-        # print('starting time :', self.Platform.StartingTime)
-        # print('curent pulses :', self.Platform.Pulses)
-        # print('visible pulses :', self.Platform.VisiblePulses)
-        # print('ending time :', self.Platform.EndingTime)
-        # print('trackers:', [el for el in self.Trackers if el.IsTaken])
-        # print('PDWs:', self.PDWs)
-        # print('\n')
+        print('starting time :', self.Platform.StartingTime)
+        print('curent pulses :', self.Platform.Pulses)
+        print('visible pulses :', self.Platform.VisiblePulses)
+        print('ending time :', self.Platform.EndingTime)
+        print('trackers:', [el for el in self.Trackers if el.IsTaken])
+        print('PDWs:', self.PDWs)
+        print('\n')
 
 
 if __name__ == '__main__':
     import numpy as np
-    import scipy as sp
     # AntP = [Pulse(TOA=1, LI=16, FreqStart=10, FreqEnd=12, Level=1), Pulse(TOA=7, LI=12, FreqStart=9, FreqEnd=6, Level=1)]
     AntP = [Pulse(TOA=5*k, LI=k, FreqStart=np.random.randint(7, 13), FreqEnd=np.random.randint(7, 13), Level=5.5*np.random.random()) for k in range(4, 13)]
 
     DT = DigitalTwin()
-    DT.forward(AntPulses=AntP)
+    DT.forward(AntP)
 
