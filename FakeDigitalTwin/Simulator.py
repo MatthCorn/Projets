@@ -17,6 +17,7 @@ class DigitalTwin():
     def forward(self, AntPulses=None):
         if AntPulses is not None:
             self.AntPulses = AntPulses
+        print(self.TimeId)
         if self.TimeId == -1:
             self.initialization()
         elif self.TimeId < len(self.AntPulses)-1:
@@ -95,13 +96,13 @@ class DigitalTwin():
     def PlatformProcessing(self):
         self.Processor.RunPlatform(self.Platform, self.Trackers)
 
-        print('starting time :', self.Platform.StartingTime)
-        print('curent pulses :', self.Platform.Pulses)
-        print('visible pulses :', self.Platform.VisiblePulses)
-        print('ending time :', self.Platform.EndingTime)
-        print('trackers:', [el for el in self.Trackers if el.IsTaken])
-        print('PDWs:', self.PDWs)
-        print('\n')
+        # print('starting time :', self.Platform.StartingTime)
+        # print('curent pulses :', self.Platform.Pulses)
+        # print('visible pulses :', self.Platform.VisiblePulses)
+        # print('ending time :', self.Platform.EndingTime)
+        # print('trackers:', [el for el in self.Trackers if el.IsTaken])
+        # print('PDWs:', self.PDWs)
+        # print('\n')
 
 
 if __name__ == '__main__':

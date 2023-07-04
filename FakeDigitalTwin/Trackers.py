@@ -108,4 +108,4 @@ class Pulse():
         return '(TOA={}, LI={}, FreqStart={}, FreqEnd={})'.format(self.TOA, self.LI, self.FreqStart, self.FreqEnd)
 
     def __repr__(self):
-        return '(Pulse : TOA={} ; LI={} ; FreqStart={} ; FreqEnd={})'.format(self.TOA, self.LI, self.FreqStart, self.FreqEnd)
+        return 'Pulse(TOA={}, LI={}, Level={}, FreqStart={}, FreqEnd={})'.format(self.TOA, self.LI, self.Level, self.FreqStart, self.FreqEnd)
