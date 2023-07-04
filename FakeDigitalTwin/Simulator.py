@@ -2,7 +2,6 @@ from FakeDigitalTwin.Trackers import Tracker, Pulse
 from FakeDigitalTwin.Platform import Platform, Processor
 class DigitalTwin():
     def __init__(self, NbMaxTrackers=4, FreqThreshold=1.5, Fe=500, MaxAgeTracker=10, FreqSensibility=1, SaturationThreshold=5):
-        self.AntPulses = None
         self.Platform = Platform()
         self.TimeId = -1
 
@@ -15,8 +14,8 @@ class DigitalTwin():
                                    FreqSensibility=FreqSensibility, SaturationThreshold=SaturationThreshold)
         self.PDWs = []
 
-    def forward(self, AntPulses):
-        if self.AntPulses is None:
+    def forward(self, AntPulses=None):
+        if AntPulses is not None:
             self.AntPulses = AntPulses
         if self.TimeId == -1:
             self.initialization()
@@ -44,7 +43,7 @@ class DigitalTwin():
             self.PlatformProcessing()
             self.TimeId += 1
             self.Platform.AddPulse(self.AntPulses[self.TimeId])
-        self.forward(self.AntPulses)
+        self.forward()
 
     def step(self):
         self.Platform.StartingTime = self.Platform.EndingTime
@@ -75,7 +74,7 @@ class DigitalTwin():
                 self.Platform.DelPulse(TOEList.index(minTOE))
                 self.TimeId += 1
                 self.Platform.AddPulse(self.AntPulses[self.TimeId])
-        self.forward(self.AntPulses)
+        self.forward()
 
     def termination(self):
         if self.Platform.IsEmpty():
@@ -91,7 +90,7 @@ class DigitalTwin():
         self.PlatformProcessing()
         self.Platform.DelPulse(TOEList.index(minTOE))
 
-        self.forward(self.AntPulses)
+        self.forward()
 
     def PlatformProcessing(self):
         self.Processor.RunPlatform(self.Platform, self.Trackers)
@@ -111,5 +110,5 @@ if __name__ == '__main__':
     AntP = [Pulse(TOA=5*k, LI=k, FreqStart=np.random.randint(7, 13), FreqEnd=np.random.randint(7, 13), Level=5.5*np.random.random()) for k in range(4, 13)]
 
     DT = DigitalTwin()
-    DT.forward(AntP)
+    DT.forward(AntPulses=AntP)
 
