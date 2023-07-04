@@ -20,11 +20,10 @@ class Platform():
         return self.Pulses==[]
 
 class Processor():
-    def __init__(self, FreqThreshold=1.5, Fe=500, MaxAgeTracker=10, FreqSensibility=1, SaturationThreshold=5):
+    def __init__(self, FreqThreshold=1.5, Fe=500, FreqSensibility=1, SaturationThreshold=5):
         self.FreqThreshold = FreqThreshold
         self.FreqSensibility = FreqSensibility
         self.Fe = Fe
-        self.MaxAgeTracker = MaxAgeTracker
         self.SaturationThreshold = SaturationThreshold
 
     # Cette fonction supprime les impulsions qui doivent l'être suite à leurs interaction sur un palier

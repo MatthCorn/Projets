@@ -1,5 +1,5 @@
 class Tracker():
-    def __init__(self, Id, MaxAge, HoldingTime=3, parent=None):
+    def __init__(self, Id, MaxAge, HoldingTime=2, parent=None):
         self.id = Id
         self.MaxAge = MaxAge
         self.HoldingTime = HoldingTime
@@ -59,18 +59,40 @@ class Tracker():
         elif Age > self.MaxAge:
             # Si le mesureur est ouvert depuis trop longtemps
             self.TOE = self.TOA + self.MaxAge
+            TOA_CW = self.TOE
 
-            # On met à jour les fréquences min et max
+            # On regarde si la dernière impulsion arrive sur la rupture de suivi du mesureur
+            # Il se peut que non si la trace de l'impulsion était perdue sur le parlier de la date d'arrêt de suivi du mesureur
             Id = self.Histogram[-1]
-            CurrentFreq = platform.Pulses[Id].GetFreq(self.TOE)
-            self.FreqMin = min(self.FreqMin, CurrentFreq)
-            self.FreqMax = max(self.FreqMax, CurrentFreq)
+            LastPulse = platform.Pulses[Id]
+            if self.TOE > LastPulse.TOA:
+                # Si la dernière impulsion arrive sur la rupture de suivi du mesureur
+                # On met à jour les fréquences min et max
+                Id = self.Histogram[-1]
+                CurrentFreq = LastPulse.GetFreq(self.TOE)
+                self.FreqMin = min(self.FreqMin, CurrentFreq)
+                self.FreqMax = max(self.FreqMax, CurrentFreq)
 
-            # On émet un PDW avec un flag "CW"
-            self.Release(flag='CW')
-            # Puis on réouvre le mesureur avec la même impulsion
-            self.Open(Id=Id, TOA=self.TOE, flag=['CW'])
-            self.Check(platform)
+                # On émet un PDW avec un flag "CW"
+                self.Release(flag='CW')
+                # Puis on réouvre le mesureur avec la même impulsion
+                self.Open(Id=Id, TOA=TOA_CW, flag=['CW'])
+                self.Check(platform)
+            else:
+                # Sinon, le mesureur est en fait coupé avant l'arrivé de la dernière impulsion
+                # D'abord on émet un PDW puis on s'occupe de la nouvelle impulsion
+                Id = self.Histogram[-1]
+
+                # On émet un PDW avec un flag 'CW'
+                self.Release(flag='CW')
+                # On réouvre le mesureur et on le laisse prendre les infos de la nouvelle impulsion
+                self.Open(Id=Id, flag=['CW'])
+                # On change la TOA du mesureur (une fois que les fréquences sont initialisées par Open())
+                self.TOA = TOA_CW
+                self.Check(platform)
+
+
+
 
         elif platform.EndingTime - self.TOE > self.HoldingTime:
             # Si le mesureur a perdu la trace de son impulsion

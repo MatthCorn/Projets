@@ -1,17 +1,16 @@
 from FakeDigitalTwin.Trackers import Tracker, Pulse
 from FakeDigitalTwin.Platform import Platform, Processor
 class DigitalTwin():
-    def __init__(self, NbMaxTrackers=4, FreqThreshold=1.5, Fe=500, MaxAgeTracker=10, FreqSensibility=1, SaturationThreshold=5):
+    def __init__(self, NbMaxTrackers=4, FreqThreshold=1.5, Fe=500, MaxAgeTracker=5, FreqSensibility=1, SaturationThreshold=5, HoldingTime=2):
         self.Platform = Platform()
         self.TimeId = -1
 
         # Making trackers to follow the pulses through the platforms
         self.Trackers = []
         for i in range(NbMaxTrackers):
-            self.Trackers.append(Tracker(Id=str(i), parent=self, MaxAge=5))
+            self.Trackers.append(Tracker(Id=str(i), parent=self, MaxAge=MaxAgeTracker, HoldingTime=HoldingTime))
 
-        self.Processor = Processor(FreqThreshold=FreqThreshold, Fe=Fe, MaxAgeTracker=MaxAgeTracker,
-                                   FreqSensibility=FreqSensibility, SaturationThreshold=SaturationThreshold)
+        self.Processor = Processor(FreqThreshold=FreqThreshold, Fe=Fe, FreqSensibility=FreqSensibility, SaturationThreshold=SaturationThreshold)
         self.PDWs = []
 
     def forward(self, AntPulses=None):
