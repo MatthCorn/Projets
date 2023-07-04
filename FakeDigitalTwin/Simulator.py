@@ -14,8 +14,8 @@ class DigitalTwin():
                                    FreqSensibility=FreqSensibility, SaturationThreshold=SaturationThreshold)
         self.PDWs = []
 
-    def forward(self, AntPulses):
-        if self.AntPulses is None:
+    def forward(self, AntPulses=None):
+        if AntPulses is not None:
             self.AntPulses = AntPulses
         if self.TimeId == -1:
             self.initialization()
@@ -95,18 +95,17 @@ class DigitalTwin():
     def PlatformProcessing(self):
         self.Processor.RunPlatform(self.Platform, self.Trackers)
 
-        # print('starting time :', self.Platform.StartingTime)
-        # print('curent pulses :', self.Platform.Pulses)
-        # print('visible pulses :', self.Platform.VisiblePulses)
-        # print('ending time :', self.Platform.EndingTime)
-        # print('trackers:', [el for el in self.Trackers if el.IsTaken])
-        # print('PDWs:', self.PDWs)
-        # print('\n')
+        print('starting time :', self.Platform.StartingTime)
+        print('curent pulses :', self.Platform.Pulses)
+        print('visible pulses :', self.Platform.VisiblePulses)
+        print('ending time :', self.Platform.EndingTime)
+        print('trackers:', [el for el in self.Trackers if el.IsTaken])
+        print('PDWs:', self.PDWs)
+        print('\n')
 
 
 if __name__ == '__main__':
     import numpy as np
-    import scipy as sp
     # AntP = [Pulse(TOA=1, LI=16, FreqStart=10, FreqEnd=12, Level=1), Pulse(TOA=7, LI=12, FreqStart=9, FreqEnd=6, Level=1)]
     AntP = [Pulse(TOA=5*k, LI=k, FreqStart=np.random.randint(7, 13), FreqEnd=np.random.randint(7, 13), Level=5.5*np.random.random()) for k in range(4, 13)]
 

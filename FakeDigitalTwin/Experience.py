@@ -45,13 +45,27 @@ LI = np.random.gamma(shape=2, scale=0.5146, size=size)
 ####################################################################################################################
 Level = np.random.gamma(shape=2, scale=2.5716, size=size)
 
-# Les fréquences se trouvent entre 0 et 10 et peuvent varier le long d'une impulsion de 0.1
-dF = 0.1 * (2 * np.random.random(size=size) - 1)
-FreqMoy = 10 * (np.random.random(size=size) + 0.1)
+# Les fréquences se trouvent entre 0 et 10 et peuvent varier le long d'une impulsion de 0.5 unité de fréquence
+dF = 0.5 * (2 * np.random.random(size=size) - 1)
+FreqMoy = 9 * np.random.random(size=size) + 0.5
 FreqStart = FreqMoy + dF
 FreqEnd = FreqMoy - dF
 
 AntP = [Pulse(TOA=TOA[k], LI=LI[k], Level=Level[k], FreqStart=FreqStart[k], FreqEnd=FreqEnd[k]) for k in range(size)]
 
-DT = DigitalTwin(NbMaxTrackers=6, FreqThreshold=1.5, Fe=3, MaxAgeTracker=10, FreqSensibility=1, SaturationThreshold=5)
+# Nombre de mesureurs
+NbMaxTrackers = 6
+# Seuil de différence de fréquences repliées en dessous duquel deux impulsions se gênent
+FreqSensibility = 1
+# Seuil de différence de fréquence entre un mesureur et une impulsion en dessous duquel ces derniers sont associés
+FreqThreshold = 1.5
+# Fréquence d'échantillionage du système
+Fe = 3
+# Temps de maintien d'un mesureur
+MaxAgeTracker = 10
+# Seuil du niveau au dessus duquel les impulsions saturent le palier
+SaturationThreshold = 10
+
+
+DT = DigitalTwin(NbMaxTrackers=NbMaxTrackers, FreqThreshold=FreqThreshold, Fe=Fe, MaxAgeTracker=MaxAgeTracker, FreqSensibility=FreqSensibility, SaturationThreshold=SaturationThreshold)
 DT.forward(AntP)
