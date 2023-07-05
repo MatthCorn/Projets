@@ -13,12 +13,14 @@ class Tracker():
         self.Histogram = []
 
     def Open(self, Id, TOA=None, flag=[]):
-        # L'implémentation de l'histogramme ne permet pas de savoir quelles impulsions sont présentes dans le mesureur
-        # L'histogramme ne sert qu'à réouvrir correctement un mesureur en cas de CW (pour l'instant)
-        self.Histogram = [Id]
-        # Id est l'indice de l'impulsion qui nous intéresse dans la liste des impulsions du palier
         if self.IsTaken:
             return False
+        print('Tracker no. {} opened'.format(self.id))
+        # LastPulseId permet de réouvrir correctement un mesureur en cas de CW
+        self.LastPulseId = Id
+        self.Histogram = [self.parent.Platform.Pulses[Id].Id]
+        # Id est l'indice de l'impulsion qui nous intéresse dans la liste des impulsions du palier
+
         self.IsTaken = True
         self.flags = set(flag)
         self.TOA = self.parent.Platform.StartingTime
@@ -42,8 +44,9 @@ class Tracker():
         self.IsTaken = False
 
     def Update(self, Id):
-        self.Histogram.append(Id)
+        self.LastPulseId = Id
         platform = self.parent.Platform
+        self.Histogram.append(platform.Pulses[Id].Id)
         self.TOE = platform.EndingTime
         CurrentFreq = platform.Pulses[Id].GetFreq(self.TOE)
         self.FreqCur = CurrentFreq
@@ -63,12 +66,11 @@ class Tracker():
 
             # On regarde si la dernière impulsion arrive sur la rupture de suivi du mesureur
             # Il se peut que non si la trace de l'impulsion était perdue sur le parlier de la date d'arrêt de suivi du mesureur
-            Id = self.Histogram[-1]
+            Id = self.LastPulseId
             LastPulse = platform.Pulses[Id]
             if self.TOE > LastPulse.TOA:
                 # Si la dernière impulsion arrive sur la rupture de suivi du mesureur
                 # On met à jour les fréquences min et max
-                Id = self.Histogram[-1]
                 CurrentFreq = LastPulse.GetFreq(self.TOE)
                 self.FreqMin = min(self.FreqMin, CurrentFreq)
                 self.FreqMax = max(self.FreqMax, CurrentFreq)
@@ -81,7 +83,7 @@ class Tracker():
             else:
                 # Sinon, le mesureur est en fait coupé avant l'arrivé de la dernière impulsion
                 # D'abord on émet un PDW puis on s'occupe de la nouvelle impulsion
-                Id = self.Histogram[-1]
+                Id = self.LastPulseId
 
                 # On émet un PDW avec un flag 'CW'
                 self.Release(flag='CW')
@@ -101,7 +103,7 @@ class Tracker():
 
         elif platform.EndingTime == self.TOE:
             # Sinon, si le mesureur vient effectivement de suivre une impulsion sur le palier, on met à jour les fréquences min et max
-            Id = self.Histogram[-1]
+            Id = self.LastPulseId
             CurrentFreq = platform.Pulses[Id].GetFreq(self.TOE)
             self.FreqMin = min(self.FreqMin, CurrentFreq)
             self.FreqMax = max(self.FreqMax, CurrentFreq)
@@ -111,14 +113,16 @@ class Tracker():
         return PDW
 
     def __repr__(self):
-        return '(Tracker : Taken={} ; TOA={} ; TOE={} ; Histogram={} ; Freq={} ; Tracker Id={})'.format(self.IsTaken, self.TOA, self.TOE, self.Histogram, self.FreqCur, self.id)
+        return '(Tracker : Taken={} ; TOA={} ; TOE={} ; Histogram={} ; Freq={} ; Tracker Id={})'.format(self.IsTaken, round(self.TOA, 3), round(self.TOE, 3),
+                                                                                                        self.Histogram, round(self.FreqCur, 3), self.id)
 class Pulse():
-    def __init__(self, FreqStart=0, FreqEnd=0, TOA=0, LI=0, Level=0):
+    def __init__(self, FreqStart=0, FreqEnd=0, TOA=0, LI=0, Level=0, Id=0):
         self.FreqStart = FreqStart
         self.FreqEnd = FreqEnd
         self.TOA = TOA
         self.LI = LI
         self.Level = Level
+        self.Id = Id
 
     def GetFreq(self, t):
         TOA, TOE = self.TOA, self.TOA+self.LI
@@ -127,7 +131,7 @@ class Pulse():
         return (self.FreqStart*(TOE-t) + self.FreqEnd*(t-TOA))/self.LI
 
     def __str__(self):
-        return '(TOA={}, LI={}, FreqStart={}, FreqEnd={})'.format(self.TOA, self.LI, self.FreqStart, self.FreqEnd)
+        return 'Pulse(TOA={}, LI={}, Level={}, FreqStart={}, FreqEnd={}, Id={})'.format(self.TOA, self.LI, self.Level, self.FreqStart, self.FreqEnd, self.Id)
 
     def __repr__(self):
-        return 'Pulse(TOA={}, LI={}, Level={}, FreqStart={}, FreqEnd={})'.format(self.TOA, self.LI, self.Level, self.FreqStart, self.FreqEnd)
+        return 'Pulse(TOA={}, LI={}, Level={}, FreqStart={}, FreqEnd={}, Id={})'.format(self.TOA, self.LI, self.Level, self.FreqStart, self.FreqEnd, self.Id)

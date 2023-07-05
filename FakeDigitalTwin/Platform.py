@@ -46,6 +46,11 @@ class Processor():
                 if OtherPulse != Pulse:
                     FreqRepOther = OtherPulse.GetFreq(Platform.StartingTime) % self.Fe
                     if (abs(FreqRep-FreqRepOther) < self.FreqSensibility) and (Pulse.Level > OtherPulse.Level):
+                        print('\n')
+                        print(Pulse, ' is hiding ', OtherPulse)
+                        print('Folded Frequency of hiding pulse : {}'.format(FreqRep))
+                        print('Folded Frequency of hided pulse : {}'.format(FreqRepOther))
+                        print('\n')
                         Platform.DelVisiblePulse(Platform.VisiblePulses.index(OtherPulse))
 
     def Correlation(self, Platform, Trackers):

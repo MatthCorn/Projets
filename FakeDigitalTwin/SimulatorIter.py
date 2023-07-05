@@ -95,13 +95,22 @@ class DigitalTwin():
     def PlatformProcessing(self):
         self.Processor.RunPlatform(self.Platform, self.Trackers)
 
-        # print('starting time :', self.Platform.StartingTime)
-        # print('curent pulses :', self.Platform.Pulses)
-        # print('visible pulses :', self.Platform.VisiblePulses)
-        # print('ending time :', self.Platform.EndingTime)
-        # print('trackers:', [el for el in self.Trackers if el.IsTaken])
-        # print('PDWs:', self.PDWs)
-        # print('\n')
+        print('\n')
+        print('starting time :', self.Platform.StartingTime)
+        print('\n')
+        print('curent pulses :', self.Platform.Pulses)
+        print('\n')
+        print('visible pulses :', self.Platform.VisiblePulses)
+        print('\n')
+        print('ending time :', self.Platform.EndingTime)
+        print('\n')
+        print('trackers:', [el for el in self.Trackers if el.IsTaken])
+        print('\n')
+        print('PDWs:', self.PDWs)
+        print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+        print('\n')
+        print('\n')
+        print('\n')
 
 
 if __name__ == '__main__':
