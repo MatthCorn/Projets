@@ -74,4 +74,4 @@ DT = DigitalTwin(NbMaxTrackers=NbMaxTrackers, FreqThreshold=FreqThreshold, Fe=Fe
                          FreqSensibility=FreqSensibility, SaturationThreshold=SaturationThreshold, HoldingTime=HoldingTime)
 
 DT.forward(AntP)
-print('nombre de PDWs :',len(DT.PDWs))
+print('nombre de PDWs :', len(DT.PDWs))
