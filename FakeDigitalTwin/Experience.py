@@ -1,5 +1,5 @@
 from FakeDigitalTwin.Trackers import Pulse
-from FakeDigitalTwin.Simulator import DigitalTwin
+from FakeDigitalTwin.SimulatorIter import DigitalTwin
 import numpy as np
 import sys
 
@@ -20,40 +20,10 @@ SaturationThreshold = 10
 # Temps de maintien max d'un mesureur
 HoldingTime = 2
 
-# On essaie d'avoir une distribution qui occasionne un bug assez tôt
-Bool = False
-while Bool:
-
-    size = 1000
-    TOA = 1000 * np.sort(np.random.random(size=size))
-
-    LI = np.random.gamma(shape=2, scale=0.5146, size=size)
-
-    Level = np.random.gamma(shape=2, scale=2.5716, size=size)
-
-    dF = 0.5 * (2 * np.random.random(size=size) - 1)
-    FreqMoy = 9 * np.random.random(size=size) + 0.5
-    FreqStart = FreqMoy + dF
-    FreqEnd = FreqMoy - dF
-
-    AntP = [Pulse(TOA=TOA[k], LI=LI[k], Level=Level[k], FreqStart=FreqStart[k], FreqEnd=FreqEnd[k]) for k in range(size)]
-
-
-    try:
-        DT = DigitalTwin(NbMaxTrackers=NbMaxTrackers, FreqThreshold=FreqThreshold, Fe=Fe, MaxAgeTracker=MaxAgeTracker,
-                         FreqSensibility=FreqSensibility, SaturationThreshold=SaturationThreshold, HoldingTime=HoldingTime)
-        DT.forward(AntP)
-    except:
-        Bool = DT.TimeId > 10
-
-    if not Bool:
-        AntP = AntP[:10]
-        print(AntP)
-
-size = 1000
+size = 100000
 
 # On se donne un scénario de 100 unités de temps
-TOA = 100 * np.sort(np.random.random(size=size))
+TOA = 1000 * np.sort(np.random.random(size=size))
 
 ####################################################################################################################
 # Le temps de maintien max est de 2 unités de temps, on veut que 90% des impulsions soit moins longues
