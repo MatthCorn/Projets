@@ -1,13 +1,15 @@
 from FakeDigitalTwin.Trackers import Pulse
 from FakeDigitalTwin.SimulatorIter import DigitalTwin
+from FakeDigitalTwin.XMLTools import saveObjAsXml
+import os
 import numpy as np
 
 # Nombre de mesureurs
-NbMaxTrackers = 8
+NbMaxTrackers = 7
 # Seuil de différence de fréquences repliées en dessous duquel deux impulsions se gênent
 FreqSensibility = 0.1
 # Seuil de différence de fréquence entre un mesureur et une impulsion en dessous duquel ces derniers sont associés
-FreqThreshold = 0.3
+FreqThreshold = 0.2
 # Fréquence d'échantillionage du système
 Fe = 3
 # Temps de maintien d'un mesureur
@@ -15,13 +17,13 @@ MaxAgeTracker = 2
 # Seuil du niveau au dessus duquel les impulsions saturent le palier
 SaturationThreshold = 10
 # Temps de maintien max d'un mesureur
-HoldingTime = 1
+HoldingTime = 0.5
 
-size = 20
+size = 4000
 
 # On se donne un scénario de 10 unités de temps
 # On a donc en moyenne 4 impulsions en même temps
-TOA = 10 * np.sort(np.random.random(size=size))
+TOA = 1000 * np.sort(np.random.random(size=size))
 
 ####################################################################################################################
 # Le temps de maintien max d'un mesureur est de 2 unités de temps, on veut que 90% des impulsions soit moins longues
@@ -71,7 +73,11 @@ AntP = [Pulse(TOA=round(TOA[k], 3), LI=round(LI[k], 3), Level=round(Level[k], 3)
 
 
 DT = DigitalTwin(NbMaxTrackers=NbMaxTrackers, FreqThreshold=FreqThreshold, Fe=Fe, MaxAgeTracker=MaxAgeTracker,
-                         FreqSensibility=FreqSensibility, SaturationThreshold=SaturationThreshold, HoldingTime=HoldingTime)
+                 FreqSensibility=FreqSensibility, SaturationThreshold=SaturationThreshold, HoldingTime=HoldingTime)
 
 DT.forward(AntP)
-print('nombre de PDWs :', len(DT.PDWs))
+
+cwd = os.getcwd()
+saveObjAsXml([{'TOA': Pulse.TOA, 'LI': Pulse.LI, 'Level': Pulse.Level, 'FreqStart': Pulse.FreqStart, 'FreqEnd': Pulse.FreqEnd,
+               'Id': Pulse.Id} for Pulse in AntP], os.path.join(cwd, 'Data', 'PulsesAnt.xml'))
+saveObjAsXml(DT.PDWs, os.path.join(cwd, 'Data', 'PDWsDCI.xml'))

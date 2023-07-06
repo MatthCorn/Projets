@@ -15,7 +15,7 @@ class Tracker():
     def Open(self, Id, TOA=None, flag=[]):
         if self.IsTaken:
             return False
-        print('Tracker no. {} opened'.format(self.id))
+        # print('Tracker no. {} opened'.format(self.id))
         # LastPulseId permet de réouvrir correctement un mesureur en cas de CW
         self.LastPulseId = Id
         self.Histogram = [self.parent.Platform.Pulses[Id].Id]
