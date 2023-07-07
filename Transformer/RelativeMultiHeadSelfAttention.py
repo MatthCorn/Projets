@@ -35,7 +35,7 @@ class RMHSA(nn.Module):
             )
             # self.mask.shape = (1, 1, max_len, max_len)
 
-    def forward(self,x):
+    def forward(self, x):
         # x.shape = (batch_size, seq_len, d_model)
         batch_size, seq_len, _ = x.shape
         Kt = self.key(x).reshape(batch_size, seq_len, self.num_heads, -1).permute(0, 2, 3, 1)

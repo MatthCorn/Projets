@@ -4,17 +4,19 @@ import idx2numpy
 import torch
 import torch.nn as nn
 
+# local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
+local = r'C:\Users\Matthieu\Documents\Python\Projets'
 def MakeLabelSet(x):
     out = torch.zeros(x.shape[0],10)
     for i in range(len(x)):
         out[i,int(x[i])] = 1
     return out
 
-TrainingImageSet = torch.tensor(idx2numpy.convert_from_file(r'C:\Users\Matthieu\Documents\Python\Projets\Projets\DigitsClassifier\train-images.idx3-ubyte')).to(torch.float32)
-TrainingLabels = torch.tensor(idx2numpy.convert_from_file(r'C:\Users\Matthieu\Documents\Python\Projets\Projets\DigitsClassifier\train-labels.idx1-ubyte')).to(torch.int)
+TrainingImageSet = torch.tensor(idx2numpy.convert_from_file(local + r'\DigitsClassifier\Data\train-images.idx3-ubyte')).to(torch.float32)
+TrainingLabels = torch.tensor(idx2numpy.convert_from_file(local + r'\DigitsClassifier\Data\train-labels.idx1-ubyte')).to(torch.int)
 TrainingLabelSet = MakeLabelSet(TrainingLabels)
-ValidationImageSet = torch.tensor(idx2numpy.convert_from_file(r'C:\Users\Matthieu\Documents\Python\Projets\Projets\DigitsClassifier\t10k-images.idx3-ubyte')).to(torch.float32)
-ValidationLabels = torch.tensor(idx2numpy.convert_from_file(r'C:\Users\Matthieu\Documents\Python\Projets\Projets\DigitsClassifier\t10k-labels.idx1-ubyte')).to(torch.int)
+ValidationImageSet = torch.tensor(idx2numpy.convert_from_file(local + r'\DigitsClassifier\Data\t10k-images.idx3-ubyte')).to(torch.float32)
+ValidationLabels = torch.tensor(idx2numpy.convert_from_file(local + r'\DigitsClassifier\Data\t10k-labels.idx1-ubyte')).to(torch.int)
 ValidationLabelSet = MakeLabelSet(ValidationLabels)
 
 d_model = 28
@@ -27,11 +29,11 @@ d_out = 10
 class ClassifierTransformer(nn.Module):
     def __init__(self):
         super().__init__()
-        self.FirstEncoder = EncoderLayer(d_model, num_heads, WidthsFeedForward=[100,100], max_len=64, MHADropout=0.1, FFDropout=0.05, masked=False)
-        self.SecondEncoder = EncoderLayer(d_model, num_heads, WidthsFeedForward=[100, 100], max_len=64, MHADropout=0.1, FFDropout=0.05, masked=False)
-        self.FinalClassifier = nn.Linear(784,10)
+        self.FirstEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=64, MHADropout=0.1, FFDropout=0.05, masked=False)
+        self.SecondEncoder = EncoderLayer(d_model=d_model, d_att=d_model, num_heads=num_heads, WidthsFeedForward=[100, 100], max_len=64, MHADropout=0.1, FFDropout=0.05, masked=False)
+        self.FinalClassifier = nn.Linear(784, 10)
 
-    def forward(self,x):
+    def forward(self, x):
         # x.shape = (batch_size, seq_len, d_model)
         y = self.FirstEncoder(x)
         # y.shape = (batch_size, seq_len, d_model)
@@ -55,7 +57,7 @@ ValidationLabels = ValidationLabels.to(device)
 
 Batchs = [list(range(100*k,100*(k+1))) for k in range(600)]
 
-optimizer = torch.optim.Adam(N.parameters(),weight_decay = 0.05)
+optimizer = torch.optim.Adam(N.parameters(), weight_decay=0.05)
 
 ErrorTrainingSet = []
 AccuracyValidationSet = []

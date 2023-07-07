@@ -11,11 +11,11 @@ def MakeLabelSet(x):
         out[i,int(x[i])] = 1
     return out
 
-TrainingImageSet = torch.tensor(idx2numpy.convert_from_file(local + r'\DigitsClassifier\train-images.idx3-ubyte')).reshape(60000,-1).to(torch.float32)
-TrainingLabels = torch.tensor(idx2numpy.convert_from_file(local + r'\DigitsClassifier\train-labels.idx1-ubyte')).to(torch.int)
+TrainingImageSet = torch.tensor(idx2numpy.convert_from_file(local + r'\DigitsClassifier\Data\train-images.idx3-ubyte')).reshape(60000,-1).to(torch.float32)
+TrainingLabels = torch.tensor(idx2numpy.convert_from_file(local + r'\DigitsClassifier\Data\train-labels.idx1-ubyte')).to(torch.int)
 TrainingLabelSet = MakeLabelSet(TrainingLabels)
-ValidationImageSet = torch.tensor(idx2numpy.convert_from_file(local + r'\DigitsClassifier\t10k-images.idx3-ubyte')).reshape(10000,-1).to(torch.float32)
-ValidationLabels = torch.tensor(idx2numpy.convert_from_file(local + r'\DigitsClassifier\t10k-labels.idx1-ubyte')).to(torch.int)
+ValidationImageSet = torch.tensor(idx2numpy.convert_from_file(local + r'\DigitsClassifier\Data\t10k-images.idx3-ubyte')).reshape(10000,-1).to(torch.float32)
+ValidationLabels = torch.tensor(idx2numpy.convert_from_file(local + r'\DigitsClassifier\Data\t10k-labels.idx1-ubyte')).to(torch.int)
 ValidationLabelSet = MakeLabelSet(ValidationLabels)
 
 d_in = 784

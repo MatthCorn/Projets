@@ -5,7 +5,7 @@ import os
 import numpy as np
 
 # Nombre de mesureurs
-NbMaxTrackers = 7
+NbMaxTrackers = 4
 # Seuil de différence de fréquences repliées en dessous duquel deux impulsions se gênent
 FreqSensibility = 0.1
 # Seuil de différence de fréquence entre un mesureur et une impulsion en dessous duquel ces derniers sont associés
@@ -19,11 +19,11 @@ SaturationThreshold = 10
 # Temps de maintien max d'un mesureur
 HoldingTime = 0.5
 
-size = 4000
+size = 100
 
-# On se donne un scénario de 10 unités de temps
-# On a donc en moyenne 4 impulsions en même temps
-TOA = 1000 * np.sort(np.random.random(size=size))
+# On se donne un scénario de 30 unités de temps
+# On a donc en moyenne 3 impulsions en même temps
+TOA = 30 * np.sort(np.random.random(size=size))
 
 ####################################################################################################################
 # Le temps de maintien max d'un mesureur est de 2 unités de temps, on veut que 90% des impulsions soit moins longues

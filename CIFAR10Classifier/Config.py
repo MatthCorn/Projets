@@ -31,7 +31,7 @@ class config():
             self.input_len = 1024
 
     def LoadBatch(self, i, local, device=torch.device('cpu'), type=torch.float32):
-        dict = unpickle(local + r'\CIFAR10Classifier\data_batch_' + str(i))
+        dict = unpickle(local + r'\CIFAR10Classifier\Data\data_batch_' + str(i))
         data = torch.tensor(dict[b'data'])
         # data.shape = (BatchSize,3*n*n)
         BatchSize, temp = data.shape
@@ -52,7 +52,7 @@ class config():
         return data.to(device, type), torch.tensor(dict[b'labels']).to(device)
 
     def LoadValidation(self, local, device=torch.device('cpu'), type=torch.float32):
-        dict = unpickle(local + r'\CIFAR10Classifier\test_batch')
+        dict = unpickle(local + r'\CIFAR10Classifier\Data\test_batch')
         data = torch.tensor(dict[b'data'])
         # data.shape = (BatchSize,3*n*n)
         BatchSize, temp = data.shape

@@ -17,13 +17,13 @@ def MakeLabelSet(x):
     return out
 
 def LoadBatch(i,device):
-    dict = unpickle(local + r'\CIFAR10Classifier\data_batch_' + str(i))
+    dict = unpickle(local + r'\CIFAR10Classifier\Data\data_batch_' + str(i))
     data = torch.tensor(dict[b'data'])
     labels = MakeLabelSet(torch.tensor(dict[b'labels']))
     return data.to(device,torch.float32), labels.to(device)
 
 def LoadValidation(device):
-    dict = unpickle(local + r'\CIFAR10Classifier\test_batch')
+    dict = unpickle(local + r'\CIFAR10Classifier\Data\test_batch')
     data = torch.tensor(dict[b'data'])
     return data.to(device,torch.float32), torch.tensor(dict[b'labels']).to(device)
 
