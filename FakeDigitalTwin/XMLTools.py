@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
+import ast
 
 '''Ensemble des outils de traduction en xml'''
 
@@ -37,10 +38,8 @@ def fromObjToXml(Obj):
                 ElType = "Dictionary"
             elif type(tail) == list:
                 ElType = "List"
-            elif type(tail) == float:
-                ElType = "Float"
-            elif type(tail) == int:
-                ElType = "Int"
+            elif type(tail) == str:
+                ElType = "String"
             else:
                 ElType = "Object"
 
@@ -54,10 +53,8 @@ def fromObjToXml(Obj):
                 ElType = "Dictionary"
             elif type(x) == list:
                 ElType = "List"
-            elif type(x) == float:
-                ElType = "Float"
-            elif type(x) == int:
-                ElType = "Int"
+            elif type(x) == str:
+                ElType = "String"
             else:
                 ElType = "Object"
             El = ET.Element(ElType)
@@ -75,10 +72,8 @@ def fromObjToXmlRec(Base, Tail, Head=None):
                 ElType = "Dictionary"
             elif type(tail) == list:
                 ElType = "List"
-            elif type(tail) == float:
-                ElType = "Float"
-            elif type(tail) == int:
-                ElType = "Int"
+            elif type(tail) == str:
+                ElType = "String"
             else:
                 ElType = "Object"
             El = ET.Element(ElType)
@@ -91,10 +86,8 @@ def fromObjToXmlRec(Base, Tail, Head=None):
                 ElType = "Dictionary"
             elif type(x) == list:
                 ElType = "List"
-            elif type(x) == float:
-                ElType = "Float"
-            elif type(x) == int:
-                ElType = "Int"
+            elif type(x) == str:
+                ElType = "String"
             else:
                 ElType = "Object"
 
@@ -132,12 +125,8 @@ def fromXmlToObj(tree):
     return Obj
 
 def fromXmlToObjRec(Base):
-    if Base.tag == 'Object':
+    if Base.tag == 'String':
         return Base.get('Value')
-    elif Base.tag == 'Float':
-        return float(Base.get('Value'))
-    elif Base.tag == 'Int':
-        return int(Base.get('Value'))
     elif Base.tag == 'List':
         li = []
         for El in Base.findall("./"):
@@ -148,7 +137,8 @@ def fromXmlToObjRec(Base):
         for El in Base.findall("./"):
             (El != Base) and dic.update({El.get('Key'): fromXmlToObjRec(El)})
         return dic
-
+    else:
+        return ast.literal_eval(Base.get('Value'))
 def loadXmlAsObj(file):
     tree = ET.parse(file)
     dic = fromXmlToObj(tree)

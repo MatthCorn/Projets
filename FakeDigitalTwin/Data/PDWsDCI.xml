@@ -1,451 +1,603 @@
 <?xml version="1.0" ?>
 <List>
  <Dictionary>
-  <Object Key="TOA" Value="0.058"/>
-  <Object Key="LI" Value="1.9999999999999998"/>
-  <Object Key="FreqMin" Value="1.612041825095057"/>
-  <Object Key="FreqMax" Value="2.209"/>
+  <Object Key="TOA" Value="0.501"/>
+  <Object Key="LI" Value="0.10199999999999998"/>
+  <Object Key="Level" Value="11.999"/>
+  <Object Key="FreqMin" Value="1.7779999999999998"/>
+  <Object Key="FreqMax" Value="2.5989999999999998"/>
+  <Object Key="flags" Value="set()"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="0.223"/>
+  <Object Key="LI" Value="0.549"/>
+  <Object Key="Level" Value="4.539"/>
+  <Object Key="FreqMin" Value="6.824"/>
+  <Object Key="FreqMax" Value="7.727999999999999"/>
+  <Object Key="flags" Value="set()"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="0.411"/>
+  <Object Key="LI" Value="1.133"/>
+  <Object Key="Level" Value="6.414"/>
+  <Object Key="FreqMin" Value="5.287"/>
+  <Object Key="FreqMax" Value="5.525"/>
+  <Object Key="flags" Value="set()"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="0.895"/>
+  <Object Key="LI" Value="0.30699999999999994"/>
+  <Object Key="Level" Value="10.906"/>
+  <Object Key="FreqMin" Value="8.600999999999999"/>
+  <Object Key="FreqMax" Value="9.469999999999999"/>
+  <Object Key="flags" Value="set()"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="2.092"/>
+  <Object Key="LI" Value="0.9089999999999998"/>
+  <Object Key="Level" Value="1.346"/>
+  <Object Key="FreqMin" Value="0.9812829493087558"/>
+  <Object Key="FreqMax" Value="1.649"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="1.552"/>
+  <Object Key="LI" Value="2.0"/>
+  <Object Key="Level" Value="2.087"/>
+  <Object Key="FreqMin" Value="5.822152793614595"/>
+  <Object Key="FreqMax" Value="6.455"/>
   <Object Key="flags" Value="{'CW'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="2.058"/>
-  <Object Key="LI" Value="0.10400000000000009"/>
-  <Object Key="FreqMin" Value="1.581"/>
-  <Object Key="FreqMax" Value="1.612041825095057"/>
+  <Object Key="TOA" Value="2.24"/>
+  <Object Key="LI" Value="0.7609999999999997"/>
+  <Object Key="Level" Value="2.658"/>
+  <Object Key="FreqMin" Value="8.32922358346095"/>
+  <Object Key="FreqMax" Value="8.54"/>
+  <Object Key="flags" Value="set()"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="1.543"/>
+  <Object Key="LI" Value="1.712"/>
+  <Object Key="Level" Value="6.609"/>
+  <Object Key="FreqMin" Value="3.817"/>
+  <Object Key="FreqMax" Value="4.007"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="3.778"/>
+  <Object Key="LI" Value="0.10199999999999987"/>
+  <Object Key="Level" Value="2.72"/>
+  <Object Key="FreqMin" Value="6.927465539661901"/>
+  <Object Key="FreqMax" Value="6.961156046814045"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="3.552"/>
+  <Object Key="LI" Value="0.44300000000000006"/>
+  <Object Key="Level" Value="5.072"/>
+  <Object Key="FreqMin" Value="6.129935005701253"/>
+  <Object Key="FreqMax" Value="6.284"/>
   <Object Key="flags" Value="{'CW', 'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="2.162"/>
-  <Object Key="LI" Value="0.33199999999999985"/>
-  <Object Key="FreqMin" Value="6.094999999999999"/>
-  <Object Key="FreqMax" Value="6.222973568281937"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="2.162"/>
-  <Object Key="LI" Value="1.6680000000000001"/>
-  <Object Key="FreqMin" Value="5.353950782997763"/>
-  <Object Key="FreqMax" Value="5.900000000000001"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="4.144"/>
-  <Object Key="LI" Value="0.12899999999999956"/>
-  <Object Key="FreqMin" Value="8.43999999999997"/>
-  <Object Key="FreqMax" Value="8.77199999999997"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="4.335"/>
-  <Object Key="LI" Value="0.5090000000000003"/>
-  <Object Key="FreqMin" Value="4.961000000000003"/>
-  <Object Key="FreqMax" Value="5.1620000000000035"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="4.426"/>
-  <Object Key="LI" Value="0.7569999999999997"/>
-  <Object Key="FreqMin" Value="7.243999999999996"/>
-  <Object Key="FreqMax" Value="7.506999999999997"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="4.439"/>
-  <Object Key="LI" Value="0.6609999999999996"/>
-  <Object Key="FreqMin" Value="4.536999999999997"/>
-  <Object Key="FreqMax" Value="4.775999999999996"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="5.438"/>
-  <Object Key="LI" Value="0.835"/>
-  <Object Key="FreqMin" Value="5.889999999999999"/>
-  <Object Key="FreqMax" Value="6.5404045155221056"/>
+  <Object Key="TOA" Value="3.662"/>
+  <Object Key="LI" Value="0.21799999999999997"/>
+  <Object Key="Level" Value="2.658"/>
+  <Object Key="FreqMin" Value="8.27"/>
+  <Object Key="FreqMax" Value="8.280899999999999"/>
   <Object Key="flags" Value="{'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="5.986"/>
-  <Object Key="LI" Value="0.6820000000000004"/>
-  <Object Key="FreqMin" Value="4.2810000000000015"/>
-  <Object Key="FreqMax" Value="4.698000000000003"/>
+  <Object Key="TOA" Value="3.662"/>
+  <Object Key="LI" Value="1.1850000000000005"/>
+  <Object Key="Level" Value="6.844"/>
+  <Object Key="FreqMin" Value="5.42"/>
+  <Object Key="FreqMax" Value="5.701916795069337"/>
   <Object Key="flags" Value="{'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="5.986"/>
-  <Object Key="LI" Value="0.9639999999999995"/>
-  <Object Key="FreqMin" Value="7.386685185185183"/>
-  <Object Key="FreqMax" Value="7.649999999999998"/>
+  <Object Key="TOA" Value="4.631"/>
+  <Object Key="LI" Value="0.36299999999999955"/>
+  <Object Key="Level" Value="3.651"/>
+  <Object Key="FreqMin" Value="0.5900948979591835"/>
+  <Object Key="FreqMax" Value="0.7489999999999997"/>
   <Object Key="flags" Value="{'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="5.143"/>
-  <Object Key="LI" Value="1.9480000000000004"/>
-  <Object Key="FreqMin" Value="3.6519999999999992"/>
-  <Object Key="FreqMax" Value="4.004"/>
+  <Object Key="TOA" Value="4.631"/>
+  <Object Key="LI" Value="1.6999999999999993"/>
+  <Object Key="Level" Value="7.195"/>
+  <Object Key="FreqMin" Value="1.120309831570701"/>
+  <Object Key="FreqMax" Value="1.6669999999999996"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="5.79"/>
+  <Object Key="LI" Value="0.6799999999999997"/>
+  <Object Key="Level" Value="3.076"/>
+  <Object Key="FreqMin" Value="1.6539999999999992"/>
+  <Object Key="FreqMax" Value="2.4489999999999985"/>
   <Object Key="flags" Value="set()"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="7.421"/>
-  <Object Key="LI" Value="0.06099999999999994"/>
-  <Object Key="FreqMin" Value="5.847523489932887"/>
-  <Object Key="FreqMax" Value="5.877000000000001"/>
+  <Object Key="TOA" Value="4.631"/>
+  <Object Key="LI" Value="1.8420000000000005"/>
+  <Object Key="Level" Value="2.074"/>
+  <Object Key="FreqMin" Value="8.608000000000002"/>
+  <Object Key="FreqMax" Value="9.250000000000004"/>
   <Object Key="flags" Value="{'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="6.886"/>
-  <Object Key="LI" Value="1.13"/>
-  <Object Key="FreqMin" Value="8.996999999999998"/>
-  <Object Key="FreqMax" Value="9.47049456521739"/>
+  <Object Key="TOA" Value="6.976"/>
+  <Object Key="LI" Value="0.29000000000000004"/>
+  <Object Key="Level" Value="3.012"/>
+  <Object Key="FreqMin" Value="4.004541734860882"/>
+  <Object Key="FreqMax" Value="4.154999999999999"/>
   <Object Key="flags" Value="{'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="7.482"/>
-  <Object Key="LI" Value="0.19699999999999918"/>
-  <Object Key="FreqMin" Value="2.711029074889868"/>
-  <Object Key="FreqMax" Value="2.8569999999999993"/>
+  <Object Key="TOA" Value="6.976"/>
+  <Object Key="LI" Value="0.21399999999999952"/>
+  <Object Key="Level" Value="7.133"/>
+  <Object Key="FreqMin" Value="0.5438010335917312"/>
+  <Object Key="FreqMax" Value="0.9529999999999988"/>
   <Object Key="flags" Value="{'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="8.145"/>
-  <Object Key="LI" Value="0.31099999999999994"/>
-  <Object Key="FreqMin" Value="3.0649999999999995"/>
-  <Object Key="FreqMax" Value="3.6679999999999997"/>
+  <Object Key="TOA" Value="5.856"/>
+  <Object Key="LI" Value="1.12"/>
+  <Object Key="Level" Value="1.381"/>
+  <Object Key="FreqMin" Value="1.083"/>
+  <Object Key="FreqMax" Value="1.197"/>
   <Object Key="flags" Value="set()"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="9.055"/>
-  <Object Key="LI" Value="0.04600000000000115"/>
-  <Object Key="FreqMin" Value="2.4150000000000005"/>
-  <Object Key="FreqMax" Value="2.4191380753138083"/>
-  <Object Key="flags" Value="{'TroncAv'}"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="8.171"/>
-  <Object Key="LI" Value="0.9300000000000015"/>
-  <Object Key="FreqMin" Value="4.383000000000002"/>
-  <Object Key="FreqMax" Value="4.90882278481013"/>
+  <Object Key="TOA" Value="7.106"/>
+  <Object Key="LI" Value="1.1159999999999997"/>
+  <Object Key="Level" Value="1.219"/>
+  <Object Key="FreqMin" Value="3.3759999999999986"/>
+  <Object Key="FreqMax" Value="3.4569999999999985"/>
   <Object Key="flags" Value="set()"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="8.234"/>
-  <Object Key="LI" Value="0.8670000000000009"/>
-  <Object Key="FreqMin" Value="5.927341050756897"/>
-  <Object Key="FreqMax" Value="6.615999999999995"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="9.101"/>
-  <Object Key="LI" Value="0.9770000000000003"/>
-  <Object Key="FreqMin" Value="2.914000000000001"/>
-  <Object Key="FreqMax" Value="3.3910000000000013"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="10.078000000000001"/>
-  <Object Key="LI" Value="0.7129999999999992"/>
-  <Object Key="FreqMin" Value="8.926401345291485"/>
-  <Object Key="FreqMax" Value="8.928000000000006"/>
+  <Object Key="TOA" Value="8.222"/>
+  <Object Key="LI" Value="0.5300000000000011"/>
+  <Object Key="Level" Value="4.602"/>
+  <Object Key="FreqMin" Value="3.866433538979249"/>
+  <Object Key="FreqMax" Value="4.055188446438588"/>
   <Object Key="flags" Value="{'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="10.078000000000001"/>
-  <Object Key="LI" Value="0.8099999999999987"/>
-  <Object Key="FreqMin" Value="1.593999999999997"/>
-  <Object Key="FreqMax" Value="2.5625313807531382"/>
+  <Object Key="TOA" Value="8.261"/>
+  <Object Key="LI" Value="0.9090000000000007"/>
+  <Object Key="Level" Value="14.967"/>
+  <Object Key="FreqMin" Value="3.084929824561404"/>
+  <Object Key="FreqMax" Value="4.501999999999998"/>
+  <Object Key="flags" Value="set()"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="8.693999999999999"/>
+  <Object Key="LI" Value="0.47600000000000087"/>
+  <Object Key="Level" Value="3.483"/>
+  <Object Key="FreqMin" Value="4.643365653245687"/>
+  <Object Key="FreqMax" Value="4.702425636811834"/>
+  <Object Key="flags" Value="set()"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="8.752"/>
+  <Object Key="LI" Value="0.24399999999999977"/>
+  <Object Key="Level" Value="10.525"/>
+  <Object Key="FreqMin" Value="7.100999999999993"/>
+  <Object Key="FreqMax" Value="7.149999999999993"/>
   <Object Key="flags" Value="{'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="10.088"/>
-  <Object Key="LI" Value="2.0"/>
-  <Object Key="FreqMin" Value="4.518083969465649"/>
-  <Object Key="FreqMax" Value="5.362266187050364"/>
+  <Object Key="TOA" Value="9.721"/>
+  <Object Key="LI" Value="0.5820000000000007"/>
+  <Object Key="Level" Value="10.868"/>
+  <Object Key="FreqMin" Value="8.930000000000007"/>
+  <Object Key="FreqMax" Value="9.066125330979707"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="10.303"/>
+  <Object Key="LI" Value="0.3979999999999997"/>
+  <Object Key="Level" Value="4.744"/>
+  <Object Key="FreqMin" Value="0.7517676056338031"/>
+  <Object Key="FreqMax" Value="0.8718215962441317"/>
+  <Object Key="flags" Value="set()"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="10.303"/>
+  <Object Key="LI" Value="0.3979999999999997"/>
+  <Object Key="Level" Value="3.472"/>
+  <Object Key="FreqMin" Value="7.5106745152354515"/>
+  <Object Key="FreqMax" Value="7.813308864265922"/>
+  <Object Key="flags" Value="set()"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="10.701"/>
+  <Object Key="LI" Value="0.38899999999999935"/>
+  <Object Key="Level" Value="19.027"/>
+  <Object Key="FreqMin" Value="5.63499999999999"/>
+  <Object Key="FreqMax" Value="5.92299999999999"/>
+  <Object Key="flags" Value="set()"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="11.09"/>
+  <Object Key="LI" Value="0.35600000000000165"/>
+  <Object Key="Level" Value="7.563"/>
+  <Object Key="FreqMin" Value="4.346833740831302"/>
+  <Object Key="FreqMax" Value="4.695000000000008"/>
+  <Object Key="flags" Value="set()"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="11.367"/>
+  <Object Key="LI" Value="0.6829999999999998"/>
+  <Object Key="Level" Value="3.81"/>
+  <Object Key="FreqMin" Value="5.449552892561983"/>
+  <Object Key="FreqMax" Value="5.726986363636365"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="11.627"/>
+  <Object Key="LI" Value="0.9169999999999998"/>
+  <Object Key="Level" Value="5.577"/>
+  <Object Key="FreqMin" Value="9.340160577740013"/>
+  <Object Key="FreqMax" Value="9.703999999999997"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="11.367"/>
+  <Object Key="LI" Value="1.629999999999999"/>
+  <Object Key="Level" Value="3.861"/>
+  <Object Key="FreqMin" Value="2.5389999999999993"/>
+  <Object Key="FreqMax" Value="2.9401469933184843"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="12.05"/>
+  <Object Key="LI" Value="1.5509999999999984"/>
+  <Object Key="Level" Value="6.332"/>
+  <Object Key="FreqMin" Value="5.7480000000000055"/>
+  <Object Key="FreqMax" Value="6.357"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="12.802"/>
+  <Object Key="LI" Value="0.6440000000000019"/>
+  <Object Key="Level" Value="5.059"/>
+  <Object Key="FreqMin" Value="2.224524355300861"/>
+  <Object Key="FreqMax" Value="2.356000000000001"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="13.234"/>
+  <Object Key="LI" Value="0.45899999999999963"/>
+  <Object Key="Level" Value="4.625"/>
+  <Object Key="FreqMin" Value="7.065999999999993"/>
+  <Object Key="FreqMax" Value="7.253912751677845"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="14.29"/>
+  <Object Key="LI" Value="0.5790000000000006"/>
+  <Object Key="Level" Value="1.93"/>
+  <Object Key="FreqMin" Value="1.8649999999999995"/>
+  <Object Key="FreqMax" Value="2.1710048780487803"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="13.691"/>
+  <Object Key="LI" Value="1.202"/>
+  <Object Key="Level" Value="8.822"/>
+  <Object Key="FreqMin" Value="2.172650793650794"/>
+  <Object Key="FreqMax" Value="2.745999999999999"/>
+  <Object Key="flags" Value="set()"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="14.29"/>
+  <Object Key="LI" Value="1.5549999999999997"/>
+  <Object Key="Level" Value="1.533"/>
+  <Object Key="FreqMin" Value="0.8309999999999997"/>
+  <Object Key="FreqMax" Value="1.7979999999999998"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="14.388"/>
+  <Object Key="LI" Value="1.9999999999999982"/>
+  <Object Key="Level" Value="3.689"/>
+  <Object Key="FreqMin" Value="8.505999999999998"/>
+  <Object Key="FreqMax" Value="8.708405576679343"/>
   <Object Key="flags" Value="{'CW'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="10.791"/>
-  <Object Key="LI" Value="1.1319999999999997"/>
-  <Object Key="FreqMin" Value="2.571167364016737"/>
-  <Object Key="FreqMax" Value="2.6730000000000005"/>
-  <Object Key="flags" Value="set()"/>
+  <Object Key="TOA" Value="15.729"/>
+  <Object Key="LI" Value="0.34299999999999997"/>
+  <Object Key="Level" Value="7.106"/>
+  <Object Key="FreqMin" Value="2.528999999999997"/>
+  <Object Key="FreqMax" Value="2.907469318181815"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="12.088"/>
-  <Object Key="LI" Value="0.28000000000000114"/>
-  <Object Key="FreqMin" Value="4.369"/>
-  <Object Key="FreqMax" Value="4.518083969465649"/>
-  <Object Key="flags" Value="{'CW', 'TroncAv'}"/>
+  <Object Key="TOA" Value="15.729"/>
+  <Object Key="LI" Value="0.5740000000000016"/>
+  <Object Key="Level" Value="7.779"/>
+  <Object Key="FreqMin" Value="9.090000000000027"/>
+  <Object Key="FreqMax" Value="9.866000000000028"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="11.32"/>
+  <Object Key="TOA" Value="16.419"/>
+  <Object Key="LI" Value="0.6690000000000005"/>
+  <Object Key="Level" Value="5.433"/>
+  <Object Key="FreqMin" Value="9.02719733924613"/>
+  <Object Key="FreqMax" Value="9.13400000000001"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="16.387999999999998"/>
   <Object Key="LI" Value="2.0"/>
-  <Object Key="FreqMin" Value="3.594000000000003"/>
-  <Object Key="FreqMax" Value="3.7832656355077336"/>
+  <Object Key="Level" Value="3.689"/>
+  <Object Key="FreqMin" Value="8.708405576679343"/>
+  <Object Key="FreqMax" Value="9.0431038961039"/>
   <Object Key="flags" Value="{'CW', 'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="12.511"/>
-  <Object Key="LI" Value="0.26200000000000045"/>
-  <Object Key="FreqMin" Value="2.959000000000005"/>
-  <Object Key="FreqMax" Value="3.443000000000006"/>
+  <Object Key="TOA" Value="16.606"/>
+  <Object Key="LI" Value="1.3320000000000007"/>
+  <Object Key="Level" Value="2.715"/>
+  <Object Key="FreqMin" Value="1.2560000000000007"/>
+  <Object Key="FreqMax" Value="1.7180000000000009"/>
   <Object Key="flags" Value="{'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="11.405"/>
-  <Object Key="LI" Value="1.9730000000000008"/>
-  <Object Key="FreqMin" Value="7.436999999999993"/>
-  <Object Key="FreqMax" Value="8.593513748191027"/>
+  <Object Key="TOA" Value="17.803"/>
+  <Object Key="LI" Value="0.14599999999999724"/>
+  <Object Key="Level" Value="4.511"/>
+  <Object Key="FreqMin" Value="3.5039999999999925"/>
+  <Object Key="FreqMax" Value="3.64170253929866"/>
   <Object Key="flags" Value="{'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="13.091"/>
-  <Object Key="LI" Value="0.7330000000000005"/>
-  <Object Key="FreqMin" Value="6.906268162393162"/>
-  <Object Key="FreqMax" Value="7.193673076923076"/>
+  <Object Key="TOA" Value="17.088"/>
+  <Object Key="LI" Value="1.1649999999999991"/>
+  <Object Key="Level" Value="1.617"/>
+  <Object Key="FreqMin" Value="6.973213857428386"/>
+  <Object Key="FreqMax" Value="7.234000000000006"/>
   <Object Key="flags" Value="{'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="14.057"/>
-  <Object Key="LI" Value="0.5099999999999998"/>
-  <Object Key="FreqMin" Value="1.6438460377358484"/>
-  <Object Key="FreqMax" Value="1.9599999999999989"/>
-  <Object Key="flags" Value="{'TroncAv'}"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="13.32"/>
-  <Object Key="LI" Value="1.2720000000000002"/>
-  <Object Key="FreqMin" Value="3.7832656355077336"/>
-  <Object Key="FreqMax" Value="3.8440000000000003"/>
+  <Object Key="TOA" Value="18.387999999999998"/>
+  <Object Key="LI" Value="0.31700000000000017"/>
+  <Object Key="Level" Value="5.643"/>
+  <Object Key="FreqMin" Value="9.0431038961039"/>
+  <Object Key="FreqMax" Value="9.08976190476191"/>
   <Object Key="flags" Value="{'CW', 'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="13.378"/>
-  <Object Key="LI" Value="1.8649999999999984"/>
-  <Object Key="FreqMin" Value="1.0765291723202173"/>
-  <Object Key="FreqMax" Value="1.5379999999999994"/>
+  <Object Key="TOA" Value="18.53"/>
+  <Object Key="LI" Value="0.8499999999999979"/>
+  <Object Key="Level" Value="3.723"/>
+  <Object Key="FreqMin" Value="0.5819025221540555"/>
+  <Object Key="FreqMax" Value="0.7029999999999994"/>
   <Object Key="flags" Value="{'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="14.349"/>
-  <Object Key="LI" Value="1.911999999999999"/>
-  <Object Key="FreqMin" Value="5.8099999999999925"/>
-  <Object Key="FreqMax" Value="6.700418803418803"/>
+  <Object Key="TOA" Value="18.53"/>
+  <Object Key="LI" Value="1.120000000000001"/>
+  <Object Key="Level" Value="8.724"/>
+  <Object Key="FreqMin" Value="1.3040000000000012"/>
+  <Object Key="FreqMax" Value="1.9760769230769248"/>
   <Object Key="flags" Value="{'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="15.858"/>
-  <Object Key="LI" Value="0.4789999999999992"/>
-  <Object Key="FreqMin" Value="0.23999999999999957"/>
-  <Object Key="FreqMax" Value="0.9059999999999986"/>
+  <Object Key="TOA" Value="18.946"/>
+  <Object Key="LI" Value="1.386999999999997"/>
+  <Object Key="Level" Value="6.803"/>
+  <Object Key="FreqMin" Value="6.191374078624079"/>
+  <Object Key="FreqMax" Value="6.441000000000001"/>
   <Object Key="flags" Value="{'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="15.109"/>
-  <Object Key="LI" Value="1.4880000000000013"/>
-  <Object Key="FreqMin" Value="1.0279549180327867"/>
-  <Object Key="FreqMax" Value="1.2032827868852458"/>
+  <Object Key="TOA" Value="20.333"/>
+  <Object Key="LI" Value="0.46600000000000463"/>
+  <Object Key="Level" Value="0.867"/>
+  <Object Key="FreqMin" Value="5.647651172357057"/>
+  <Object Key="FreqMax" Value="5.68886466474702"/>
   <Object Key="flags" Value="{'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="15.109"/>
-  <Object Key="LI" Value="1.8759999999999994"/>
-  <Object Key="FreqMin" Value="1.2140000000000026"/>
-  <Object Key="FreqMax" Value="2.2124986876640436"/>
-  <Object Key="flags" Value="{'TroncAv'}"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="16.985"/>
-  <Object Key="LI" Value="0.6189999999999998"/>
-  <Object Key="FreqMin" Value="3.6439999999999984"/>
-  <Object Key="FreqMax" Value="3.6518489913544654"/>
-  <Object Key="flags" Value="{'TroncAv'}"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="16.985"/>
-  <Object Key="LI" Value="1.1600000000000001"/>
-  <Object Key="FreqMin" Value="4.359390309555855"/>
-  <Object Key="FreqMax" Value="4.533"/>
-  <Object Key="flags" Value="{'TroncAv'}"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="17.183"/>
-  <Object Key="LI" Value="1.2860000000000014"/>
-  <Object Key="FreqMin" Value="2.248230425963489"/>
-  <Object Key="FreqMax" Value="2.5268202839756593"/>
-  <Object Key="flags" Value="{'TroncAv'}"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="17.924"/>
-  <Object Key="LI" Value="0.6980000000000004"/>
-  <Object Key="FreqMin" Value="2.591335842501448"/>
-  <Object Key="FreqMax" Value="2.8690000000000007"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="18.622"/>
-  <Object Key="LI" Value="1.7390000000000008"/>
-  <Object Key="FreqMin" Value="1.4080000000000004"/>
-  <Object Key="FreqMax" Value="1.5340000000000005"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="20.361"/>
-  <Object Key="LI" Value="0.054999999999999716"/>
-  <Object Key="FreqMin" Value="7.604213984835727"/>
-  <Object Key="FreqMax" Value="7.636000000000006"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="20.361"/>
-  <Object Key="LI" Value="0.4969999999999999"/>
-  <Object Key="FreqMin" Value="3.288999999999999"/>
-  <Object Key="FreqMax" Value="3.4756462882096057"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="20.361"/>
-  <Object Key="LI" Value="0.5389999999999979"/>
-  <Object Key="FreqMin" Value="9.048856557377041"/>
-  <Object Key="FreqMax" Value="9.377999999999993"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="21.356"/>
-  <Object Key="LI" Value="0.5710000000000015"/>
-  <Object Key="FreqMin" Value="5.722000000000016"/>
-  <Object Key="FreqMax" Value="6.439000000000018"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="22.424"/>
-  <Object Key="LI" Value="0.47800000000000153"/>
-  <Object Key="FreqMin" Value="8.275000000000018"/>
-  <Object Key="FreqMax" Value="8.855686838124072"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="22.902"/>
-  <Object Key="LI" Value="0.365000000000002"/>
-  <Object Key="FreqMin" Value="3.038360627177709"/>
-  <Object Key="FreqMax" Value="3.156000000000009"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="22.902"/>
-  <Object Key="LI" Value="0.7920000000000016"/>
-  <Object Key="FreqMin" Value="1.3540000000000028"/>
-  <Object Key="FreqMax" Value="2.063000000000004"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="21.927000000000003"/>
-  <Object Key="LI" Value="1.945999999999998"/>
-  <Object Key="FreqMin" Value="8.881913043478258"/>
-  <Object Key="FreqMax" Value="8.965199728260867"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="23.428"/>
-  <Object Key="LI" Value="0.4450000000000003"/>
-  <Object Key="FreqMin" Value="7.12600000000001"/>
-  <Object Key="FreqMax" Value="7.200166666666678"/>
-  <Object Key="flags" Value="{'TroncAv'}"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="23.873"/>
-  <Object Key="LI" Value="1.5779999999999994"/>
-  <Object Key="FreqMin" Value="1.0270000000000001"/>
-  <Object Key="FreqMax" Value="1.7216149532710279"/>
-  <Object Key="flags" Value="{'TroncAv'}"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="25.451"/>
-  <Object Key="LI" Value="0.6899999999999977"/>
-  <Object Key="FreqMin" Value="8.579568773234186"/>
-  <Object Key="FreqMax" Value="8.865999999999984"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="26.141"/>
-  <Object Key="LI" Value="1.5109999999999992"/>
-  <Object Key="FreqMin" Value="1.5239999999999994"/>
-  <Object Key="FreqMax" Value="2.142999999999999"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="27.651999999999997"/>
-  <Object Key="LI" Value="0.7020000000000053"/>
-  <Object Key="FreqMin" Value="1.8117960128159483"/>
-  <Object Key="FreqMax" Value="1.9410000000000005"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="27.651999999999997"/>
-  <Object Key="LI" Value="1.0160000000000018"/>
-  <Object Key="FreqMin" Value="2.4939999999999984"/>
-  <Object Key="FreqMax" Value="2.8749999999999973"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="29.107000000000003"/>
-  <Object Key="LI" Value="0.20499999999999474"/>
-  <Object Key="FreqMin" Value="3.5079999999999973"/>
-  <Object Key="FreqMax" Value="3.726835770528676"/>
-  <Object Key="flags" Value="{'TroncAv'}"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="28.224"/>
-  <Object Key="LI" Value="1.2399999999999984"/>
-  <Object Key="FreqMin" Value="4.926999999999993"/>
-  <Object Key="FreqMax" Value="5.699999999999993"/>
-  <Object Key="flags" Value="{'TroncAv'}"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="27.651999999999997"/>
-  <Object Key="LI" Value="1.953000000000003"/>
-  <Object Key="FreqMin" Value="8.720694862480537"/>
-  <Object Key="FreqMax" Value="9.108862480539697"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="30.118"/>
-  <Object Key="LI" Value="0.272000000000002"/>
-  <Object Key="FreqMin" Value="6.668000000000003"/>
-  <Object Key="FreqMax" Value="6.74342358078603"/>
-  <Object Key="flags" Value="{'TroncAv'}"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="29.333"/>
-  <Object Key="LI" Value="0.8870000000000005"/>
-  <Object Key="FreqMin" Value="0.15300000000000005"/>
-  <Object Key="FreqMax" Value="0.9690000000000005"/>
-  <Object Key="flags" Value="set()"/>
- </Dictionary>
- <Dictionary>
-  <Object Key="TOA" Value="29.95"/>
+  <Object Key="TOA" Value="19.219"/>
   <Object Key="LI" Value="2.0"/>
-  <Object Key="FreqMin" Value="6.264318587834961"/>
-  <Object Key="FreqMax" Value="6.677759676733302"/>
+  <Object Key="Level" Value="8.755"/>
+  <Object Key="FreqMin" Value="8.235374407582942"/>
+  <Object Key="FreqMax" Value="8.749000000000004"/>
   <Object Key="flags" Value="{'CW', 'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="31.261"/>
-  <Object Key="LI" Value="0.4139999999999979"/>
-  <Object Key="FreqMin" Value="4.410991071428568"/>
-  <Object Key="FreqMax" Value="4.556999999999996"/>
+  <Object Key="TOA" Value="20.333"/>
+  <Object Key="LI" Value="1.5530000000000008"/>
+  <Object Key="Level" Value="1.581"/>
+  <Object Key="FreqMin" Value="5.3261599045346015"/>
+  <Object Key="FreqMax" Value="5.798999999999995"/>
   <Object Key="flags" Value="{'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="31.95"/>
-  <Object Key="LI" Value="0.006000000000000227"/>
-  <Object Key="FreqMin" Value="6.677759676733302"/>
-  <Object Key="FreqMax" Value="6.6789999999999985"/>
+  <Object Key="TOA" Value="21.348999999999997"/>
+  <Object Key="LI" Value="0.679000000000002"/>
+  <Object Key="Level" Value="1.496"/>
+  <Object Key="FreqMin" Value="1.2772310061601637"/>
+  <Object Key="FreqMax" Value="1.6000000000000005"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="21.054"/>
+  <Object Key="LI" Value="1.1179999999999986"/>
+  <Object Key="Level" Value="3.438"/>
+  <Object Key="FreqMin" Value="3.338999999999997"/>
+  <Object Key="FreqMax" Value="3.4344390243902407"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="22.51"/>
+  <Object Key="LI" Value="0.0799999999999983"/>
+  <Object Key="Level" Value="2.002"/>
+  <Object Key="FreqMin" Value="3.135509881422929"/>
+  <Object Key="FreqMax" Value="3.268000000000001"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="21.219"/>
+  <Object Key="LI" Value="1.3760000000000012"/>
+  <Object Key="Level" Value="8.755"/>
+  <Object Key="FreqMin" Value="7.882000000000002"/>
+  <Object Key="FreqMax" Value="8.235374407582942"/>
   <Object Key="flags" Value="{'CW', 'TroncAv'}"/>
  </Dictionary>
  <Dictionary>
-  <Object Key="TOA" Value="30.118"/>
-  <Object Key="LI" Value="1.708000000000002"/>
-  <Object Key="FreqMin" Value="8.699067889908255"/>
-  <Object Key="FreqMax" Value="8.948999999999998"/>
+  <Object Key="TOA" Value="22.59"/>
+  <Object Key="LI" Value="0.6490000000000009"/>
+  <Object Key="Level" Value="7.205"/>
+  <Object Key="FreqMin" Value="4.181648477157359"/>
+  <Object Key="FreqMax" Value="4.903000000000001"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="23.173000000000002"/>
+  <Object Key="LI" Value="0.10699999999999577"/>
+  <Object Key="Level" Value="1.996"/>
+  <Object Key="FreqMin" Value="2.212349436392916"/>
+  <Object Key="FreqMax" Value="2.3799999999999946"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="22.69"/>
+  <Object Key="LI" Value="0.48300000000000054"/>
+  <Object Key="Level" Value="2.232"/>
+  <Object Key="FreqMin" Value="4.920477366255138"/>
+  <Object Key="FreqMax" Value="5.3630617283950555"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="23.949"/>
+  <Object Key="LI" Value="0.021999999999998465"/>
+  <Object Key="Level" Value="6.485"/>
+  <Object Key="FreqMin" Value="3.1467506702412815"/>
+  <Object Key="FreqMax" Value="3.1519999999999944"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="23.173000000000002"/>
+  <Object Key="LI" Value="0.7979999999999983"/>
+  <Object Key="Level" Value="1.669"/>
+  <Object Key="FreqMin" Value="1.4976239850093684"/>
+  <Object Key="FreqMax" Value="1.6820462211118041"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="23.971"/>
+  <Object Key="LI" Value="1.5180000000000007"/>
+  <Object Key="Level" Value="16.623"/>
+  <Object Key="FreqMin" Value="6.3560000000000025"/>
+  <Object Key="FreqMax" Value="6.963000000000004"/>
+  <Object Key="flags" Value="set()"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="25.489"/>
+  <Object Key="LI" Value="0.522000000000002"/>
+  <Object Key="Level" Value="2.568"/>
+  <Object Key="FreqMin" Value="1.0102563580874877"/>
+  <Object Key="FreqMax" Value="1.1000000000000005"/>
+  <Object Key="flags" Value="set()"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="26.284"/>
+  <Object Key="LI" Value="1.6170000000000009"/>
+  <Object Key="Level" Value="2.298"/>
+  <Object Key="FreqMin" Value="2.631000000000001"/>
+  <Object Key="FreqMax" Value="3.513000000000002"/>
+  <Object Key="flags" Value="set()"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="26.932"/>
+  <Object Key="LI" Value="1.0030000000000001"/>
+  <Object Key="Level" Value="0.505"/>
+  <Object Key="FreqMin" Value="5.582000000000001"/>
+  <Object Key="FreqMax" Value="5.916000000000002"/>
+  <Object Key="flags" Value="set()"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="26.955"/>
+  <Object Key="LI" Value="1.1129999999999995"/>
+  <Object Key="Level" Value="3.572"/>
+  <Object Key="FreqMin" Value="2.156999999999999"/>
+  <Object Key="FreqMax" Value="2.1679999999999993"/>
+  <Object Key="flags" Value="set()"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="28.522"/>
+  <Object Key="LI" Value="0.0070000000000014495"/>
+  <Object Key="Level" Value="8.248"/>
+  <Object Key="FreqMin" Value="0.4620000000000004"/>
+  <Object Key="FreqMax" Value="0.4658013559322047"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="27.052"/>
+  <Object Key="LI" Value="2.0"/>
+  <Object Key="Level" Value="7.975"/>
+  <Object Key="FreqMin" Value="1.7290000000000003"/>
+  <Object Key="FreqMax" Value="2.1940571791613728"/>
+  <Object Key="flags" Value="{'CW'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="28.522"/>
+  <Object Key="LI" Value="0.25000000000000355"/>
+  <Object Key="Level" Value="3.747"/>
+  <Object Key="FreqMin" Value="4.227966292134833"/>
+  <Object Key="FreqMax" Value="4.301000000000003"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="28.602"/>
+  <Object Key="LI" Value="1.073999999999998"/>
+  <Object Key="Level" Value="2.969"/>
+  <Object Key="FreqMin" Value="4.805"/>
+  <Object Key="FreqMax" Value="5.66587521663778"/>
+  <Object Key="flags" Value="{'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="29.052"/>
+  <Object Key="LI" Value="0.36100000000000065"/>
+  <Object Key="Level" Value="7.975"/>
+  <Object Key="FreqMin" Value="2.1940571791613728"/>
+  <Object Key="FreqMax" Value="2.2780000000000005"/>
+  <Object Key="flags" Value="{'CW', 'TroncAv'}"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="29.813"/>
+  <Object Key="LI" Value="0.6539999999999999"/>
+  <Object Key="Level" Value="3.976"/>
+  <Object Key="FreqMin" Value="1.4869999999999999"/>
+  <Object Key="FreqMax" Value="1.7319999999999995"/>
+  <Object Key="flags" Value="set()"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="29.404"/>
+  <Object Key="LI" Value="1.7949999999999982"/>
+  <Object Key="Level" Value="2.116"/>
+  <Object Key="FreqMin" Value="8.80599999999999"/>
+  <Object Key="FreqMax" Value="9.547999999999991"/>
+  <Object Key="flags" Value="set()"/>
+ </Dictionary>
+ <Dictionary>
+  <Object Key="TOA" Value="30.467"/>
+  <Object Key="LI" Value="1.120000000000001"/>
+  <Object Key="Level" Value="6.154"/>
+  <Object Key="FreqMin" Value="6.766675738274464"/>
+  <Object Key="FreqMax" Value="7.327000000000001"/>
   <Object Key="flags" Value="{'TroncAv'}"/>
  </Dictionary>
 </List>

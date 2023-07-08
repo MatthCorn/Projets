@@ -21,11 +21,10 @@ class RMHSA(nn.Module):
         self.key = nn.Linear(d_model, d_att)
         self.value = nn.Linear(d_model, d_att)
         self.query = nn.Linear(d_model, d_att)
-        self.finalLinear = nn.Linear(d_att,d_model)
+        self.finalLinear = nn.Linear(d_att, d_model)
         self.dropout = nn.Dropout(dropout)
         self.relative = relative
-        if self.relative:
-            self.Er = nn.Parameter(torch.randn(2*max_len-1, d_head))
+        self.Er = nn.Parameter(torch.randn(2*max_len-1, d_head))
         self.masked = masked
         if self.masked:
             self.register_buffer(
@@ -60,7 +59,7 @@ class RMHSA(nn.Module):
         RSA = self.RelativeSelfAttention(Q, Kt, Ert, V, Mask=mask)
         # RSA.shape = (batch_size, num_heads, seq_len, d_head)
 
-        Concat = RSA.transpose(1,2).reshape(batch_size,seq_len,-1)
+        Concat = RSA.transpose(1, 2).reshape(batch_size, seq_len, -1)
         # Concat.shape = (batch_size, seq_len, d_model)
         out = self.finalLinear(Concat)
         # out.shape = (batch_size, seq_len, d_model)
@@ -73,7 +72,7 @@ class RMHSA(nn.Module):
         batch_size, num_heads, seq_len, _ = padded_1.shape
         reshaped_1 = padded_1.reshape(batch_size, num_heads, -1)
         # reshaped_1.shape = (batch_size, num_heads, 2*seq_len**2)
-        padded_2 = F.pad(reshaped_1,(0,seq_len-1))
+        padded_2 = F.pad(reshaped_1, (0, seq_len-1))
         # padded_2.shape = (batch_size, num_heads, 2*seq_len**2+seq_len-1) = (batch_size, num_heads, (seq_len+1)*(2*seq_len-1))
         reshaped_2 = padded_2.reshape(batch_size, num_heads, seq_len+1, 2*seq_len-1)
         Srel = reshaped_2[:, :,:seq_len][:,:,:,-seq_len:]

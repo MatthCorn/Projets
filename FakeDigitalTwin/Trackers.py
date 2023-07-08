@@ -109,7 +109,7 @@ class Tracker():
             self.FreqMax = max(self.FreqMax, CurrentFreq)
 
     def Emission(self):
-        PDW = {'TOA': self.TOA, 'LI': self.TOE - self.TOA, 'FreqMin': self.FreqMin, 'FreqMax': self.FreqMax, 'flags': self.flags}
+        PDW = {'TOA': self.TOA, 'LI': self.TOE - self.TOA, 'Level': self.Level, 'FreqMin': self.FreqMin, 'FreqMax': self.FreqMax, 'flags': self.flags}
         return PDW
 
     def __repr__(self):
