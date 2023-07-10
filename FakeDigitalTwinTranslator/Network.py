@@ -60,6 +60,10 @@ class TransformerTranslator(nn.Module):
             trg = Decoder(target=trg, source=src)
         y = torch.sum(trg, dim=1)
         Physic, Flags, Action = self.PhysicalPrediction(y), self.FlagsPrediction(y), self.ActionPrediction(y)
+        Physic = Physic.unsqueeze(dim=1)
+        Flags = Flags.unsqueeze(dim=1)
+        Action = Action.unsqueeze(dim=1)
+
         # Physic.shape = (batch_size, 1, d_target)
         # Flags.shape = (batch_size, 1, num_flags)
         # Action.shape = (batch_size, 1, 1)
@@ -101,7 +105,7 @@ class TransformerTranslator(nn.Module):
 
         for i in range(len_target):
             # On donne à chaque fois la source et les "i" premiers mots de la traduction et on compare le mot prédit
-            ended = (torch.tensor(LenList) <= i).unsqueeze(-1).unsqueeze(-1)
+            ended = (torch.tensor(LenList) <= i).unsqueeze(-1).unsqueeze(-1).to(dtype=torch.float32, device=self.device)
             # ended.shape = (batch_size, 1, 1)
             target_input = translatedSource[:, :i]
             expected_prediction = translatedSource[:, i]

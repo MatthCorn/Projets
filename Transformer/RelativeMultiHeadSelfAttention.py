@@ -75,7 +75,7 @@ class RMHSA(nn.Module):
         padded_2 = F.pad(reshaped_1, (0, seq_len-1))
         # padded_2.shape = (batch_size, num_heads, 2*seq_len**2+seq_len-1) = (batch_size, num_heads, (seq_len+1)*(2*seq_len-1))
         reshaped_2 = padded_2.reshape(batch_size, num_heads, seq_len+1, 2*seq_len-1)
-        Srel = reshaped_2[:, :,:seq_len][:,:,:,-seq_len:]
+        Srel = reshaped_2[:, :, :seq_len][:, :, :, -seq_len:]
         # Srel.shape = (batch_size, num_heads, seq_len, seq_len)
         return Srel
 
