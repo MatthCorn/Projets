@@ -36,6 +36,8 @@ class TransformerTranslator(nn.Module):
         # Ce vecteur a pour but de déterminer l'action a réaliser, mettre fin à la traduction dans notre cas particulier
         self.ActionPrediction = FeedForward(d_in=d_input_Dec, d_out=1, widths=[32, 8])
 
+        self.to(device)
+
 
     def forward(self, source, target, ended=None):
         # target.shape = (batch_size, target_len, d_target+num_flags)
@@ -74,7 +76,7 @@ class TransformerTranslator(nn.Module):
     def translateSentence(self, source):
         # source.shape = (1, source_len, d_source)
         target_len = 0
-        target = torch.zeros(size=(1, 0, self.d_target+self.num_flags))
+        target = torch.zeros(size=(1, 0, self.d_target+self.num_flags)).to(self.device)
         while target_len < self.target_len:
             PDW, Action = self.forward(source=source, target=target)
             if Action[0, 0, 0] > self.eps_end:
@@ -101,8 +103,8 @@ class TransformerTranslator(nn.Module):
             # On donne à chaque fois la source et les "i" premiers mots de la traduction et on compare le mot prédit
             ended = (torch.tensor(LenList) <= i).unsqueeze(-1).unsqueeze(-1)
             # ended.shape = (batch_size, 1, 1)
-            target_input = translatedSource[:i]
-            expected_prediction = translatedSource[i]
+            target_input = translatedSource[:, :i]
+            expected_prediction = translatedSource[:, i]
             actual_prediction, action = self.forward(source=source_input, target=target_input, ended=ended)
 
             Error += torch.norm(expected_prediction - actual_prediction) + torch.norm(action - ended)
