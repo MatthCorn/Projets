@@ -10,7 +10,7 @@ from tqdm import tqdm
 local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
 # local = r'C:\Users\Matthieu\Documents\Python\Projets'
 
-LocalConfig = config(config=2)
+LocalConfig = config(config=3)
 LocalConfig.AddParam(d_latent=8, d_att=8, num_heads=1, latent_len=32, max_len=64, d_out=10)
 
 
@@ -38,7 +38,7 @@ N = ClassifierPerceiver(relative=True).to(device)
 
 MiniBatchs = [list(range(100*k, 100*(k+1))) for k in range(5)]
 
-optimizer = torch.optim.Adam(N.parameters(), weight_decay=1e-6, lr=3e-5)
+optimizer = torch.optim.Adam(N.parameters(), weight_decay=1e-6, lr=3e-4)
 scaler = GradScaler()
 loss = nn.CrossEntropyLoss()
 

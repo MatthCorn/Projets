@@ -1,6 +1,6 @@
 import torch.nn as nn
 from Transformer.RelativeMultiHeadSelfAttention import RMHSA
-from Perceiver.RelativeMultiHeadCrossAttention import RLCA
+from Perceiver.RelativeMultiHeadCrossAttentionSoft import RLCA
 from Transformer.EasyFeedForward import FeedForward
 
 class DecoderLayer(nn.Module):
@@ -9,7 +9,7 @@ class DecoderLayer(nn.Module):
         self.target_len = target_len
         self.MultiHeadAttention = RMHSA(d_model=d_model, d_att=d_att, num_heads=num_heads, max_len=target_len, dropout=MHADropout, masked=masked, relative=relative)
         self.FirstLayerNorm = nn.LayerNorm(d_model)
-        self.CrossAttentionLayer = RLCA(d_latent=d_model, d_input=d_model, d_att=d_att, num_heads=num_heads, latent_len=target_len,
+        self.CrossAttentionLayer = RLCA(d_latent=d_model, d_input=d_model, d_att=d_att, num_heads=num_heads, RPR_len=target_len,
                                         dropout=MHADropout, masked=False, relative=False)
         self.SecondLayerNorm = nn.LayerNorm(d_model)
         self.FeedForward = FeedForward(d_model, d_model, widths=WidthsFeedForward, dropout=FFDropout)

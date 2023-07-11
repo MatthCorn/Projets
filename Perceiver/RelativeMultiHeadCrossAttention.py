@@ -4,6 +4,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+# Dans cette version, on s'attend à ce que toutes les entrées x_latent aient la même longueur latent_len, faute de quoi
+# le relative position representation (RPR) provoquera une erreur lors des calculs
+
 #Relative Latent Cross Attention
 class RLCA(nn.Module):
     def __init__(self, d_latent, d_input, d_att, num_heads, latent_len=32, max_len=64, dropout=0.1, masked=True, relative=True):
@@ -29,8 +32,7 @@ class RLCA(nn.Module):
             self.Er = nn.Parameter(torch.randn(2*latent_len-1, d_head))
         self.masked = masked
         if self.masked:
-            self.register_buffer("mask", self.MakeMask(self.latent_len, max_len).unsqueeze(0).unsqueeze(0))
-            self.LenInputsMask = max_len
+            self.register_buffer("mask", self.MakeMask(max_len).unsqueeze(0).unsqueeze(0))
             # self.mask.shape = (1, 1, latent_len, max_len)
         self.previousInputLen = max_len
         self.register_buffer("ConvDistrib", self.Weight(M=max_len, sigma=1.5))
@@ -41,12 +43,11 @@ class RLCA(nn.Module):
         # x_latent.shape = (batch_size, latent_len, d_latent)
         # OR
         # x_latent.shape = (1, latent_len, d_latent)
-        _, latent_len, d_latent = x_latent.shape
         Kt = self.key(x_input).reshape(batch_size, input_len, self.num_heads, -1).permute(0, 2, 3, 1)
         # Kt.shape = (batch_size, num_heads, d_head, input_len)
         V = self.value(x_input).reshape(batch_size, input_len, self.num_heads, -1).transpose(1, 2)
         # V.shape = (batch_size, num_heads, input_len, d_head)
-        Q = self.query(x_latent).reshape(batch_size, latent_len, self.num_heads, -1).transpose(1, 2)
+        Q = self.query(x_latent).reshape(-1, self.latent_len, self.num_heads, self.d_head).transpose(1, 2)
         # Q.shape = (batch_size, num_heads, latent_len, d_head)
         # OR
         # Q.shape = (1, num_heads, latent_len, d_head)
@@ -57,9 +58,9 @@ class RLCA(nn.Module):
 
         mask = None
         if self.masked:
-            if self.LenInputsMask != input_len:
-                self.register_buffer("mask", self.MakeMask(latent_len, input_len).unsqueeze(0).unsqueeze(0).to(self.Er.device, self.Er.dtype))
-                self.LenInputsMask = input_len
+            if self.previousInputLen != input_len:
+                self.mask = self.MakeMask(input_len).unsqueeze(0).unsqueeze(0).to(self.Er.device, self.Er.dtype)
+                self.previousInputLen = input_len
 
             mask = self.mask
             # mask.shape = (1, 1, latent_len, input_len)
@@ -67,7 +68,7 @@ class RLCA(nn.Module):
         RCA = self.RelativeCrossAttention(Q, Kt, Ert, V, input_len, Mask=mask)
         # RCA.shape = (batch_size, num_heads, latent_len, d_head)
 
-        Concat = RCA.transpose(1, 2).reshape(batch_size, latent_len, -1)
+        Concat = RCA.transpose(1,2).reshape(batch_size, self.latent_len, -1)
         # Concat.shape = (batch_size, latent_len, d_att)
         out = self.finalLinear(Concat)
         # out.shape = (batch_size, seq_len, d_latent)
@@ -87,7 +88,7 @@ class RLCA(nn.Module):
             # QEr.shape = (1, num_heads, latent_len, 2*latent_len-1)
             # V.shape = (batch_size, num_heads, input_len, d_head)
             if self.previousInputLen != input_len:
-                self.register_buffer("ConvDistrib", self.Weight(M=input_len, sigma=1.5).to(self.Er.device, self.Er.dtype))
+                self.ConvDistrib = self.Weight(M=input_len, sigma=1.5).to(self.Er.device, self.Er.dtype)
                 self.previousInputLen = input_len
 
             # ConvDistrib.shape = (latent_len, 2*latent_len-1, input_len)

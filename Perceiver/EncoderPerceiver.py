@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from Transformer.RelativeMultiHeadSelfAttention import RMHSA
 from Transformer.EasyFeedForward import FeedForward
-from Perceiver.RelativeMultiHeadCrossAttention import RLCA
+from Perceiver.RelativeMultiHeadCrossAttentionSoft import RLCA
 
 class EncoderLayer(nn.Module):
     def __init__(self, d_latent, d_input, d_att, num_heads, latent_len=16, WidthsFeedForward=[64],
@@ -37,8 +37,8 @@ class EncoderIO(nn.Module):
             self.xLatentInit = nn.parameter.Parameter(torch.normal(mean=torch.zeros(1, latent_len, d_latent)))
         self.LatentLayerNormCA = nn.LayerNorm(d_latent)
         self.InputLayerNorm = nn.LayerNorm(d_input)
-        self.CrossAttention = RLCA(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads,
-                                   latent_len=latent_len, max_len=max_len, dropout=ADropout, masked=masked, relative=relative)
+        self.CrossAttention = RLCA(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, masked=masked,
+                                   latent_len=latent_len, max_len=max_len, dropout=ADropout, relative=relative)
         self.LatentLayerNormMLP = nn.LayerNorm(d_latent)
         self.MLP = FeedForward(d_in=d_latent, d_out=d_latent, widths=WidthsFeedForward, dropout=FFDropout)
         self.ListSelfAttention = nn.ModuleList()
