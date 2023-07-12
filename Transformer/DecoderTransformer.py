@@ -1,6 +1,6 @@
 import torch.nn as nn
 from Transformer.RelativeMultiHeadSelfAttention import RMHSA
-from Perceiver.RelativeMultiHeadCrossAttentionSoft import RLCA
+from Perceiver.RelativeMultiHeadCrossAttention import RLCA
 from Transformer.EasyFeedForward import FeedForward
 
 class DecoderLayer(nn.Module):
