@@ -2,7 +2,8 @@ import torch
 import torch.nn as nn
 from Transformer.RelativeMultiHeadSelfAttention import RMHSA
 from Transformer.EasyFeedForward import FeedForward
-from Perceiver.RelativeMultiHeadCrossAttention import RLCA
+from Perceiver.RelativeMultiHeadCrossAttentionV0 import RLCA
+
 
 class EncoderLayer(nn.Module):
     def __init__(self, d_latent, d_input, d_att, num_heads, latent_len=16, WidthsFeedForward=[64],

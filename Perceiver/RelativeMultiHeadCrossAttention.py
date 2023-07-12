@@ -3,8 +3,9 @@ import math
 import torch.nn as nn
 import torch.nn.functional as F
 
-# Dans cette version, on tente de rendre l'objet plus souple en autorisant x_latent à avoir des longueurs de séquence variable (mais bornée) entre batch
-# Il fera dans l'idée extactement les mêmes calculs que RelativeMultiHeadCrossAttentionV0 si cette longueur ne varie pas entre batchs.
+# Dans cette version, on tente de rendre RLCA plus souple que dans RelativeMultiHeadCrossAttentionV0 en autorisant x_latent à avoir des
+# longueurs de séquence variable (mais bornée) entre batch. Il fera dans l'idée extactement les mêmes calculs que
+# RelativeMultiHeadCrossAttentionV0 si cette longueur ne varie pas entre batchs.
 
 #Relative Latent Cross Attention
 class RLCA(nn.Module):
@@ -51,19 +52,29 @@ class RLCA(nn.Module):
         # Q.shape = (batch_size, num_heads, latent_len, d_head)
         # OR
         # Q.shape = (1, num_heads, latent_len, d_head)
-        Ert = None
-        if self.relative:
-            Ert = self.Er.transpose(0, 1)
-            # Ert.shape = (d_head, 2*latent_len-1)
 
         mask = None
-        if self.masked:
-            if self.previousInputLen != input_len or self.previousLatentLen != latent_len:
+        Ert = None
+        if self.previousInputLen != input_len or self.previousLatentLen != latent_len:
+            if self.masked:
                 self.mask = self.MakeMask(latent_len=latent_len, input_len=input_len).unsqueeze(0).unsqueeze(0).to(self.Er.device, self.Er.dtype)
                 self.previousInputLen = input_len
                 self.previousLatentLen = latent_len
-            mask = self.mask
-            # mask.shape = (1, 1, latent_len, input_len)
+                mask = self.mask
+                # mask.shape = (1, 1, latent_len, input_len)
+            if self.relative:
+                self.ConvDistrib = self.Weight(M=input_len, N=latent_len, sigma=1.5).to(self.Er.device, self.Er.dtype)
+                # ConvDistrib.shape = (latent_len, 2*RPR_len-1, input_len)
+                Ert = self.Er.transpose(0, 1)
+                # Ert.shape = (d_head, 2*latent_len-1)
+        else:
+            if self.masked:
+                mask = self.mask
+                # mask.shape = (1, 1, latent_len, input_len)
+            if self.relative:
+                Ert = self.Er.transpose(0, 1)
+                # Ert.shape = (d_head, 2*latent_len-1)
+
 
         RCA = self.RelativeCrossAttention(Q, Kt, Ert, V, input_len, Mask=mask)
         # RCA.shape = (batch_size, num_heads, latent_len, d_head)
@@ -92,11 +103,6 @@ class RLCA(nn.Module):
             # or
             # QEr.shape = (1, num_heads, latent_len, 2*RPR_len-1)
             # V.shape = (batch_size, num_heads, input_len, d_head)
-            if self.previousInputLen != input_len or self.previousLatentLen != latent_len:
-                self.ConvDistrib = self.Weight(M=input_len, N=latent_len, sigma=1.5).to(self.Er.device, self.Er.dtype)
-                self.previousInputLen = input_len
-                self.previousLatentLen = latent_len
-
             # ConvDistrib.shape = (latent_len, 2*RPR_len-1, input_len)
 
             QEr = QEr.unsqueeze(dim=-2)
@@ -130,7 +136,7 @@ class RLCA(nn.Module):
         return out
 
 
-    def Make_Mask(self, latent_len, input_len):
+    def MakeMask(self, latent_len, input_len):
         N = latent_len
         M = input_len
         mat = torch.zeros((N, M))
@@ -147,5 +153,4 @@ class RLCA(nn.Module):
                     alpha = (2*self.RPR_len-1) * (i/N - j/M + 1)/2
                     mat[i, k, j] = -(k-alpha)**2/sigma
         mat = torch.softmax(mat, dim=1)
-        print('ConvDistrib: ',mat.shape)
         return mat

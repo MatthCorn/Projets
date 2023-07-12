@@ -1,6 +1,6 @@
 from Transformer.EasyFeedForward import FeedForward
 from Transformer.EncoderTransformer import EncoderLayer
-from Transformer.DecoderTransformer import DecoderLayer
+from Perceiver.FlexibleDecoder import DecoderLayer
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -41,13 +41,14 @@ class TransformerTranslator(nn.Module):
 
     def forward(self, source, target, ended=None):
         # target.shape = (batch_size, target_len, d_target+num_flags)
-        batch_size, _, d_target_raw = target.shape
+        batch_size, target_len, d_target_raw = target.shape
 
         # On ajoute le token start au début de target
         trg = torch.cat((self.targetStart.expand(batch_size, 1, d_target_raw), target), 1)
+        target_len += 1
         # On pad la trg avec des 0 sur les mots par encore écrits
-        if self.target_len-len(target) > 0:
-            trg = F.pad(trg, (0, 0, 0, self.target_len-len(target)))
+        if self.target_len-target_len > 0:
+            trg = F.pad(trg, (0, 0, 0, self.target_len-target_len))
         else:
             raise ValueError('max len in the target reached')
         trg = self.TargetEmbedding(trg)
@@ -76,19 +77,7 @@ class TransformerTranslator(nn.Module):
             Action = ended
         return PDW, Action
 
-    # Cette fonction permet de traduire les phrases une par une, elle ne peut pas être utilisée dans l'apprentissage dans sa forme
-    def translateSentence(self, source):
-        # source.shape = (1, source_len, d_source)
-        target_len = 0
-        target = torch.zeros(size=(1, 0, self.d_target+self.num_flags)).to(self.device)
-        while target_len < self.target_len:
-            PDW, Action = self.forward(source=source, target=target)
-            if Action[0, 0, 0] > self.eps_end:
-                return target
-            target = torch.cat((target, PDW), dim=1)
-            target_len += 1
-        return target
-
+    # Le problème avec cette fonction est la création et le stockage "cachés" de len_target duo source-target pour l'apprentissage qui saturent la RAM
     def Error(self, source, translatedSource):
         # Ici les données sont founies en batch
         # source est une liste de séquence de même taille
@@ -104,6 +93,7 @@ class TransformerTranslator(nn.Module):
         Error = 0
 
         for i in range(len_target):
+            print(i)
             # On donne à chaque fois la source et les "i" premiers mots de la traduction et on compare le mot prédit
             ended = (torch.tensor(LenList) <= i).unsqueeze(-1).unsqueeze(-1).to(dtype=torch.float32, device=self.device)
             # ended.shape = (batch_size, 1, 1)
