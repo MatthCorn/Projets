@@ -17,7 +17,6 @@ class DigitalTwin():
         if AntPulses is not None:
             self.AntPulses = AntPulses
         while self.TimeId < len(self.AntPulses):
-            print(self.TimeId)
             if self.TimeId == -1:
                 self.initialization()
             elif self.TimeId < len(self.AntPulses) - 1:
