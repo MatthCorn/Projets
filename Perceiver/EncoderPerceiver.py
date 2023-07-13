@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from Transformer.RelativeMultiHeadSelfAttention import RMHSA
 from Transformer.EasyFeedForward import FeedForward
-from Perceiver.RelativeMultiHeadCrossAttentionV0 import RLCA
+from Perceiver.RelativeMultiHeadCrossAttention import RLCA
 
 
 class EncoderLayer(nn.Module):
@@ -12,7 +12,7 @@ class EncoderLayer(nn.Module):
         self.LatentLayerNorm1 = nn.LayerNorm(d_latent)
         self.InputLayerNorm1 = nn.LayerNorm(d_input)
         self.CrossAttentionLayer = RLCA(d_latent=d_latent, d_input=d_input, d_att=d_att, num_heads=num_heads, latent_len=latent_len,
-                                        max_len=max_len, dropout=ADropout, masked=masked, relative=relative)
+                                        max_len=max_len, dropout=ADropout, masked=masked, relative=relative, RPR_len=latent_len)
         self.LatentLayerNorm2 = nn.LayerNorm(d_latent)
         self.MLP1 = FeedForward(d_in=d_latent, d_out=d_latent, widths=WidthsFeedForward, dropout=FFDropout)
         self.LatentLayerNorm3 = nn.LayerNorm(d_latent)

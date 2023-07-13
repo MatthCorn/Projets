@@ -19,8 +19,6 @@ class DecoderLayer(nn.Module):
         self.ThirdLayerNorm = nn.LayerNorm(d_model)
 
     def forward(self, target, source):
-        # target doit toujours être de la forme
-        # target.shape = (batch_size, self.max_len, d_att)
         y = self.FirstLayerNorm(self.SelfAttentionLayer(x_latent=target, x_input=target) + target)
         y = self.SecondLayerNorm(self.CrossAttentionLayer(x_latent=y, x_input=source) + y)
         y = self.ThirdLayerNorm(self.FeedForward(y) + y)

@@ -3,12 +3,14 @@ from FakeDigitalTwin.SimulatorIter import DigitalTwin
 from FakeDigitalTwin.XMLTools import saveObjAsXml
 import os
 import numpy as np
+from tqdm import tqdm
 
-Batch_size = 20
+Batch_size = 10000
 BatchPulses = []
 BatchPDWs = []
 
-for iter in range(Batch_size):
+np.random.seed(0)
+for iter in tqdm(range(Batch_size)):
     # Nombre de mesureurs
     NbMaxTrackers = 4
     # Seuil de différence de fréquences repliées en dessous duquel deux impulsions se gênent
