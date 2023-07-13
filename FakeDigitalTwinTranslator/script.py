@@ -74,7 +74,7 @@ NextAction = torch.tensor(NextAction).unsqueeze(-1).unsqueeze(-1)
 PartialTranslation = pad_sequence(PartialTranslation, batch_first=True)
 # PartialTranslation.shape = (batch_size, len_target, d_target + num_flags)
 
-batch_size = 50
+batch_size = 100
 
 # On mélange les entrées pour éviter des biais d'apprentissage (car on va découper nos données en batchs)
 random.seed(0)
@@ -85,16 +85,15 @@ Source, NextPDW, NextAction, PartialTranslation = Source[IdList], NextPDW[IdList
 # Procédure d'entrainement
 optimizer = torch.optim.Adam(Translator.parameters(), weight_decay=1e-5, lr=3e-5)
 ErrList = []
-for i in tqdm(range(2000)):
+for i in tqdm(range(100)):
     n_batch = int(data_size/batch_size)
     for j in range(n_batch):
-        print(j)
         optimizer.zero_grad(set_to_none=True)
 
-        BatchSource = Source[j*n_batch: (j+1)*n_batch].detach().to(device=device, dtype=torch.float32)
-        BatchPartialTranslation = PartialTranslation[j*n_batch: (j+1)*n_batch].detach().to(device=device, dtype=torch.float32)
-        BatchNextPDW = NextPDW[j*n_batch: (j+1)*n_batch].detach().to(device=device, dtype=torch.float32)
-        BatchNextAction = NextAction[j*n_batch: (j+1)*n_batch].detach().to(device=device, dtype=torch.float32)
+        BatchSource = Source[j*batch_size: (j+1)*batch_size].detach().to(device=device, dtype=torch.float32)
+        BatchPartialTranslation = PartialTranslation[j*batch_size: (j+1)*batch_size].detach().to(device=device, dtype=torch.float32)
+        BatchNextPDW = NextPDW[j*batch_size: (j+1)*batch_size].detach().to(device=device, dtype=torch.float32)
+        BatchNextAction = NextAction[j*batch_size: (j+1)*batch_size].detach().to(device=device, dtype=torch.float32)
 
         PredictedPDW, PredictedAction = Translator.forward(source=BatchSource, target=BatchPartialTranslation, ended=BatchNextAction)
         err = torch.norm(BatchNextPDW - PredictedPDW) + torch.norm(BatchNextAction - PredictedAction)

@@ -5,7 +5,7 @@ import os
 import numpy as np
 from tqdm import tqdm
 
-Batch_size = 100
+Batch_size = 200
 BatchPulses = []
 BatchPDWs = []
 
