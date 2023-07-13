@@ -77,32 +77,3 @@ class TransformerTranslator(nn.Module):
             Action = ended
         return PDW, Action
 
-    # Le problème avec cette fonction est la création et le stockage "cachés" de len_target duo source-target pour l'apprentissage qui saturent la RAM
-    def Error(self, source, translatedSource):
-        # Ici les données sont founies en batch
-        # source est une liste de séquence de même taille
-        source_input = torch.tensor(source).to(self.device)
-
-        # translatedSource est une liste de traduction, elles peuvent être de tailles différentes
-        LenList = [len(el) for el in translatedSource]
-        len_target = max(LenList)
-
-        translatedSource = pad_sequence([torch.tensor(sublist) for sublist in translatedSource], batch_first=True).to(self.device)
-        # translatedSource.shape = (batch_size, len_target, d_target)
-
-        Error = 0
-
-        for i in range(len_target):
-            print(i)
-            # On donne à chaque fois la source et les "i" premiers mots de la traduction et on compare le mot prédit
-            ended = (torch.tensor(LenList) <= i).unsqueeze(-1).unsqueeze(-1).to(dtype=torch.float32, device=self.device)
-            # ended.shape = (batch_size, 1, 1)
-            target_input = translatedSource[:, :i]
-            expected_prediction = translatedSource[:, i]
-            actual_prediction, action = self.forward(source=source_input, target=target_input, ended=ended)
-
-            Error += torch.norm(expected_prediction - actual_prediction) + torch.norm(action - ended)
-
-        return Error
-
-

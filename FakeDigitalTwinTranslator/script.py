@@ -3,9 +3,11 @@ from FakeDigitalTwinTranslator.Network import TransformerTranslator
 import os
 import torch
 from tqdm import tqdm
+from torch.nn.utils.rnn import pad_sequence
+import random
 
-local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
-# local = r'C:\Users\Matthieu\Documents\Python\Projets'
+# local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
+local = r'C:\Users\Matthieu\Documents\Python\Projets'
 BatchPulses = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', 'PulsesAnt.xml'))
 BatchPDWs = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', 'PDWsDCI.xml'))
 
@@ -22,44 +24,69 @@ num_flags = 3
 num_heads = 4
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-device = torch.device('cpu')
 
 Translator = TransformerTranslator(d_source=d_source, d_target=d_target, d_att=d_att, d_input_Enc=d_input_Enc,
                                    d_input_Dec=d_input_Dec, num_flags=num_flags, num_heads=num_heads, device=device)
 
-if False:
-    from torch.nn.utils.rnn import pad_sequence
 
-    source = BatchPulses
-    translatedSource = BatchPDWs
-    # Ici les données sont founies en batch
-    # source est une liste de séquence de même taille
-    source_input = torch.tensor(source)
+# Pour l'entrainement, il nous faut en fait des listes de tuples (impulsions antenne - début des PDWs - prochain PDW),
+# il faut  donc transformer  BatchPDWs pour créer à partir de chaque liste de PDWs tous les couples (début des PDWs - prochain PDW)
 
-    # translatedSource est une liste de traduction, elles peuvent être de tailles différentes
-    LenList = [len(el) for el in translatedSource]
-    len_target = max(LenList)
+# Ici les données sont founies en batch
+# BatchPulses est une liste de séquence de même taille
 
-    translatedSource = pad_sequence([torch.tensor(sublist) for sublist in translatedSource], batch_first=True)
-    # translatedSource.shape = (batch_size, len_target, d_target)
+# BatchPDWs est une liste de traduction, elles peuvent être de tailles différentes
+# On crée une liste de début de séquence de PDWs et une liste de la PDW suivante à prédire
+# La liste de l'action à prédire correspond si on arrête ou pas la génération (on a fini de traduire les Pulses en PDWs)
+LenBatch = len(BatchPDWs)
+# LenBatch = len(BatchPulses) aussi
+Source = []
+PartialTranslation = []
+NextPDW = []
+NextAction = []
+for i in range(LenBatch):
+    PDWsList = BatchPDWs[i]
+    for j in range(len(PDWsList)):
+        Source.append(BatchPulses[i])
+        NextPDW.append(PDWsList[j])
+        NextAction.append(0)
 
-    Error = 0
-    for i in range(len_target):
-        print(i)
-        # On donne à chaque fois la source et les "i" premiers mots de la traduction et on compare le mot prédit
-        ended = (torch.tensor(LenList) <= i).unsqueeze(-1).unsqueeze(-1).to(dtype=torch.float32)
-        # ended.shape = (batch_size, 1, 1)
-        target_input = translatedSource[:, :i]
-        expected_prediction = translatedSource[:, i]
-        actual_prediction, action = Translator.forward(source=source_input, target=target_input, ended=ended)
+        # On fait directement cela pour le besoin future du passage en tensor
+        PartialTranslation.append(torch.tensor(PDWsList[:j]).reshape(-1, d_target+num_flags))
 
-        Error += torch.norm(expected_prediction - actual_prediction) + torch.norm(action - ended)
+    Source.append(BatchPulses[i])
+    NextPDW.append([0]*(d_target+num_flags))
+    NextAction.append(1)
+    PartialTranslation.append(torch.tensor(PDWsList))
 
 
+# On transforme ces listes en tenseur
+Source = torch.tensor(Source)
+# Source.shape = (batch_size, len_input, d_input)
+batch_size = len(Source)
+NextPDW = torch.tensor(NextPDW)
+# NextPDW.shape = (batch_size, d_target + num_flags)
+NextAction = torch.tensor(NextAction).unsqueeze(-1).unsqueeze(-1)
+# NextAction.shape = (batch_size, 1, 1)
+
+# Rajoute des 0 à la fin des traductions partielles pour qu'elles aient toutes la même taille
+PartialTranslation = pad_sequence(PartialTranslation, batch_first=True)
+# PartialTranslation.shape = (batch_size, len_target, d_target + num_flags)
+
+# On mélange les entrées pour éviter des biais d'apprentissage (car on va découper notre batch en mini-batchs)
+random.seed(0)
+IdList = list(range(batch_size))
+random.shuffle(IdList)
+Source, NextPDW, NextAction, PartialTranslation = Source[IdList], NextPDW[IdList], NextAction[IdList], PartialTranslation[IdList]
+
+# Procédure d'entrainement
 optimizer = torch.optim.Adam(Translator.parameters(), weight_decay=1e-6, lr=3e-4)
 ErrList = []
 for i in tqdm(range(100)):
-    err = Translator.Error(source=BatchPulses, translatedSource=BatchPDWs)
+    PredictedPDW, PredictedAction = Translator.forward(source=Source, target=PartialTranslation, ended=NextAction)
+    err = torch.norm(NextPDW - PredictedPDW) + torch.norm(NextAction - PredictedAction)
     err.backward()
     optimizer.step()
     ErrList.append(float(err))
+
+
