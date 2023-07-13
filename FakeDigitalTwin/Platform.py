@@ -11,7 +11,11 @@ class Platform():
         self.Pulses.append(Pulse)
 
     def DelPulse(self, Id):
-        del(self.Pulses[Id])
+        if type(Id) == list:
+            for Id in reversed(Id):
+                del(self.Pulses[Id])
+        else:
+            del (self.Pulses[Id])
 
     def DelVisiblePulse(self, Id):
         del(self.VisiblePulses[Id])

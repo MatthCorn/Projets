@@ -44,6 +44,7 @@ class Tracker():
         self.IsTaken = False
 
     def Update(self, Id):
+        # print('update tracker no.{} with Id{}'.format(self.id, Id))
         self.LastPulseId = Id
         platform = self.parent.Platform
         self.Histogram.append(platform.Pulses[Id].Id)

@@ -65,7 +65,7 @@ AccuracyValidationSet = []
 for i in range(100):
     print(i)
     for Batch in Batchs:
-        optimizer.zero_grad()
+        optimizer.zero_grad(set_to_none=True)
         err = torch.norm(N(TrainingImageSet[Batch])-TrainingLabelSet[Batch])
         err.backward()
         optimizer.step()

@@ -30,7 +30,7 @@ ValidationImageSet = ValidationImageSet.to(device)
 ValidationLabelSet = ValidationLabelSet.to(device)
 ValidationLabels = ValidationLabels.to(device)
 
-Batchs = [list(range(100*k,100*(k+1))) for k in range(600)]
+Batchs = [list(range(100*k, 100*(k+1))) for k in range(600)]
 
 optimizer = torch.optim.Adam(N.parameters(),weight_decay = 0.1)
 
@@ -41,7 +41,7 @@ for i in range(200):
     print(i)
     ErrorTrainingSet.append(float(torch.norm(N(TrainingImageSet[Batchs[0]])-TrainingLabelSet[Batchs[0]])))
     for Batch in Batchs:
-        optimizer.zero_grad()
+        optimizer.zero_grad(set_to_none=True)
         err = torch.norm(N(TrainingImageSet[Batch])-TrainingLabelSet[Batch])
         err.backward()
         optimizer.step()
