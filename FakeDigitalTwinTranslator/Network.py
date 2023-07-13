@@ -8,7 +8,7 @@ from torch.nn.utils.rnn import pad_sequence
 
 class TransformerTranslator(nn.Module):
 
-    def __init__(self, d_source, d_target, d_input_Enc=10, d_input_Dec=10, d_att=10, num_heads=2, num_encoders=3,
+    def __init__(self, d_source, d_target, d_input_Enc=10, d_input_Dec=10, d_att=10, num_heads=2, num_encoders=3, RPR_len_decoder=32,
                  num_decoders=3, target_len=80, num_flags=4, eps_end=1-1e-1, device=torch.device('cpu')):
         super().__init__()
         self.device = device
@@ -25,7 +25,7 @@ class TransformerTranslator(nn.Module):
         self.Decoders = nn.ModuleList()
         for i in range(num_decoders):
             # on doit spécifier target_len car on a un masque dans le décodage
-            self.Decoders.append(DecoderLayer(d_model=d_input_Dec, d_att=d_att, num_heads=num_heads, target_len=target_len))
+            self.Decoders.append(DecoderLayer(d_model=d_input_Dec, d_att=d_att, num_heads=num_heads, RPR_len=RPR_len_decoder))
 
         self.SourceEmbedding = FeedForward(d_in=d_source, d_out=d_input_Enc, widths=[16])
         self.TargetEmbedding = FeedForward(d_in=d_target+num_flags, d_out=d_input_Dec, widths=[16])
@@ -50,6 +50,8 @@ class TransformerTranslator(nn.Module):
         if self.target_len-target_len > 0:
             trg = F.pad(trg, (0, 0, 0, self.target_len-target_len))
         else:
+            print('target_len :', target_len)
+            print('self.target_len :', self.target_len)
             raise ValueError('max len in the target reached')
         trg = self.TargetEmbedding(trg)
         # trg.shape = (batch_size, target_len, d_input_Dec)

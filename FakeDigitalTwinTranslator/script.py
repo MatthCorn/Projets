@@ -5,6 +5,7 @@ import torch
 from tqdm import tqdm
 from torch.nn.utils.rnn import pad_sequence
 import random
+import matplotlib.pyplot as plt
 
 # local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
 local = r'C:\Users\Matthieu\Documents\Python\Projets'
@@ -25,7 +26,7 @@ num_heads = 4
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-Translator = TransformerTranslator(d_source=d_source, d_target=d_target, d_att=d_att, d_input_Enc=d_input_Enc,
+Translator = TransformerTranslator(d_source=d_source, d_target=d_target, d_att=d_att, d_input_Enc=d_input_Enc, target_len=100,
                                    d_input_Dec=d_input_Dec, num_flags=num_flags, num_heads=num_heads, device=device)
 
 
@@ -63,7 +64,7 @@ for i in range(LenBatch):
 # On transforme ces listes en tenseur
 Source = torch.tensor(Source)
 # Source.shape = (batch_size, len_input, d_input)
-batch_size = len(Source)
+data_size = len(Source)
 NextPDW = torch.tensor(NextPDW)
 # NextPDW.shape = (batch_size, d_target + num_flags)
 NextAction = torch.tensor(NextAction).unsqueeze(-1).unsqueeze(-1)
@@ -73,20 +74,32 @@ NextAction = torch.tensor(NextAction).unsqueeze(-1).unsqueeze(-1)
 PartialTranslation = pad_sequence(PartialTranslation, batch_first=True)
 # PartialTranslation.shape = (batch_size, len_target, d_target + num_flags)
 
-# On mélange les entrées pour éviter des biais d'apprentissage (car on va découper notre batch en mini-batchs)
+batch_size = 100
+
+# On mélange les entrées pour éviter des biais d'apprentissage (car on va découper nos données en batchs)
 random.seed(0)
-IdList = list(range(batch_size))
+IdList = list(range(data_size))
 random.shuffle(IdList)
 Source, NextPDW, NextAction, PartialTranslation = Source[IdList], NextPDW[IdList], NextAction[IdList], PartialTranslation[IdList]
 
 # Procédure d'entrainement
-optimizer = torch.optim.Adam(Translator.parameters(), weight_decay=1e-6, lr=3e-4)
+optimizer = torch.optim.Adam(Translator.parameters(), weight_decay=1e-5, lr=3e-5)
 ErrList = []
-for i in tqdm(range(100)):
-    PredictedPDW, PredictedAction = Translator.forward(source=Source, target=PartialTranslation, ended=NextAction)
-    err = torch.norm(NextPDW - PredictedPDW) + torch.norm(NextAction - PredictedAction)
-    err.backward()
-    optimizer.step()
-    ErrList.append(float(err))
+for i in tqdm(range(2000)):
+    n_batch = int(data_size/batch_size)
+    for j in range(n_batch):
+        BatchSource = Source[j*n_batch: (j+1)*n_batch].to(device=device, dtype=torch.float32)
+        BatchPartialTranslation = PartialTranslation[j*n_batch: (j+1)*n_batch].to(device=device, dtype=torch.float32)
+        BatchNextPDW = NextPDW[j*n_batch: (j+1)*n_batch].to(device=device, dtype=torch.float32)
+        BatchNextAction = NextAction[j*n_batch: (j+1)*n_batch].to(device=device, dtype=torch.float32)
 
+        PredictedPDW, PredictedAction = Translator.forward(source=BatchSource, target=BatchPartialTranslation, ended=BatchNextAction)
+        err = torch.norm(BatchNextPDW - PredictedPDW) + torch.norm(BatchNextAction - PredictedAction)
+        err.backward()
+        optimizer.step()
+        ErrList.append(float(err))
+
+plt.plot(ErrList)
+plt.show()
+None
 
