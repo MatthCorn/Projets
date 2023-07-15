@@ -44,9 +44,8 @@ class TransformerTranslator(nn.Module):
 
         # On ajoute le token start au début de target
         trg = torch.cat((self.targetStart.expand(batch_size, 1, d_target_raw), target), 1)
-        target_len += 1
         # On pad la trg avec des 0 sur les mots par encore écrits
-        if self.target_len-target_len > 0:
+        if self.target_len-target_len >= 0:
             trg = F.pad(trg, (0, 0, 0, self.target_len-target_len))
         else:
             print('target_len :', target_len)

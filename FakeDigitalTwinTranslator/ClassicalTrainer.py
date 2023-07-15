@@ -1,5 +1,5 @@
 from FakeDigitalTwin.XMLTools import loadXmlAsObj
-from FakeDigitalTwinTranslator.Network import TransformerTranslator
+from FakeDigitalTwinTranslator.ClassicNetwork import TransformerTranslator
 import os
 import torch
 from tqdm import tqdm
@@ -65,9 +65,9 @@ for i in tqdm(range(100)):
         BatchEnded = Ended[j*batch_size: (j+1)*batch_size].detach().to(device=device, dtype=torch.float32)
 
         # On ajoute un zero au début pour décaler le masque vers la droite et voir si le réseau prédit correctement l'action d'arrêter l'écriture
-        BatchActionMask = (1 - F.pad(BatchEnded, (0, 0, 1, 0)[:, len_target]))
+        BatchActionMask = (1 - F.pad(BatchEnded, (0, 0, 1, 0))[:, len_target])
 
-        PredictedTranslation, PredictedAction = Translator.forward(source=BatchSource, target=BatchTranslation, ended=BatchEnded)
+        PredictedTranslation, PredictedAction = Translator.forward(source=BatchSource, target=BatchTranslation)
         err = torch.norm((BatchTranslation - PredictedTranslation)*(1-BatchEnded)) + torch.norm((PredictedAction - (1-BatchEnded))*BatchActionMask)
         err.backward()
         optimizer.step()
