@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 
 # Ce script sert à, l'apprentissage du réseau Network.TransformerTranslator
 
-local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
-# local = r'C:\Users\Matthieu\Documents\Python\Projets'
+# local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
+local = r'C:\Users\Matthieu\Documents\Python\Projets'
 TrainingPulses = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', 'TrainingPulsesAnt.xml'))
 TrainingPDWs = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', 'TrainingPDWsDCI.xml'))
 ValidationPulses = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', 'ValidationPulsesAnt.xml'))

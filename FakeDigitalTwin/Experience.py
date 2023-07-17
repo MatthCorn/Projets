@@ -5,7 +5,7 @@ import os
 import numpy as np
 from tqdm import tqdm
 
-Batch_size = 100
+Batch_size = 3000
 BatchPulses = []
 BatchPDWs = []
 
@@ -49,7 +49,7 @@ for iter in tqdm(range(Batch_size)):
     #
     # scale = 0.5146
     ####################################################################################################################
-    LI = np.random.gamma(shape=2, scale=0.5146, size=size)
+    LI = np.random.gamma(shape=2, scale=0.5146, size=size) + 1e-2
 
     ####################################################################################################################
     # Le niveau de saturation est de 10 unités, on veut que 90% des impulsions soit moins fortes
