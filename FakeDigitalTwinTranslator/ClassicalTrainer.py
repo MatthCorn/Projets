@@ -9,14 +9,21 @@ import matplotlib.pyplot as plt
 
 # Ce script sert à, l'apprentissage du réseau Network.TransformerTranslator
 
-# local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
-local = r'C:\Users\Matthieu\Documents\Python\Projets'
-BatchPulses = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', 'PulsesAnt.xml'))
-BatchPDWs = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', 'PDWsDCI.xml'))
+local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
+# local = r'C:\Users\Matthieu\Documents\Python\Projets'
+TrainingPulses = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', 'TrainingPulsesAnt.xml'))
+TrainingPDWs = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', 'TrainingPDWsDCI.xml'))
+ValidationPulses = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', 'ValidationPulsesAnt.xml'))
+ValidationPDWs = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', 'ValidationPDWsDCI.xml'))
 
-Source = [[[Pulse['TOA'], Pulse['LI'], Pulse['Level'], Pulse['FreqStart'], Pulse['FreqEnd']] for Pulse in PulsesAnt] for PulsesAnt in BatchPulses]
-Translation = [[[PDW['TOA'], PDW['LI'], PDW['Level'], PDW['FreqMin'], PDW['FreqMax'], int('CW' in PDW['flags']), int('TroncAv' in PDW['flags']),
-               int(len(PDW['flags']) == 0)] for PDW in PDWsDCI] for PDWsDCI in BatchPDWs]
+
+TrainingSource = [[[Pulse['TOA'], Pulse['LI'], Pulse['Level'], Pulse['FreqStart'], Pulse['FreqEnd']] for Pulse in PulsesAnt] for PulsesAnt in TrainingPulses]
+TrainingTranslation = [[[PDW['TOA'], PDW['LI'], PDW['Level'], PDW['FreqMin'], PDW['FreqMax'], int('CW' in PDW['flags']), int('TroncAv' in PDW['flags']),
+                         int(len(PDW['flags']) == 0)] for PDW in PDWsDCI] for PDWsDCI in TrainingPDWs]
+
+ValidationSource = [[[Pulse['TOA'], Pulse['LI'], Pulse['Level'], Pulse['FreqStart'], Pulse['FreqEnd']] for Pulse in PulsesAnt] for PulsesAnt in ValidationPulses]
+ValidationTranslation = [[[PDW['TOA'], PDW['LI'], PDW['Level'], PDW['FreqMin'], PDW['FreqMax'], int('CW' in PDW['flags']), int('TroncAv' in PDW['flags']),
+                         int(len(PDW['flags']) == 0)] for PDW in PDWsDCI] for PDWsDCI in ValidationPDWs]
 
 d_source = 5
 d_target = 5
@@ -38,41 +45,84 @@ Translator = TransformerTranslator(d_source=d_source, d_target=d_target, d_att=d
 # Translation est une liste de séquence de PDWs, elles peuvent être de longueures différentes
 
 # On transforme ces listes en tenseur
-Source = torch.tensor(Source)
+TrainingSource = torch.tensor(TrainingSource)
 # Source.shape = (batch_size, len_input, d_input)
 
 # Rajoute des 0 à la fin des scénarios de PDWs pour qu'ils aient toutes la même longueure
-Translation = pad_sequence([torch.tensor(el) for el in Translation], batch_first=True)
-_, temp_len, _ = Translation.shape
-Translation = F.pad(Translation, (0, 0, 0, len_target-temp_len))
+TrainingTranslation = pad_sequence([torch.tensor(el) for el in TrainingTranslation], batch_first=True)
+
+_, temp_len, _ = TrainingTranslation.shape
+TrainingTranslation = F.pad(TrainingTranslation, (0, 0, 0, len_target-temp_len))
 # Translation.shape = (batch_size, len_target, d_target + num_flags)
 
-Ended = (Translation == 0).to(torch.float32)
 
-batch_size = 100
-data_size = len(Source)
+# Même travail sur l'ensemble de validation
+ValidationSource = torch.tensor(ValidationSource)
+TrainingEnded = (torch.norm(TrainingTranslation, dim=-1) == 0).unsqueeze(-1).to(torch.float32)
+ValidationTranslation = pad_sequence([torch.tensor(el) for el in ValidationTranslation], batch_first=True)
+_, temp_len, _ = ValidationTranslation.shape
+ValidationTranslation = F.pad(ValidationTranslation, (0, 0, 0, len_target-temp_len))
+ValidationEnded = (torch.norm(ValidationTranslation, dim=-1) == 0).unsqueeze(-1).to(torch.float32)
+
+batch_size = 50
+training_size = len(TrainingSource)
+validation_size = len(ValidationSource)
 
 # Procédure d'entrainement
 optimizer = torch.optim.Adam(Translator.parameters(), weight_decay=1e-5, lr=3e-5)
-ErrList = []
-for i in tqdm(range(100)):
-    n_batch = int(data_size/batch_size)
+TrainingErrList = []
+ValidationErrList = []
+for i in tqdm(range(200)):
+    n_batch = int(training_size/batch_size)
+    TrainingError = 0
     for j in range(n_batch):
         optimizer.zero_grad(set_to_none=True)
 
-        BatchSource = Source[j*batch_size: (j+1)*batch_size].detach().to(device=device, dtype=torch.float32)
-        BatchTranslation = Translation[j*batch_size: (j+1)*batch_size].detach().to(device=device, dtype=torch.float32)
-        BatchEnded = Ended[j*batch_size: (j+1)*batch_size].detach().to(device=device, dtype=torch.float32)
+        BatchSource = TrainingSource[j*batch_size: (j+1)*batch_size].detach().to(device=device, dtype=torch.float32)
+        BatchTranslation = TrainingTranslation[j*batch_size: (j+1)*batch_size].detach().to(device=device, dtype=torch.float32)
+        BatchEnded = TrainingEnded[j*batch_size: (j+1)*batch_size].detach().to(device=device, dtype=torch.float32)
 
-        # On ajoute un zero au début pour décaler le masque vers la droite et voir si le réseau prédit correctement l'action d'arrêter l'écriture
-        BatchActionMask = (1 - F.pad(BatchEnded, (0, 0, 1, 0))[:, len_target])
+        # Pour faire en sorte que l'action "continuer d'écrire" soit autant représentée en True qu'en False, on pondère le masque des actions
+        NumWords = torch.sum(BatchEnded, dim=1).unsqueeze(-1).to(torch.int32)
+        BatchActionMask = (1 - BatchEnded) / NumWords
+        for i in range(len(NumWords)):
+            BatchActionMask[(i, int(NumWords[i]))] = 1
 
         PredictedTranslation, PredictedAction = Translator.forward(source=BatchSource, target=BatchTranslation)
-        err = torch.norm((BatchTranslation - PredictedTranslation)*(1-BatchEnded)) + torch.norm((PredictedAction - (1-BatchEnded))*BatchActionMask)
+
+        # Comme la décision d'arrêter d'écrire passe par Action, et pas par un token <end>, on ne s'interesse pas au dernier mot
+        # On ne s'interesse pas non plus à l'action prédite par le token <start>, puisque de toute manière il est suivi d'un mot
+        PredictedTranslation = PredictedTranslation[:, 1:]
+        PredictedAction = PredictedAction[:, :-1]
+        err = (torch.norm((BatchTranslation - PredictedTranslation)*(1-BatchEnded)) + torch.norm((PredictedAction - (1-BatchEnded))*BatchActionMask))/batch_size
         err.backward()
         optimizer.step()
-        ErrList.append(float(err))
+        TrainingError += float(err)*batch_size
+    TrainingErrList.append(TrainingError/training_size)
 
-plt.plot(ErrList)
+    n_batch = int(validation_size / batch_size)
+    ValidationError = 0
+    for j in range(n_batch):
+
+        BatchSource = ValidationSource[j * batch_size: (j + 1) * batch_size].detach().to(device=device, dtype=torch.float32)
+        BatchTranslation = ValidationTranslation[j * batch_size: (j + 1) * batch_size].detach().to(device=device, dtype=torch.float32)
+        BatchEnded = ValidationEnded[j * batch_size: (j + 1) * batch_size].detach().to(device=device, dtype=torch.float32)
+
+        # On ajoute un zero au début pour décaler le masque vers la droite et voir si le réseau prédit correctement l'action d'arrêter l'écriture
+        BatchActionMask = (1 - F.pad(BatchEnded, (0, 0, 1, 0))[:, :len_target])
+
+        with torch.no_grad():
+            PredictedTranslation, PredictedAction = Translator.forward(source=BatchSource, target=BatchTranslation)
+
+        # Comme la décision d'arrêter d'écrire passe par Action, et pas par un token <end>, on ne s'interesse pas au dernier mot
+        # On ne s'interesse pas non plus à l'action prédite par le token <start>, puisque de toute manière il est suivi d'un mot
+        PredictedTranslation = PredictedTranslation[:, 1:]
+        PredictedAction = PredictedAction[:, :-1]
+        err = (torch.norm((BatchTranslation - PredictedTranslation) * (1 - BatchEnded)) + torch.norm((PredictedAction - (1 - BatchEnded)) * BatchActionMask)) / batch_size
+        ValidationError += float(err)*batch_size
+    ValidationErrList.append(ValidationError/validation_size)
+
+plt.plot(TrainingErrList, 'b')
+plt.plot(ValidationErrList, 'r')
 plt.show()
 
