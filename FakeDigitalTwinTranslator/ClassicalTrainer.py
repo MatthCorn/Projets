@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 
 # Ce script sert à, l'apprentissage du réseau Network.TransformerTranslator
 
-# local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
-local = r'C:\Users\Matthieu\Documents\Python\Projets'
+local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
+# local = r'C:\Users\Matthieu\Documents\Python\Projets'
 TrainingPulses = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', 'TrainingPulsesAnt.xml'))
 TrainingPDWs = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', 'TrainingPDWsDCI.xml'))
 ValidationPulses = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', 'ValidationPulsesAnt.xml'))
@@ -72,7 +72,7 @@ validation_size = len(ValidationSource)
 optimizer = torch.optim.Adam(Translator.parameters(), weight_decay=1e-5, lr=3e-5)
 TrainingErrList = []
 ValidationErrList = []
-for i in tqdm(range(200)):
+for i in tqdm(range(500)):
     n_batch = int(training_size/batch_size)
     TrainingError = 0
     for j in range(n_batch):
@@ -83,7 +83,7 @@ for i in tqdm(range(200)):
         BatchEnded = TrainingEnded[j*batch_size: (j+1)*batch_size].detach().to(device=device, dtype=torch.float32)
 
         # Pour faire en sorte que l'action "continuer d'écrire" soit autant représentée en True qu'en False, on pondère le masque des actions
-        NumWords = torch.sum(BatchEnded, dim=1).unsqueeze(-1).to(torch.int32)
+        NumWords = torch.sum((1-BatchEnded), dim=1).unsqueeze(-1).to(torch.int32)
         BatchActionMask = (1 - BatchEnded) / NumWords
         for i in range(len(NumWords)):
             BatchActionMask[(i, int(NumWords[i]))] = 1
@@ -108,8 +108,11 @@ for i in tqdm(range(200)):
         BatchTranslation = ValidationTranslation[j * batch_size: (j + 1) * batch_size].detach().to(device=device, dtype=torch.float32)
         BatchEnded = ValidationEnded[j * batch_size: (j + 1) * batch_size].detach().to(device=device, dtype=torch.float32)
 
-        # On ajoute un zero au début pour décaler le masque vers la droite et voir si le réseau prédit correctement l'action d'arrêter l'écriture
-        BatchActionMask = (1 - F.pad(BatchEnded, (0, 0, 1, 0))[:, :len_target])
+        # Pour faire en sorte que l'action "continuer d'écrire" soit autant représentée en True qu'en False, on pondère le masque des actions
+        NumWords = torch.sum((1-BatchEnded), dim=1).unsqueeze(-1).to(torch.int32)
+        BatchActionMask = (1 - BatchEnded) / NumWords
+        for i in range(len(NumWords)):
+            BatchActionMask[(i, int(NumWords[i]))] = 1
 
         with torch.no_grad():
             PredictedTranslation, PredictedAction = Translator.forward(source=BatchSource, target=BatchTranslation)
@@ -122,7 +125,11 @@ for i in tqdm(range(200)):
         ValidationError += float(err)*batch_size
     ValidationErrList.append(ValidationError/validation_size)
 
+torch.save(Translator.state_dict(), os.path.join(local, 'FakeDigitalTwinTranslator', 'Translator'))
+
 plt.plot(TrainingErrList, 'b')
 plt.plot(ValidationErrList, 'r')
 plt.show()
+
+Translator.load_state_dict(torch.load(os.path.join(local, 'FakeDigitalTwinTranslator', 'Translator')))
 

@@ -10,9 +10,7 @@ class RMHSA(nn.Module):
         super().__init__()
         d_head, remainder = divmod(d_att, num_heads)
         if remainder:
-            raise ValueError(
-                "incompatible `d_model` and `num_heads`"
-            )
+            raise ValueError("incompatible `d_model` and `num_heads`")
         self.max_len = max_len
         self.d_model = d_model
         self.d_att = d_att
@@ -27,11 +25,7 @@ class RMHSA(nn.Module):
         self.Er = nn.Parameter(torch.randn(2*max_len-1, d_head))
         self.masked = masked
         if self.masked:
-            self.register_buffer(
-                "mask",
-                torch.tril(torch.ones(max_len, max_len))
-                .unsqueeze(0).unsqueeze(0)
-            )
+            self.register_buffer("mask", torch.tril(torch.ones(max_len, max_len), persistent=False).unsqueeze(0).unsqueeze(0))
             # self.mask.shape = (1, 1, max_len, max_len)
 
     def forward(self, x):

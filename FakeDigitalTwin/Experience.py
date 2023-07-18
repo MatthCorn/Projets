@@ -9,7 +9,7 @@ Batch_size = 100
 BatchPulses = []
 BatchPDWs = []
 
-np.random.seed(0)
+np.random.seed(10)
 for iter in tqdm(range(Batch_size)):
     # Nombre de mesureurs
     NbMaxTrackers = 4
