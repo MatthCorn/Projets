@@ -7,7 +7,7 @@ from torch.nn.utils.rnn import pad_sequence
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
 
-# Ce script sert à, l'apprentissage du réseau Network.TransformerTranslator
+# Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
 local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
 # local = r'C:\Users\Matthieu\Documents\Python\Projets'
@@ -55,10 +55,11 @@ _, temp_len, _ = TrainingTranslation.shape
 TrainingTranslation = F.pad(TrainingTranslation, (0, 0, 0, len_target-temp_len))
 # Translation.shape = (batch_size, len_target, d_target + num_flags)
 
+TrainingEnded = (torch.norm(TrainingTranslation, dim=-1) == 0).unsqueeze(-1).to(torch.float32)
+
 
 # Même travail sur l'ensemble de validation
 ValidationSource = torch.tensor(ValidationSource)
-TrainingEnded = (torch.norm(TrainingTranslation, dim=-1) == 0).unsqueeze(-1).to(torch.float32)
 ValidationTranslation = pad_sequence([torch.tensor(el) for el in ValidationTranslation], batch_first=True)
 _, temp_len, _ = ValidationTranslation.shape
 ValidationTranslation = F.pad(ValidationTranslation, (0, 0, 0, len_target-temp_len))
@@ -72,7 +73,7 @@ validation_size = len(ValidationSource)
 optimizer = torch.optim.Adam(Translator.parameters(), weight_decay=1e-5, lr=3e-5)
 TrainingErrList = []
 ValidationErrList = []
-for i in tqdm(range(500)):
+for i in tqdm(range(300)):
     n_batch = int(training_size/batch_size)
     TrainingError = 0
     for j in range(n_batch):
@@ -131,5 +132,4 @@ plt.plot(TrainingErrList, 'b')
 plt.plot(ValidationErrList, 'r')
 plt.show()
 
-Translator.load_state_dict(torch.load(os.path.join(local, 'FakeDigitalTwinTranslator', 'Translator')))
 
