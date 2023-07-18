@@ -33,16 +33,21 @@ class DigitalTwin():
         TOEList = [Pulse.TOA + Pulse.LI for Pulse in self.Platform.Pulses]
         minTOE = min(TOEList)
         if minTOE < self.AntPulses[self.TimeId + 1].TOA:
-            # un palier commence car une impulsion se termine
+            # un palier commence car une impulsion se termine (il ne peut pas y en avoir plusieurs)
             self.Platform.EndingTime = minTOE
             self.PlatformProcessing()
             self.Platform.DelPulse(TOEList.index(minTOE))
         else:
-            # un palier commence car une impulsion arrive
+            # un palier commence car une ou plusieurs impulsions arrivent
             self.Platform.EndingTime = self.AntPulses[self.TimeId + 1].TOA
             self.PlatformProcessing()
-            self.TimeId += 1
-            self.Platform.AddPulse(self.AntPulses[self.TimeId])
+            UpcommingTOA = self.AntPulses[self.TimeId + 1].TOA
+            while self.AntPulses[self.TimeId + 1].TOA == UpcommingTOA:
+                self.TimeId += 1
+                self.Platform.AddPulse(self.AntPulses[self.TimeId])
+                if self.TimeId == len(self.AntPulses) - 1:
+                    # on s'arrête si on a ajouté toutes les impulsions
+                    break
         return None
 
     def step(self):
@@ -99,11 +104,11 @@ class DigitalTwin():
         TOEList = [Pulse.TOA + Pulse.LI for Pulse in self.Platform.Pulses]
         minTOE = min(TOEList)
 
-        # un palier commence car une impulsion se termine
+        # un palier commence car une ou plusieurs impulsions se terminent
         self.Platform.EndingTime = minTOE
         self.PlatformProcessing()
-        self.Platform.DelPulse(TOEList.index(minTOE))
-
+        Index = [i for i, TOE in enumerate(TOEList) if TOE == minTOE]
+        self.Platform.DelPulse(Index)
         return None
     def PlatformProcessing(self):
         self.Processor.RunPlatform(self.Platform, self.Trackers)

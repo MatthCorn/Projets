@@ -5,11 +5,11 @@ import os
 import numpy as np
 from tqdm import tqdm
 
-Batch_size = 3000
+Batch_size = 100
 BatchPulses = []
 BatchPDWs = []
 
-np.random.seed(1)
+np.random.seed(0)
 for iter in tqdm(range(Batch_size)):
     # Nombre de mesureurs
     NbMaxTrackers = 4
