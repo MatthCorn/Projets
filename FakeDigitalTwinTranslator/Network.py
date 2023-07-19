@@ -38,43 +38,33 @@ class TransformerTranslator(nn.Module):
         self.to(device)
 
 
-    def forward(self, source, target, ended=None):
+    def forward(self, source, target):
         # target.shape = (batch_size, target_len, d_target+num_flags)
         batch_size, target_len, d_target_raw = target.shape
 
         # On ajoute le token start au début de target
         trg = torch.cat((self.targetStart.expand(batch_size, 1, d_target_raw), target), 1)
-        target_len += 1
         # On pad la trg avec des 0 sur les mots par encore écrits
-        if self.target_len-target_len > 0:
+        if self.target_len-target_len >= 0:
             trg = F.pad(trg, (0, 0, 0, self.target_len-target_len))
         else:
             print('target_len :', target_len)
             print('self.target_len :', self.target_len)
             raise ValueError('max len in the target reached')
         trg = self.TargetEmbedding(trg)
-        # trg.shape = (batch_size, target_len, d_input_Dec)
+        # trg.shape = (batch_size, self.target_len, d_input_Dec)
 
         src = self.SourceEmbedding(source)
         for Encoder in self.Encoders:
             src = Encoder(src)
         for Decoder in self.Decoders:
             trg = Decoder(target=trg, source=src)
-        y = torch.sum(trg, dim=1)
-        Physic, Flags, Action = self.PhysicalPrediction(y), self.FlagsPrediction(y), self.ActionPrediction(y)
-        Physic = Physic.unsqueeze(dim=1)
-        Flags = Flags.unsqueeze(dim=1)
-        Action = Action.unsqueeze(dim=1)
+        # trg.shape = (batch_size, target_len, d_input_Dec)
+        Physic, Flags, Action = self.PhysicalPrediction(trg), self.FlagsPrediction(trg), self.ActionPrediction(trg)
 
-        # Physic.shape = (batch_size, 1, d_target)
-        # Flags.shape = (batch_size, 1, num_flags)
-        # Action.shape = (batch_size, 1, 1)
+        # Physic.shape = (batch_size, target_len, d_target)
+        # Flags.shape = (batch_size, target_len, num_flags)
+        # Action.shape = (batch_size, target_len, 1)
         PDW = torch.cat((Physic, Flags), dim=2)
-
-        if ended is not None:
-            # ended est une matrice qui va masquer les prédictions des phrases qui sont déjà finies
-            # ended.shape = (batch_size, 1, 1)
-            PDW = PDW * (1-ended)
-            Action = ended
         return PDW, Action
 

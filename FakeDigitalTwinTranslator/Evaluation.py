@@ -1,5 +1,5 @@
 from FakeDigitalTwin.XMLTools import loadXmlAsObj
-from FakeDigitalTwinTranslator.ClassicNetwork import TransformerTranslator
+from FakeDigitalTwinTranslator.Network import TransformerTranslator
 import os
 import torch
 from tqdm import tqdm
@@ -25,7 +25,7 @@ d_input_Dec = 32
 d_att = 32
 num_flags = 3
 num_heads = 4
-len_target = 150
+len_target = 100
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -48,21 +48,41 @@ EvaluationSource = EvaluationSource.to(device=device, dtype=torch.float32)
 EvaluationTranslation = EvaluationTranslation.to(device=device, dtype=torch.float32)
 EvaluationEnded = EvaluationEnded.to(device=device, dtype=torch.float32)
 
-# Pour faire en sorte que l'action "continuer d'écrire" soit autant représentée en True qu'en False, on pondère le masque des actions
-NumWords = torch.sum((1 - EvaluationEnded), dim=1).unsqueeze(-1).to(torch.int32)
-ActionMask = (1 - EvaluationEnded) / NumWords
-for i in range(len(NumWords)):
-    ActionMask[(i, int(NumWords[i]))] = 1
+# NumWords = torch.sum((1 - EvaluationEnded), dim=1).unsqueeze(-1).to(torch.int32)
+# ActionMask = (1 - EvaluationEnded) / NumWords
+# for i in range(len(NumWords)):
+#     ActionMask[(i, int(NumWords[i]))] = 1
+#
+# with torch.no_grad():
+#     PredictedTranslation, PredictedAction = Translator.forward(source=EvaluationSource, target=EvaluationTranslation)
+#
+# PredictedTranslation = PredictedTranslation[:, 1:]
+# PredictedAction = PredictedAction[:, :-1]
+# err = (torch.norm((EvaluationTranslation - PredictedTranslation) * (1 - EvaluationEnded)) +
+#        torch.norm((PredictedAction - (1 - EvaluationEnded)) * ActionMask)) / evaluation_size
+
+
+Translation = torch.zeros(size=EvaluationTranslation.shape).to(device)
+# Translation.shape = (batch_size, len_target, d_target + num_flags)
+batch_size = len(EvaluationTranslation)
 
 with torch.no_grad():
-    PredictedTranslation, PredictedAction = Translator.forward(source=EvaluationSource, target=EvaluationTranslation)
+    for i in tqdm(range(len_target)):
+        if i == len_target-1:
+            Translation, Actions = Translator.forward(source=EvaluationSource, target=Translation)
+        else:
+            Translation, _ = Translator.forward(source=EvaluationSource, target=Translation)
+        Translation = Translation[:, 1:]
+        Translation[:, len_target+1:] = 0
 
-# Comme la décision d'arrêter d'écrire passe par Action, et pas par un token <end>, on ne s'interesse pas au dernier mot
-# On ne s'interesse pas non plus à l'action prédite par le token <start>, puisque de toute manière il est suivi d'un mot
-PredictedTranslation = PredictedTranslation[:, 1:]
-PredictedAction = PredictedAction[:, :-1]
-err = (torch.norm((EvaluationTranslation - PredictedTranslation) * (1 - EvaluationEnded)) +
-       torch.norm((PredictedAction - (1 - EvaluationEnded)) * ActionMask)) / evaluation_size
+Actions = Actions[:, 1:, 0]
+MaskEndTranslation = torch.zeros(size=EvaluationTranslation.shape)
+for i in range(batch_size):
+    for j in range(len_target):
+        if Actions[i, j] > 0.5:
+            MaskEndTranslation[i, j] = 1
+        else:
+            break
 
 
 
