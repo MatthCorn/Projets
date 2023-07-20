@@ -5,7 +5,7 @@ from torch.nn.utils.rnn import pad_sequence
 import torch.nn.functional as F
 
 
-def LoadData(ListTypeData=[], len_target=100, local=''):
+def LoadData(ListTypeData=[], len_target=100, local='', variables_dict={}):
 
     NewArg = []
     NewValue = []
@@ -39,5 +39,5 @@ def LoadData(ListTypeData=[], len_target=100, local=''):
             NewValue.append(Translation)
 
     for i in range(len(NewArg)):
-        vars().__setitem__(NewArg[i], NewValue[i])
+        variables_dict.__setitem__(NewArg[i], NewValue[i])
 
