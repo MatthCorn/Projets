@@ -71,22 +71,22 @@ class TransformerTranslator(nn.Module):
     def translate(self, source):
         batch_size = len(source)
 
-        Translation = torch.zeros(size=(batch_size, self.len_target, self.d_target + self.num_flags), device=self.device)
-        # Translation.shape = (batch_size, len_target, d_target + num_flags)
+        Translation = torch.zeros(size=(batch_size, self.target_len, self.d_target + self.num_flags), device=self.device)
+        # Translation.shape = (batch_size, target_len, d_target + num_flags)
 
         with torch.no_grad():
-            for i in range(self.len_target):
-                if i == self.len_target - 1:
+            for i in range(self.target_len):
+                if i == self.target_len - 1:
                     Translation, Actions = self.forward(source=source, target=Translation)
                 else:
                     Translation, _ = self.forward(source=source, target=Translation)
                 Translation = Translation[:, 1:]
-                Translation[:, self.len_target + 1:] = 0
+                Translation[:, self.target_len + 1:] = 0
 
             Actions = Actions[:, 1:, 0]
-            MaskEndTranslation = torch.zeros(size=(batch_size, self.len_target, self.d_target + self.num_flags), device=self.device)
+            MaskEndTranslation = torch.zeros(size=(batch_size, self.target_len, self.d_target + self.num_flags), device=self.device)
             for i in range(batch_size):
-                for j in range(self.len_target):
+                for j in range(self.target_len):
                     if Actions[i, j] > 0.5:
                         MaskEndTranslation[i, j] = 1
                     else:

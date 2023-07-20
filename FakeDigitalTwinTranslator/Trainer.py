@@ -20,8 +20,8 @@ num_flags = 3
 num_heads = 4
 len_target = 100
 
-# Cette ligne crée les variables globales "TrainingSource", "TrainingTranslation", "ValidationSource" et "ValidationTranslation"
-LoadData(ListTypeData=['Training', 'Validation'], len_target=len_target, local=local, variables_dict=vars())
+# Cette ligne crée les variables globales "~TYPE~Source" et "~TYPE~Translation" pour tout ~TYPE~ dans ListTypeData
+LoadData(ListTypeData=['Training', 'Validation', 'Evaluation'], len_target=len_target, local=local, variables_dict=vars())
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -33,23 +33,33 @@ TrainingEnded = (torch.norm(TrainingTranslation, dim=-1) == 0).unsqueeze(-1).to(
 
 ValidationEnded = (torch.norm(ValidationTranslation, dim=-1) == 0).unsqueeze(-1).to(torch.float32)
 
+EvaluationEnded = (torch.norm(EvaluationTranslation, dim=-1) == 0).unsqueeze(-1).to(torch.float32)
+
 batch_size = 50
 
 # Procédure d'entrainement
 optimizer = torch.optim.Adam(Translator.parameters(), weight_decay=1e-5, lr=3e-5)
 TrainingErrList = []
 ValidationErrList = []
-for i in tqdm(range(50)):
+RealEvalutionList = []
+CutEvaluationList = []
+for i in tqdm(range(1000)):
 
     TrainingErrList.append(ErrorAction(TrainingSource, TrainingTranslation, TrainingEnded, Translator, batch_size, Action='Training', Optimizer=optimizer))
     ValidationErrList.append(ErrorAction(ValidationSource, ValidationTranslation, ValidationEnded, Translator, batch_size, Action='Validation'))
 
-# torch.save(Translator.state_dict(), os.path.join(local, 'FakeDigitalTwinTranslator', 'Translator'))
-# torch.save(optimizer.state_dict(), os.path.join(local, 'FakeDigitalTwinTranslator', 'Optimizer'))
+    RealError, CutError = ErrorAction(EvaluationSource, EvaluationTranslation, EvaluationEnded, Translator, Action='Evaluation')
+    RealEvalutionList.append(RealError)
+    CutEvaluationList.append(CutError)
 
+torch.save(Translator.state_dict(), os.path.join(local, 'FakeDigitalTwinTranslator', 'Translator-20-07-1000Epochs'))
+torch.save(optimizer.state_dict(), os.path.join(local, 'FakeDigitalTwinTranslator', 'Optimizer-20-07-1000Epochs'))
 
-plt.plot(TrainingErrList, 'b')
-plt.plot(ValidationErrList, 'r')
+fig, ((ax1, ax2)) = plt.subplots(2, 1)
+ax1.plot(TrainingErrList, 'b', label="Ensemble d'entrainement"); ax1.plot(ValidationErrList, "r", label="Ensemble de validation");
+ax1.set_title("Evolution de l'erreur d'entrainement"); ax1.set_xlabel('Epoch'); ax1.set_ylabel("erreur d'entrainement"); ax1.legend(loc='upper right')
+ax2.plot(RealEvalutionList, 'r', label="Erreur sur traduction réelle"); ax2.plot(CutEvaluationList, 'b', label='Erreur sur traduction tronquée');
+ax2.set_title("Evolution de l'erreur sur traduction"); ax2.set_xlabel('Epoch'), ax2.set_ylabel('Erreur sur traduction'); ax2.legend(loc='upper right')
 plt.show()
 
 

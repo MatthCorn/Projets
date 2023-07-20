@@ -12,7 +12,7 @@ def TrainingError(Source, Translation, Ended, batch_size, batch_indice, Translat
     NumWords = torch.sum((1 - BatchEnded), dim=1).unsqueeze(-1).to(torch.int32)
     BatchActionMask = (1 - BatchEnded) / NumWords
     for i in range(len(NumWords)):
-        BatchActionMask[(i, int(NumWords[i]))] = 1
+        BatchActionMask[(i, int(NumWords[i]))] = 2
 
     PredictedTranslation, PredictedAction = Translator.forward(source=BatchSource, target=BatchTranslation)
 
@@ -27,6 +27,7 @@ def TrainingError(Source, Translation, Ended, batch_size, batch_indice, Translat
 
 def ObjectiveError(Source, Translation, Ended, Translator):
     PredictedTranslation, PredictedMaskTranslation = Translator.translate(Source.to(device=Translator.device))
+    Translation, Ended = Translation.to(device=Translator.device), Ended.to(device=Translator.device)
 
     # On calcule l'erreur de la phrase intentionnellement écrite.
     # C'est-à-dire qu'on prend en compte la fin de l'écriture gérée par Action et représentée par le masque PredictedMaskTranslation
@@ -35,10 +36,10 @@ def ObjectiveError(Source, Translation, Ended, Translator):
     # On calcule l'erreur sur le même nombre de mot que les traductions attendues
     CutError = torch.norm(PredictedTranslation * (1-Ended) - Translation)
 
-    return RealError, CutError
+    return float(RealError)/len(Source), float(CutError)/len(Source)
 
 
-def ErrorAction(Source, Translation, Ended, Translator, batch_size, Action='', Optimizer=None):
+def ErrorAction(Source, Translation, Ended, Translator, batch_size=50, Action='', Optimizer=None):
     data_size = len(Source)
     n_batch = int(data_size/batch_size)
 
