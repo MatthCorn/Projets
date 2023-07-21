@@ -4,8 +4,7 @@ import torch
 from torch.nn.utils.rnn import pad_sequence
 import torch.nn.functional as F
 
-
-def LoadData(ListTypeData=[], len_target=100, local='', variables_dict={}):
+def FDTDataLoader(ListTypeData=[], len_target=100, local='', variables_dict={}):
 
     NewArg = []
     NewValue = []
@@ -41,3 +40,6 @@ def LoadData(ListTypeData=[], len_target=100, local='', variables_dict={}):
     for i in range(len(NewArg)):
         variables_dict.__setitem__(NewArg[i], NewValue[i])
 
+def LoadParam(dict, variables_dict):
+    for key in dict.keys():
+        variables_dict.__setitem__(key, dict[key])
