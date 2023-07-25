@@ -14,18 +14,18 @@ local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
 # local = r'C:\Users\Matthieu\Documents\Python\Projets'
 
 param = {
-    'd_source' : 5,
-    'd_target' : 5,
-    'd_input_Enc' : 32,
-    'd_input_Dec' : 32,
-    'd_att' : 32,
-    'num_flags' : 3,
-    'num_heads' : 4,
-    'num_encoders' : 4,
-    'num_decoders' : 4,
-    'len_target' : 100,
-    'RPR_len_decoder' : 64,
-    'batch_size' : 50
+    'd_source': 5,
+    'd_target': 5,
+    'd_input_Enc': 32,
+    'd_input_Dec': 32,
+    'd_att': 32,
+    'num_flags': 3,
+    'num_heads': 4,
+    'num_encoders': 4,
+    'num_decoders': 4,
+    'len_target': 100,
+    'RPR_len_decoder': 64,
+    'batch_size': 50
 }
 
 # Cette ligne crée les variables globales "~TYPE~Source" et "~TYPE~Translation" pour tout ~TYPE~ dans ListTypeData
@@ -50,19 +50,35 @@ batch_size = param['batch_size']
 # Procédure d'entrainement
 optimizer = torch.optim.Adam(Translator.parameters(), weight_decay=1e-5, lr=3e-5)
 TrainingErrList = []
+TrainingErrTransList = []
+TrainingErrActList = []
 ValidationErrList = []
+ValidationErrTransList = []
+ValidationErrActList = []
 RealEvalutionList = []
 CutEvaluationList = []
-for i in tqdm(range(10)):
+for i in tqdm(range(200)):
+    Error, ErrAct, ErrTrans = ErrorAction(TrainingSource, TrainingTranslation, TrainingEnded, Translator, batch_size, Action='Training', Optimizer=optimizer)
+    TrainingErrList.append(Error)
+    TrainingErrActList.append(ErrAct)
+    TrainingErrTransList.append(ErrTrans)
 
-    TrainingErrList.append(ErrorAction(TrainingSource, TrainingTranslation, TrainingEnded, Translator, batch_size, Action='Training', Optimizer=optimizer))
-    ValidationErrList.append(ErrorAction(ValidationSource, ValidationTranslation, ValidationEnded, Translator, batch_size, Action='Validation'))
+    Error, ErrAct, ErrTrans = ErrorAction(ValidationSource, ValidationTranslation, ValidationEnded, Translator, batch_size, Action='Validation')
+    ValidationErrList.append(Error)
+    ValidationErrActList.append(ErrAct)
+    ValidationErrTransList.append(ErrTrans)
 
     RealError, CutError = ErrorAction(EvaluationSource, EvaluationTranslation, EvaluationEnded, Translator, Action='Evaluation')
     RealEvalutionList.append(RealError)
     CutEvaluationList.append(CutError)
 
-error = {'TrainingErrList': TrainingErrList, 'ValidationErrList': ValidationErrList, 'RealEvalutionList': RealEvalutionList, 'CutEvaluationList': CutEvaluationList}
+
+error = {'Training':
+             {'ErrList': TrainingErrList, 'ErrTransList': TrainingErrTransList, 'ErrActList': TrainingErrActList},
+         'Validation':
+             {'ErrList': ValidationErrList, 'ErrTransList': ValidationErrTransList, 'ErrActList': ValidationErrActList},
+         'Evaluation':
+             {'Real': RealEvalutionList, 'Cut': CutEvaluationList}}
 
 folder = datetime.datetime.now().strftime("%d-%m-%Y__%H-%M")
 os.mkdir(os.path.join(local, 'FakeDigitalTwinTranslator', 'Save', folder))
@@ -73,11 +89,32 @@ saveObjAsXml(param, os.path.join(local, 'FakeDigitalTwinTranslator', 'Save', fol
 saveObjAsXml(error, os.path.join(local, 'FakeDigitalTwinTranslator', 'Save', folder, 'error'))
 
 
-fig, ((ax1, ax2)) = plt.subplots(2, 1)
-ax1.plot(TrainingErrList, 'b', label="Ensemble d'entrainement"); ax1.plot(ValidationErrList, "r", label="Ensemble de validation");
-ax1.set_title("Evolution de l'erreur d'entrainement"); ax1.set_xlabel('Epoch'); ax1.set_ylabel("erreur d'entrainement"); ax1.legend(loc='upper right')
-ax2.plot(RealEvalutionList, 'r', label="Erreur sur traduction réelle"); ax2.plot(CutEvaluationList, 'b', label='Erreur sur traduction tronquée');
-ax2.set_title("Evolution de l'erreur sur traduction"); ax2.set_xlabel('Epoch'), ax2.set_ylabel('Erreur sur traduction'); ax2.legend(loc='upper right')
+fig, ((ax11, ax12), (ax21, ax22), (ax31, ax32), (ax41, ax42)) = plt.subplots(4, 2)
+
+ax11.plot(TrainingErrList, 'r', label="Ensemble d'entrainement"); ax11.set_title('Erreur gobale')
+ax11.plot(ValidationErrList, 'b', label="Ensemble d'entrainement"); ax11.legend(loc='upper right')
+
+ax12.plot([el[0] for el in TrainingErrTransList], 'r', label="Ensemble d'entrainement"); ax12.set_title('Erreur sur TOA')
+ax12.plot([el[0] for el in ValidationErrTransList], 'b', label="Ensemble d'entrainement"); ax12.legend(loc='upper right')
+
+ax21.plot([el[1] for el in TrainingErrTransList], 'r', label="Ensemble d'entrainement"); ax21.set_title('Erreur sur LI')
+ax21.plot([el[1] for el in ValidationErrTransList], 'b', label="Ensemble d'entrainement"); ax21.legend(loc='upper right')
+
+ax22.plot([el[2] for el in TrainingErrTransList], 'r', label="Ensemble d'entrainement"); ax22.set_title('Erreur sur Niveau')
+ax22.plot([el[2] for el in ValidationErrTransList], 'b', label="Ensemble d'entrainement"); ax22.legend(loc='upper right')
+
+ax31.plot([el[3] for el in TrainingErrTransList], 'r', label="Ensemble d'entrainement"); ax31.set_title('Erreur sur FreqMin')
+ax31.plot([el[3] for el in ValidationErrTransList], 'b', label="Ensemble d'entrainement"); ax31.legend(loc='upper right')
+
+ax32.plot([el[4] for el in TrainingErrTransList], 'r', label="Ensemble d'entrainement"); ax32.set_title('Erreur sur FreqMax')
+ax32.plot([el[4] for el in ValidationErrTransList], 'b', label="Ensemble d'entrainement"); ax32.legend(loc='upper right')
+
+ax41.plot(TrainingErrActList, 'r', label="Ensemble d'entrainement"); ax41.set_title("Erreur sur l'action")
+ax41.plot(ValidationErrActList, 'b', label="Ensemble d'entrainement"); ax41.legend(loc='upper right')
+
+ax42.plot(RealEvalutionList, 'r', label="Erreur sur traduction réelle"); ax42.set_title("Erreur sur traduction")
+ax42.plot(CutEvaluationList, 'b', label='Erreur sur traduction tronquée'); ax42.legend(loc='upper right')
+
 plt.show()
 
 

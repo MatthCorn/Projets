@@ -1,0 +1,95 @@
+<?xml version="1.0" ?>
+<Dictionary>
+ <Dictionary Key="Training">
+  <List Key="ErrList">
+   <Object Value="0.37653387188911436"/>
+   <Object Value="0.36937190691630045"/>
+   <Object Value="0.3674437249700228"/>
+   <Object Value="0.3661113530397415"/>
+   <Object Value="0.36518930047750475"/>
+   <Object Value="0.36424746910731"/>
+   <Object Value="0.36292874068021774"/>
+   <Object Value="0.3617068668206533"/>
+   <Object Value="0.36015745053688686"/>
+   <Object Value="0.3591949929793676"/>
+  </List>
+  <Object Key="ErrTransList" Value="tensor([0.3765, 0.3694, 0.3674, 0.3661, 0.3652, 0.3642, 0.3629, 0.3617, 0.3602,
+        0.3592])"/>
+  <List Key="ErrActList">
+   <Object Value="0.029019633183876674"/>
+   <Object Value="0.022424300697942576"/>
+   <Object Value="0.02100606756284833"/>
+   <Object Value="0.02002093531191349"/>
+   <Object Value="0.019364590321977935"/>
+   <Object Value="0.018675763625651598"/>
+   <Object Value="0.017627598298713566"/>
+   <Object Value="0.016743821914618214"/>
+   <Object Value="0.015679613609487813"/>
+   <Object Value="0.01533972630277276"/>
+  </List>
+ </Dictionary>
+ <Dictionary Key="Validation">
+  <List Key="ErrList">
+   <Object Value="0.36775900423526764"/>
+   <Object Value="0.36586426198482513"/>
+   <Object Value="0.3637120723724365"/>
+   <Object Value="0.36264748871326447"/>
+   <Object Value="0.3630130738019943"/>
+   <Object Value="0.3622186779975891"/>
+   <Object Value="0.3607351630926132"/>
+   <Object Value="0.3600185215473175"/>
+   <Object Value="0.35830163955688477"/>
+   <Object Value="0.35523875057697296"/>
+  </List>
+  <List Key="ErrTransList">
+   <Object Value="0.3449121117591858"/>
+   <Object Value="0.344272255897522"/>
+   <Object Value="0.3438778221607208"/>
+   <Object Value="0.34359031915664673"/>
+   <Object Value="0.3433447480201721"/>
+   <Object Value="0.34307271242141724"/>
+   <Object Value="0.3427997827529907"/>
+   <Object Value="0.3423869013786316"/>
+   <Object Value="0.3417850434780121"/>
+   <Object Value="0.3411552906036377"/>
+  </List>
+  <List Key="ErrActList">
+   <Object Value="0.02284689899533987"/>
+   <Object Value="0.021592004224658012"/>
+   <Object Value="0.019834255799651146"/>
+   <Object Value="0.01905716210603714"/>
+   <Object Value="0.019668327644467354"/>
+   <Object Value="0.019145960919559002"/>
+   <Object Value="0.017935370095074177"/>
+   <Object Value="0.01763160526752472"/>
+   <Object Value="0.01651659607887268"/>
+   <Object Value="0.014083463232964277"/>
+  </List>
+ </Dictionary>
+ <Dictionary Key="Evaluation">
+  <List Key="Real">
+   <Object Value="5.418035888671875"/>
+   <Object Value="5.418035888671875"/>
+   <Object Value="5.418035888671875"/>
+   <Object Value="5.418035888671875"/>
+   <Object Value="5.418035888671875"/>
+   <Object Value="5.418035888671875"/>
+   <Object Value="5.417650146484375"/>
+   <Object Value="5.415938720703125"/>
+   <Object Value="5.4112481689453125"/>
+   <Object Value="5.400817260742188"/>
+  </List>
+  <List Key="Cut">
+   <Object Value="5.422412109375"/>
+   <Object Value="5.4160003662109375"/>
+   <Object Value="5.410388793945312"/>
+   <Object Value="5.408649291992187"/>
+   <Object Value="5.407049560546875"/>
+   <Object Value="5.40351806640625"/>
+   <Object Value="5.397518310546875"/>
+   <Object Value="5.387361450195312"/>
+   <Object Value="5.376781616210938"/>
+   <Object Value="5.3631982421875"/>
+  </List>
+ </Dictionary>
+</Dictionary>

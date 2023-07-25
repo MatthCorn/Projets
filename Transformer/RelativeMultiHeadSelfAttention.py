@@ -59,7 +59,7 @@ class RMHSA(nn.Module):
         # out.shape = (batch_size, seq_len, d_model)
         return self.dropout(out)
 
-    def NotSkew(self,QEr):
+    def NotSkew(self, QEr):
         # QEr.shape = (batch_size, num_heads, seq_len, 2*seq_len-1)
         padded_1 = F.pad(QEr, (0, 1))
         # padded_1.shape = (batch_size, num_heads, seq_len, 2*seq_len)
@@ -73,7 +73,7 @@ class RMHSA(nn.Module):
         # Srel.shape = (batch_size, num_heads, seq_len, seq_len)
         return Srel
 
-    def RelativeSelfAttention(self,Q, Kt, Ert, V, Mask=None):
+    def RelativeSelfAttention(self, Q, Kt, Ert, V, Mask=None):
         Dh = self.d_head
         # Ert.shape = (d_head, 2*seq_len-1)
         QKt = torch.matmul(Q, Kt)
