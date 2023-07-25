@@ -10,8 +10,8 @@ import datetime
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
-# local = r'C:\Users\Matthieu\Documents\Python\Projets'
+# local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
+local = r'C:\Users\Matthieu\Documents\Python\Projets'
 
 param = {
     'd_source': 5,
@@ -55,9 +55,9 @@ TrainingErrActList = []
 ValidationErrList = []
 ValidationErrTransList = []
 ValidationErrActList = []
-RealEvalutionList = []
+RealEvaluationList = []
 CutEvaluationList = []
-for i in tqdm(range(200)):
+for i in tqdm(range(1000)):
     Error, ErrAct, ErrTrans = ErrorAction(TrainingSource, TrainingTranslation, TrainingEnded, Translator, batch_size, Action='Training', Optimizer=optimizer)
     TrainingErrList.append(Error)
     TrainingErrActList.append(ErrAct)
@@ -69,7 +69,7 @@ for i in tqdm(range(200)):
     ValidationErrTransList.append(ErrTrans)
 
     RealError, CutError = ErrorAction(EvaluationSource, EvaluationTranslation, EvaluationEnded, Translator, Action='Evaluation')
-    RealEvalutionList.append(RealError)
+    RealEvaluationList.append(RealError)
     CutEvaluationList.append(CutError)
 
 
@@ -78,7 +78,7 @@ error = {'Training':
          'Validation':
              {'ErrList': ValidationErrList, 'ErrTransList': ValidationErrTransList, 'ErrActList': ValidationErrActList},
          'Evaluation':
-             {'Real': RealEvalutionList, 'Cut': CutEvaluationList}}
+             {'Real': RealEvaluationList, 'Cut': CutEvaluationList}}
 
 folder = datetime.datetime.now().strftime("%d-%m-%Y__%H-%M")
 os.mkdir(os.path.join(local, 'FakeDigitalTwinTranslator', 'Save', folder))
@@ -112,7 +112,7 @@ ax32.plot([el[4] for el in ValidationErrTransList], 'b', label="Ensemble d'entra
 ax41.plot(TrainingErrActList, 'r', label="Ensemble d'entrainement"); ax41.set_title("Erreur sur l'action")
 ax41.plot(ValidationErrActList, 'b', label="Ensemble d'entrainement"); ax41.legend(loc='upper right')
 
-ax42.plot(RealEvalutionList, 'r', label="Erreur sur traduction réelle"); ax42.set_title("Erreur sur traduction")
+ax42.plot(RealEvaluationList, 'r', label="Erreur sur traduction réelle"); ax42.set_title("Erreur sur traduction")
 ax42.plot(CutEvaluationList, 'b', label='Erreur sur traduction tronquée'); ax42.legend(loc='upper right')
 
 plt.show()
