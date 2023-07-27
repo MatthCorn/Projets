@@ -59,9 +59,9 @@ class RMHSA(nn.Module):
         # out.shape = (batch_size, seq_len, d_model)
         return self.dropout(out)
 
-    def NotSkew(self, QEr):
-        # QEr.shape = (batch_size, num_heads, seq_len, 2*seq_len-1)
-        padded_1 = F.pad(QEr, (0, 1))
+    def NotSkew(self, QErt):
+        # QErt.shape = (batch_size, num_heads, seq_len, 2*seq_len-1)
+        padded_1 = F.pad(QErt, (0, 1))
         # padded_1.shape = (batch_size, num_heads, seq_len, 2*seq_len)
         batch_size, num_heads, seq_len, _ = padded_1.shape
         reshaped_1 = padded_1.reshape(batch_size, num_heads, -1)
@@ -80,9 +80,9 @@ class RMHSA(nn.Module):
         # QKt.shape = (batch_size, num_heads, seq_len, seq_len)
 
         if self.relative:
-            QEr = torch.matmul(Q, Ert)
+            QErt = torch.matmul(Q, Ert)
             # QEr.shape = (batch_size, num_heads, seq_len, 2*seq_len-1)
-            Srel = self.NotSkew(QEr)
+            Srel = self.NotSkew(QErt)
             # Srel.shape = (batch_size, num_heads, seq_len, seq_len)
             Attention = (QKt + Srel) / math.sqrt(Dh)
         else:

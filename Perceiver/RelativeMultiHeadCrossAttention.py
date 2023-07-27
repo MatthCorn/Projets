@@ -85,7 +85,7 @@ class RLCA(nn.Module):
         # out.shape = (batch_size, seq_len, d_latent)
         return self.dropout(out)
 
-    def RelativeCrossAttention(self, Q, Kt, Ert, V, input_len, Mask=None):
+    def RelativeCrossAttention(self, Q, Kt, Ert, V, Mask=None):
         # Q.shape = (batch_size, num_heads, latent_len, d_head)
         # or
         # Q.shape = (1, num_heads, latent_len, d_head)
@@ -98,22 +98,22 @@ class RLCA(nn.Module):
 
         if Ert is not None:
             # Ert.shape = (d_head, 2*RPR_len-1)
-            QEr = torch.matmul(Q, Ert)
-            # QEr.shape = (batch_size, num_heads, latent_len, 2*RPR_len-1)
+            QErt = torch.matmul(Q, Ert)
+            # QErt.shape = (batch_size, num_heads, latent_len, 2*RPR_len-1)
             # or
-            # QEr.shape = (1, num_heads, latent_len, 2*RPR_len-1)
+            # QErt.shape = (1, num_heads, latent_len, 2*RPR_len-1)
             # V.shape = (batch_size, num_heads, input_len, d_head)
             # ConvDistrib.shape = (latent_len, 2*RPR_len-1, input_len)
 
-            QEr = QEr.unsqueeze(dim=-2)
-            # QEr.shape = (batch_size, num_heads, latent_len, 1, 2*RPR_len-1)
+            QErt = QErt.unsqueeze(dim=-2)
+            # QErt.shape = (batch_size, num_heads, latent_len, 1, 2*RPR_len-1)
             # OR
-            # QEr.shape = (1, num_heads, latent_len, 1, 2*RPR_len-1)
+            # QErt.shape = (1, num_heads, latent_len, 1, 2*RPR_len-1)
 
             # Here we want the i-th vector of QEr (shape = (1, 2*RPR_len-1)) to be multiplied with the i-th matrix of ConvDistrib (shape = (2*RPR_len-1, input_len)),
             # i in [1; latent_len], in order to get a matrix of the shape (latent_len, input_len)
 
-            Srel = torch.matmul(QEr, self.ConvDistrib)
+            Srel = torch.matmul(QErt, self.ConvDistrib)
             # Srel.shape = (batch_size, num_heads, latent_len, 1, input_len)
             # OR
             # Srel.shape = (1, num_heads, latent_len, 1, input_len)
