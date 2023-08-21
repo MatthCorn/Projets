@@ -21,11 +21,11 @@ def MakeData(Batch_size, seed, name):
         FreqThreshold = 0.2
         # Fréquence d'échantillionage du système
         Fe = 3
-        # Temps de maintien d'un mesureur
+        # Temps de maintien d'un mesureur (fermé automatiquement dès que plus vieux)
         MaxAgeTracker = 2
         # Seuil du niveau au dessus duquel les impulsions saturent le palier
         SaturationThreshold = 10
-        # Temps de maintien max d'un mesureur
+        # Temps de maintien max d'un mesureur sans voir son impulsion
         HoldingTime = 0.5
 
         size = 100

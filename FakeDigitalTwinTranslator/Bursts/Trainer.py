@@ -1,11 +1,11 @@
-from FakeDigitalTwinTranslator.Network import TransformerTranslator
-from FakeDigitalTwinTranslator.DataLoader import FDTDataLoader
+from FakeDigitalTwinTranslator.Bursts.Network import TransformerTranslator
+from FakeDigitalTwinTranslator.Bursts.DataLoader import FDTDataLoader
 from FakeDigitalTwin.XMLTools import saveObjAsXml
 import os
 import torch
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-from FakeDigitalTwinTranslator.Error import ErrorAction
+from FakeDigitalTwinTranslator.Bursts.Error import ErrorAction
 import datetime
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
@@ -81,12 +81,12 @@ error = {'Training':
              {'Real': RealEvaluationList, 'Cut': CutEvaluationList}}
 
 folder = datetime.datetime.now().strftime("%d-%m-%Y__%H-%M")
-os.mkdir(os.path.join(local, 'FakeDigitalTwinTranslator', 'Save', folder))
+os.mkdir(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder))
 
-torch.save(Translator.state_dict(), os.path.join(local, 'FakeDigitalTwinTranslator', 'Save', folder, 'Translator'))
-torch.save(optimizer.state_dict(), os.path.join(local, 'FakeDigitalTwinTranslator', 'Save', folder, 'Optimizer'))
-saveObjAsXml(param, os.path.join(local, 'FakeDigitalTwinTranslator', 'Save', folder, 'param'))
-saveObjAsXml(error, os.path.join(local, 'FakeDigitalTwinTranslator', 'Save', folder, 'error'))
+torch.save(Translator.state_dict(), os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'Translator'))
+torch.save(optimizer.state_dict(), os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'Optimizer'))
+saveObjAsXml(param, os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'param'))
+saveObjAsXml(error, os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'error'))
 
 
 fig, ((ax11, ax12), (ax21, ax22), (ax31, ax32), (ax41, ax42)) = plt.subplots(4, 2)
