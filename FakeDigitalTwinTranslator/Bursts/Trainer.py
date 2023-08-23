@@ -10,8 +10,8 @@ import datetime
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-# local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
-local = r'C:\Users\Matthieu\Documents\Python\Projets'
+local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
+# local = r'C:\Users\Matthieu\Documents\Python\Projets'
 
 param = {
     'd_source': 5,
@@ -29,7 +29,7 @@ param = {
 }
 
 # Cette ligne crée les variables globales "~TYPE~Source" et "~TYPE~Translation" pour tout ~TYPE~ dans ListTypeData
-FDTDataLoader(ListTypeData=['Training', 'Validation', 'Evaluation'], len_target=param['len_target'], local=local, variables_dict=vars())
+FDTDataLoader(ListTypeData=['Training', 'Validation'], local=local, variables_dict=vars())
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 

@@ -39,7 +39,3 @@ def FDTDataLoader(ListTypeData=[], len_target=100, local='', variables_dict={}):
 
     for i in range(len(NewArg)):
         variables_dict.__setitem__(NewArg[i], NewValue[i])
-
-def LoadParam(dict, variables_dict):
-    for key in dict.keys():
-        variables_dict.__setitem__(key, dict[key])

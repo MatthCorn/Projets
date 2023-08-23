@@ -1,0 +1,128 @@
+from FakeDigitalTwin.XMLTools import loadXmlAsObj
+import os
+import torch
+import numpy as np
+from torch.nn.utils.rnn import pad_sequence
+import torch.nn.functional as F
+import shutil
+
+local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
+# local = r'C:\Users\Matthieu\Documents\Python\Projets'
+
+# Temps de maintien max d'un mesureur sans voir son impulsion
+HoldingTime = 0.5
+NbMaxPulses = 10
+NbPDWsMemory = 5
+DeltaT = 0.5
+NbMaxPDWs = 15
+BatchSize = 10000
+
+# Cette fonction donne un majorant de la date de publication d'un PDW donné
+def TimeRelease(PDW):
+    # PDW est une liste de la forme [TOA: float, LI: float, Level: float, FreqMin: float, FreqMax: float, flag1: int, flag2: int, flag3: int]
+    Maj = PDW[0] + PDW[1] + HoldingTime
+    return Maj
+
+def Spliter(Source, Translation, DeltaT):
+    NewSource = []
+    NewTranslation = []
+    batch_len = len(Source)
+    for i in range(batch_len):
+        SourceSentence = Source[i]
+        TranslationSentence = Translation[i]
+        # Il faut trier les PDWs par date de publication
+        TranslationSentence.sort(key=TimeRelease)
+
+        # On commence par découper la phrase de Source et la phrase de Translation sur les intervalles de taille DeltaT
+        SplitedSourceSentence = []
+        SplitedTranslationSentence = []
+
+        # Ces indices permettent de suivre les impulsions déjà ajoutées (comme elles sont triées par TOA)
+        SourceId = 0
+        TranslationId = 0
+        t = 0
+        while not (SourceId == len(SourceSentence) and TranslationId == len(TranslationSentence)):
+            t += DeltaT
+            SourceBursts = []
+            while not SourceId == len(SourceSentence):
+                if SourceSentence[SourceId][0] > t:
+                    break
+                SourceBursts.append(SourceSentence[SourceId])
+                SourceId += 1
+            # On ajoute l'impulsion informant de la date de fin de la salve
+            SourceBursts.append([t, 0, 0, 0, 0])
+            SplitedSourceSentence.append(SourceBursts)
+
+            TranslationBursts = []
+            while not TranslationId == len(TranslationSentence):
+                if TranslationSentence[TranslationId][0] > t:
+                    break
+                TranslationBursts.append(TranslationSentence[TranslationId])
+                TranslationId += 1
+            SplitedTranslationSentence.append(TranslationBursts)
+
+        # On reconstruit les phrases telles qu'elles seront données au traducteur
+        Remain = [[0] * 5] * NbMaxPulses
+        for Bursts in SplitedSourceSentence:
+            Remain = (Remain + Bursts)[-NbMaxPulses:]
+            NewSource.append(Remain)
+
+        Remain = [[0] * 8] * NbPDWsMemory
+        for Bursts in SplitedTranslationSentence:
+            Remain = Remain[-NbPDWsMemory:] + Bursts
+            NewTranslation.append(Remain)
+    return NewSource, NewTranslation
+
+# Cette fonction a pour rôle de transformer les phrases de Source et Translation en plein de petites
+# phrases correspondant au découpage par salve temporelle de longueur DeltaT
+def FDTDataMaker():
+    for TypeData in ['Validation', 'Training']:
+        Pulses = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', TypeData + 'PulsesAnt.xml'))
+        PDWs = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', TypeData + 'PDWsDCI.xml'))
+
+        Source = [
+            [[Pulse['TOA'], Pulse['LI'], Pulse['Level'], Pulse['FreqStart'], Pulse['FreqEnd']] for Pulse in PulsesAnt]
+            for PulsesAnt in Pulses]
+        Translation = [[[PDW['TOA'], PDW['LI'], PDW['Level'], PDW['FreqMin'], PDW['FreqMax'], int('CW' in PDW['flags']),
+                         int('TroncAv' in PDW['flags']),
+                         int(len(PDW['flags']) == 0)] for PDW in PDWsDCI] for PDWsDCI in PDWs]
+
+        # Ici les données sont founies en batch
+        # Source est une liste de séquence d'impulsions de même longueur
+        # Translation est une liste de séquence de PDWs, elles peuvent être de longueures différentes
+
+        Source, Translation = Spliter(Source, Translation, DeltaT)
+        # On transforme ces listes en tenseur
+        Source = torch.tensor(Source)
+        # Source.shape = (batch_size, len_input, d_input)
+
+        # Rajoute des 0 à la fin des scénarios de PDWs pour qu'ils aient toutes la même longueure
+        Translation = pad_sequence([torch.tensor(el) for el in Translation], batch_first=True)
+
+        _, temp_len, _ = Translation.shape
+        Translation = F.pad(Translation, (0, 0, 0, NbMaxPDWs - temp_len))
+        # Translation.shape = (batch_size, NbMaxPDWs, d_target + num_flags)
+
+        WriteBatchs(Source=Source, Translation=Translation, BatchSize=BatchSize, TypeData=TypeData)
+
+
+def WriteBatchs(Source, Translation, BatchSize, TypeData):
+    try:
+        shutil.rmtree(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'BurstsData', 'Data', TypeData))
+    except:
+        None
+
+    os.mkdir(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'BurstsData', 'Data', TypeData))
+
+    NbBatch, r = divmod(len(Source), BatchSize)
+    NbBatch += (r != 0)
+    for i in range(NbBatch):
+        BatchSource = Source[i*BatchSize:(i+1)*BatchSize].numpy()
+        BatchTranslation = Translation[i*BatchSize:(i+1)*BatchSize].numpy()
+        SourceFName = os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'BurstsData', 'Data', TypeData, 'PulsesAnt_{}.npy'.format(i))
+        TranslationFName = os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'BurstsData', 'Data', TypeData, 'PDWsDCI_{}.npy'.format(i))
+        np.save(SourceFName, BatchSource)
+        np.save(TranslationFName, BatchTranslation)
+
+if __name__ == '__main__':
+    FDTDataMaker()
