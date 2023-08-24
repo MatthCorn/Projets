@@ -12,10 +12,10 @@ local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
 # Temps de maintien max d'un mesureur sans voir son impulsion
 HoldingTime = 0.5
 NbMaxPulses = 10
-NbPDWsMemory = 5
+NbPDWsMemory = 10
 DeltaT = 0.5
 NbMaxPDWs = 15
-BatchSize = 10000
+BatchSize = 10000000
 
 # Cette fonction donne un majorant de la date de publication d'un PDW donné
 def TimeRelease(PDW):
@@ -49,6 +49,7 @@ def Spliter(Source, Translation, DeltaT):
                     break
                 SourceBursts.append(SourceSentence[SourceId])
                 SourceId += 1
+
             # On ajoute l'impulsion informant de la date de fin de la salve
             SourceBursts.append([t, 0, 0, 0, 0])
             SplitedSourceSentence.append(SourceBursts)
@@ -64,7 +65,7 @@ def Spliter(Source, Translation, DeltaT):
         # On reconstruit les phrases telles qu'elles seront données au traducteur
         Remain = [[0] * 5] * NbMaxPulses
         for Bursts in SplitedSourceSentence:
-            Remain = (Remain + Bursts)[-NbMaxPulses:]
+            Remain = (Remain[:-1] + Bursts)[-NbMaxPulses:]
             NewSource.append(Remain)
 
         Remain = [[0] * 8] * NbPDWsMemory

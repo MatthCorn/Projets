@@ -16,20 +16,20 @@ local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
 param = {
     'd_source': 5,
     'd_target': 5,
-    'd_input_Enc': 32,
-    'd_input_Dec': 32,
-    'd_att': 32,
+    'd_input_Enc': 16,
+    'd_input_Dec': 16,
+    'd_att': 16,
     'num_flags': 3,
     'num_heads': 4,
     'num_encoders': 4,
     'num_decoders': 4,
-    'len_target': 100,
-    'RPR_len_decoder': 64,
-    'batch_size': 50
+    'len_target': 15,
+    'RPR_len_decoder': 16,
+    'batch_size': 10000
 }
 
 # Cette ligne crée les variables globales "~TYPE~Source" et "~TYPE~Translation" pour tout ~TYPE~ dans ListTypeData
-FDTDataLoader(ListTypeData=['Training', 'Validation'], local=local, variables_dict=vars())
+FDTDataLoader(ListTypeData=['Validation', 'Training'], local=local, variables_dict=vars())
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -43,8 +43,6 @@ TrainingEnded = (torch.norm(TrainingTranslation, dim=-1) == 0).unsqueeze(-1).to(
 
 ValidationEnded = (torch.norm(ValidationTranslation, dim=-1) == 0).unsqueeze(-1).to(torch.float32)
 
-EvaluationEnded = (torch.norm(EvaluationTranslation, dim=-1) == 0).unsqueeze(-1).to(torch.float32)
-
 batch_size = param['batch_size']
 
 # Procédure d'entrainement
@@ -55,8 +53,7 @@ TrainingErrActList = []
 ValidationErrList = []
 ValidationErrTransList = []
 ValidationErrActList = []
-RealEvaluationList = []
-CutEvaluationList = []
+
 for i in tqdm(range(1000)):
     Error, ErrAct, ErrTrans = ErrorAction(TrainingSource, TrainingTranslation, TrainingEnded, Translator, batch_size, Action='Training', Optimizer=optimizer)
     TrainingErrList.append(Error)
