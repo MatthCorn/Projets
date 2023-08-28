@@ -48,7 +48,7 @@ EvaluationEnded = (torch.norm(EvaluationTranslation, dim=-1) == 0).unsqueeze(-1)
 batch_size = param['batch_size']
 
 # Procédure d'entrainement
-optimizer = torch.optim.Adam(Translator.parameters(), weight_decay=1e-5, lr=3e-5)
+optimizer = torch.optim.Adam(Translator.parameters(), weight_decay=1e-5, lr=1e-4)
 TrainingErrList = []
 TrainingErrTransList = []
 TrainingErrActList = []
@@ -57,7 +57,7 @@ ValidationErrTransList = []
 ValidationErrActList = []
 RealEvaluationList = []
 CutEvaluationList = []
-for i in tqdm(range(200)):
+for i in tqdm(range(1000)):
     Error, ErrAct, ErrTrans = ErrorAction(TrainingSource, TrainingTranslation, TrainingEnded, Translator, batch_size, Action='Training', Optimizer=optimizer)
     TrainingErrList.append(Error)
     TrainingErrActList.append(ErrAct)
