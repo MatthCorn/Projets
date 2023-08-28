@@ -21,9 +21,9 @@ def TrainingError(Source, Translation, Ended, batch_size, batch_indice, Translat
     # Comme la décision d'arrêter d'écrire passe par Action, et pas par un token <end>, on ne s'interesse pas au dernier mot
     # On ne s'interesse pas non plus à l'action prédite par le token <start>, puisque de toute manière il est suivi d'un mot
 
-    PredictedTranslation = PredictedTranslation[:, 1:]
+    PredictedTranslation = PredictedTranslation[:, :-1]
     # PredictedTranslation.shape = (batch_size, target_len, d_target+num_flags)
-    PredictedAction = PredictedAction[:, :-1]
+    PredictedAction = PredictedAction[:, 1:]
     # PredictedAction.shape = (batch_size, target_len, 1)
 
     ErrTrans = torch.norm((BatchTranslation - PredictedTranslation) * (1 - BatchEnded) / NumWords, dim=(0, 1))/batch_size
