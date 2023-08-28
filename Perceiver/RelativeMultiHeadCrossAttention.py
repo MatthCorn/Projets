@@ -76,7 +76,7 @@ class RLCA(nn.Module):
                 # Ert.shape = (d_head, 2*latent_len-1)
 
 
-        RCA = self.RelativeCrossAttention(Q, Kt, Ert, V, input_len, Mask=mask)
+        RCA = self.RelativeCrossAttention(Q, Kt, Ert, V, Mask=mask)
         # RCA.shape = (batch_size, num_heads, latent_len, d_head)
 
         Concat = RCA.transpose(1, 2).reshape(batch_size, latent_len, -1)
