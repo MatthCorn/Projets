@@ -1,4 +1,5 @@
 import torch
+import torch.nn.functional as F
 
 # Ce script définit les erreurs utilisées pour l'appentissage et pour visualisé si l'objectif final est atteint
 
@@ -12,23 +13,25 @@ def TrainingError(Source, Translation, Ended, batch_size, batch_indice, Translat
     # Pour faire en sorte que l'action "continuer d'écrire" soit autant représentée en True qu'en False, on pondère le masque des actions
     NumWords = torch.sum((1 - BatchEnded), dim=1).unsqueeze(-1).to(torch.int32)
     # NumWords.shape = (batch_size, 1, 1)
-    BatchActionMask = (1 - BatchEnded) / NumWords
+    BatchActionMask = F.pad(1 - BatchEnded, [0, 0, 0, 1]) / NumWords
     for i in range(len(NumWords)):
         BatchActionMask[(i, int(NumWords[i]))] = 1
 
     PredictedTranslation, PredictedAction = Translator.forward(source=BatchSource, target=BatchTranslation)
 
-    # Comme la décision d'arrêter d'écrire passe par Action, et pas par un token <end>, on ne s'interesse pas au dernier mot
-    # On ne s'interesse pas non plus à l'action prédite par le token <start>, puisque de toute manière il est suivi d'un mot
+    # Comme la décision d'arrêter d'écrire passe par Action, et pas par un token <end>, on ne s'interesse pas au dernier mot. En revenche, la dernière action,
+    # si observée, ne peut être que "attendre la nouvelle salve", sinon cela signifie que le réseau est la dimensionné (target_len - NbPDWsMemory trop petit).
+    # On ne s'interesse aussi qu'aux prédictions à partir de la position "Translator.NbPDWsMemory", ce qui correspond aux prédictions devant être
+    # faites à l'arrivée de la dernière salve.
 
-    PredictedTranslation = PredictedTranslation[:, 1:]
-    # PredictedTranslation.shape = (batch_size, target_len, d_target+num_flags)
-    PredictedAction = PredictedAction[:, :-1]
-    # PredictedAction.shape = (batch_size, target_len, 1)
+    PredictedTranslation = PredictedTranslation[:, Translator.NbPDWsMemory-1:-1]
+    # PredictedTranslation.shape = (batch_size, target_len-PDWsMemory, d_target+num_flags)
+    PredictedAction = PredictedAction[:, Translator.NbPDWsMemory-1:]
+    # PredictedAction.shape = (batch_size, target_len-PDWsMemory+1, 1)
 
-    ErrTrans = torch.norm((BatchTranslation - PredictedTranslation) * (1 - BatchEnded) / NumWords, dim=(0, 1))/batch_size
+    ErrTrans = torch.norm((BatchTranslation[:, Translator.NbPDWsMemory:] - PredictedTranslation) * (1 - BatchEnded) / NumWords, dim=(0, 1))/batch_size
     # ErrTrans.shape = d_target+num_flags
-    ErrAct = torch.norm((PredictedAction - (1 - BatchEnded)) * BatchActionMask)/batch_size
+    ErrAct = torch.norm((PredictedAction - F.pad(1 - BatchEnded, [0, 0, 0, 1])) * BatchActionMask)/batch_size
 
     return ErrTrans, ErrAct
 

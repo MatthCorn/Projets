@@ -3,12 +3,11 @@ from Transformer.EncoderTransformer import EncoderLayer
 from Perceiver.FlexibleDecoder import DecoderLayer
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 class TransformerTranslator(nn.Module):
 
     def __init__(self, d_source, d_target, d_input_Enc=10, d_input_Dec=10, d_att=10, num_heads=2, num_encoders=3, RPR_len_decoder=32,
-                 num_decoders=3, target_len=80, num_flags=4, eps_end=1-1e-1, device=torch.device('cpu')):
+                 num_decoders=3, NbPDWsMemory=10, target_len=80, num_flags=4, eps_end=1-1e-1, device=torch.device('cpu')):
         super().__init__()
         self.device = device
         self.eps_end = eps_end
@@ -20,6 +19,7 @@ class TransformerTranslator(nn.Module):
             self.Encoders.append(EncoderLayer(d_model=d_input_Enc, d_att=d_att, num_heads=num_heads, relative=False))
         self.Encoders[0].relative = True
         self.target_len = target_len
+        self.NbPDWsMemory = NbPDWsMemory
         self.targetStart = nn.Parameter(torch.randn(1, d_target+num_flags))
         self.Decoders = nn.ModuleList()
         for i in range(num_decoders):
@@ -39,19 +39,10 @@ class TransformerTranslator(nn.Module):
 
 
     def forward(self, source, target):
-        # target.shape = (batch_size, target_len, d_target+num_flags)
-        batch_size, target_len, d_target_raw = target.shape
+        # target.shape = (batch_size, self.target_len, d_target+num_flags)
+        batch_size, _, d_target_raw = target.shape
 
-        # On ajoute le token start au début de target
-        trg = torch.cat((self.targetStart.expand(batch_size, 1, d_target_raw), target), 1)
-        # On pad la trg avec des 0 sur les mots par encore écrits
-        if self.target_len-target_len >= 0:
-            trg = F.pad(trg, (0, 0, 0, self.target_len-target_len))
-        else:
-            print('target_len :', target_len)
-            print('self.target_len :', self.target_len)
-            raise ValueError('max len in the target reached')
-        trg = self.TargetEmbedding(trg)
+        trg = self.TargetEmbedding(target)
         # trg.shape = (batch_size, self.target_len, d_input_Dec)
 
         src = self.SourceEmbedding(source)

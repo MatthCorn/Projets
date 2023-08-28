@@ -14,7 +14,7 @@ HoldingTime = 0.5
 NbMaxPulses = 10
 NbPDWsMemory = 10
 DeltaT = 0.5
-NbMaxPDWs = 15
+NbMaxPDWs = 20
 BatchSize = 10000000
 
 # Cette fonction donne un majorant de la date de publication d'un PDW donné
