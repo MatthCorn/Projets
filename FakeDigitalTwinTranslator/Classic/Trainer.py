@@ -10,8 +10,8 @@ from FakeDigitalTwinTranslator.PlotError import Plot
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
-# local = r'C:\Users\matth\Documents\Python\Projets'
+# local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
+local = r'C:\Users\matth\Documents\Python\Projets'
 
 param = {
     'd_source': 5,
@@ -25,7 +25,7 @@ param = {
     'num_decoders': 4,
     'len_target': 100,
     'RPR_len_decoder': 64,
-    'batch_size': 50
+    'batch_size': 70
 }
 
 # Cette ligne crée les variables globales "~TYPE~Source" et "~TYPE~Translation" pour tout ~TYPE~ dans ListTypeData
@@ -48,7 +48,7 @@ EvaluationEnded = (torch.norm(EvaluationTranslation, dim=-1) == 0).unsqueeze(-1)
 batch_size = param['batch_size']
 
 # Procédure d'entrainement
-optimizer = torch.optim.Adam(Translator.parameters(), weight_decay=1e-5, lr=1e-4)
+optimizer = torch.optim.Adam(Translator.parameters(), weight_decay=1e-5, lr=3e-4)
 TrainingErrList = []
 TrainingErrTransList = []
 TrainingErrActList = []
@@ -58,7 +58,7 @@ ValidationErrActList = []
 RealEvaluationList = []
 CutEvaluationList = []
 
-for i in tqdm(range(1000)):
+for i in tqdm(range(1500)):
     Error, ErrAct, ErrTrans = ErrorAction(TrainingSource, TrainingTranslation, TrainingEnded, Translator, batch_size, Action='Training', Optimizer=optimizer)
     TrainingErrList.append(Error)
     TrainingErrActList.append(ErrAct)
