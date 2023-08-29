@@ -1,6 +1,5 @@
-from FakeDigitalTwin.Trackers import Pulse
 from FakeDigitalTwin.SimulatorIter import DigitalTwin
-from FakeDigitalTwin.XMLTools import saveObjAsXml
+from Tools.XMLTools import saveObjAsXml
 import os
 import numpy as np
 from tqdm import tqdm

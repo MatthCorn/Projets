@@ -1,4 +1,4 @@
-from FakeDigitalTwin.XMLTools import loadXmlAsObj
+from Tools.XMLTools import loadXmlAsObj
 import os
 import torch
 import numpy as np
@@ -23,7 +23,9 @@ def TimeRelease(PDW):
     Maj = PDW[0] + PDW[1] + HoldingTime
     return Maj
 
-def Spliter(Source, Translation, DeltaT):
+# Cette fonction a pour rôle de transformer les phrases de Source et Translation en plein de petites
+# phrases correspondant au découpage par salve temporelle de longueur DeltaT
+def Spliter(Source, Translation, DeltaT, Eval=False):
     NewSource = []
     NewTranslation = []
     batch_len = len(Source)
@@ -62,20 +64,32 @@ def Spliter(Source, Translation, DeltaT):
                 TranslationId += 1
             SplitedTranslationSentence.append(TranslationBursts)
 
-        # On reconstruit les phrases telles qu'elles seront données au traducteur
-        Remain = [[0] * 5] * NbMaxPulses
-        for Bursts in SplitedSourceSentence:
-            Remain = (Remain[:-1] + Bursts)[-NbMaxPulses:]
-            NewSource.append(Remain)
+        if Eval:
+            # On reconstruit la liste les salves de mots composants la phrase
+            Sentence = []
+            Remain = [[0] * 5] * NbMaxPulses
+            for Bursts in SplitedSourceSentence:
+                Remain = (Remain[:-1] + Bursts)[-NbMaxPulses:]
+                Sentence.append(Remain)
+            NewSource.append(Sentence)
+
+        else:
+            # On reconstruit les phrases telles qu'elles seront données au traducteur
+            Remain = [[0] * 5] * NbMaxPulses
+            for Bursts in SplitedSourceSentence:
+                Remain = (Remain[:-1] + Bursts)[-NbMaxPulses:]
+                NewSource.append(Remain)
 
         Remain = [[0] * 8] * NbPDWsMemory
         for Bursts in SplitedTranslationSentence:
             Remain = Remain[-NbPDWsMemory:] + Bursts
             NewTranslation.append(Remain)
+
+    if Eval:
+        return NewSource, Translation
+
     return NewSource, NewTranslation
 
-# Cette fonction a pour rôle de transformer les phrases de Source et Translation en plein de petites
-# phrases correspondant au découpage par salve temporelle de longueur DeltaT
 def FDTDataMaker():
     for TypeData in ['Validation', 'Training']:
         Pulses = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', TypeData + 'PulsesAnt.xml'))

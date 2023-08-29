@@ -13,7 +13,7 @@ def TrainingError(Source, Translation, Ended, batch_size, batch_indice, Translat
     # Pour faire en sorte que l'action "continuer d'écrire" soit autant représentée en True qu'en False, on pondère le masque des actions
     NumWords = torch.sum((1 - BatchEnded), dim=1).unsqueeze(-1).to(torch.int32)
     # NumWords.shape = (batch_size, 1, 1)
-    BatchActionMask = F.pad(1 - BatchEnded, [0, 0, 0, 1]) / NumWords
+    BatchActionMask = F.pad(1 - BatchEnded, [0, 0, 0, 1])/ (NumWords + 1e-5)
     for i in range(len(NumWords)):
         BatchActionMask[(i, int(NumWords[i]))] = 1
 
@@ -29,7 +29,7 @@ def TrainingError(Source, Translation, Ended, batch_size, batch_indice, Translat
     PredictedAction = PredictedAction[:, Translator.NbPDWsMemory-1:]
     # PredictedAction.shape = (batch_size, target_len-PDWsMemory+1, 1)
 
-    ErrTrans = torch.norm((BatchTranslation[:, Translator.NbPDWsMemory:] - PredictedTranslation) * (1 - BatchEnded) / NumWords, dim=(0, 1))/batch_size
+    ErrTrans = torch.norm((BatchTranslation[:, Translator.NbPDWsMemory:] - PredictedTranslation) * (1 - BatchEnded) / (NumWords + 1e-5), dim=(0, 1))/batch_size
     # ErrTrans.shape = d_target+num_flags
     ErrAct = torch.norm((PredictedAction - F.pad(1 - BatchEnded, [0, 0, 0, 1])) * BatchActionMask)/batch_size
 
