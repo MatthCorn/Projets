@@ -42,10 +42,10 @@ def ObjectiveError(Source, Translation, Ended, Translator):
     Translation, Ended = Translation.to(device=Translator.device), Ended.to(device=Translator.device)
 
     PredictedTranslation = pad_sequence(PredictedTranslation, batch_first=True)
-
+PredictedTranslation = F.pad(PredictedTranslation, (0, 0, 0, len_target - temp_len))
     # On calcule l'erreur de la phrase intentionnellement écrite.
     # C'est-à-dire qu'on prend en compte la fin de l'écriture gérée par Action et représentée par le masque PredictedMaskTranslation
-    RealError = torch.norm(PredictedTranslation * PredictedMaskTranslation - Translation)
+    RealError = torch.norm(PredictedTranslation - Translation)
 
     # On calcule l'erreur sur le même nombre de mot que les traductions attendues
     CutError = torch.norm(PredictedTranslation * (1-Ended) - Translation)
