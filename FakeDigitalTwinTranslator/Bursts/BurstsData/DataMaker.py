@@ -6,8 +6,8 @@ from torch.nn.utils.rnn import pad_sequence
 import torch.nn.functional as F
 import shutil
 
-# local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
-local = r'C:\Users\matth\Documents\Python\Projets'
+local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
+# local = r'C:\Users\matth\Documents\Python\Projets'
 
 # Temps de maintien max d'un mesureur sans voir son impulsion
 HoldingTime = 0.5
@@ -16,6 +16,7 @@ NbPDWsMemory = 10
 DeltaT = 0.5
 NbMaxPDWs = 20
 BatchSize = 10000000
+TMax = 35
 
 # Cette fonction donne un majorant de la date de publication d'un PDW donné
 def TimeRelease(PDW):
@@ -64,6 +65,11 @@ def Spliter(Source, Translation, DeltaT, Eval=False):
                 TranslationId += 1
             SplitedTranslationSentence.append(TranslationBursts)
 
+        while t < TMax:
+            t += DeltaT
+            SplitedSourceSentence.append([[t, 0, 0, 0, 0]])
+            SplitedTranslationSentence.append([])
+
         if Eval:
             # On reconstruit la liste les salves de mots composants la phrase
             Sentence = []
@@ -91,7 +97,7 @@ def Spliter(Source, Translation, DeltaT, Eval=False):
     return NewSource, NewTranslation
 
 def FDTDataMaker():
-    for TypeData in ['Validation', 'Training']:
+    for TypeData in ['Validation', 'Training', 'Evaluation']:
         Pulses = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', TypeData + 'PulsesAnt.xml'))
         PDWs = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', TypeData + 'PDWsDCI.xml'))
 
@@ -106,7 +112,9 @@ def FDTDataMaker():
         # Source est une liste de séquence d'impulsions de même longueur
         # Translation est une liste de séquence de PDWs, elles peuvent être de longueures différentes
 
-        Source, Translation = Spliter(Source, Translation, DeltaT)
+
+        Eval = (TypeData == 'Evaluation')
+        Source, Translation = Spliter(Source, Translation, DeltaT, Eval=Eval)
         # On transforme ces listes en tenseur
         Source = torch.tensor(Source)
         # Source.shape = (batch_size, len_input, d_input)
@@ -114,9 +122,10 @@ def FDTDataMaker():
         # Rajoute des 0 à la fin des scénarios de PDWs pour qu'ils aient toutes la même longueure
         Translation = pad_sequence([torch.tensor(el) for el in Translation], batch_first=True)
 
-        _, temp_len, _ = Translation.shape
-        Translation = F.pad(Translation, (0, 0, 0, NbMaxPDWs - temp_len))
-        # Translation.shape = (batch_size, NbMaxPDWs, d_target + num_flags)
+        if not Eval:
+            _, temp_len, _ = Translation.shape
+            Translation = F.pad(Translation, (0, 0, 0, NbMaxPDWs - temp_len))
+            # Translation.shape = (batch_size, NbMaxPDWs, d_target + num_flags)
 
         WriteBatchs(Source=Source, Translation=Translation, BatchSize=BatchSize, TypeData=TypeData)
 

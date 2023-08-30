@@ -55,4 +55,4 @@ def Plot(path, eval=False):
     plt.show()
 
 if __name__ == '__main__':
-    Plot(r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets\\FakeDigitalTwinTranslator\\Classic\\Save\\28-08-2023__21-50\\error', eval=True)
+    Plot(r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets\\FakeDigitalTwinTranslator\\Classic\\Save\\29-08-2023__20-57\\error', eval=True)

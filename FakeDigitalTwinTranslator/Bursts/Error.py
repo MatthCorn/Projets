@@ -1,5 +1,7 @@
 import torch
 import torch.nn.functional as F
+from torch.nn.utils.rnn import pad_sequence
+
 
 # Ce script définit les erreurs utilisées pour l'appentissage et pour visualisé si l'objectif final est atteint
 
@@ -36,8 +38,10 @@ def TrainingError(Source, Translation, Ended, batch_size, batch_indice, Translat
     return ErrTrans, ErrAct
 
 def ObjectiveError(Source, Translation, Ended, Translator):
-    PredictedTranslation, PredictedMaskTranslation = Translator.translate(Source.to(device=Translator.device))
+    PredictedTranslation = Translator.translate(Source.to(device=Translator.device))
     Translation, Ended = Translation.to(device=Translator.device), Ended.to(device=Translator.device)
+
+    PredictedTranslation = pad_sequence(PredictedTranslation, batch_first=True)
 
     # On calcule l'erreur de la phrase intentionnellement écrite.
     # C'est-à-dire qu'on prend en compte la fin de l'écriture gérée par Action et représentée par le masque PredictedMaskTranslation

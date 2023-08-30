@@ -78,7 +78,7 @@ for i in tqdm(range(100)):
 error = {'Training':
              {'ErrList': TrainingErrList, 'ErrTransList': TrainingErrTransList, 'ErrActList': TrainingErrActList},
          'Validation':
-             {'ErrList': ValidationErrList, 'ErrTransList': ValidationErrTransList, 'ErrActList': ValidationErrActList}
+             {'ErrList': ValidationErrList, 'ErrTransList': ValidationErrTransList, 'ErrActList': ValidationErrActList},
          'Evaluation':
              {'Real': RealEvaluationList, 'Cut': CutEvaluationList}}
 

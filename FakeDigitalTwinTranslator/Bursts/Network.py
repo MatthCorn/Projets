@@ -3,6 +3,7 @@ from Transformer.EncoderTransformer import EncoderLayer
 from Perceiver.FlexibleDecoder import DecoderLayer
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 class TransformerTranslator(nn.Module):
 
@@ -62,26 +63,29 @@ class TransformerTranslator(nn.Module):
     def translate(self, source):
         batch_size = len(source)
 
-        Translation = torch.zeros(size=(batch_size, self.target_len, self.d_target + self.num_flags), device=self.device)
-        # Translation.shape = (batch_size, target_len, d_target + num_flags)
+        NbPDWsMemory = self.target_len / 2
+        Translations = []
+        for sentence in source:
+            Translation = []
 
-        with torch.no_grad():
-            for i in range(self.target_len):
-                if i == self.target_len - 1:
-                    Translation, Actions = self.forward(source=source, target=Translation)
-                else:
-                    Translation, _ = self.forward(source=source, target=Translation)
-                Translation = Translation[:, 1:]
-                Translation[:, self.target_len + 1:] = 0
+            target = torch.zeros(size=(1, self.target_len, self.d_target + self.num_flags), device=self.device)
+            for bursts in sentence:
+                IdLastPDW = NbPDWsMemory
+                Action = 1
 
-            Actions = Actions[:, 1:, 0]
-            MaskEndTranslation = torch.zeros(size=(batch_size, self.target_len, self.d_target + self.num_flags), device=self.device)
-            for i in range(batch_size):
-                for j in range(self.target_len):
-                    if Actions[i, j] > 0.5:
-                        MaskEndTranslation[i, j] = 1
-                    else:
-                        break
+                while Action > 0.5:
+                    # Action=1 signifie qu'on publie le PDW d'indice IdLastPDW
+                    with torch.no_grad():
+                        target, Actions = self.forward(source=bursts.unsqueeze(0), target=target)
+                    Action = Actions[IdLastPDW]
+                    IdLastPDW += 1
+                    if IdLastPDW == self.target_len - 1:
+                        raise ValueError("not enougth space to generate PDWs, fixe an higher target_len")
 
+                # En sortant de la boucle, on attend la prochaine salve
+                Translation += target[:, NbPDWsMemory:IdLastPDW].tolist()
+                target = target[:, IdLastPDW-NbPDWsMemory:IdLastPDW]
+                target = F.pad(target, (0, 0, 0, self.target_len-NbPDWsMemory))
+            Translations.append(torch.tensor(Translation))
 
-        return Translation, MaskEndTranslation
+        return Translations

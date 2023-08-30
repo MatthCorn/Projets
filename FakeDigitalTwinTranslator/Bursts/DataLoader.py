@@ -1,14 +1,15 @@
 import os
 import numpy as np
 import torch
-
+from Tools.XMLTools import loadXmlAsObj
+from FakeDigitalTwinTranslator.Bursts.BurstsData.DataMaker import Spliter, DeltaT
 
 # Cette fonction ne prend pas en compte le chargement du mode évaluation pour l'instant
 def FDTDataLoader(ListTypeData=[], local='', variables_dict={}):
 
     NewArg = []
     NewValue = []
-    for TypeData in ['Validation', 'Training']:
+    for TypeData in ['Validation', 'Training', 'Evaluation']:
         if TypeData in ListTypeData:
             # Source, Translation = ParallelLoading(TypeData, local)
             Source = np.load(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'BurstsData', 'Data', TypeData, 'PulsesAnt_0.npy'))
@@ -21,7 +22,6 @@ def FDTDataLoader(ListTypeData=[], local='', variables_dict={}):
 
     for i in range(len(NewArg)):
         variables_dict.__setitem__(NewArg[i], torch.tensor(NewValue[i]))
-
 
 def LoadParam(dict, variables_dict):
     for key in dict.keys():
