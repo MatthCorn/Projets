@@ -10,8 +10,8 @@ import datetime
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
-# local = r'C:\Users\Matthieu\Documents\Python\Projets'
+# local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
+local = r'C:\Users\matth\Documents\Python\Projets'
 
 param = {
     'd_source': 5,
