@@ -7,6 +7,7 @@ from tqdm import tqdm
 from FakeDigitalTwinTranslator.PlotError import Plot
 from FakeDigitalTwinTranslator.Bursts.Error import ErrorAction
 import datetime
+from GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
@@ -16,17 +17,17 @@ local = r'C:\Users\matth\Documents\Python\Projets'
 param = {
     'd_source': 5,
     'd_target': 5,
-    'd_input_Enc': 16,
-    'd_input_Dec': 16,
-    'd_att': 16,
+    'd_input_Enc': 32,
+    'd_input_Dec': 32,
+    'd_att': 32,
     'num_flags': 3,
     'num_heads': 4,
-    'num_encoders': 2,
-    'num_decoders': 2,
+    'num_encoders': 3,
+    'num_decoders': 3,
     'NbPDWsMemory': 10,
     'len_target': 20,
     'RPR_len_decoder': 16,
-    'batch_size': 1000
+    'batch_size': 2048
 }
 
 # Cette ligne crée les variables globales "~TYPE~Source" et "~TYPE~Translation" pour tout ~TYPE~ dans ListTypeData
@@ -50,7 +51,7 @@ EvaluationEnded = (torch.norm(EvaluationTranslation, dim=-1) == 0).unsqueeze(-1)
 batch_size = param['batch_size']
 
 # Procédure d'entrainement
-optimizer = torch.optim.Adam(Translator.parameters(), weight_decay=1e-5, lr=3e-5)
+optimizer = torch.optim.Adam(Translator.parameters(), lr=3e-5)
 TrainingErrList = []
 TrainingErrTransList = []
 TrainingErrActList = []
@@ -60,7 +61,7 @@ ValidationErrActList = []
 RealEvaluationList = []
 CutEvaluationList = []
 
-for i in tqdm(range(100)):
+for i in tqdm(range(500)):
     Error, ErrAct, ErrTrans = ErrorAction(TrainingSource, TrainingTranslation, TrainingEnded, Translator, batch_size, Action='Training', Optimizer=optimizer)
     TrainingErrList.append(Error)
     TrainingErrActList.append(ErrAct)
@@ -89,6 +90,8 @@ torch.save(Translator.state_dict(), os.path.join(local, 'FakeDigitalTwinTranslat
 torch.save(optimizer.state_dict(), os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'Optimizer'))
 saveObjAsXml(param, os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'param'))
 saveObjAsXml(error, os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'error'))
+
+git_push(local=local, file=os.path.join('FakeDigitalTwinTranslator', 'Bursts', 'Save', folder), CommitMsg='simu '+folder)
 
 Plot(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'error'), eval=True)
 
