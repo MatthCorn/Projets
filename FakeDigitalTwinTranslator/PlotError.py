@@ -58,4 +58,4 @@ if __name__ == '__main__':
     import os
     # local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets
     local = r'C:\\Users\\matth\\Documents\\Python\\Projets'
-    Plot(os.path.join(local, r'FakeDigitalTwinTranslator\\Classic\\Save\\29-08-2023__20-57\\error'), eval=True)
+    Plot(os.path.join(local, r'FakeDigitalTwinTranslator\\Classic\\Save\\30-08-2023__22-59\\error'), eval=True)

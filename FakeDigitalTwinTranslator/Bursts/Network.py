@@ -61,9 +61,7 @@ class TransformerTranslator(nn.Module):
         return PDW, Action
 
     def translate(self, source):
-        batch_size = len(source)
-
-        NbPDWsMemory = self.target_len / 2
+        NbPDWsMemory = int(self.target_len / 2)
         Translations = []
         for sentence in source:
             Translation = []
@@ -77,13 +75,14 @@ class TransformerTranslator(nn.Module):
                     # Action=1 signifie qu'on publie le PDW d'indice IdLastPDW
                     with torch.no_grad():
                         target, Actions = self.forward(source=bursts.unsqueeze(0), target=target)
-                    Action = Actions[IdLastPDW]
+                    Action = Actions[0, IdLastPDW]
                     IdLastPDW += 1
                     if IdLastPDW == self.target_len - 1:
-                        raise ValueError("not enougth space to generate PDWs, fixe an higher target_len")
+                        break
+                        # raise ValueError("not enougth space to generate PDWs, fixe an higher target_len")
 
                 # En sortant de la boucle, on attend la prochaine salve
-                Translation += target[:, NbPDWsMemory:IdLastPDW].tolist()
+                Translation += target[0, NbPDWsMemory:IdLastPDW].tolist()
                 target = target[:, IdLastPDW-NbPDWsMemory:IdLastPDW]
                 target = F.pad(target, (0, 0, 0, self.target_len-NbPDWsMemory))
             Translations.append(torch.tensor(Translation))

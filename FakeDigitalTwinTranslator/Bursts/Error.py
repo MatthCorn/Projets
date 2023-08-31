@@ -39,18 +39,19 @@ def TrainingError(Source, Translation, Ended, batch_size, batch_indice, Translat
 
 def ObjectiveError(Source, Translation, Ended, Translator):
     PredictedTranslation = Translator.translate(Source.to(device=Translator.device))
-    Translation, Ended = Translation.to(device=Translator.device), Ended.to(device=Translator.device)
+    PredictedTranslation = pad_sequence(PredictedTranslation, batch_first=True).to(device=Translator.device)
 
-    PredictedTranslation = pad_sequence(PredictedTranslation, batch_first=True)
+    Translation, Ended = Translation.to(device=Translator.device), Ended.to(device=Translator.device)
 
 
     _, temp_len, _ = PredictedTranslation.shape
     _, len_target, _ = Translation.shape
 
     if temp_len < len_target:
-        PredictedTranslation = F.pad(PredictedTranslation, (0, 0, 0, temp_len - len_target))
+        PredictedTranslation = F.pad(PredictedTranslation, (0, 0, 0, len_target - temp_len))
     if temp_len > len_target:
-        Translation = F.pad(Translation, (0, 0, 0, len_target - temp_len))
+        Translation = F.pad(Translation, (0, 0, 0, temp_len - len_target))
+        Ended = F.pad(Ended, (0, 0, 0, temp_len - len_target))
 
     # On calcule l'erreur de la phrase intentionnellement écrite.
     # C'est-à-dire qu'on prend en compte la fin de l'écriture gérée par Action et représentée par le masque PredictedMaskTranslation
@@ -59,7 +60,7 @@ def ObjectiveError(Source, Translation, Ended, Translator):
     # On calcule l'erreur sur le même nombre de mot que les traductions attendues
     CutError = torch.norm(PredictedTranslation * (1-Ended) - Translation)
 
-    return float(RealError)/len(Source), float(CutError)/len(Source)
+    return float(RealError)/float(torch.norm(Ended, p=1)), float(CutError)/float(torch.norm(Ended, p=1))
 
 
 def ErrorAction(Source, Translation, Ended, Translator, batch_size=50, Action='', Optimizer=None):
