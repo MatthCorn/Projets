@@ -1,16 +1,20 @@
 from git import Repo
+import os
 
-PATH_OF_GIT_REPO = r'C:\Users\matth\Documents\Python\Projets\.git'  # make sure .git folder is properly configured
-COMMIT_MESSAGE = 'test push script'
+local = r'C:\Users\matth\Documents\Python\Projets'
+# local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
 
-def git_push(file):
+COMMIT_MESSAGE = 'Rien à dire'
+
+def git_push(local, file, CommitMsg=COMMIT_MESSAGE):
     try:
-        repo = Repo(PATH_OF_GIT_REPO)
-        repo.git.add([file], update=True)
-        repo.index.commit(COMMIT_MESSAGE)
-        origin = repo.remote(name='origin')
+        repo = Repo(os.path.join(local, r'.git'))
+        repo.git.add([os.path.join(local, file)])
+        repo.index.commit(CommitMsg)
+        origin = repo.remote(name='main')
         origin.push()
     except:
         print('Some error occured while pushing the code')
 
-git_push(r'C:\Users\matth\Documents\Python\Projets\GitPush.py')
+if __name__ == '__main__':
+    git_push(local=local, file=r'GitPush.py')
