@@ -51,7 +51,7 @@ EvaluationEnded = (torch.norm(EvaluationTranslation, dim=-1) == 0).unsqueeze(-1)
 batch_size = param['batch_size']
 
 # Procédure d'entrainement
-optimizer = torch.optim.Adam(Translator.parameters(), lr=3e-5)
+optimizer = torch.optim.Adam(Translator.parameters(), lr=3e-4)
 TrainingErrList = []
 TrainingErrTransList = []
 TrainingErrActList = []
@@ -61,7 +61,11 @@ ValidationErrActList = []
 RealEvaluationList = []
 CutEvaluationList = []
 
-for i in tqdm(range(100)):
+RealError, CutError = ErrorAction(EvaluationSource, EvaluationTranslation, EvaluationEnded, Translator, Action='Evaluation')
+RealEvaluationList.append(RealError)
+CutEvaluationList.append(CutError)
+
+for i in tqdm(range(10)):
     Error, ErrAct, ErrTrans = ErrorAction(TrainingSource, TrainingTranslation, TrainingEnded, Translator, batch_size, Action='Training', Optimizer=optimizer)
     TrainingErrList.append(Error)
     TrainingErrActList.append(ErrAct)
@@ -75,6 +79,23 @@ for i in tqdm(range(100)):
     RealError, CutError = ErrorAction(EvaluationSource, EvaluationTranslation, EvaluationEnded, Translator, Action='Evaluation')
     RealEvaluationList.append(RealError)
     CutEvaluationList.append(CutError)
+
+Translator2 = TransformerTranslator(d_source=param['d_source'], d_target=param['d_target'], d_att=param['d_att'], d_input_Enc=param['d_input_Enc'],
+                                   target_len=param['len_target'], num_encoders=param['num_encoders'], d_input_Dec=param['d_input_Dec'],
+                                   num_flags=param['num_flags'], num_heads=param['num_heads'], num_decoders=param['num_decoders'],
+                                   RPR_len_decoder=param['RPR_len_decoder'], NbPDWsMemory=param['NbPDWsMemory'], device=device)
+
+RealError, CutError = ErrorAction(EvaluationSource, EvaluationTranslation, EvaluationEnded, Translator2, Action='Evaluation')
+RealEvaluationList.append(RealError)
+CutEvaluationList.append(CutError)
+
+Translator2.load_state_dict(Translator.state_dict())
+Translator2.eval()
+
+RealError, CutError = ErrorAction(EvaluationSource, EvaluationTranslation, EvaluationEnded, Translator2, Action='Evaluation')
+RealEvaluationList.append(RealError)
+CutEvaluationList.append(CutError)
+
 
 error = {'Training':
              {'ErrList': TrainingErrList, 'ErrTransList': TrainingErrTransList, 'ErrActList': TrainingErrActList},
@@ -91,8 +112,4 @@ torch.save(optimizer.state_dict(), os.path.join(local, 'FakeDigitalTwinTranslato
 saveObjAsXml(param, os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'param'))
 saveObjAsXml(error, os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'error'))
 
-# git_push(local=local, file=os.path.join('FakeDigitalTwinTranslator', 'Bursts', 'Save', folder), CommitMsg='simu '+folder)
-
 Plot(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'error'), eval=True)
-
-

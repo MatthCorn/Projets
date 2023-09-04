@@ -81,7 +81,7 @@ error = {'Training':
          'Evaluation':
              {'Real': RealEvaluationList, 'Cut': CutEvaluationList}}
 
-folder = datetime.datetime.now().strftime("%d-%m-%Y__%H-%M")
+folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
 os.mkdir(os.path.join(local, 'FakeDigitalTwinTranslator', 'Classic', 'Save', folder))
 
 torch.save(Translator.state_dict(), os.path.join(local, 'FakeDigitalTwinTranslator', 'Classic', 'Save', folder, 'Translator'))
