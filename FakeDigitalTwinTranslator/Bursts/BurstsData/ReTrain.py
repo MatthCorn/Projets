@@ -1,6 +1,6 @@
 from FakeDigitalTwinTranslator.Bursts.Network import TransformerTranslator
 from FakeDigitalTwinTranslator.Bursts.DataLoader import FDTDataLoader
-from Tools.XMLTools import saveObjAsXml
+from Tools.XMLTools import saveObjAsXml, loadXmlAsObj
 import os
 import torch
 from tqdm import tqdm
@@ -14,21 +14,7 @@ from GitPush import git_push
 # local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
 local = r'C:\Users\matth\Documents\Python\Projets'
 
-param = {
-    'd_source': 5,
-    'd_target': 5,
-    'd_input_Enc': 32,
-    'd_input_Dec': 32,
-    'd_att': 32,
-    'num_flags': 3,
-    'num_heads': 4,
-    'num_encoders': 3,
-    'num_decoders': 3,
-    'NbPDWsMemory': 10,
-    'len_target': 20,
-    'RPR_len_decoder': 16,
-    'batch_size': 2048
-}
+param = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', '01-09-2023__11-34', 'param'))
 
 # Cette ligne crée les variables globales "~TYPE~Source" et "~TYPE~Translation" pour tout ~TYPE~ dans ListTypeData
 FDTDataLoader(ListTypeData=['Validation', 'Training', 'Evaluation'], local=local, variables_dict=vars())
@@ -40,6 +26,8 @@ Translator = TransformerTranslator(d_source=param['d_source'], d_target=param['d
                                    num_flags=param['num_flags'], num_heads=param['num_heads'], num_decoders=param['num_decoders'],
                                    RPR_len_decoder=param['RPR_len_decoder'], NbPDWsMemory=param['NbPDWsMemory'], device=device)
 
+Translator.load_state_dict(torch.load(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', '01-09-2023__11-34', 'Translator')))
+Translator.eval()
 
 TrainingEnded = (torch.norm(TrainingTranslation[:, param['NbPDWsMemory']:], dim=-1) == 0).unsqueeze(-1).to(torch.float32)
 
@@ -52,16 +40,20 @@ batch_size = param['batch_size']
 
 # Procédure d'entrainement
 optimizer = torch.optim.Adam(Translator.parameters(), lr=3e-5)
-TrainingErrList = []
-TrainingErrTransList = []
-TrainingErrActList = []
-ValidationErrList = []
-ValidationErrTransList = []
-ValidationErrActList = []
-RealEvaluationList = []
-CutEvaluationList = []
+optimizer.load_state_dict(torch.load(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', '01-09-2023__11-34', 'Optimizer')))
 
-for i in tqdm(range(400)):
+error = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', '01-09-2023__11-34', 'error'))
+
+TrainingErrList = error['Training']['ErrList']
+TrainingErrTransList = error['Training']['ErrTransList']
+TrainingErrActList = error['Training']['ErrActList']
+ValidationErrList = error['Validation']['ErrList']
+ValidationErrTransList = error['Validation']['ErrTransList']
+ValidationErrActList = error['Validation']['ErrActList']
+RealEvaluationList = error['Evaluation']['Real']
+CutEvaluationList = error['Evaluation']['Cut']
+
+for i in tqdm(range(5)):
     Error, ErrAct, ErrTrans = ErrorAction(TrainingSource, TrainingTranslation, TrainingEnded, Translator, batch_size, Action='Training', Optimizer=optimizer)
     TrainingErrList.append(Error)
     TrainingErrActList.append(ErrAct)
