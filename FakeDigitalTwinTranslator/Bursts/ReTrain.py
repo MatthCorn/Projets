@@ -11,10 +11,12 @@ from GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-# local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
-local = r'C:\Users\matth\Documents\Python\Projets'
+local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
+# local = r'C:\Users\matth\Documents\Python\Projets'
 
-param = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', '01-09-2023__11-34', 'param'))
+folder = '2023-09-05__16-54'
+
+param = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'param'))
 
 # Cette ligne crée les variables globales "~TYPE~Source" et "~TYPE~Translation" pour tout ~TYPE~ dans ListTypeData
 FDTDataLoader(ListTypeData=['Validation', 'Training', 'Evaluation'], local=local, variables_dict=vars())
@@ -26,8 +28,8 @@ Translator = TransformerTranslator(d_source=param['d_source'], d_target=param['d
                                    num_flags=param['num_flags'], num_heads=param['num_heads'], num_decoders=param['num_decoders'],
                                    RPR_len_decoder=param['RPR_len_decoder'], NbPDWsMemory=param['NbPDWsMemory'], device=device)
 
-Translator.load_state_dict(torch.load(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', '01-09-2023__11-34', 'Translator')))
-Translator.eval()
+Translator.load_state_dict(torch.load(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'Translator')))
+Translator.train()
 
 TrainingEnded = (torch.norm(TrainingTranslation[:, param['NbPDWsMemory']:], dim=-1) == 0).unsqueeze(-1).to(torch.float32)
 
@@ -40,9 +42,9 @@ batch_size = param['batch_size']
 
 # Procédure d'entrainement
 optimizer = torch.optim.Adam(Translator.parameters(), lr=3e-5)
-optimizer.load_state_dict(torch.load(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', '01-09-2023__11-34', 'Optimizer')))
+optimizer.load_state_dict(torch.load(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'Optimizer')))
 
-error = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', '01-09-2023__11-34', 'error'))
+error = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'error'))
 
 TrainingErrList = error['Training']['ErrList']
 TrainingErrTransList = error['Training']['ErrTransList']
@@ -75,7 +77,7 @@ error = {'Training':
          'Evaluation':
              {'Real': RealEvaluationList, 'Cut': CutEvaluationList}}
 
-folder = datetime.datetime.now().strftime("%d-%m-%Y__%H-%M")
+folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
 os.mkdir(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder))
 
 torch.save(Translator.state_dict(), os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'Translator'))

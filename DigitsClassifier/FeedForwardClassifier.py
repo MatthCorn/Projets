@@ -2,6 +2,7 @@ from Transformer.EasyFeedForward import FeedForward
 import matplotlib.pyplot as plt
 import idx2numpy
 import torch
+from tqdm import tqdm
 
 local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
 # local = r'C:\Users\Matthieu\Documents\Python\Projets'
@@ -32,24 +33,27 @@ ValidationLabels = ValidationLabels.to(device)
 
 Batchs = [list(range(100*k, 100*(k+1))) for k in range(600)]
 
-optimizer = torch.optim.Adam(N.parameters(),weight_decay = 0.1)
+optimizer = torch.optim.Adam(N.parameters(), weight_decay=0.1, lr=1e-5)
 
 ErrorTrainingSet = []
 AccuracyValidationSet = []
 
-for i in range(200):
-    print(i)
-    ErrorTrainingSet.append(float(torch.norm(N(TrainingImageSet[Batchs[0]])-TrainingLabelSet[Batchs[0]])))
+for i in tqdm(range(50)):
+    error = 0
     for Batch in Batchs:
         optimizer.zero_grad(set_to_none=True)
         err = torch.norm(N(TrainingImageSet[Batch])-TrainingLabelSet[Batch])
         err.backward()
         optimizer.step()
-    ErrorTrainingSet.append(float(err))
-    AccuracyValidationSet.append(float(1 - torch.count_nonzero(torch.argmax(N(ValidationImageSet),dim=1)-ValidationLabels)/len(ValidationLabels)))
+        error += float(err)
+    ErrorTrainingSet.append(error)
+    with torch.no_grad():
+        AccuracyValidationSet.append(float(1 - torch.count_nonzero(torch.argmax(N(ValidationImageSet),dim=1)-ValidationLabels)/len(ValidationLabels)))
 
 print(sum(p.numel() for p in N.parameters() if p.requires_grad))
+
+
 fig, ((ax1, ax2)) = plt.subplots(2, 1)
 ax1.plot(AccuracyValidationSet); ax1.set_title("Précision sur l'ensemble de validation")
 ax2.plot(ErrorTrainingSet); ax2.set_title("Erreur sur l'ensemble de test")
-fig.show()
+plt.show()
