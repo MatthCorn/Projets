@@ -14,7 +14,7 @@ NData = 1000
 TrainingData = torch.normal(torch.zeros(NData, NVec, DVec), sigma*torch.ones(NData, NVec, DVec))
 
 ShiftRange = 100
-Shift = torch.exp(math.log(ShiftRange)*torch.rand(size=(NData, NVec, 2)))
+Shift = torch.exp(math.log(ShiftRange)*torch.rand(size=(NData, 1, 1)).expand(NData, NVec, 2))
 Shift = F.pad(Shift, (0, DVec-2))
 
 
