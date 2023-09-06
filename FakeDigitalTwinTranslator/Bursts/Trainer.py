@@ -61,7 +61,7 @@ ValidationErrActList = []
 RealEvaluationList = []
 CutEvaluationList = []
 
-for i in tqdm(range(20)):
+for i in tqdm(range(200)):
     Error, ErrAct, ErrTrans = ErrorAction(TrainingSource, TrainingTranslation, TrainingEnded, Translator, batch_size, Action='Training', Optimizer=optimizer)
     TrainingErrList.append(Error)
     TrainingErrActList.append(ErrAct)

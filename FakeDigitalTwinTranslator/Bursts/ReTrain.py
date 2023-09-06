@@ -14,7 +14,7 @@ from GitPush import git_push
 local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
 # local = r'C:\Users\matth\Documents\Python\Projets'
 
-folder = '2023-09-05__16-54'
+folder = '2023-09-06__13-17'
 
 param = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'param'))
 
@@ -55,7 +55,7 @@ ValidationErrActList = error['Validation']['ErrActList']
 RealEvaluationList = error['Evaluation']['Real']
 CutEvaluationList = error['Evaluation']['Cut']
 
-for i in tqdm(range(5)):
+for i in tqdm(range(20)):
     Error, ErrAct, ErrTrans = ErrorAction(TrainingSource, TrainingTranslation, TrainingEnded, Translator, batch_size, Action='Training', Optimizer=optimizer)
     TrainingErrList.append(Error)
     TrainingErrActList.append(ErrAct)
