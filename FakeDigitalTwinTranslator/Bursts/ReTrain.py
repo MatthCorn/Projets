@@ -14,7 +14,7 @@ from GitPush import git_push
 local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
 # local = r'C:\Users\matth\Documents\Python\Projets'
 
-folder = '2023-09-06__13-17'
+folder = '2023-09-07__10-30'
 
 param = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'param'))
 
@@ -41,7 +41,7 @@ EvaluationEnded = (torch.norm(EvaluationTranslation, dim=-1) == 0).unsqueeze(-1)
 batch_size = param['batch_size']
 
 # Procédure d'entrainement
-optimizer = torch.optim.Adam(Translator.parameters(), lr=3e-5)
+optimizer = torch.optim.Adam(Translator.parameters(), lr=3e-4)
 optimizer.load_state_dict(torch.load(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'Optimizer')))
 
 error = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'error'))
@@ -55,7 +55,7 @@ ValidationErrActList = error['Validation']['ErrActList']
 RealEvaluationList = error['Evaluation']['Real']
 CutEvaluationList = error['Evaluation']['Cut']
 
-for i in tqdm(range(20)):
+for i in tqdm(range(50)):
     Error, ErrAct, ErrTrans = ErrorAction(TrainingSource, TrainingTranslation, TrainingEnded, Translator, batch_size, Action='Training', Optimizer=optimizer)
     TrainingErrList.append(Error)
     TrainingErrActList.append(ErrAct)
