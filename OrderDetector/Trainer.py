@@ -12,13 +12,13 @@ N.to(device)
 
 optimizer = torch.optim.Adam(N.parameters(), weight_decay=1e-3, lr=1e-3)
 
-TrainingInput, TrainingOutput, _ = MakeData(NVec=5, DVec=10, sigma=1, NData=10000, ShiftRange=10)
-ValidationInput, ValidationOutput, _ = MakeData(NVec=5, DVec=10, sigma=1, NData=1000, ShiftRange=10)
+TrainingInput, TrainingOutput, _ = MakeData(NVec=5, DVec=10, sigma=1, NData=10000, ShiftInterval=[0, 1000])
+ValidationInput, ValidationOutput, _ = MakeData(NVec=5, DVec=10, sigma=1, NData=1000, ShiftInterval=[0, 1000])
 
 batch_size = 10000
 n_batch = 1
 
-n_iter = 1000
+n_iter = 10000
 TrainingError = []
 ValidationError = []
 for j in tqdm(range(n_iter)):
