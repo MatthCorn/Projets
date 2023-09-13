@@ -1,8 +1,10 @@
 import torch
 import torch.nn.functional as F
 from torch.nn.utils.rnn import pad_sequence
+from math import sqrt
 
-
+Pond = [1., 40, 3, 4, 3, 0.2, 0.2, 0.2]
+Pond = [1.]*8
 # Ce script définit les erreurs utilisées pour l'appentissage et pour visualisé si l'objectif final est atteint
 
 def TrainingError(Source, Translation, Ended, batch_size, batch_indice, Translator):
@@ -31,9 +33,9 @@ def TrainingError(Source, Translation, Ended, batch_size, batch_indice, Translat
     PredictedAction = PredictedAction[:, Translator.NbPDWsMemory-1:]
     # PredictedAction.shape = (batch_size, target_len-PDWsMemory+1, 1)
 
-    ErrTrans = torch.norm((BatchTranslation[:, Translator.NbPDWsMemory:] - PredictedTranslation) * (1 - BatchEnded) / (NumWords + 1e-5), dim=(0, 1))/batch_size
+    ErrTrans = torch.norm((BatchTranslation[:, Translator.NbPDWsMemory:] - PredictedTranslation) * (1 - BatchEnded) / (NumWords + 1e-5), dim=(0, 1))/float(torch.norm(BatchEnded))
     # ErrTrans.shape = d_target+num_flags
-    ErrAct = torch.norm((PredictedAction - F.pad(1 - BatchEnded, [0, 0, 0, 1])) * BatchActionMask)/batch_size
+    ErrAct = torch.norm((PredictedAction - F.pad(1 - BatchEnded, [0, 0, 0, 1])) * BatchActionMask)/sqrt(batch_size)
 
     return ErrTrans, ErrAct
 
@@ -60,7 +62,7 @@ def ObjectiveError(Source, Translation, Ended, Translator):
     # On calcule l'erreur sur le même nombre de mot que les traductions attendues
     CutError = torch.norm(PredictedTranslation * (1-Ended) - Translation)
 
-    return float(RealError)/float(torch.norm(Ended, p=1)), float(CutError)/float(torch.norm(Ended, p=1))
+    return float(RealError)/float(torch.norm(Ended)), float(CutError)/float(torch.norm(Ended))
 
 
 def ErrorAction(Source, Translation, Ended, Translator, batch_size=50, Action='', Optimizer=None):
@@ -70,7 +72,7 @@ def ErrorAction(Source, Translation, Ended, Translator, batch_size=50, Action=''
     if Action == 'Evaluation':
         with torch.no_grad():
             RealError, CutError = ObjectiveError(Source, Translation, Ended, Translator)
-        return RealError/data_size, CutError/data_size
+        return RealError, CutError
 
 
     Error = 0
@@ -82,16 +84,16 @@ def ErrorAction(Source, Translation, Ended, Translator, batch_size=50, Action=''
             Optimizer.zero_grad(set_to_none=True)
 
             errtrans, erract = TrainingError(Source, Translation, Ended, batch_size, j, Translator)
-            err = torch.norm(errtrans * torch.tensor([1., 40, 3, 4, 3, 0.2, 0.2, 0.2], device=Translator.device)) + 40 * erract
+            err = torch.norm(errtrans * torch.tensor(Pond, device=Translator.device)) + erract
             err.backward()
             Optimizer.step()
         elif Action == 'Validation':
             with torch.no_grad():
                 errtrans, erract = TrainingError(Source, Translation, Ended, batch_size, j, Translator)
-                err = torch.norm(errtrans * torch.tensor([1., 40, 3, 4, 3, 0.2, 0.2, 0.2], device=Translator.device)) + 40 * erract
+                err = torch.norm(errtrans * torch.tensor(Pond, device=Translator.device)) + erract
 
-        Error += float(err/n_batch)
-        ErrAct += float(erract/n_batch)
-        ErrTrans.append(errtrans/n_batch)
+        Error += float(err)/sqrt(n_batch)
+        ErrAct += float(erract)/sqrt(n_batch)
+        ErrTrans.append(errtrans/sqrt(n_batch))
     ErrTrans = sum(ErrTrans).tolist()
     return Error, ErrAct, ErrTrans

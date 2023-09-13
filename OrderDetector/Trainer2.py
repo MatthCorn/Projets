@@ -14,7 +14,7 @@ N.to(device)
 
 optimizer = torch.optim.Adam(N.parameters(), weight_decay=1e-3, lr=3e-4)
 
-Max = 10000
+Max = 100000
 Min = 0
 
 NDataT = 10000
@@ -24,7 +24,7 @@ ValidationInput, ValidationOutput, _ = MakeData(NVec=5, DVec=10, sigma=1, NData=
 batch_size = 10000
 n_batch = 1
 
-n_iter = 1000
+n_iter = 2000
 TrainingError = []
 ValidationError = []
 
@@ -34,16 +34,17 @@ fig, (ax1, ax2) = plt.subplots(1, 2)
 # ShiftIntervals = [[ShiftList[i], ShiftList[i+1]] for i in range(len(ShiftList)-1)] + [[0, 200]] + [[0, 1000]] + [[0, 1000]]
 
 
-ShiftList = [0] + list(np.logspace(1, log10(Max), 10))
+# ShiftList = [0] + list(np.logspace(1, log10(Max), 10))
+# ShiftList = list(map(int, ShiftList))
+# ShiftIntervals = [[ShiftList[i], ShiftList[i+1]] for i in range(len(ShiftList)-1)] + [[Min, Max]]
+
+ShiftList = list(np.logspace(1, log10(Max), 31))
 ShiftList = list(map(int, ShiftList))
-ShiftIntervals = [[ShiftList[i], ShiftList[i+1]] for i in range(len(ShiftList)-1)] + [[Min, Max]]
+ShiftIntervals = [[Min, ShiftList[i]] for i in range(len(ShiftList))]
 
-
+i = 0
 for ShiftInterval in ShiftIntervals:
     TrainingInput, TrainingOutput, _ = MakeData(NVec=5, DVec=10, sigma=1, NData=NDataT, ShiftInterval=ShiftInterval)
-
-    if ShiftInterval == [Min, Max]:
-        n_iter = 3000
 
     for j in tqdm(range(n_iter)):
         error = 0
@@ -72,19 +73,22 @@ for ShiftInterval in ShiftIntervals:
 
     Input, Output, Shift = MakeData(NVec=5, DVec=10, sigma=1, NData=10000, ShiftInterval=[Min, Max])
 
-    with torch.no_grad():
-        Input = Input.to(device)
-        Output = Output.to(device)
-        Prediction = N(Input)
-        ErrShift = torch.norm(Output - Prediction, dim=(1, 2)).cpu().numpy() / sqrt(5)
-    Shift = Shift[:, 0, 0].numpy()
+    if i % 5 == 0:
+        with torch.no_grad():
+            Input = Input.to(device)
+            Output = Output.to(device)
+            Prediction = N(Input)
+            ErrShift = torch.norm(Output - Prediction, dim=(1, 2)).cpu().numpy() / sqrt(5)
+        Shift = Shift[:, 0, 0].numpy()
 
-    #g, f, \
-    e, d, c, b, a = np.polyfit(Shift, ErrShift, deg=4)
+        #g, f, \
+        e, d, c, b, a = np.polyfit(Shift, ErrShift, deg=4)
 
-    x = np.linspace(0, ShiftList[-1], 100)
-    y = a + b * x + c * x ** 2 + d * x ** 3 + e * x ** 4 #+ f * x ** 5 + g * x ** 6
-    ax2.plot(x, y, label=str(ShiftInterval[1]))
+        x = np.linspace(0, ShiftList[-1], 100)
+        y = a + b * x + c * x ** 2 + d * x ** 3 + e * x ** 4 #+ f * x ** 5 + g * x ** 6
+        ax2.plot(x, y, label=str(ShiftInterval[1]))
+
+    i += 1
 
 
 

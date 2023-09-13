@@ -11,8 +11,8 @@ from GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
-# local = r'C:\Users\matth\Documents\Python\Projets'
+# local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
+local = r'C:\Users\matth\Documents\Python\Projets'
 
 param = {
     'd_source': 5,
@@ -51,7 +51,7 @@ EvaluationEnded = (torch.norm(EvaluationTranslation, dim=-1) == 0).unsqueeze(-1)
 batch_size = param['batch_size']
 
 # Procédure d'entrainement
-optimizer = torch.optim.Adam(Translator.parameters(), lr=3e-4)
+optimizer = torch.optim.Adam(Translator.parameters(), lr=1e-4)
 TrainingErrList = []
 TrainingErrTransList = []
 TrainingErrActList = []
@@ -61,7 +61,7 @@ ValidationErrActList = []
 RealEvaluationList = []
 CutEvaluationList = []
 
-for i in tqdm(range(50)):
+for i in tqdm(range(400)):
     Error, ErrAct, ErrTrans = ErrorAction(TrainingSource, TrainingTranslation, TrainingEnded, Translator, batch_size, Action='Training', Optimizer=optimizer)
     TrainingErrList.append(Error)
     TrainingErrActList.append(ErrAct)
