@@ -58,7 +58,7 @@ class TransformerTranslator(nn.Module):
         # Flags.shape = (batch_size, target_len, num_flags)
         # Action.shape = (batch_size, target_len, 1)
         PDW = torch.cat((Physic, Flags), dim=2)
-        return PDW, Action
+        return 0*PDW, 0*Action
 
     def translate(self, source):
         NbPDWsMemory = int(self.target_len / 2)

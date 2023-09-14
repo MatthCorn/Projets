@@ -11,8 +11,8 @@ from GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-# local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
-local = r'C:\Users\matth\Documents\Python\Projets'
+local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
+# local = r'C:\Users\matth\Documents\Python\Projets'
 
 param = {
     'd_source': 5,
@@ -61,7 +61,7 @@ ValidationErrActList = []
 RealEvaluationList = []
 CutEvaluationList = []
 
-for i in tqdm(range(400)):
+for i in tqdm(range(5)):
     Error, ErrAct, ErrTrans = ErrorAction(TrainingSource, TrainingTranslation, TrainingEnded, Translator, batch_size, Action='Training', Optimizer=optimizer)
     TrainingErrList.append(Error)
     TrainingErrActList.append(ErrAct)
@@ -91,7 +91,7 @@ torch.save(optimizer.state_dict(), os.path.join(local, 'FakeDigitalTwinTranslato
 saveObjAsXml(param, os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'param'))
 saveObjAsXml(error, os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'error'))
 
-git_push(local=local, file=os.path.join('FakeDigitalTwinTranslator', 'Bursts', 'Save', folder), CommitMsg='simu '+folder)
+# git_push(local=local, file=os.path.join('FakeDigitalTwinTranslator', 'Bursts', 'Save', folder), CommitMsg='simu '+folder)
 
 Plot(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'error'), eval=True)
 
