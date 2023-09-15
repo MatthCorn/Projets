@@ -1,0 +1,77 @@
+<?xml version="1.0" ?>
+<Dictionary>
+ <Dictionary Key="Training">
+  <List Key="ErrList">
+   <Object Value="11.270831202364514"/>
+   <Object Value="11.270831202364514"/>
+  </List>
+  <List Key="ErrTransList">
+   <List>
+    <Object Value="1.934001088142395"/>
+    <Object Value="1.934001088142395"/>
+    <Object Value="1.934001088142395"/>
+    <Object Value="1.934001088142395"/>
+    <Object Value="1.934001088142395"/>
+    <Object Value="1.934001088142395"/>
+    <Object Value="1.934001088142395"/>
+    <Object Value="1.934001088142395"/>
+   </List>
+   <List>
+    <Object Value="1.934001088142395"/>
+    <Object Value="1.934001088142395"/>
+    <Object Value="1.934001088142395"/>
+    <Object Value="1.934001088142395"/>
+    <Object Value="1.934001088142395"/>
+    <Object Value="1.934001088142395"/>
+    <Object Value="1.934001088142395"/>
+    <Object Value="1.934001088142395"/>
+   </List>
+  </List>
+  <List Key="ErrActList">
+   <Object Value="5.800649191937942"/>
+   <Object Value="5.800649191937942"/>
+  </List>
+ </Dictionary>
+ <Dictionary Key="Validation">
+  <List Key="ErrList">
+   <Object Value="1.9372964094618756"/>
+   <Object Value="1.9372964094618756"/>
+  </List>
+  <List Key="ErrTransList">
+   <List>
+    <Object Value="0.3325120806694031"/>
+    <Object Value="0.3325120806694031"/>
+    <Object Value="0.3325120806694031"/>
+    <Object Value="0.3325120806694031"/>
+    <Object Value="0.3325120806694031"/>
+    <Object Value="0.3325120806694031"/>
+    <Object Value="0.3325120806694031"/>
+    <Object Value="0.3325120806694031"/>
+   </List>
+   <List>
+    <Object Value="0.3325120806694031"/>
+    <Object Value="0.3325120806694031"/>
+    <Object Value="0.3325120806694031"/>
+    <Object Value="0.3325120806694031"/>
+    <Object Value="0.3325120806694031"/>
+    <Object Value="0.3325120806694031"/>
+    <Object Value="0.3325120806694031"/>
+    <Object Value="0.3325120806694031"/>
+   </List>
+  </List>
+  <List Key="ErrActList">
+   <Object Value="0.9968102635399971"/>
+   <Object Value="0.9968102635399971"/>
+  </List>
+ </Dictionary>
+ <Dictionary Key="Evaluation">
+  <List Key="Real">
+   <Object Value="48.37854258160376"/>
+   <Object Value="48.37854258160376"/>
+  </List>
+  <List Key="Cut">
+   <Object Value="48.37854258160376"/>
+   <Object Value="48.37854258160376"/>
+  </List>
+ </Dictionary>
+</Dictionary>

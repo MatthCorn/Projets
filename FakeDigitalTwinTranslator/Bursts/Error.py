@@ -17,9 +17,12 @@ def TrainingError(Source, Translation, Ended, batch_size, batch_indice, Translat
     # Pour faire en sorte que l'action "continuer d'écrire" soit autant représentée en True qu'en False, on pondère le masque des actions
     NumWords = torch.sum((1 - BatchEnded), dim=1).unsqueeze(-1).to(torch.int32)
     # NumWords.shape = (batch_size, 1, 1)
-    BatchActionMask = F.pad(1 - BatchEnded, [0, 0, 0, 1])/ (NumWords + 1e-5)
+    BatchActionMask = F.pad(1 - BatchEnded, [0, 0, 0, 1])/torch.sqrt((2*NumWords + 1e-5))
     for i in range(len(NumWords)):
-        BatchActionMask[(i, int(NumWords[i]))] = 1
+        if int(NumWords[i]) == 0:
+            BatchActionMask[(i, int(NumWords[i]))] = 1
+        else:
+            BatchActionMask[(i, int(NumWords[i]))] = 1/4
 
     PredictedTranslation, PredictedAction = Translator.forward(source=BatchSource, target=BatchTranslation)
 
@@ -33,7 +36,7 @@ def TrainingError(Source, Translation, Ended, batch_size, batch_indice, Translat
     PredictedAction = PredictedAction[:, Translator.NbPDWsMemory-1:]
     # PredictedAction.shape = (batch_size, target_len-PDWsMemory+1, 1)
 
-    ErrTrans = torch.norm((BatchTranslation[:, Translator.NbPDWsMemory:] - PredictedTranslation) * (1 - BatchEnded) / (NumWords + 1e-5), dim=(0, 1))/float(torch.norm(BatchEnded))
+    ErrTrans = torch.norm((BatchTranslation[:, Translator.NbPDWsMemory:] - PredictedTranslation) * (1 - BatchEnded), dim=(0, 1))/float(torch.norm((1 - BatchEnded)))
     # ErrTrans.shape = d_target+num_flags
     ErrAct = torch.norm((PredictedAction - F.pad(1 - BatchEnded, [0, 0, 0, 1])) * BatchActionMask)/sqrt(batch_size)
 
@@ -66,7 +69,7 @@ def ObjectiveError(Source, Translation, Ended, Translator):
 
 
 def ErrorAction(Source, Translation, Ended, Translator, batch_size=50, Action='', Optimizer=None):
-    data_size = len(Source)
+    data_size, _, d_out = Translation.shape
     n_batch = int(data_size/batch_size)
 
     if Action == 'Evaluation':
@@ -84,16 +87,18 @@ def ErrorAction(Source, Translation, Ended, Translator, batch_size=50, Action=''
             Optimizer.zero_grad(set_to_none=True)
 
             errtrans, erract = TrainingError(Source, Translation, Ended, batch_size, j, Translator)
-            err = torch.norm(errtrans * torch.tensor(Pond, device=Translator.device)) + erract
+            err = torch.sqrt(torch.norm(errtrans * torch.tensor(Pond, device=Translator.device))**2/(4*d_out) + erract**2/4)
             err.backward()
             Optimizer.step()
         elif Action == 'Validation':
             with torch.no_grad():
                 errtrans, erract = TrainingError(Source, Translation, Ended, batch_size, j, Translator)
-                err = torch.norm(errtrans * torch.tensor(Pond, device=Translator.device)) + erract
+                err = torch.sqrt(torch.norm(errtrans * torch.tensor(Pond, device=Translator.device))**2/(4*d_out) + erract**2/4)
 
-        Error += float(err)/sqrt(n_batch)
-        ErrAct += float(erract)/sqrt(n_batch)
-        ErrTrans.append(errtrans/sqrt(n_batch))
-    ErrTrans = sum(ErrTrans).tolist()
+        Error += float(err)**2
+        ErrAct += float(erract)**2
+        ErrTrans.append(errtrans**2)
+    ErrTrans = sqrt(sum(ErrTrans)/n_batch).tolist()
+    Error = sqrt(Error/n_batch)
+    ErrAct = sqrt(ErrAct/n_batch)
     return Error, ErrAct, ErrTrans

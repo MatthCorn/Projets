@@ -33,6 +33,7 @@ param = {
 # Cette ligne crée les variables globales "~TYPE~Source" et "~TYPE~Translation" pour tout ~TYPE~ dans ListTypeData
 FDTDataLoader(ListTypeData=['Validation', 'Training', 'Evaluation'], local=local, variables_dict=vars())
 
+
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 Translator = TransformerTranslator(d_source=param['d_source'], d_target=param['d_target'], d_att=param['d_att'], d_input_Enc=param['d_input_Enc'],
@@ -61,7 +62,7 @@ ValidationErrActList = []
 RealEvaluationList = []
 CutEvaluationList = []
 
-for i in tqdm(range(5)):
+for i in tqdm(range(2)):
     Error, ErrAct, ErrTrans = ErrorAction(TrainingSource, TrainingTranslation, TrainingEnded, Translator, batch_size, Action='Training', Optimizer=optimizer)
     TrainingErrList.append(Error)
     TrainingErrActList.append(ErrAct)
