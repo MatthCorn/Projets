@@ -5,7 +5,7 @@ import os
 import torch
 from tqdm import tqdm
 from FakeDigitalTwinTranslator.PlotError import Plot
-from FakeDigitalTwinTranslator.Bursts.Error import ErrorAction
+from FakeDigitalTwinTranslator.Bursts.Error import ErrorAction, DetailObjectiveError
 import datetime
 from GitPush import git_push
 
@@ -62,7 +62,9 @@ ValidationErrActList = []
 RealEvaluationList = []
 CutEvaluationList = []
 
-for i in tqdm(range(2)):
+DetailObjectiveError(EvaluationSource, EvaluationTranslation, EvaluationEnded, Translator, dim=None)
+
+for i in tqdm(range(3)):
     Error, ErrAct, ErrTrans = ErrorAction(TrainingSource, TrainingTranslation, TrainingEnded, Translator, batch_size, Action='Training', Optimizer=optimizer)
     TrainingErrList.append(Error)
     TrainingErrActList.append(ErrAct)

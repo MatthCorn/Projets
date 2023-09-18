@@ -2,9 +2,12 @@ import torch
 import torch.nn.functional as F
 from torch.nn.utils.rnn import pad_sequence
 from math import sqrt
+import numpy as np
 
-Pond = [1., 40, 3, 4, 3, 0.2, 0.2, 0.2]
+# Pond = [1., 40, 3, 4, 3, 0.2, 0.2, 0.2]
+ActPond = 10
 Pond = [1.]*8
+# ActPond = 1
 # Ce script définit les erreurs utilisées pour l'appentissage et pour visualisé si l'objectif final est atteint
 
 def TrainingError(Source, Translation, Ended, batch_size, batch_indice, Translator):
@@ -50,7 +53,7 @@ def ObjectiveError(Source, Translation, Ended, Translator):
 
 
     _, temp_len, _ = PredictedTranslation.shape
-    _, len_target, _ = Translation.shape
+    _, len_target, d_out = Translation.shape
 
     if temp_len < len_target:
         PredictedTranslation = F.pad(PredictedTranslation, (0, 0, 0, len_target - temp_len))
@@ -60,13 +63,12 @@ def ObjectiveError(Source, Translation, Ended, Translator):
 
     # On calcule l'erreur de la phrase intentionnellement écrite.
     # C'est-à-dire qu'on prend en compte la fin de l'écriture gérée par Action et représentée par le masque PredictedMaskTranslation
-    RealError = torch.norm(PredictedTranslation - Translation)
+    RealError = torch.norm(PredictedTranslation - Translation)/float(torch.norm((1 - Ended)))
 
     # On calcule l'erreur sur le même nombre de mot que les traductions attendues
-    CutError = torch.norm(PredictedTranslation * (1-Ended) - Translation)
+    CutError = torch.norm(PredictedTranslation * (1-Ended) - Translation)/float(torch.norm((1 - Ended)))
 
-    return float(RealError)/float(torch.norm(Ended)), float(CutError)/float(torch.norm(Ended))
-
+    return float(RealError)/sqrt(d_out), float(CutError)/sqrt(d_out)
 
 def ErrorAction(Source, Translation, Ended, Translator, batch_size=50, Action='', Optimizer=None):
     data_size, _, d_out = Translation.shape
@@ -87,18 +89,59 @@ def ErrorAction(Source, Translation, Ended, Translator, batch_size=50, Action=''
             Optimizer.zero_grad(set_to_none=True)
 
             errtrans, erract = TrainingError(Source, Translation, Ended, batch_size, j, Translator)
-            err = torch.sqrt(torch.norm(errtrans * torch.tensor(Pond, device=Translator.device))**2/(4*d_out) + erract**2/4)
+            err = torch.sqrt(torch.norm(errtrans * torch.tensor(Pond, device=Translator.device))**2/(4*d_out) + (ActPond*erract)**2/4)
             err.backward()
             Optimizer.step()
         elif Action == 'Validation':
             with torch.no_grad():
                 errtrans, erract = TrainingError(Source, Translation, Ended, batch_size, j, Translator)
-                err = torch.sqrt(torch.norm(errtrans * torch.tensor(Pond, device=Translator.device))**2/(4*d_out) + erract**2/4)
+                err = torch.sqrt(torch.norm(errtrans * torch.tensor(Pond, device=Translator.device))**2/(4*d_out) + (ActPond*erract)**2/4)
 
         Error += float(err)**2
         ErrAct += float(erract)**2
         ErrTrans.append(errtrans**2)
-    ErrTrans = sqrt(sum(ErrTrans)/n_batch).tolist()
+    ErrTrans = torch.sqrt(sum(ErrTrans)/n_batch).tolist()
     Error = sqrt(Error/n_batch)
     ErrAct = sqrt(ErrAct/n_batch)
     return Error, ErrAct, ErrTrans
+
+# Cette fonction permet de savoir l'évolution de l'erreur générale ou d'une coordonnée en fonction de la position
+# dans la phrase traduite (sachant qu'on s'attend à voir une propagation de l'erreur au fil de la traduction)
+def DetailObjectiveError(Source, Translation, Ended, Translator, dim=None):
+    NbTranslation = len(Source)
+    PredictedTranslation = Translator.translate(Source.to(device=Translator.device))
+
+    NumWords = torch.sum((1 - Ended), dim=1).squeeze(-1).to(torch.int)
+    Translation = [Translation[i][:NumWords[i]] for i in range(NbTranslation)]
+
+    CutDiffList = []
+    for i in range(NbTranslation):
+        PredTrans = PredictedTranslation[i]
+        Trans = Translation[i]
+        if len(Trans) > len(PredTrans):
+            PredTrans = F.pad(PredTrans, (0, 0, 0, len(Trans) - len(PredTrans)))
+        elif len(Trans) < len(PredTrans):
+            PredTrans = PredTrans[:len(Trans)]
+
+
+    RealDiffList = []
+
+    _, temp_len, _ = PredictedTranslation.shape
+    _, len_target, d_out = Translation.shape
+
+    if temp_len < len_target:
+        PredictedTranslation = F.pad(PredictedTranslation, (0, 0, 0, len_target - temp_len))
+    if temp_len > len_target:
+        Translation = F.pad(Translation, (0, 0, 0, temp_len - len_target))
+        Ended = F.pad(Ended, (0, 0, 0, temp_len - len_target))
+
+    # On calcule l'erreur de la phrase intentionnellement écrite.
+    # C'est-à-dire qu'on prend en compte la fin de l'écriture gérée par Action et représentée par le masque PredictedMaskTranslation
+    RealDiff = (PredictedTranslation - Translation)/float(torch.norm((1 - Ended)))
+
+    np.polyfit(Shift, ErrShift, deg=4)
+
+    # On calcule l'erreur sur le même nombre de mot que les traductions attendues
+    CutDiff = torch.norm(PredictedTranslation * (1-Ended) - Translation)/float(torch.norm((1 - Ended)))
+
+    return float(RealError)/sqrt(d_out), float(CutError)/sqrt(d_out)
