@@ -111,10 +111,13 @@ def DetailObjectiveError(Source, Translation, Ended, Translator, dim=None):
     NbTranslation = len(Source)
     PredictedTranslation = Translator.translate(Source.to(device=Translator.device))
 
+    _, _, d_out = Translation.shape
+
     NumWords = torch.sum((1 - Ended), dim=1).squeeze(-1).to(torch.int)
     Translation = [Translation[i][:NumWords[i]] for i in range(NbTranslation)]
 
     CutDiffList = []
+    CutPosList = []
     for i in range(NbTranslation):
         PredTrans = PredictedTranslation[i]
         Trans = Translation[i]
@@ -123,25 +126,27 @@ def DetailObjectiveError(Source, Translation, Ended, Translator, dim=None):
         elif len(Trans) < len(PredTrans):
             PredTrans = PredTrans[:len(Trans)]
 
+        CutPosList += list(np.linspace(0, 1, len(Trans)))
+        if dim is not None:
+            CutDiffList += torch.abs(Trans[:, dim] - PredTrans[:, dim]).cpu().tolist()
+        else:
+            CutDiffList += (torch.norm(Trans - PredTrans, dim=-1)/sqrt(d_out)).cpu().tolist()
 
     RealDiffList = []
+    RealPosList = []
 
-    _, temp_len, _ = PredictedTranslation.shape
-    _, len_target, d_out = Translation.shape
+    for i in range(NbTranslation):
+        PredTrans = PredictedTranslation[i]
+        Trans = Translation[i]
+        if len(Trans) > len(PredTrans):
+            PredTrans = F.pad(PredTrans, (0, 0, 0, len(Trans) - len(PredTrans)))
+        elif len(Trans) < len(PredTrans):
+            Trans = F.pad(Trans, (0, 0, 0, len(PredTrans) - len(Trans)))
 
-    if temp_len < len_target:
-        PredictedTranslation = F.pad(PredictedTranslation, (0, 0, 0, len_target - temp_len))
-    if temp_len > len_target:
-        Translation = F.pad(Translation, (0, 0, 0, temp_len - len_target))
-        Ended = F.pad(Ended, (0, 0, 0, temp_len - len_target))
+        RealPosList += list(np.linspace(0, 1, len(Trans)))
+        if dim is not None:
+            RealDiffList += torch.abs(Trans[:, dim] - PredTrans[:, dim]).cpu().tolist()
+        else:
+            RealDiffList += (torch.norm(Trans - PredTrans, dim=-1)/sqrt(d_out)).cpu().tolist()
 
-    # On calcule l'erreur de la phrase intentionnellement écrite.
-    # C'est-à-dire qu'on prend en compte la fin de l'écriture gérée par Action et représentée par le masque PredictedMaskTranslation
-    RealDiff = (PredictedTranslation - Translation)/float(torch.norm((1 - Ended)))
-
-    np.polyfit(Shift, ErrShift, deg=4)
-
-    # On calcule l'erreur sur le même nombre de mot que les traductions attendues
-    CutDiff = torch.norm(PredictedTranslation * (1-Ended) - Translation)/float(torch.norm((1 - Ended)))
-
-    return float(RealError)/sqrt(d_out), float(CutError)/sqrt(d_out)
+    return [[RealPosList, RealDiffList], [CutPosList, CutDiffList]]

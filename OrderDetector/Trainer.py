@@ -81,11 +81,11 @@ for ShiftInterval in ShiftIntervals:
             ErrShift = torch.norm(Output - Prediction, dim=(1, 2)).cpu().numpy() / sqrt(5)
         Shift = Shift[:, 0, 0].numpy()
 
-        #g, f, \
-        e, d, c, b, a = np.polyfit(Shift, ErrShift, deg=4)
+
+        p = np.poly1d(np.polyfit(Shift, ErrShift, deg=4))
 
         x = np.linspace(0, ShiftList[-1], 100)
-        y = a + b * x + c * x ** 2 + d * x ** 3 + e * x ** 4 #+ f * x ** 5 + g * x ** 6
+        y = p(x)
         ax2.plot(x, y, label=str(ShiftInterval[1]))
 
     i += 1

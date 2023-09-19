@@ -1,5 +1,7 @@
 from Tools.XMLTools import loadXmlAsObj
 import matplotlib.pyplot as plt
+import numpy as np
+
 def Plot(path, eval=False):
     data = loadXmlAsObj(path)
 
@@ -53,6 +55,34 @@ def Plot(path, eval=False):
         ax42.legend(loc='upper right')
 
     plt.show()
+
+def PlotPropError(path, deg=4):
+    PropError = loadXmlAsObj(path)
+
+    fig, (ax1, ax2) = plt.subplots(1, 2)
+
+    for key in PropError.keys():
+        for i in range(2):
+            Pos = PropError[key][i][0]
+            Diff = PropError[key][i][1]
+
+            p = np.poly1d(np.polyfit(Pos, Diff, deg=deg))
+            x = np.linspace(0, 1, 100)
+            y = p(x)
+
+            if i == 0:
+                ax1.plot(x, y, label=key)
+            else:
+                ax2.plot(x, y, label=key)
+
+    ax1.set_title('Propagation of error on real translation')
+    ax1.legend(loc='upper right')
+
+    ax2.set_title('Propagation of error on troncated translation')
+    ax2.legend(loc='upper right')
+
+    plt.show()
+
 
 if __name__ == '__main__':
     import os

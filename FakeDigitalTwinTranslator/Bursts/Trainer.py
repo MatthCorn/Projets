@@ -4,9 +4,11 @@ from Tools.XMLTools import saveObjAsXml
 import os
 import torch
 from tqdm import tqdm
-from FakeDigitalTwinTranslator.PlotError import Plot
+from FakeDigitalTwinTranslator.PlotError import Plot, PlotPropError
 from FakeDigitalTwinTranslator.Bursts.Error import ErrorAction, DetailObjectiveError
 import datetime
+import numpy as np
+from math import log10
 from GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
@@ -62,9 +64,12 @@ ValidationErrActList = []
 RealEvaluationList = []
 CutEvaluationList = []
 
-DetailObjectiveError(EvaluationSource, EvaluationTranslation, EvaluationEnded, Translator, dim=None)
+NbEpochs = 200
+NbEvalProp = 10
+ListEvalPropErrorId = list(map(int, list(np.logspace(0, log10(NbEpochs), NbEvalProp))))
+DictEvalPropError = {}
 
-for i in tqdm(range(3)):
+for i in tqdm(range(NbEpochs)):
     Error, ErrAct, ErrTrans = ErrorAction(TrainingSource, TrainingTranslation, TrainingEnded, Translator, batch_size, Action='Training', Optimizer=optimizer)
     TrainingErrList.append(Error)
     TrainingErrActList.append(ErrAct)
@@ -78,6 +83,9 @@ for i in tqdm(range(3)):
     RealError, CutError = ErrorAction(EvaluationSource, EvaluationTranslation, EvaluationEnded, Translator, Action='Evaluation')
     RealEvaluationList.append(RealError)
     CutEvaluationList.append(CutError)
+
+    if i in ListEvalPropErrorId:
+        DictEvalPropError[str(i)] = DetailObjectiveError(EvaluationSource, EvaluationTranslation, EvaluationEnded, Translator)
 
 error = {'Training':
              {'ErrList': TrainingErrList, 'ErrTransList': TrainingErrTransList, 'ErrActList': TrainingErrActList},
@@ -93,9 +101,11 @@ torch.save(Translator.state_dict(), os.path.join(local, 'FakeDigitalTwinTranslat
 torch.save(optimizer.state_dict(), os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'Optimizer'))
 saveObjAsXml(param, os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'param'))
 saveObjAsXml(error, os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'error'))
+saveObjAsXml(DictEvalPropError, os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'PropError'))
 
 # git_push(local=local, file=os.path.join('FakeDigitalTwinTranslator', 'Bursts', 'Save', folder), CommitMsg='simu '+folder)
 
 Plot(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'error'), eval=True)
+PlotPropError(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'PropError'))
 
 
