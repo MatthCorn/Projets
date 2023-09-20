@@ -1,8 +1,9 @@
 from Tools.XMLTools import loadXmlAsObj
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
-def Plot(path, eval=False):
+def Plot(path, eval=False, std=False):
     data = loadXmlAsObj(path)
 
     TrainingErrList, ValidationErrList = data['Training']['ErrList'], data['Validation']['ErrList']
@@ -11,48 +12,68 @@ def Plot(path, eval=False):
 
     fig, ((ax11, ax12), (ax21, ax22), (ax31, ax32), (ax41, ax42)) = plt.subplots(4, 2)
 
-    ax11.plot(TrainingErrList, 'r', label="Ensemble d'entrainement");
+    ax11.plot(TrainingErrList, 'r', label="Ensemble d'entrainement")
     ax11.set_title('Erreur gobale')
-    ax11.plot(ValidationErrList, 'b', label="Ensemble de Validation");
+    ax11.plot(ValidationErrList, 'b', label="Ensemble de Validation")
     ax11.legend(loc='upper right')
+    ax11.set_ylim(bottom=0)
 
-    ax12.plot([el[0] for el in TrainingErrTransList], 'r', label="Ensemble d'entrainement");
+    ax12.plot([el[0] for el in TrainingErrTransList], 'r', label="Ensemble d'entrainement")
     ax12.set_title('Erreur sur TOA')
-    ax12.plot([el[0] for el in ValidationErrTransList], 'b', label="Ensemble de Validation");
+    ax12.plot([el[0] for el in ValidationErrTransList], 'b', label="Ensemble de Validation")
     ax12.legend(loc='upper right')
+    ax12.set_ylim(bottom=0)
 
-    ax21.plot([el[1] for el in TrainingErrTransList], 'r', label="Ensemble d'entrainement");
+    ax21.plot([el[1] for el in TrainingErrTransList], 'r', label="Ensemble d'entrainement")
     ax21.set_title('Erreur sur LI')
-    ax21.plot([el[1] for el in ValidationErrTransList], 'b', label="Ensemble de Validation");
+    ax21.plot([el[1] for el in ValidationErrTransList], 'b', label="Ensemble de Validation")
     ax21.legend(loc='upper right')
+    ax21.set_ylim(bottom=0)
 
-    ax22.plot([el[2] for el in TrainingErrTransList], 'r', label="Ensemble d'entrainement");
+    ax22.plot([el[2] for el in TrainingErrTransList], 'r', label="Ensemble d'entrainement")
     ax22.set_title('Erreur sur Niveau')
-    ax22.plot([el[2] for el in ValidationErrTransList], 'b', label="Ensemble de Validation");
+    ax22.plot([el[2] for el in ValidationErrTransList], 'b', label="Ensemble de Validation")
     ax22.legend(loc='upper right')
+    ax22.set_ylim(bottom=0)
 
-    ax31.plot([el[3] for el in TrainingErrTransList], 'r', label="Ensemble d'entrainement");
+    ax31.plot([el[3] for el in TrainingErrTransList], 'r', label="Ensemble d'entrainement")
     ax31.set_title('Erreur sur FreqMin')
-    ax31.plot([el[3] for el in ValidationErrTransList], 'b', label="Ensemble de Validation");
+    ax31.plot([el[3] for el in ValidationErrTransList], 'b', label="Ensemble de Validation")
     ax31.legend(loc='upper right')
+    ax31.set_ylim(bottom=0)
 
-    ax32.plot([el[4] for el in TrainingErrTransList], 'r', label="Ensemble d'entrainement");
+    ax32.plot([el[4] for el in TrainingErrTransList], 'r', label="Ensemble d'entrainement")
     ax32.set_title('Erreur sur FreqMax')
-    ax32.plot([el[4] for el in ValidationErrTransList], 'b', label="Ensemble de Validation");
+    ax32.plot([el[4] for el in ValidationErrTransList], 'b', label="Ensemble de Validation")
     ax32.legend(loc='upper right')
+    ax32.set_ylim(bottom=0)
 
-    ax41.plot(TrainingErrActList, 'r', label="Ensemble d'entrainement");
+    ax41.plot(TrainingErrActList, 'r', label="Ensemble d'entrainement")
     ax41.set_title("Erreur sur l'action")
-    ax41.plot(ValidationErrActList, 'b', label="Ensemble de Validation");
+    ax41.plot(ValidationErrActList, 'b', label="Ensemble de Validation")
     ax41.legend(loc='upper right')
+    ax41.set_ylim(bottom=0)
 
     if eval:
         RealEvaluationList, CutEvaluationList = data['Evaluation']['Real'], data['Evaluation']['Cut']
 
-        ax42.plot(RealEvaluationList, 'r', label="Erreur sur traduction réelle");
+        ax42.plot(RealEvaluationList, 'r', label="Erreur sur traduction réelle")
         ax42.set_title("Erreur sur traduction")
-        ax42.plot(CutEvaluationList, 'b', label='Erreur sur traduction tronquée');
+        ax42.plot(CutEvaluationList, 'b', label='Erreur sur traduction tronquée')
         ax42.legend(loc='upper right')
+        ax42.set_ylim(bottom=0)
+
+    if std:
+        # On calcule l'écart type et on trace sur chaque subplot
+        TransPath = os.path.join(path.split('Save')[0], 'BurstsData', 'Data', 'Training', 'PDWsDCI_0.npy')
+        Translation = np.load(TransPath)
+        Std = np.std(Translation, axis=(0, 1))
+
+        ax12.plot([Std[0]]*len(TrainingErrList), 'k')
+        ax22.plot([Std[2]]*len(TrainingErrList), 'k')
+        ax21.plot([Std[1]]*len(TrainingErrList), 'k')
+        ax31.plot([Std[3]]*len(TrainingErrList), 'k')
+        ax32.plot([Std[4]]*len(TrainingErrList), 'k')
 
     plt.show()
 
@@ -77,9 +98,11 @@ def PlotPropError(path, deg=4):
 
     ax1.set_title('Propagation of error on real translation')
     ax1.legend(loc='upper right')
+    ax1.set_ylim(bottom=0)
 
     ax2.set_title('Propagation of error on troncated translation')
     ax2.legend(loc='upper right')
+    ax2.set_ylim(bottom=0)
 
     plt.show()
 
@@ -88,4 +111,5 @@ if __name__ == '__main__':
     import os
     local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
     # local = r'C:\\Users\\matth\\Documents\\Python\\Projets'
-    Plot(os.path.join(local, r'FakeDigitalTwinTranslator\\Bursts\\Save\\2023-09-19__16-00\\error'), eval=True)
+    Plot(os.path.join(local, r'FakeDigitalTwinTranslator\\Bursts3\\Save\\2023-09-20__16-15\\error'), eval=False, std=True)
+

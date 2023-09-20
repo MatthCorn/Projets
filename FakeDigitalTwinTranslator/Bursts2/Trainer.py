@@ -1,11 +1,11 @@
-from FakeDigitalTwinTranslator.Bursts.Network import TransformerTranslator
-from FakeDigitalTwinTranslator.Bursts.DataLoader import FDTDataLoader
+from FakeDigitalTwinTranslator.Bursts2.Network import TransformerTranslator
+from FakeDigitalTwinTranslator.Bursts2.DataLoader import FDTDataLoader
 from Tools.XMLTools import saveObjAsXml
 import os
 import torch
 from tqdm import tqdm
 from FakeDigitalTwinTranslator.PlotError import Plot, PlotPropError
-from FakeDigitalTwinTranslator.Bursts.Error import ErrorAction, DetailObjectiveError
+from FakeDigitalTwinTranslator.Bursts2.Error import ErrorAction, DetailObjectiveError
 import datetime
 import numpy as np
 from math import log10

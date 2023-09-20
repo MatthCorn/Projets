@@ -17,7 +17,7 @@ class TransformerTranslator(nn.Module):
         self.Encoders = nn.ModuleList()
         for i in range(num_encoders):
             # on se moque de max_len car on n'a ni masque, ni RPR
-            self.Encoders.append(EncoderLayer(d_model=d_input_Enc, d_att=d_att, num_heads=num_heads, relative=False))
+            self.Encoders.append(EncoderLayer(d_model=d_input_Enc, d_att=d_att, num_heads=num_heads, relative=False, MHADropout=0, FFDropout=0))
         self.Encoders[0].relative = True
         self.target_len = target_len
         self.NbPDWsMemory = NbPDWsMemory
@@ -25,16 +25,16 @@ class TransformerTranslator(nn.Module):
         self.Decoders = nn.ModuleList()
         for i in range(num_decoders):
             # on doit spécifier target_len car on a un masque dans le décodage
-            self.Decoders.append(DecoderLayer(d_model=d_input_Dec, d_att=d_att, num_heads=num_heads, RPR_len=RPR_len_decoder))
+            self.Decoders.append(DecoderLayer(d_model=d_input_Dec, d_att=d_att, num_heads=num_heads, RPR_len=RPR_len_decoder, MHADropout=0, FFDropout=0))
 
-        self.SourceEmbedding = FeedForward(d_in=d_source, d_out=d_input_Enc, widths=[16])
-        self.TargetEmbedding = FeedForward(d_in=d_target+num_flags, d_out=d_input_Dec, widths=[16])
+        self.SourceEmbedding = FeedForward(d_in=d_source, d_out=d_input_Enc, widths=[16], dropout=0)
+        self.TargetEmbedding = FeedForward(d_in=d_target+num_flags, d_out=d_input_Dec, widths=[16], dropout=0)
 
-        self.PhysicalPrediction = FeedForward(d_in=d_input_Dec, d_out=d_target, widths=[16, 32, 16])
-        self.FlagsPrediction = FeedForward(d_in=d_input_Dec, d_out=num_flags, widths=[32, 8])
+        self.PhysicalPrediction = FeedForward(d_in=d_input_Dec, d_out=d_target, widths=[16, 32, 16], dropout=0)
+        self.FlagsPrediction = FeedForward(d_in=d_input_Dec, d_out=num_flags, widths=[32, 8], dropout=0)
 
         # Ce vecteur a pour but de déterminer l'action a réaliser, mettre fin à la traduction dans notre cas particulier
-        self.ActionPrediction = FeedForward(d_in=d_input_Dec, d_out=1, widths=[32, 8])
+        self.ActionPrediction = FeedForward(d_in=d_input_Dec, d_out=1, widths=[32, 8], dropout=0)
 
         self.to(device)
 

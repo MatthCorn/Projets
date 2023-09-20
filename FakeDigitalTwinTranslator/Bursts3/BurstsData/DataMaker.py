@@ -6,8 +6,8 @@ from torch.nn.utils.rnn import pad_sequence
 import torch.nn.functional as F
 import shutil
 
-# local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
-local = r'C:\Users\matth\Documents\Python\Projets'
+local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
+# local = r'C:\Users\matth\Documents\Python\Projets'
 
 # Temps de maintien max d'un mesureur sans voir son impulsion
 HoldingTime = 0.5
@@ -76,7 +76,7 @@ def Spliter(Source, Translation, DeltaT, Eval=False):
             Sentence = []
             Remain = [[0] * 5] * NbMaxPulses
             for Bursts in SplitedSourceSentence:
-                Remain = (Remain[:-1] + Bursts)[-NbMaxPulses:]
+                Remain = (Remain + Bursts)[-NbMaxPulses:]
                 Sentence.append(Remain)
             NewSource.append(Sentence)
 
@@ -86,7 +86,7 @@ def Spliter(Source, Translation, DeltaT, Eval=False):
             t = 0
             for Bursts in SplitedSourceSentence:
                 t += DeltaT
-                Remain = (Remain[:-1] + Bursts)[-NbMaxPulses:]
+                Remain = (Remain + Bursts)[-NbMaxPulses:]
                 NewSource.append((np.array(Remain) - [t, 0, 0, 0, 0]).tolist())
 
         Remain = [[0] * 8] * NbPDWsMemory
@@ -101,7 +101,7 @@ def Spliter(Source, Translation, DeltaT, Eval=False):
     return NewSource, NewTranslation
 
 def FDTDataMaker():
-    for TypeData in ['Validation', 'Training']:
+    for TypeData in ['Validation', 'Training', 'Evaluation']:
         Pulses = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', TypeData + 'PulsesAnt.xml'))
         PDWs = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', TypeData + 'PDWsDCI.xml'))
 
@@ -136,19 +136,19 @@ def FDTDataMaker():
 
 def WriteBatchs(Source, Translation, BatchSize, TypeData):
     try:
-        shutil.rmtree(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'BurstsData', 'Data', TypeData))
+        shutil.rmtree(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts3', 'BurstsData', 'Data', TypeData))
     except:
         None
 
-    os.mkdir(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'BurstsData', 'Data', TypeData))
+    os.mkdir(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts3', 'BurstsData', 'Data', TypeData))
 
     NbBatch, r = divmod(len(Source), BatchSize)
     NbBatch += (r != 0)
     for i in range(NbBatch):
         BatchSource = Source[i*BatchSize:(i+1)*BatchSize].numpy()
         BatchTranslation = Translation[i*BatchSize:(i+1)*BatchSize].numpy()
-        SourceFName = os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'BurstsData', 'Data', TypeData, 'PulsesAnt_{}.npy'.format(i))
-        TranslationFName = os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'BurstsData', 'Data', TypeData, 'PDWsDCI_{}.npy'.format(i))
+        SourceFName = os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts3', 'BurstsData', 'Data', TypeData, 'PulsesAnt_{}.npy'.format(i))
+        TranslationFName = os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts3', 'BurstsData', 'Data', TypeData, 'PDWsDCI_{}.npy'.format(i))
         np.save(SourceFName, BatchSource)
         np.save(TranslationFName, BatchTranslation)
 

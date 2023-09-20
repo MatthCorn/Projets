@@ -1,20 +1,21 @@
-from FakeDigitalTwinTranslator.Bursts.Network import TransformerTranslator
-from FakeDigitalTwinTranslator.Bursts.DataLoader import FDTDataLoader
+from FakeDigitalTwinTranslator.Bursts3.Network import TransformerTranslator
+from FakeDigitalTwinTranslator.Bursts3.DataLoader import FDTDataLoader
 from Tools.XMLTools import saveObjAsXml
 import os
 import torch
 from tqdm import tqdm
 from FakeDigitalTwinTranslator.PlotError import Plot, PlotPropError
-from FakeDigitalTwinTranslator.Bursts.Error import ErrorAction, DetailObjectiveError
+from FakeDigitalTwinTranslator.Bursts3.Error import ErrorAction, DetailObjectiveError
 import datetime
+import os
 import numpy as np
 from math import log10
 from GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-local = r'C:\\Users\\matth\\OneDrive\\Documents\\Python\\Projets'
-# local = r'C:\Users\matth\Documents\Python\Projets'
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 param = {
     'd_source': 5,
@@ -33,7 +34,7 @@ param = {
 }
 
 # Cette ligne crée les variables globales "~TYPE~Source" et "~TYPE~Translation" pour tout ~TYPE~ dans ListTypeData
-FDTDataLoader(ListTypeData=['Validation', 'Training', 'Evaluation'], local=local, variables_dict=vars())
+FDTDataLoader(ListTypeData=['Validation', 'Training'], local=local, variables_dict=vars())
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -48,26 +49,26 @@ TrainingEnded = (torch.norm(TrainingTranslation[:, param['NbPDWsMemory']:], dim=
 
 ValidationEnded = (torch.norm(ValidationTranslation[:, param['NbPDWsMemory']:], dim=-1) == 0).unsqueeze(-1).to(torch.float32)
 
-EvaluationEnded = (torch.norm(EvaluationTranslation, dim=-1) == 0).unsqueeze(-1).to(torch.float32)
+# EvaluationEnded = (torch.norm(EvaluationTranslation, dim=-1) == 0).unsqueeze(-1).to(torch.float32)
 
 
 batch_size = param['batch_size']
 
 # Procédure d'entrainement
-optimizer = torch.optim.Adam(Translator.parameters(), lr=1e-4)
+optimizer = torch.optim.Adam(Translator.parameters(), lr=1e-2)
 TrainingErrList = []
 TrainingErrTransList = []
 TrainingErrActList = []
 ValidationErrList = []
 ValidationErrTransList = []
 ValidationErrActList = []
-RealEvaluationList = []
-CutEvaluationList = []
+# RealEvaluationList = []
+# CutEvaluationList = []
 
-NbEpochs = 200
-NbEvalProp = 10
-ListEvalPropErrorId = list(map(int, list(np.logspace(0, log10(NbEpochs), NbEvalProp))))
-DictEvalPropError = {}
+NbEpochs = 5
+# NbEvalProp = 10
+# ListEvalPropErrorId = list(map(int, list(np.logspace(0, log10(NbEpochs), NbEvalProp))))
+# DictEvalPropError = {}
 
 for i in tqdm(range(NbEpochs)):
     Error, ErrAct, ErrTrans = ErrorAction(TrainingSource, TrainingTranslation, TrainingEnded, Translator, batch_size, Action='Training', Optimizer=optimizer)
@@ -80,32 +81,32 @@ for i in tqdm(range(NbEpochs)):
     ValidationErrActList.append(ErrAct)
     ValidationErrTransList.append(ErrTrans)
 
-    RealError, CutError = ErrorAction(EvaluationSource, EvaluationTranslation, EvaluationEnded, Translator, Action='Evaluation')
-    RealEvaluationList.append(RealError)
-    CutEvaluationList.append(CutError)
+    # RealError, CutError = ErrorAction(EvaluationSource, EvaluationTranslation, EvaluationEnded, Translator, Action='Evaluation')
+    # RealEvaluationList.append(RealError)
+    # CutEvaluationList.append(CutError)
 
-    if i in ListEvalPropErrorId:
-        DictEvalPropError[str(i)] = DetailObjectiveError(EvaluationSource, EvaluationTranslation, EvaluationEnded, Translator)
+    # if i in ListEvalPropErrorId:
+    #     DictEvalPropError[str(i)] = DetailObjectiveError(EvaluationSource, EvaluationTranslation, EvaluationEnded, Translator)
 
 error = {'Training':
              {'ErrList': TrainingErrList, 'ErrTransList': TrainingErrTransList, 'ErrActList': TrainingErrActList},
          'Validation':
-             {'ErrList': ValidationErrList, 'ErrTransList': ValidationErrTransList, 'ErrActList': ValidationErrActList},
-         'Evaluation':
-             {'Real': RealEvaluationList, 'Cut': CutEvaluationList}}
+             {'ErrList': ValidationErrList, 'ErrTransList': ValidationErrTransList, 'ErrActList': ValidationErrActList}}
+         # , 'Evaluation':
+         #     {'Real': RealEvaluationList, 'Cut': CutEvaluationList}}
 
 folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
-os.mkdir(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder))
+os.mkdir(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts3', 'Save', folder))
 
-torch.save(Translator.state_dict(), os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'Translator'))
-torch.save(optimizer.state_dict(), os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'Optimizer'))
-saveObjAsXml(param, os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'param'))
-saveObjAsXml(error, os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'error'))
-saveObjAsXml(DictEvalPropError, os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'PropError'))
+torch.save(Translator.state_dict(), os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts3', 'Save', folder, 'Translator'))
+torch.save(optimizer.state_dict(), os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts3', 'Save', folder, 'Optimizer'))
+saveObjAsXml(param, os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts3', 'Save', folder, 'param'))
+saveObjAsXml(error, os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts3', 'Save', folder, 'error'))
+# saveObjAsXml(DictEvalPropError, os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'PropError'))
 
 # git_push(local=local, file=os.path.join('FakeDigitalTwinTranslator', 'Bursts', 'Save', folder), CommitMsg='simu '+folder)
 
-Plot(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'error'), eval=True)
-PlotPropError(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'PropError'))
+Plot(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts3', 'Save', folder, 'error'), eval=False, std=True)
+# PlotPropError(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'Save', folder, 'PropError'))
 
 

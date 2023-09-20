@@ -12,8 +12,8 @@ def FDTDataLoader(ListTypeData=[], local='', variables_dict={}):
     for TypeData in ['Validation', 'Training', 'Evaluation']:
         if TypeData in ListTypeData:
             # Source, Translation = ParallelLoading(TypeData, local)
-            Source = np.load(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'BurstsData', 'Data', TypeData, 'PulsesAnt_0.npy'))
-            Translation = np.load(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts', 'BurstsData', 'Data', TypeData, 'PDWsDCI_0.npy'))
+            Source = np.load(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts3', 'BurstsData', 'Data', TypeData, 'PulsesAnt_0.npy'))
+            Translation = np.load(os.path.join(local, 'FakeDigitalTwinTranslator', 'Bursts3', 'BurstsData', 'Data', TypeData, 'PDWsDCI_0.npy'))
 
             NewArg.append(TypeData + 'Source')
             NewValue.append(Source)
