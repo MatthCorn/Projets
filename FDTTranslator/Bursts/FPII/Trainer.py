@@ -64,8 +64,8 @@ ValidationErrActList = []
 RealEvaluationList = []
 CutEvaluationList = []
 
-NbEpochs = 10
-NbEvalProp = 3
+NbEpochs = 100
+NbEvalProp = 6
 ListEvalPropErrorId = list(map(int, list(np.logspace(0, log10(NbEpochs), NbEvalProp))))
 DictEvalPropError = {}
 
