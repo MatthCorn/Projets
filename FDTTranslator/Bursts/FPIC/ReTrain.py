@@ -20,7 +20,7 @@ save_path = os.path.join(local, 'FDTTranslator', 'Bursts', 'FPIC', 'Save', folde
 param = loadXmlAsObj(os.path.join(save_path, 'param'))
 
 # Cette ligne crée les variables globales "~TYPE~Source" et "~TYPE~Translation" pour tout ~TYPE~ dans ListTypeData
-FDTDataLoader(ListTypeData=['Validation', 'Training', 'Evaluation'], local=local, variables_dict=vars())
+FDTDataLoader(ListTypeData=['Validation', 'Training', 'Evaluation'], local=local, variables_dict=vars(), TypeBursts='FPIC')
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 

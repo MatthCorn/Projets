@@ -3,14 +3,14 @@ import numpy as np
 import torch
 
 # Cette fonction ne prend pas en compte le chargement du mode évaluation pour l'instant
-def FDTDataLoader(ListTypeData=[], local='', variables_dict={}):
+def FDTDataLoader(ListTypeData=[], local='', variables_dict={}, TypeBursts='FPII'):
 
     NewArg = []
     NewValue = []
     for TypeData in ['Validation', 'Training', 'Evaluation']:
         if TypeData in ListTypeData:
-            Source = np.load(os.path.join(local, 'FDTTranslator', 'Bursts', 'FPII', 'BurstsData', 'Data', TypeData, 'PulsesAnt_0.npy'))
-            Translation = np.load(os.path.join(local, 'FDTTranslator', 'Bursts', 'FPII', 'BurstsData', 'Data', TypeData, 'PDWsDCI_0.npy'))
+            Source = np.load(os.path.join(local, 'FDTTranslator', 'Bursts', TypeBursts, 'BurstsData', 'Data', TypeData, 'PulsesAnt_0.npy'))
+            Translation = np.load(os.path.join(local, 'FDTTranslator', 'Bursts', TypeBursts, 'BurstsData', 'Data', TypeData, 'PDWsDCI_0.npy'))
 
             NewArg.append(TypeData + 'Source')
             NewValue.append(Source)

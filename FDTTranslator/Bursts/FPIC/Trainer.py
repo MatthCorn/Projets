@@ -33,7 +33,7 @@ param = {
 }
 
 # Cette ligne crée les variables globales "~TYPE~Source" et "~TYPE~Translation" pour tout ~TYPE~ dans ListTypeData
-FDTDataLoader(ListTypeData=['Validation', 'Training', 'Evaluation'], local=local, variables_dict=vars())
+FDTDataLoader(ListTypeData=['Validation', 'Training', 'Evaluation'], local=local, variables_dict=vars(), TypeBursts='FPIC')
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -95,7 +95,7 @@ error = {'Training':
              {'Real': RealEvaluationList, 'Cut': CutEvaluationList}}
 
 folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
-save_path = os.path.join(local, 'FDTTranslator', 'Bursts', 'Save', folder)
+save_path = os.path.join(local, 'FDTTranslator', 'Bursts', 'FPIC', 'Save', folder)
 os.mkdir(save_path)
 
 torch.save(Translator.state_dict(), os.path.join(save_path, 'Translator'))

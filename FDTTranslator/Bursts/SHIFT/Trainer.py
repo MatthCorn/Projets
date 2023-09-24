@@ -13,8 +13,8 @@ from GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 param = {
     'd_source': 5,
@@ -33,7 +33,7 @@ param = {
 }
 
 # Cette ligne crée les variables globales "~TYPE~Source" et "~TYPE~Translation" pour tout ~TYPE~ dans ListTypeData
-FDTDataLoader(ListTypeData=['Validation', 'Training'], local=local, variables_dict=vars())
+FDTDataLoader(ListTypeData=['Validation', 'Training'], local=local, variables_dict=vars(), TypeBursts='SHIFT')
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -54,7 +54,7 @@ ValidationEnded = (torch.norm(ValidationTranslation[:, param['NbPDWsMemory']:], 
 batch_size = param['batch_size']
 
 # Procédure d'entrainement
-optimizer = torch.optim.Adam(Translator.parameters(), lr=1e-2)
+optimizer = torch.optim.Adam(Translator.parameters(), lr=3e-5)
 TrainingErrList = []
 TrainingErrTransList = []
 TrainingErrActList = []
@@ -64,7 +64,7 @@ ValidationErrActList = []
 # RealEvaluationList = []
 # CutEvaluationList = []
 
-NbEpochs = 5
+NbEpochs = 500
 # NbEvalProp = 10
 # ListEvalPropErrorId = list(map(int, list(np.logspace(0, log10(NbEpochs), NbEvalProp))))
 # DictEvalPropError = {}
@@ -95,7 +95,7 @@ error = {'Training':
          #     {'Real': RealEvaluationList, 'Cut': CutEvaluationList}}
 
 folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
-save_path = os.path.join(local, 'FDTTranslator', 'Bursts', 'FPII', 'Save', folder)
+save_path = os.path.join(local, 'FDTTranslator', 'Bursts', 'SHIFT', 'Save', folder)
 os.mkdir(save_path)
 
 torch.save(Translator.state_dict(), os.path.join(save_path, 'Translator'))
@@ -104,7 +104,7 @@ saveObjAsXml(param, os.path.join(save_path, 'param'))
 saveObjAsXml(error, os.path.join(save_path, 'error'))
 # saveObjAsXml(DictEvalPropError, os.path.join(save_path, 'PropError'))
 
-# git_push(local=local, file=save_path, CommitMsg='simu '+folder)
+git_push(local=local, file=save_path, CommitMsg='simu '+folder)
 
 Plot(os.path.join(save_path, 'error'), eval=False, std=True)
 # PlotPropError(os.path.join(save_path, 'PropError'))
