@@ -1,7 +1,7 @@
 import numpy as np
 
-from OrderDetector.Detector import Network
-from OrderDetector.DataMaker import MakeData
+from StepByStep.OrderDetector.Detector import Network
+from StepByStep.OrderDetector.DataMaker import MakeData
 from math import sqrt, log10
 import torch
 from tqdm import tqdm

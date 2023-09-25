@@ -1,7 +1,5 @@
 import torch
 from torch.nn import functional as F
-import math
-from OrderDetector.Detector import Network
 
 def GetOrders(Input):
     Values = torch.sum(Input[:, :, :2], dim=-1)
