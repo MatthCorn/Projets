@@ -83,7 +83,7 @@ def FDTDataMaker():
 
 
 def WriteBatchs(Source, Translation, BatchSize, TypeData):
-    save_path = os.path.join(local, 'StepByStep', '0', 'BurstsData', 'Data')
+    save_path = os.path.join(local, 'StepByStep', 'S0', 'BurstsData', 'Data')
     try:
         shutil.rmtree(os.path.join(save_path, TypeData))
     except:

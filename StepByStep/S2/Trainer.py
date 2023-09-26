@@ -1,7 +1,7 @@
-from StepByStep.S0.Network import TransformerTranslator
-from StepByStep.S0.DataLoader import FDTDataLoader
+from StepByStep.S1.Network import TransformerTranslator
+from StepByStep.S1.DataLoader import FDTDataLoader
 from StepByStep.PlotError import Plot
-from StepByStep.S0.Error import ErrorAction
+from StepByStep.S1.Error import ErrorAction
 from Tools.XMLTools import saveObjAsXml
 import os
 import torch
@@ -21,11 +21,11 @@ param = {
     'd_att': 32,
     'num_flags': 0,
     'num_heads': 4,
-    'num_encoders': 2,
-    'num_decoders': 2,
+    'num_encoders': 3,
+    'num_decoders': 3,
     'NbPDWsMemory': 10,
     'len_target': 20,
-    'RPR_len_decoder': 10,
+    'RPR_len_decoder': 16,
     'batch_size': 2048
 }
 
@@ -44,7 +44,7 @@ Translator = TransformerTranslator(d_source=param['d_source'], d_target=param['d
 batch_size = param['batch_size']
 
 # Procédure d'entrainement
-optimizer = torch.optim.Adam(Translator.parameters(), lr=1e-3)
+optimizer = torch.optim.Adam(Translator.parameters(), lr=3e-4)
 TrainingErrList = []
 TrainingErrTransList = []
 ValidationErrList = []
@@ -68,7 +68,7 @@ error = {'Training':
              {'ErrList': ValidationErrList, 'ErrTransList': ValidationErrTransList}}
 
 folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
-save_path = os.path.join(local, 'StepByStep', 'S0', 'Save', folder)
+save_path = os.path.join(local, 'StepByStep', 'S1', 'Save', folder)
 os.mkdir(save_path)
 
 saveObjAsXml(error, os.path.join(save_path, 'error'))

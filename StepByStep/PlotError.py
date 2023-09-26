@@ -3,14 +3,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-def Plot(path, eval=False, std=False):
+def Plot(path, std=False):
     data = loadXmlAsObj(path)
 
     TrainingErrList, ValidationErrList = data['Training']['ErrList'], data['Validation']['ErrList']
     TrainingErrTransList, ValidationErrTransList = data['Training']['ErrTransList'], data['Validation']['ErrTransList']
-    TrainingErrActList, ValidationErrActList = data['Training']['ErrActList'], data['Validation']['ErrActList']
 
-    fig, ((ax11, ax12), (ax21, ax22), (ax31, ax32), (ax41, ax42)) = plt.subplots(4, 2)
+    fig, ((ax11, ax12), (ax21, ax22), (ax31, ax32)) = plt.subplots(3, 2)
 
     ax11.plot(TrainingErrList, 'r', label="Ensemble d'entrainement")
     ax11.set_title('Erreur gobale')
@@ -37,31 +36,16 @@ def Plot(path, eval=False, std=False):
     ax22.set_ylim(bottom=0)
 
     ax31.plot([el[3] for el in TrainingErrTransList], 'r', label="Ensemble d'entrainement")
-    ax31.set_title('Erreur sur FreqMin')
+    ax31.set_title('Erreur sur FreqStart')
     ax31.plot([el[3] for el in ValidationErrTransList], 'b', label="Ensemble de Validation")
     ax31.legend(loc='upper right')
     ax31.set_ylim(bottom=0)
 
     ax32.plot([el[4] for el in TrainingErrTransList], 'r', label="Ensemble d'entrainement")
-    ax32.set_title('Erreur sur FreqMax')
+    ax32.set_title('Erreur sur FreqEnd')
     ax32.plot([el[4] for el in ValidationErrTransList], 'b', label="Ensemble de Validation")
     ax32.legend(loc='upper right')
     ax32.set_ylim(bottom=0)
-
-    ax41.plot(TrainingErrActList, 'r', label="Ensemble d'entrainement")
-    ax41.set_title("Erreur sur l'action")
-    ax41.plot(ValidationErrActList, 'b', label="Ensemble de Validation")
-    ax41.legend(loc='upper right')
-    ax41.set_ylim(bottom=0)
-
-    if eval:
-        RealEvaluationList, CutEvaluationList = data['Evaluation']['Real'], data['Evaluation']['Cut']
-
-        ax42.plot(RealEvaluationList, 'r', label="Erreur sur traduction réelle")
-        ax42.set_title("Erreur sur traduction")
-        ax42.plot(CutEvaluationList, 'b', label='Erreur sur traduction tronquée')
-        ax42.legend(loc='upper right')
-        ax42.set_ylim(bottom=0)
 
     if std:
         # On calcule l'écart type et on trace sur chaque subplot
@@ -111,6 +95,6 @@ if __name__ == '__main__':
     local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
     # local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
-    folder = os.path.join('FDTTranslator', 'Bursts', 'SHIFT', 'Save', '2023-09-24__18-48', 'error')
-    Plot(os.path.join(local, folder), eval=False, std=True)
+    folder = os.path.join('StepByStep', 'S1', 'Save', '2023-09-26__11-53', 'error')
+    Plot(os.path.join(local, folder), std=True)
 

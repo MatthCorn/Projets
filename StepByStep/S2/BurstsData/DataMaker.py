@@ -3,19 +3,17 @@ import os
 import torch
 import numpy as np
 from torch.nn.utils.rnn import pad_sequence
-import torch.nn.functional as F
 import shutil
 
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 
 # Temps de maintien max d'un mesureur sans voir son impulsion
 HoldingTime = 0.5
 NbMaxPulses = 10
-NbPDWsMemory = 10
+RangeAvg = 1
 DeltaT = 0.5
-NbMaxPDWs = 20
 BatchSize = 10000000
 TMax = 35
 
@@ -27,112 +25,68 @@ def TimeRelease(PDW):
 
 # Cette fonction a pour rôle de transformer les phrases de Source et Translation en plein de petites
 # phrases correspondant au découpage par salve temporelle de longueur DeltaT
-def Spliter(Source, Translation, DeltaT, Eval=False):
+def Spliter(Source, DeltaT):
     NewSource = []
     NewTranslation = []
     batch_len = len(Source)
     for i in range(batch_len):
         SourceSentence = Source[i]
-        TranslationSentence = Translation[i]
-        # Il faut trier les PDWs par date de publication
-        TranslationSentence.sort(key=TimeRelease)
 
-        # On commence par découper la phrase de Source et la phrase de Translation sur les intervalles de taille DeltaT
+        # On commence par découper la phrase de Source sur les intervalles de taille DeltaT
         SplitedSourceSentence = []
-        SplitedTranslationSentence = []
 
         # Ces indices permettent de suivre les impulsions déjà ajoutées (comme elles sont triées par TOA)
         SourceId = 0
-        TranslationId = 0
-        t = 0
-        while not (SourceId == len(SourceSentence) and TranslationId == len(TranslationSentence)):
-            t += DeltaT
+        t = DeltaT
+        while not SourceId == len(SourceSentence):
             SourceBursts = []
-            while not SourceId == len(SourceSentence):
-                if SourceSentence[SourceId][0] > t:
-                    break
+            while (SourceId < len(SourceSentence)) and (SourceSentence[SourceId][0] < t):
                 SourceBursts.append(SourceSentence[SourceId])
                 SourceId += 1
 
-            # On ajoute l'impulsion informant de la date de fin de la salve
-            SourceBursts.append([t, 0, 0, 0, 0])
+            t += DeltaT
+
             SplitedSourceSentence.append(SourceBursts)
 
-            TranslationBursts = []
-            while not TranslationId == len(TranslationSentence):
-                if TranslationSentence[TranslationId][0] > t:
-                    break
-                TranslationBursts.append(TranslationSentence[TranslationId])
-                TranslationId += 1
-            SplitedTranslationSentence.append(TranslationBursts)
-
-        while t < TMax:
-            t += DeltaT
-            SplitedSourceSentence.append([[t, 0, 0, 0, 0]])
-            SplitedTranslationSentence.append([])
-
-        if Eval:
-            # On reconstruit la liste les salves de mots composants la phrase
-            Sentence = []
-            Remain = [[0] * 5] * (NbMaxPulses + 1)
-            for Bursts in SplitedSourceSentence:
-                Remain = (Remain[:-1] + Bursts)[-(NbMaxPulses + 1):]
-                Sentence.append(Remain)
-            NewSource.append(Sentence)
-
-        else:
-            # On reconstruit les phrases telles qu'elles seront données au traducteur
-            Remain = [[0] * 5] * (NbMaxPulses + 1)
-            for Bursts in SplitedSourceSentence:
-                Remain = (Remain[:-1] + Bursts)[-(NbMaxPulses + 1):]
+        # On reconstruit les phrases telles qu'elles seront données au traducteur
+        Remain = [[0] * 5] * NbMaxPulses
+        for Bursts in SplitedSourceSentence:
+            Remain = (Remain + Bursts)[-NbMaxPulses:]
+            if Remain[0] != [[0] * 5]:
                 NewSource.append(Remain)
 
-        Remain = [[0] * 8] * NbPDWsMemory
-        for Bursts in SplitedTranslationSentence:
-            Remain = Remain[-NbPDWsMemory:] + Bursts
-            NewTranslation.append(Remain)
-
-    if Eval:
-        return NewSource, Translation
+                TrRemain = [max(Remain[i-1], Remain[i], Remain[i+1], key=lambda x:x[2]) for i in range(RangeAvg, len(Remain)-RangeAvg)]
+                NewTranslation.append(TrRemain)
 
     return NewSource, NewTranslation
 
 def FDTDataMaker():
-    for TypeData in ['Validation', 'Training', 'Evaluation']:
+    for TypeData in ['Validation', 'Training']:
         Pulses = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', TypeData + 'PulsesAnt.xml'))
-        PDWs = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', TypeData + 'PDWsDCI.xml'))
 
-        Source = [
-            [[Pulse['TOA'], Pulse['LI'], Pulse['Level'], Pulse['FreqStart'], Pulse['FreqEnd']] for Pulse in PulsesAnt]
-            for PulsesAnt in Pulses]
-        Translation = [[[PDW['TOA'], PDW['LI'], PDW['Level'], PDW['FreqMin'], PDW['FreqMax'], int('CW' in PDW['flags']),
-                         int('TroncAv' in PDW['flags']),
-                         int(len(PDW['flags']) == 0)] for PDW in PDWsDCI] for PDWsDCI in PDWs]
+        Source = [[[Pulse['TOA'], Pulse['LI'], Pulse['Level'], Pulse['FreqStart'], Pulse['FreqEnd']]
+                   for Pulse in PulsesAnt]
+                  for PulsesAnt in Pulses]
 
         # Ici les données sont founies en batch
         # Source est une liste de séquence d'impulsions de même longueur
-        # Translation est une liste de séquence de PDWs, elles peuvent être de longueures différentes
 
+        Source, Translation = Spliter(Source, DeltaT)
 
-        Eval = (TypeData == 'Evaluation')
-        Source, Translation = Spliter(Source, Translation, DeltaT, Eval=Eval)
         # On transforme ces listes en tenseur
         Source = torch.tensor(Source)
-        # Source.shape = (batch_size, len_input, d_input)
+        # Source.shape = (batch_size, NbMaxPulses, d_input)
 
         # Rajoute des 0 à la fin des scénarios de PDWs pour qu'ils aient toutes la même longueure
         Translation = pad_sequence([torch.tensor(el) for el in Translation], batch_first=True)
 
-        if not Eval:
-            _, temp_len, _ = Translation.shape
-            Translation = F.pad(Translation, (0, 0, 0, NbMaxPDWs - temp_len))
-            # Translation.shape = (batch_size, NbMaxPDWs, d_target + num_flags)
+        # Translation.shape = (batch_size, NbMaxPulses, d_input = d_output)
 
         WriteBatchs(Source=Source, Translation=Translation, BatchSize=BatchSize, TypeData=TypeData)
 
 
 def WriteBatchs(Source, Translation, BatchSize, TypeData):
-    save_path = os.path.join(local, 'FDTTranslator', 'Bursts', 'FPIC', 'BurstsData', 'Data')
+    save_path = os.path.join(local, 'StepByStep', 'S2', 'BurstsData', 'Data')
     try:
         shutil.rmtree(os.path.join(save_path, TypeData))
     except:

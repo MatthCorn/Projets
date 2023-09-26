@@ -9,8 +9,8 @@ def FDTDataLoader(ListTypeData=[], local='', variables_dict={}):
     NewValue = []
     for TypeData in ['Validation', 'Training']:
         if TypeData in ListTypeData:
-            Source = np.load(os.path.join(local, 'StepByStep', 'S0', 'BurstsData', 'Data', TypeData, 'PulsesAnt_0.npy'))
-            Translation = np.load(os.path.join(local, 'StepByStep', 'S0', 'BurstsData', 'Data', TypeData, 'PDWsDCI_0.npy'))
+            Source = np.load(os.path.join(local, 'StepByStep', 'S1', 'BurstsData', 'Data', TypeData, 'PulsesAnt_0.npy'))
+            Translation = np.load(os.path.join(local, 'StepByStep', 'S1', 'BurstsData', 'Data', TypeData, 'PDWsDCI_0.npy'))
 
             NewArg.append(TypeData + 'Source')
             NewValue.append(Source)
