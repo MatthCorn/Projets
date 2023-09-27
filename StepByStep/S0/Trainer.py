@@ -7,6 +7,7 @@ import os
 import torch
 from tqdm import tqdm
 import datetime
+import numpy as np
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
@@ -21,8 +22,8 @@ param = {
     'd_att': 32,
     'num_flags': 0,
     'num_heads': 4,
-    'num_encoders': 2,
-    'num_decoders': 2,
+    'num_encoders': 3,
+    'num_decoders': 3,
     'NbPDWsMemory': 10,
     'len_target': 20,
     'RPR_len_decoder': 10,
@@ -50,16 +51,36 @@ TrainingErrTransList = []
 ValidationErrList = []
 ValidationErrTransList = []
 
-NbEpochs = 100
+ValidationSdt = torch.std(ValidationTranslation, dim=(0, 1))
+ValidationSdt[0] = torch.mean(torch.std(ValidationTranslation, dim=1), dim=0)[0]
 
-for i in tqdm(range(NbEpochs)):
-    Error, ErrTrans = ErrorAction(TrainingSource, TrainingTranslation, Translator, batch_size, Action='Training', Optimizer=optimizer)
-    TrainingErrList.append(Error)
-    TrainingErrTransList.append(ErrTrans)
+TrainingSdt = torch.std(TrainingTranslation, dim=(0, 1))
+TrainingSdt[0] = torch.mean(torch.std(TrainingTranslation, dim=1), dim=0)[0]
 
-    Error, ErrTrans = ErrorAction(ValidationSource, ValidationTranslation, Translator, batch_size, Action='Validation')
-    ValidationErrList.append(Error)
-    ValidationErrTransList.append(ErrTrans)
+
+TrainingSource = TrainingSource/TrainingSdt
+TrainingTranslation = TrainingTranslation/TrainingSdt
+ValidationSource = ValidationSource/ValidationSdt
+ValidationTranslation = ValidationTranslation/ValidationSdt
+
+
+NbEpochs = 50
+
+ScaleMax = 1
+ScaleMin = 1e-2
+ScaleList = list(np.logspace(np.log10(ScaleMin), np.log10(ScaleMax), 5))
+
+for ScalingFactor in ScaleList:
+    for i in tqdm(range(NbEpochs)):
+        Error, ErrTrans = ErrorAction(ScalingFactor*TrainingSource, ScalingFactor*TrainingTranslation, Translator, batch_size, Action='Training', Optimizer=optimizer)
+        TrainingErrList.append(Error)
+        TrainingErrTransList.append([el/ScalingFactor for el in ErrTrans])
+        # TrainingErrTransList.append((torch.tensor(ErrTrans)/(ScalingFactor*TrainingSdt)).tolist())
+
+        Error, ErrTrans = ErrorAction(ScalingFactor*ValidationSource, ScalingFactor*ValidationTranslation, Translator, batch_size, Action='Validation')
+        ValidationErrList.append(Error)
+        ValidationErrTransList.append([el/ScalingFactor for el in ErrTrans])
+        # ValidationErrTransList.append((torch.tensor(ErrTrans)/(ScalingFactor*ValidationSdt)).tolist())
 
 
 error = {'Training':
@@ -73,6 +94,6 @@ os.mkdir(save_path)
 
 saveObjAsXml(error, os.path.join(save_path, 'error'))
 
-Plot(os.path.join(save_path, 'error'), std=True)
+Plot(os.path.join(save_path, 'error'), std=False)
 
 

@@ -1,7 +1,8 @@
 import torch
 from math import sqrt
 
-Pond = [0.2, 5, 1, 1, 1]
+# Pond = [0.2, 5, 1, 1, 1]
+Pond = [1., 1, 1, 1, 1]
 
 # Ce script définit les erreurs utilisées pour l'appentissage et pour visualisé si l'objectif final est atteint
 
