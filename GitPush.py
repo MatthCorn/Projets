@@ -1,8 +1,8 @@
 from git import Repo
 import os
 
-local = r'C:\Users\matth\Documents\Python\Projets'
-# local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 COMMIT_MESSAGE = 'Rien à dire'
 

@@ -7,10 +7,15 @@ class FeedForward(nn.Module):
         super().__init__()
         # self.linears lists all linear layers of the network
         self.linears = nn.ModuleList()
-        self.linears.append(nn.Linear(d_in, widths[0]))
-        for i in range(1,len(widths)):
-            self.linears.append(nn.Linear(widths[i-1], widths[i]))
-        self.linears.append(nn.Linear(widths[-1], d_out))
+
+        if widths == []:
+            self.linears.append(nn.Linear(d_in, d_out))
+
+        else:
+            self.linears.append(nn.Linear(d_in, widths[0]))
+            for i in range(1,len(widths)):
+                self.linears.append(nn.Linear(widths[i-1], widths[i]))
+            self.linears.append(nn.Linear(widths[-1], d_out))
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):

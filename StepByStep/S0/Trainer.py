@@ -1,4 +1,5 @@
 from StepByStep.S0.Network import TransformerTranslator
+from StepByStep.S0.TorchNetwork import Network
 from StepByStep.S0.DataLoader import FDTDataLoader
 from StepByStep.PlotError import Plot
 from StepByStep.S0.Error import ErrorAction
@@ -36,11 +37,12 @@ FDTDataLoader(ListTypeData=['Validation', 'Training'], local=local, variables_di
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-Translator = TransformerTranslator(d_source=param['d_source'], d_target=param['d_target'], d_att=param['d_att'], d_input_Enc=param['d_input_Enc'],
-                                   target_len=param['len_target'], num_encoders=param['num_encoders'], d_input_Dec=param['d_input_Dec'],
-                                   num_flags=param['num_flags'], num_heads=param['num_heads'], num_decoders=param['num_decoders'],
-                                   RPR_len_decoder=param['RPR_len_decoder'], NbPDWsMemory=param['NbPDWsMemory'], device=device)
+# Translator = TransformerTranslator(d_source=param['d_source'], d_target=param['d_target'], d_att=param['d_att'], d_input_Enc=param['d_input_Enc'],
+#                                    target_len=param['len_target'], num_encoders=param['num_encoders'], d_input_Dec=param['d_input_Dec'],
+#                                    num_flags=param['num_flags'], num_heads=param['num_heads'], num_decoders=param['num_decoders'],
+#                                    RPR_len_decoder=param['RPR_len_decoder'], NbPDWsMemory=param['NbPDWsMemory'], device=device)
 
+Translator = Network(d_model=64, d_source=5, d_target=5, max_len=10, nhead=8, num_decoder_layers=3, num_encoder_layers=3, device=device)
 
 batch_size = param['batch_size']
 
@@ -64,11 +66,12 @@ ValidationSource = ValidationSource/ValidationSdt
 ValidationTranslation = ValidationTranslation/ValidationSdt
 
 
-NbEpochs = 50
+NbEpochs = 30
 
 ScaleMax = 1
 ScaleMin = 1e-2
 ScaleList = list(np.logspace(np.log10(ScaleMin), np.log10(ScaleMax), 5))
+ScaleList = [1.]
 
 for ScalingFactor in ScaleList:
     for i in tqdm(range(NbEpochs)):
