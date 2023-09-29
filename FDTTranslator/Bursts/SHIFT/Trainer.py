@@ -1,4 +1,5 @@
 from FDTTranslator.Bursts.Network import TransformerTranslator
+from FDTTranslator.Bursts.TorchNetwork import Network
 from FDTTranslator.Bursts.DataLoader import FDTDataLoader
 from Tools.XMLTools import saveObjAsXml
 import os
@@ -38,10 +39,14 @@ FDTDataLoader(ListTypeData=['Validation', 'Training'], local=local, variables_di
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-Translator = TransformerTranslator(d_source=param['d_source'], d_target=param['d_target'], d_att=param['d_att'], d_input_Enc=param['d_input_Enc'],
-                                   target_len=param['len_target'], num_encoders=param['num_encoders'], d_input_Dec=param['d_input_Dec'],
-                                   num_flags=param['num_flags'], num_heads=param['num_heads'], num_decoders=param['num_decoders'],
-                                   RPR_len_decoder=param['RPR_len_decoder'], NbPDWsMemory=param['NbPDWsMemory'], device=device)
+# Translator = TransformerTranslator(d_source=param['d_source'], d_target=param['d_target'], d_att=param['d_att'], d_input_Enc=param['d_input_Enc'],
+#                                    target_len=param['len_target'], num_encoders=param['num_encoders'], d_input_Dec=param['d_input_Dec'],
+#                                    num_flags=param['num_flags'], num_heads=param['num_heads'], num_decoders=param['num_decoders'],
+#                                    RPR_len_decoder=param['RPR_len_decoder'], NbPDWsMemory=param['NbPDWsMemory'], device=device)
+
+Translator = Network(d_source=param['d_source'], d_target=param['d_target']+param['num_flags'], d_model=param['d_att'], max_len=param['len_target'], nhead=param['num_heads'],
+                     num_encoder_layers=param['num_encoders'], num_decoder_layers=param['num_decoders'], dim_feedforward=2048, dropout=0, NbPDWsMemory=param['NbPDWsMemory'],
+                     device=device)
 
 
 TrainingEnded = (torch.norm(TrainingTranslation[:, param['NbPDWsMemory']:], dim=-1) == 0).unsqueeze(-1).to(torch.float32)
@@ -64,7 +69,7 @@ ValidationErrActList = []
 # RealEvaluationList = []
 # CutEvaluationList = []
 
-NbEpochs = 500
+NbEpochs = 200
 # NbEvalProp = 10
 # ListEvalPropErrorId = list(map(int, list(np.logspace(0, log10(NbEpochs), NbEvalProp))))
 # DictEvalPropError = {}

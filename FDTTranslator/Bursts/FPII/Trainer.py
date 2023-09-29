@@ -1,4 +1,5 @@
 from FDTTranslator.Bursts.Network import TransformerTranslator
+from FDTTranslator.Bursts.TorchNetwork import Network
 from FDTTranslator.Bursts.DataLoader import FDTDataLoader
 from Tools.XMLTools import saveObjAsXml
 import os
@@ -38,11 +39,14 @@ FDTDataLoader(ListTypeData=['Validation', 'Training', 'Evaluation'], local=local
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-Translator = TransformerTranslator(d_source=param['d_source'], d_target=param['d_target'], d_att=param['d_att'], d_input_Enc=param['d_input_Enc'],
-                                   target_len=param['len_target'], num_encoders=param['num_encoders'], d_input_Dec=param['d_input_Dec'],
-                                   num_flags=param['num_flags'], num_heads=param['num_heads'], num_decoders=param['num_decoders'],
-                                   RPR_len_decoder=param['RPR_len_decoder'], NbPDWsMemory=param['NbPDWsMemory'], device=device)
+# Translator = TransformerTranslator(d_source=param['d_source'], d_target=param['d_target'], d_att=param['d_att'], d_input_Enc=param['d_input_Enc'],
+#                                    target_len=param['len_target'], num_encoders=param['num_encoders'], d_input_Dec=param['d_input_Dec'],
+#                                    num_flags=param['num_flags'], num_heads=param['num_heads'], num_decoders=param['num_decoders'],
+#                                    RPR_len_decoder=param['RPR_len_decoder'], NbPDWsMemory=param['NbPDWsMemory'], device=device)
 
+Translator = Network(d_source=param['d_source'], d_target=param['d_target']+param['num_flags'], d_model=param['d_att'], max_len=param['len_target'], nhead=param['num_heads'],
+                     num_encoder_layers=param['num_encoders'], num_decoder_layers=param['num_decoders'], dim_feedforward=2048, dropout=0, NbPDWsMemory=param['NbPDWsMemory'],
+                     device=device, target_len=param['len_target'])
 
 TrainingEnded = (torch.norm(TrainingTranslation[:, param['NbPDWsMemory']:], dim=-1) == 0).unsqueeze(-1).to(torch.float32)
 
@@ -54,7 +58,7 @@ EvaluationEnded = (torch.norm(EvaluationTranslation, dim=-1) == 0).unsqueeze(-1)
 batch_size = param['batch_size']
 
 # Procédure d'entrainement
-optimizer = torch.optim.Adam(Translator.parameters(), lr=1e-4)
+optimizer = torch.optim.Adam(Translator.parameters(), lr=3e-5)
 TrainingErrList = []
 TrainingErrTransList = []
 TrainingErrActList = []
@@ -64,10 +68,10 @@ ValidationErrActList = []
 RealEvaluationList = []
 CutEvaluationList = []
 
-NbEpochs = 10
-NbEvalProp = 3
-ListEvalPropErrorId = list(map(int, list(np.logspace(0, log10(NbEpochs), NbEvalProp))))
-DictEvalPropError = {}
+NbEpochs = 200
+# NbEvalProp = 3
+# ListEvalPropErrorId = list(map(int, list(np.logspace(0, log10(NbEpochs), NbEvalProp))))
+# DictEvalPropError = {}
 
 for i in tqdm(range(NbEpochs)):
     Error, ErrAct, ErrTrans = ErrorAction(TrainingSource, TrainingTranslation, TrainingEnded, Translator, batch_size, Action='Training', Optimizer=optimizer)
@@ -84,8 +88,8 @@ for i in tqdm(range(NbEpochs)):
     RealEvaluationList.append(RealError)
     CutEvaluationList.append(CutError)
 
-    if i in ListEvalPropErrorId:
-        DictEvalPropError[str(i)] = DetailObjectiveError(EvaluationSource, EvaluationTranslation, EvaluationEnded, Translator)
+    # if i in ListEvalPropErrorId:
+    #     DictEvalPropError[str(i)] = DetailObjectiveError(EvaluationSource, EvaluationTranslation, EvaluationEnded, Translator)
 
 error = {'Training':
              {'ErrList': TrainingErrList, 'ErrTransList': TrainingErrTransList, 'ErrActList': TrainingErrActList},
@@ -102,11 +106,11 @@ torch.save(Translator.state_dict(), os.path.join(save_path, 'Translator'))
 torch.save(optimizer.state_dict(), os.path.join(save_path, 'Optimizer'))
 saveObjAsXml(param, os.path.join(save_path, 'param'))
 saveObjAsXml(error, os.path.join(save_path, 'error'))
-saveObjAsXml(DictEvalPropError, os.path.join(save_path, 'PropError'))
+# saveObjAsXml(DictEvalPropError, os.path.join(save_path, 'PropError'))
 
 # git_push(local=local, file=save_path, CommitMsg='simu '+folder)
 
 Plot(os.path.join(save_path, 'error'), eval=True, std=True)
-PlotPropError(os.path.join(save_path, 'PropError'))
+# PlotPropError(os.path.join(save_path, 'PropError'))
 
 
