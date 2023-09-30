@@ -45,10 +45,21 @@ class Network(nn.Transformer):
         self.device = device
         self.to(device)
 
-    def forward(self, source: Tensor, target: Tensor) -> Tensor:
+    def forward(self, source: Tensor, target: Tensor, masked=True) -> Tensor:
         src, tgt = self.source_embedding(source), self.target_embedding(target)
-        output = super().forward(src=self.PE(src), tgt=self.PE(tgt))
+        if masked:
+            try:
+                output = super().forward(src=self.PE(src), tgt=self.PE(tgt), tgt_mask=self.mask)
+            except:
+                self.generate_square_subsequent_mask(size=len(target[0]))
+                output = super().forward(src=self.PE(src), tgt=self.PE(tgt), tgt_mask=self.mask)
+        else:
+            output = super().forward(src=self.PE(src), tgt=self.PE(tgt))
+
         return self.output_dembedding(output), self.action_dembedding(output)
+
+    def generate_square_subsequent_mask(self, size=200):  # Generate mask covering the top right triangle of a matrix
+        self.mask = torch.triu(torch.full((size, size), float('-inf'), device=self.device), diagonal=1)
 
     def translate(self, source):
         NbPDWsMemory = int(self.target_len / 2)

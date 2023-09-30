@@ -59,7 +59,7 @@ ValidationEnded = (torch.norm(ValidationTranslation[:, param['NbPDWsMemory']:], 
 batch_size = param['batch_size']
 
 # Procédure d'entrainement
-optimizer = torch.optim.Adam(Translator.parameters(), lr=3e-5)
+optimizer = torch.optim.Adam(Translator.parameters(), lr=3e-4)
 TrainingErrList = []
 TrainingErrTransList = []
 TrainingErrActList = []
@@ -109,7 +109,7 @@ saveObjAsXml(param, os.path.join(save_path, 'param'))
 saveObjAsXml(error, os.path.join(save_path, 'error'))
 # saveObjAsXml(DictEvalPropError, os.path.join(save_path, 'PropError'))
 
-git_push(local=local, file=save_path, CommitMsg='simu '+folder)
+# git_push(local=local, file=save_path, CommitMsg='simu '+folder)
 
 Plot(os.path.join(save_path, 'error'), eval=False, std=True)
 # PlotPropError(os.path.join(save_path, 'PropError'))

@@ -38,10 +38,21 @@ class Network(nn.Transformer):
         self.device = device
         self.to(device)
 
-    def forward(self, source: Tensor, target: Tensor) -> Tensor:
+    def forward(self, source: Tensor, target: Tensor, masked=True) -> Tensor:
         src, tgt = self.source_embedding(source), self.target_embedding(target)
-        output = super().forward(src=self.PE(src), tgt=self.PE(tgt))
+        if masked:
+            try:
+                output = super().forward(src=self.PE(src), tgt=self.PE(tgt), tgt_mask=self.mask)
+            except:
+                self.generate_square_subsequent_mask(size=len(target[0]))
+                output = super().forward(src=self.PE(src), tgt=self.PE(tgt), tgt_mask=self.mask)
+        else:
+            output = super().forward(src=self.PE(src), tgt=self.PE(tgt))
+
         return self.output_dembedding(output)
+
+    def generate_square_subsequent_mask(self, size=200):  # Generate mask covering the top right triangle of a matrix
+        self.mask = torch.triu(torch.full((size, size), float('-inf'), device=self.device), diagonal=1)
 
 class PositionalEncoding(nn.Module):
 
@@ -61,7 +72,7 @@ class PositionalEncoding(nn.Module):
         Arguments:
             x: Tensor, shape ``[batch_size, seq_len, embedding_dim]``
         """
-        x = x + self.pe[:x.size(1)]
+        x = x + self.pe[:, :x.size(1)]
         return self.dropout(x)
 
 
@@ -69,5 +80,7 @@ if __name__ == '__main__':
     N = Network(d_model=512, d_source=5, d_target=5, max_len=10, nhead=8, num_decoder_layers=3, num_encoder_layers=3)
     source = torch.rand(1000, 10, 5)
     target = torch.rand(1000, 10, 5)
-    output = N(source=source, target=target)
+    output = N(source=source, target=target, masked=True)
+    output = N(source=source, target=torch.rand(1000, 9, 5), masked=True)
+
     print(output.shape)

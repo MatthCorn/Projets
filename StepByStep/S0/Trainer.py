@@ -12,8 +12,8 @@ import numpy as np
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 param = {
     'd_source': 5,
@@ -43,6 +43,10 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 #                                    RPR_len_decoder=param['RPR_len_decoder'], NbPDWsMemory=param['NbPDWsMemory'], device=device)
 
 Translator = Network(d_model=64, d_source=5, d_target=5, max_len=10, nhead=8, num_decoder_layers=3, num_encoder_layers=3, device=device)
+
+# ValidationTranslation = torch.rand(size=ValidationTranslation.shape)
+# TrainingTranslation = torch.rand(size=TrainingTranslation.shape)
+
 
 batch_size = param['batch_size']
 

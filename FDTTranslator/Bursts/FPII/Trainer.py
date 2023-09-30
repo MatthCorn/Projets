@@ -58,7 +58,7 @@ EvaluationEnded = (torch.norm(EvaluationTranslation, dim=-1) == 0).unsqueeze(-1)
 batch_size = param['batch_size']
 
 # Procédure d'entrainement
-optimizer = torch.optim.Adam(Translator.parameters(), lr=3e-5)
+optimizer = torch.optim.Adam(Translator.parameters(), lr=3e-4)
 TrainingErrList = []
 TrainingErrTransList = []
 TrainingErrActList = []
@@ -68,7 +68,7 @@ ValidationErrActList = []
 RealEvaluationList = []
 CutEvaluationList = []
 
-NbEpochs = 200
+NbEpochs = 3
 # NbEvalProp = 3
 # ListEvalPropErrorId = list(map(int, list(np.logspace(0, log10(NbEpochs), NbEvalProp))))
 # DictEvalPropError = {}
