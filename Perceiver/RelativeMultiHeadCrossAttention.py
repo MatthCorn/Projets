@@ -57,13 +57,13 @@ class RLCA(nn.Module):
         Ert = None
         if self.previousInputLen != input_len or self.previousLatentLen != latent_len:
             if self.masked:
-                self.mask = self.MakeMask(latent_len=latent_len, input_len=input_len).unsqueeze(0).unsqueeze(0).to(self.Er.device, self.Er.dtype)
+                self.mask = self.MakeMask(latent_len=latent_len, input_len=input_len).unsqueeze(0).unsqueeze(0).to(self.key.bias.device, self.key.bias.dtype)
                 self.previousInputLen = input_len
                 self.previousLatentLen = latent_len
                 mask = self.mask
                 # mask.shape = (1, 1, latent_len, input_len)
             if self.relative:
-                self.ConvDistrib = self.Weight(M=input_len, N=latent_len, sigma=1.5).to(self.Er.device, self.Er.dtype)
+                self.ConvDistrib = self.Weight(M=input_len, N=latent_len, sigma=1.5).to(self.key.bias.device, self.key.bias.dtype)
                 # ConvDistrib.shape = (latent_len, 2*RPR_len-1, input_len)
                 Ert = self.Er.transpose(0, 1)
                 # Ert.shape = (d_head, 2*latent_len-1)

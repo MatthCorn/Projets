@@ -14,8 +14,8 @@ from GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 param = {
     'd_source': 5,
@@ -59,7 +59,7 @@ ValidationEnded = (torch.norm(ValidationTranslation[:, param['NbPDWsMemory']:], 
 batch_size = param['batch_size']
 
 # Procédure d'entrainement
-optimizer = torch.optim.Adam(Translator.parameters(), lr=3e-4)
+optimizer = torch.optim.Adam(Translator.parameters(), lr=1e-3)
 TrainingErrList = []
 TrainingErrTransList = []
 TrainingErrActList = []
