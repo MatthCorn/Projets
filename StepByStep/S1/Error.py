@@ -1,6 +1,8 @@
 import torch
 from math import sqrt
 
+# Pond = [0.2, 5, 1, 1, 1]
+Pond = [1., 1, 1, 1, 1]
 
 # Ce script définit les erreurs utilisées pour l'appentissage et pour visualisé si l'objectif final est atteint
 
@@ -10,9 +12,10 @@ def TrainingError(Source, Translation, batch_size, batch_indice, Translator):
     BatchTranslation = Translation[j * batch_size: (j + 1) * batch_size].detach().to(device=Translator.device, dtype=torch.float32)
 
     PredictedTranslation = Translator.forward(source=BatchSource, target=BatchTranslation)
+    PredictedTranslation = PredictedTranslation[:, :-1]
 
-    shape = BatchTranslation.shape
-    ErrTrans = torch.norm(BatchTranslation - PredictedTranslation, dim=(0, 1))/sqrt(shape[0]*shape[1])
+    shape = PredictedTranslation.shape
+    ErrTrans = torch.norm(BatchTranslation[:, 1:] - PredictedTranslation, dim=(0, 1))/sqrt(shape[0]*shape[1])
 
     return ErrTrans
 
@@ -28,14 +31,14 @@ def ErrorAction(Source, Translation, Translator, batch_size=50, Action='', Optim
             Optimizer.zero_grad(set_to_none=True)
 
             errtrans = TrainingError(Source, Translation, batch_size, j, Translator)
-            err = torch.norm(errtrans)/sqrt(d_out)
+            err = torch.norm(errtrans * torch.tensor(Pond, device=Translator.device))/sqrt(d_out)
             err.backward()
             Optimizer.step()
 
         elif Action == 'Validation':
             with torch.no_grad():
                 errtrans = TrainingError(Source, Translation, batch_size, j, Translator)
-                err = torch.norm(errtrans) / sqrt(d_out)
+                err = torch.norm(errtrans * torch.tensor(Pond, device=Translator.device))/sqrt(d_out)
 
         Error += float(err)**2
         ErrTrans.append(errtrans**2)

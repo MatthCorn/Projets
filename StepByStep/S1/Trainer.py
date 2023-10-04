@@ -1,10 +1,10 @@
 from StepByStep.S1.Network import TransformerTranslator
-from StepByStep.S1.DataLoader import FDTDataLoader
 from StepByStep.PlotError import Plot
 from StepByStep.S1.Error import ErrorAction
 from Tools.XMLTools import saveObjAsXml
 import os
 import torch
+import numpy as np
 from tqdm import tqdm
 import datetime
 
@@ -24,13 +24,16 @@ param = {
     'num_encoders': 3,
     'num_decoders': 3,
     'NbPDWsMemory': 10,
-    'len_target': 20,
-    'RPR_len_decoder': 16,
+    'len_target': 10,
+    'RPR_len_decoder': 10,
     'batch_size': 2048
 }
 
-# Cette ligne crée les variables globales "~TYPE~Source" et "~TYPE~Translation" pour tout ~TYPE~ dans ListTypeData
-FDTDataLoader(ListTypeData=['Validation', 'Training'], local=local, variables_dict=vars())
+TrainingSource = torch.tensor(np.load(os.path.join(local, 'StepByStep', 'S1', 'Data', 'Training', 'PulsesAnt.npy')))
+TrainingTranslation = torch.tensor(np.load(os.path.join(local, 'StepByStep', 'S1', 'Data', 'Training', 'PDWsDCI.npy')))
+ValidationSource = torch.tensor(np.load(os.path.join(local, 'StepByStep', 'S1', 'Data', 'Validation', 'PulsesAnt.npy')))
+ValidationTranslation = torch.tensor(np.load(os.path.join(local, 'StepByStep', 'S1', 'Data', 'Validation', 'PDWsDCI.npy')))
+
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -41,25 +44,47 @@ Translator = TransformerTranslator(d_source=param['d_source'], d_target=param['d
                                    RPR_len_decoder=param['RPR_len_decoder'], NbPDWsMemory=param['NbPDWsMemory'], device=device)
 
 
+# ValidationTranslation = torch.rand(size=ValidationTranslation.shape)
+# TrainingTranslation = torch.rand(size=TrainingTranslation.shape)
+
+
 batch_size = param['batch_size']
 
 # Procédure d'entrainement
-optimizer = torch.optim.Adam(Translator.parameters(), lr=3e-4)
+optimizer = torch.optim.Adam(Translator.parameters(), lr=1e-3)
 TrainingErrList = []
 TrainingErrTransList = []
 ValidationErrList = []
 ValidationErrTransList = []
 
+ValidationSdt = torch.std(ValidationTranslation, dim=(0, 1))
+ValidationSdt[0] = torch.mean(torch.std(ValidationTranslation, dim=1), dim=0)[0]
+
+TrainingSdt = torch.std(TrainingTranslation, dim=(0, 1))
+TrainingSdt[0] = torch.mean(torch.std(TrainingTranslation, dim=1), dim=0)[0]
+
+
+# TrainingSource = TrainingSource/TrainingSdt
+# TrainingTranslation = TrainingTranslation/TrainingSdt
+# ValidationSource = ValidationSource/ValidationSdt
+# ValidationTranslation = ValidationTranslation/ValidationSdt
+
+
 NbEpochs = 100
+
+ScaleList = [1.]
+
 
 for i in tqdm(range(NbEpochs)):
     Error, ErrTrans = ErrorAction(TrainingSource, TrainingTranslation, Translator, batch_size, Action='Training', Optimizer=optimizer)
     TrainingErrList.append(Error)
-    TrainingErrTransList.append(ErrTrans)
+    # TrainingErrTransList.append([el/ScalingFactor for el in ErrTrans])
+    TrainingErrTransList.append((torch.tensor(ErrTrans)/TrainingSdt).tolist())
 
     Error, ErrTrans = ErrorAction(ValidationSource, ValidationTranslation, Translator, batch_size, Action='Validation')
     ValidationErrList.append(Error)
-    ValidationErrTransList.append(ErrTrans)
+    # ValidationErrTransList.append([el/ScalingFactor for el in ErrTrans])
+    ValidationErrTransList.append((torch.tensor(ErrTrans)/ValidationSdt).tolist())
 
 
 error = {'Training':
@@ -73,6 +98,4 @@ os.mkdir(save_path)
 
 saveObjAsXml(error, os.path.join(save_path, 'error'))
 
-Plot(os.path.join(save_path, 'error'), std=True)
-
-
+Plot(os.path.join(save_path, 'error'), std=False)

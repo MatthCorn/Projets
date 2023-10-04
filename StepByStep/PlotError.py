@@ -95,6 +95,6 @@ if __name__ == '__main__':
     local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
     # local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
-    folder = os.path.join('StepByStep', 'S0', 'Save', '2023-10-02__15-14', 'error')
+    folder = os.path.join('StepByStep', 'S1', 'Save', '2023-10-03__14-22', 'error')
     Plot(os.path.join(local, folder), std=False)
 
