@@ -1,4 +1,5 @@
 from StepByStep.S1.Network import TransformerTranslator
+from StepByStep.S1.TorchNetwork import Network
 from StepByStep.PlotError import Plot
 from StepByStep.S1.Error import ErrorAction
 from Tools.XMLTools import saveObjAsXml
@@ -10,17 +11,17 @@ import datetime
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 param = {
     'd_source': 5,
     'd_target': 5,
-    'd_input_Enc': 32,
-    'd_input_Dec': 32,
-    'd_att': 32,
+    'd_input_Enc': 128,
+    'd_input_Dec': 128,
+    'd_att': 128,
     'num_flags': 0,
-    'num_heads': 4,
+    'num_heads': 8,
     'num_encoders': 3,
     'num_decoders': 3,
     'NbPDWsMemory': 10,
@@ -38,10 +39,12 @@ ValidationTranslation = torch.tensor(np.load(os.path.join(local, 'StepByStep', '
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-Translator = TransformerTranslator(d_source=param['d_source'], d_target=param['d_target'], d_att=param['d_att'], d_input_Enc=param['d_input_Enc'],
-                                   target_len=param['len_target'], num_encoders=param['num_encoders'], d_input_Dec=param['d_input_Dec'],
-                                   num_flags=param['num_flags'], num_heads=param['num_heads'], num_decoders=param['num_decoders'],
-                                   RPR_len_decoder=param['RPR_len_decoder'], NbPDWsMemory=param['NbPDWsMemory'], device=device)
+# Translator = TransformerTranslator(d_source=param['d_source'], d_target=param['d_target'], d_att=param['d_att'], d_input_Enc=param['d_input_Enc'],
+#                                    target_len=param['len_target'], num_encoders=param['num_encoders'], d_input_Dec=param['d_input_Dec'],
+#                                    num_flags=param['num_flags'], num_heads=param['num_heads'], num_decoders=param['num_decoders'],
+#                                    RPR_len_decoder=param['RPR_len_decoder'], NbPDWsMemory=param['NbPDWsMemory'], device=device)
+
+Translator = Network(d_model=256, d_source=5, d_target=5, max_len=10, nhead=16, num_decoder_layers=3, num_encoder_layers=3, device=device)
 
 
 # ValidationTranslation = torch.rand(size=ValidationTranslation.shape)

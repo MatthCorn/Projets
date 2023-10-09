@@ -4,8 +4,8 @@ from tqdm import tqdm
 import os
 import shutil
 
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 def MakeData(batch_size, decay=0.8):
     Source = torch.randn(size=(batch_size, 10, 5))
@@ -52,6 +52,6 @@ def WriteBatchs(batch_size, TypeData):
     np.save(TranslationFName, Translation)
 
 if __name__ == '__main__':
-    WriteBatchs(200000, 'Training')
+    WriteBatchs(1000000, 'Training')
     WriteBatchs(6000, 'Validation')
 
