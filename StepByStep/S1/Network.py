@@ -14,10 +14,11 @@ class TransformerTranslator(nn.Module):
         self.d_target = d_target
         self.num_flags = num_flags
         self.Encoders = nn.ModuleList()
-        for i in range(num_encoders):
+        self.Encoders.append(EncoderLayer(d_model=d_input_Enc, d_att=d_att, num_heads=num_heads, relative=False, MHADropout=0, FFDropout=0))
+        for i in range(num_encoders-1):
             # si relative=True, on s'assure juste que max_len=64 est plus grand que le nombre d'impulsions fournies à l'IA
             self.Encoders.append(EncoderLayer(d_model=d_input_Enc, d_att=d_att, num_heads=num_heads, relative=False, MHADropout=0, FFDropout=0))
-        self.Encoders[0].relative = True
+
         self.target_len = target_len
         # self.NbPDWsMemory = NbPDWsMemory
         self.Decoders = nn.ModuleList()

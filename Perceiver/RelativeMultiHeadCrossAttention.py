@@ -29,13 +29,14 @@ class RLCA(nn.Module):
         self.relative = relative
         if self.relative:
             self.Er = nn.Parameter(torch.randn(2*RPR_len-1, d_head))
+            self.register_buffer("ConvDistrib", self.Weight(M=max_len, N=latent_len, sigma=1.5), persistent=False)
+
         self.masked = masked
         if self.masked:
             self.register_buffer("mask", self.MakeMask(latent_len=latent_len, input_len=max_len).unsqueeze(0).unsqueeze(0), persistent=False)
             # self.mask.shape = (1, 1, latent_len, max_len)
         self.previousInputLen = max_len
         self.previousLatentLen = latent_len
-        self.register_buffer("ConvDistrib", self.Weight(M=max_len, N=latent_len, sigma=1.5), persistent=False)
 
     def forward(self, x_latent, x_input):
         # x_input.shape = (batch_size, input_len, d_input)
