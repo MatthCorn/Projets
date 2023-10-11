@@ -25,7 +25,7 @@ class RMHSA(nn.Module):
         self.Er = nn.Parameter(torch.randn(2*max_len-1, d_head))
         self.masked = masked
         if self.masked:
-            self.register_buffer("mask", torch.tril(torch.ones(max_len, max_len), persistent=False).unsqueeze(0).unsqueeze(0))
+            self.register_buffer("mask", torch.tril(torch.ones(max_len, max_len)).unsqueeze(0).unsqueeze(0), persistent=False)
             # self.mask.shape = (1, 1, max_len, max_len)
 
     def forward(self, x):
@@ -54,7 +54,7 @@ class RMHSA(nn.Module):
         # RSA.shape = (batch_size, num_heads, seq_len, d_head)
 
         Concat = RSA.transpose(1, 2).reshape(batch_size, seq_len, -1)
-        # Concat.shape = (batch_size, seq_len, d_model)
+        # Concat.shape = (batch_size, seq_len, d_att)
         out = self.finalLinear(Concat)
         # out.shape = (batch_size, seq_len, d_model)
         return self.dropout(out)

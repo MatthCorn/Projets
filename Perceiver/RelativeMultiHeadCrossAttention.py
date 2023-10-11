@@ -58,6 +58,7 @@ class RLCA(nn.Module):
         Ert = None
         if self.previousInputLen != input_len or self.previousLatentLen != latent_len:
             if self.masked:
+                print('changing mask')
                 self.mask = self.MakeMask(latent_len=latent_len, input_len=input_len).unsqueeze(0).unsqueeze(0).to(self.key.bias.device, self.key.bias.dtype)
                 self.previousInputLen = input_len
                 self.previousLatentLen = latent_len
