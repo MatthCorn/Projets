@@ -10,7 +10,7 @@ class EncoderLayer(nn.Module):
         self.feed_forward = FeedForward(d_att, d_att, widths=width_FF, dropout=dropout_FF)
         self.second_layer_norm = nn.LayerNorm(d_att)
 
-    def forward(self, x):
-        y = self.first_layer_norm(self.self_attention(x) + x)
+    def forward(self, x, mask=None):
+        y = self.first_layer_norm(self.self_attention(x, mask) + x)
         y = self.second_layer_norm(self.feed_forward(y) + y)
         return y

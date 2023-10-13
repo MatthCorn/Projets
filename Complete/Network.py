@@ -14,10 +14,16 @@ def MakePermutMask(n_tracker, len_target):
     Powers = tuple(torch.linalg.matrix_power(Permut, i) for i in range(len_target))
     return torch.tril(sum(Powers)).unsqueeze(0).unsqueeze(0)
 
-def MakeTrackerMask(n_tracker, len_target):
+def MakeDecoderMask(n_tracker, len_target):
     mask = torch.zeros(n_tracker*len_target, n_tracker*len_target)
     for i in range(len_target):
         mask[i*n_tracker:, i*n_tracker:(i+1)*n_tracker] = 1
+    return mask.unsqueeze(0).unsqueeze(0)
+
+def MakeDeciderMask(n_tracker, len_target):
+    mask = torch.zeros(n_tracker*len_target, n_tracker*len_target)
+    for i in range(len_target):
+        mask[i*n_tracker:(i+1)*n_tracker, i*n_tracker:(i+1)*n_tracker] = 1
     return mask.unsqueeze(0).unsqueeze(0)
 
 
@@ -40,24 +46,26 @@ class TransformerTranslator(nn.Module):
         for i in range(n_decoders):
             self.decoders.append(DecoderLayer(d_att=d_att, n_heads=n_heads))
 
+        self.encoder_decider = EncoderLayer(d_att=d_att, n_heads=n_heads)
+        self.resizer_decider = nn.Linear(d_att, 1)
+
         self.n_PDWs_memory = n_PDWs_memory
 
         self.source_embedding = FeedForward(d_in=d_pulse, d_out=d_att, widths=[], dropout=0)
         self.target_embedding = FeedForward(d_in=d_PDW+n_flags, d_out=d_att, widths=[], dropout=0)
         self.tracker_embedding = TrackerEmbeddingLayer(n_tracker=n_tracker, d_att=d_att)
 
-        self.physical_prediction = FeedForward(d_in=d_att, d_out=d_PDW, widths=[16], dropout=0)
-        self.flags_prediction = FeedForward(d_in=d_att, d_out=n_flags, widths=[8], dropout=0)
-        self.action_prediction = FeedForward(d_in=d_att, d_out=1, widths=[8], dropout=0)
+        self.PE_encoder = ClassicPositionalEncoding(d_att=d_att, dropout=0, max_len=len_target, device=device)
+        self.PE_decoder = ClassicPositionalEncoding(d_att=d_att, dropout=0, max_len=len_target, device=device)
 
-        self.PE_encoder = ClassicPositionalEncoding(d_model=d_att, dropout=0, max_len=len_target, device=device)
-        self.PE_decoder = ClassicPositionalEncoding(d_model=d_att, dropout=0, max_len=len_target, device=device)
+        self.mask_decoder = MakeDecoderMask(n_tracker, len_target)
+        self.mask_decider = MakeDeciderMask(n_tracker, len_target)
 
         self.to(device)
 
     def forward(self, source, target):
         # target.shape = (batch_size, len_target, d_target+num_flags)
-        batch_size, len_source, _ = source.shape
+        batch_size, len_target, _ = source.shape
 
         trg = self.PE_decoder(self.target_embedding(target))
         # trg.shape = (batch_size, len_target, d_att)
@@ -71,17 +79,19 @@ class TransformerTranslator(nn.Module):
             src = Encoder(src)
 
         for Decoder in self.Decoders:
-            trg = Decoder(target=trg, source=src)
+            trg = Decoder(target=trg, source=src, mask=self.mask_decoder)
         # trg.shape = (batch_size, n_tracker*len_target, d_att)
+        trg = trg.reshape(batch_size, len_target, self.n_tracker, self.d_att)
+        # trg.shape = (batch_size, len_target, n_tracker, d_att)
 
-        trg = trg.reshape(batch_size, -1, self.n_tracker*self.d_att)[:, :, :self.d_att]
+        decision = self.encoder_decider(trg, mask=self.mask_decider)
+        # decision.shape = (batch_size, n_tracker*len_target, d_att)
+        decision = self.resizer_decider(decision)
+        # decision.shape = (batch_size, n_tracker*len_target, 1)
+        decision = decision.reshape(batch_size, len_target, self.n_tracker, 1)
+
+        trg = torch.matmul(trg.transpose(-1, -2), decision).squeeze(-1)
         # trg.shape = (batch_size, len_target, d_att)
 
+        return trg
 
-        physic, flags, action = self.physical_prediction(trg), self.flags_prediction(trg), self.action_prediction(trg)
-
-        # Physic.shape = (batch_size, len_target, d_PDW)
-        # Flags.shape = (batch_size, len_target, n_flags)
-        # Action.shape = (batch_size, len_target, 1)
-        PDW = torch.cat((physic, flags), dim=2)
-        return PDW, action
