@@ -14,8 +14,8 @@ class DecoderLayer(nn.Module):
         self.third_layer_norm = nn.LayerNorm(d_att)
 
     def forward(self, target, source, mask=None):
-        y = self.first_layer_norm(self.self_attention(target) + target)
-        y = self.second_layer_norm(self.cross_attention(x_latent=y, x_input=source, mask=mask) + y)
+        y = self.first_layer_norm(self.self_attention(target, mask=mask) + target)
+        y = self.second_layer_norm(self.cross_attention(x_target=y, x_source=source) + y)
         y = self.third_layer_norm(self.feed_forward(y) + y)
         return y
 

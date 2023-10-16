@@ -35,7 +35,7 @@ class MHCA(nn.Module):
         # OR
         # Q.shape = (1, n_heads, len_target, d_head)
 
-        CA = self.CrossAttention(Q, Kt, V, mask=mask)
+        CA = self.CrossAttention(Q, Kt, V)
         # RCA.shape = (batch_size, n_heads, len_target, d_head)
 
         concat = CA.transpose(1, 2).reshape(batch_size, len_target, -1)
@@ -43,11 +43,11 @@ class MHCA(nn.Module):
 
         return self.dropout(concat)
 
-    def CrossAttention(self, Q, Kt, V, mask):
+    def CrossAttention(self, Q, Kt, V):
         d_head = self.d_head
         # Q.shape = (batch_size, n_heads, len_target, d_head)
         # or
-        # Q.shape = (1, num_heads, len_target, d_head)
+        # Q.shape = (1, n_heads, len_target, d_head)
 
         # Kt.shape = (batch_size, n_heads, d_head, len_source)
 
@@ -56,9 +56,7 @@ class MHCA(nn.Module):
 
         attention = Q_Kt / math.sqrt(d_head)
         # Attention.shape = (batch_size, n_heads, len_target, len_source)
-        if mask is not None:
-            # Mask.shape = (1, 1, len_target, len_source)
-            attention = attention.masked_fill(mask == 0, float("-inf"))
+
         attention = F.softmax(attention, dim=-1)
         out = torch.matmul(attention, V)
         # out.shape = (batch_size, n_heads, len_target, d_head)

@@ -20,13 +20,6 @@ def MakeDecoderMask(n_tracker, len_target):
         mask[i*n_tracker:, i*n_tracker:(i+1)*n_tracker] = 1
     return mask.unsqueeze(0).unsqueeze(0)
 
-def MakeDeciderMask(n_tracker, len_target):
-    mask = torch.zeros(n_tracker*len_target, n_tracker*len_target)
-    for i in range(len_target):
-        mask[i*n_tracker:(i+1)*n_tracker, i*n_tracker:(i+1)*n_tracker] = 1
-    return mask.unsqueeze(0).unsqueeze(0)
-
-
 class TransformerTranslator(nn.Module):
 
     def __init__(self, d_pulse, d_PDW, d_att=32, n_heads=4, n_encoders=3, n_tracker=4,
@@ -48,6 +41,7 @@ class TransformerTranslator(nn.Module):
 
         self.encoder_decider = EncoderLayer(d_att=d_att, n_heads=n_heads)
         self.resizer_decider = nn.Linear(d_att, 1)
+        self.normalizer_decider = nn.Softmax(dim=2)
 
         self.n_PDWs_memory = n_PDWs_memory
 
@@ -59,13 +53,12 @@ class TransformerTranslator(nn.Module):
         self.PE_decoder = ClassicPositionalEncoding(d_att=d_att, dropout=0, max_len=len_target, device=device)
 
         self.mask_decoder = MakeDecoderMask(n_tracker, len_target)
-        self.mask_decider = MakeDeciderMask(n_tracker, len_target)
 
         self.to(device)
 
     def forward(self, source, target):
         # target.shape = (batch_size, len_target, d_target+num_flags)
-        batch_size, len_target, _ = source.shape
+        batch_size, len_target, _ = target.shape
 
         trg = self.PE_decoder(self.target_embedding(target))
         # trg.shape = (batch_size, len_target, d_att)
@@ -75,23 +68,28 @@ class TransformerTranslator(nn.Module):
         src = self.PE_encoder(self.source_embedding(source))
         # src.shape = (batch_size, len_source, d_att)
 
-        for Encoder in self.Encoders:
-            src = Encoder(src)
+        for encoder in self.encoders:
+            src = encoder(src)
 
-        for Decoder in self.Decoders:
-            trg = Decoder(target=trg, source=src, mask=self.mask_decoder)
+        for decoder in self.decoders:
+            trg = decoder(target=trg, source=src, mask=self.mask_decoder)
         # trg.shape = (batch_size, n_tracker*len_target, d_att)
+        trg = trg.reshape(batch_size*len_target, self.n_tracker, self.d_att)
+        # trg.shape = (batch_size*len_target, n_tracker, d_att)
+
+        decision = self.encoder_decider(trg)
+        # decision.shape = (batch_size*len_target, n_tracker, d_att)
+
         trg = trg.reshape(batch_size, len_target, self.n_tracker, self.d_att)
         # trg.shape = (batch_size, len_target, n_tracker, d_att)
 
-        decision = self.encoder_decider(trg, mask=self.mask_decider)
-        # decision.shape = (batch_size, n_tracker*len_target, d_att)
+        decision = decision.reshape(batch_size, len_target, self.n_tracker, self.d_att)
+        # decision.shape = (batch_size, len_target, n_tracker, d_att)
         decision = self.resizer_decider(decision)
-        # decision.shape = (batch_size, n_tracker*len_target, 1)
-        decision = decision.reshape(batch_size, len_target, self.n_tracker, 1)
+        # decision.shape = (batch_size, len_target, n_tracker, 1)
+        decision = self.normalizer_decider(decision)
 
         trg = torch.matmul(trg.transpose(-1, -2), decision).squeeze(-1)
         # trg.shape = (batch_size, len_target, d_att)
 
         return trg
-
