@@ -6,14 +6,6 @@ from Complete.Transformer.DecoderTransformer import DecoderLayer
 from Complete.Embedding import TrackerEmbeddingLayer
 from Complete.PositionalEncoding import ClassicPositionalEncoding
 
-def MakePermutMask(n_tracker, len_target):
-    Permut = (torch.tril(torch.ones(n_tracker * len_target, n_tracker * len_target), n_tracker) -
-              torch.tril(torch.ones(n_tracker * len_target, n_tracker * len_target), n_tracker - 1) +
-              torch.tril(torch.ones(n_tracker * len_target, n_tracker * len_target), -n_tracker * (len_target - 1)) -
-              torch.tril(torch.ones(n_tracker * len_target, n_tracker * len_target), -n_tracker * (len_target - 1) - 1))
-    Powers = tuple(torch.linalg.matrix_power(Permut, i) for i in range(len_target))
-    return torch.tril(sum(Powers)).unsqueeze(0).unsqueeze(0)
-
 def MakeDecoderMask(n_tracker, len_target):
     mask = torch.zeros(n_tracker*len_target, n_tracker*len_target)
     for i in range(len_target):
@@ -52,7 +44,13 @@ class TransformerTranslator(nn.Module):
         self.PE_encoder = ClassicPositionalEncoding(d_att=d_att, dropout=0, max_len=len_target, device=device)
         self.PE_decoder = ClassicPositionalEncoding(d_att=d_att, dropout=0, max_len=len_target, device=device)
 
-        self.mask_decoder = MakeDecoderMask(n_tracker, len_target)
+        self.register_buffer("mask_decoder", MakeDecoderMask(n_tracker, len_target), persistent=False)
+
+        self.prediction_physics = FeedForward(d_in=d_att, d_out=d_PDW, widths=[16], dropout=0)
+        self.prediction_flags = FeedForward(d_in=d_att, d_out=n_flags, widths=[16], dropout=0)
+
+        # Ce vecteur a pour but de déterminer l'action a réaliser, mettre fin à la traduction dans notre cas particulier
+        self.prediction_action = FeedForward(d_in=d_att, d_out=1, widths=[32, 8], dropout=0)
 
         self.to(device)
 
@@ -92,4 +90,11 @@ class TransformerTranslator(nn.Module):
         trg = torch.matmul(trg.transpose(-1, -2), decision).squeeze(-1)
         # trg.shape = (batch_size, len_target, d_att)
 
-        return trg
+        physics, flags, action = self.prediction_physics(trg), self.prediction_flags(trg), self.prediction_action(trg)
+
+        # Physic.shape = (batch_size, target_len, d_PDW)
+        # Flags.shape = (batch_size, target_len, n_flags)
+        # Action.shape = (batch_size, target_len, 1)
+        PDW = torch.cat((physics, flags), dim=2)
+
+        return PDW, action
