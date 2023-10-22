@@ -1,3 +1,8 @@
+'''
+Pour cette phase, on pré-entraîne en mode auto-encoder :
+Les entrées et les sorties sont sensiblement les mêmes mais en face de chaque PDW en sortie, on prédit les n_tracker PDWs suivants
+'''
+
 from Tools.XMLTools import loadXmlAsObj
 import os
 import torch
@@ -10,31 +15,22 @@ from tqdm import tqdm
 # local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
 local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
-# Temps de maintien max d'un mesureur sans voir son impulsion
-holding_time = 0.5
 n_max_pulses = 10
 n_PDWs_memory = 10
 delta_t = 0.5
 n_max_PDWs = 20
 t_max = 35
 
-# Cette fonction donne un majorant de la date de publication d'un PDW donné
-def TimeRelease(PDW):
-    # PDW est une liste de la forme [TOA: float, LI: float, Level: float, FreqMin: float, FreqMax: float, flag1: int, flag2: int, flag3: int]
-    maj = PDW[0] + PDW[1] + holding_time
-    return maj
 
 # Cette fonction a pour rôle de transformer les phrases de source et translation en plein de petites
 # phrases correspondant au découpage par salve temporelle de longueur delta_t
-def Spliter(source, translation, delta_t):
+def Spliter(source, delta_t):
     new_source = []
     new_translation = []
     batch_len = len(source)
     for i in tqdm(range(batch_len)):
         source_sentence = source[i]
-        translation_sentence = translation[i]
-        # Il faut trier les PDWs par date de publication
-        translation_sentence.sort(key=TimeRelease)
+        translation_sentence = source[i]
 
         # On commence par découper la phrase de source et la phrase de translation sur les intervalles de taille delta_t
         splitted_source_sentence = []
@@ -70,8 +66,6 @@ def Spliter(source, translation, delta_t):
             t += delta_t
             splitted_source_sentence.append([])
             splitted_translation_sentence.append([])
-
-
 
         # On reconstruit les phrases telles qu'elles seront données au traducteur
         remain = [[0] * 5] * n_max_pulses
@@ -137,17 +131,3 @@ def WriteBatchs(source, translation, type_data):
 
 if __name__ == '__main__':
     FDTDataMaker()
-
-
-# Cette fonction ne prend pas en compte le chargement du mode évaluation pour l'instant
-def FDTDataLoader(local=''):
-
-    type_data = 'Validation'
-    validation_source = torch.tensor(np.load(os.path.join(local, 'Complete', 'Data', type_data, 'PulsesAnt.npy')))
-    validation_translation = torch.tensor(np.load(os.path.join(local, 'Complete', 'Data', type_data, 'PDWsDCI.npy')))
-
-    type_data = 'Training'
-    training_source = torch.tensor(np.load(os.path.join(local, 'Complete', 'Data', type_data, 'PulsesAnt.npy')))
-    training_translation = torch.tensor(np.load(os.path.join(local, 'Complete', 'Data', type_data, 'PDWsDCI.npy')))
-
-    return validation_source, validation_translation, training_source, training_translation

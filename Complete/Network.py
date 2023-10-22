@@ -12,6 +12,7 @@ def MakeDecoderMask(n_tracker, len_target):
         mask[i*n_tracker:, i*n_tracker:(i+1)*n_tracker] = 1
     return mask.unsqueeze(0).unsqueeze(0)
 
+
 class TransformerTranslator(nn.Module):
 
     def __init__(self, d_pulse, d_PDW, d_att=32, n_heads=4, n_encoders=3, n_tracker=4,
@@ -81,20 +82,21 @@ class TransformerTranslator(nn.Module):
         trg = trg.reshape(batch_size, len_target, self.n_tracker, self.d_att)
         # trg.shape = (batch_size, len_target, n_tracker, d_att)
 
+        trg = torch.cat((self.prediction_physics(trg), self.prediction_flags(trg), self.prediction_action(trg)), dim=2)
+
         decision = decision.reshape(batch_size, len_target, self.n_tracker, self.d_att)
         # decision.shape = (batch_size, len_target, n_tracker, d_att)
         decision = self.resizer_decider(decision)
         # decision.shape = (batch_size, len_target, n_tracker, 1)
         decision = self.normalizer_decider(decision)
 
-        trg = torch.matmul(trg.transpose(-1, -2), decision).squeeze(-1)
-        # trg.shape = (batch_size, len_target, d_att)
+        trg = self.HookMatmul(trg.transpose(-1, -2), decision).squeeze(-1)
+        # trg.shape = (batch_size, len_target, d_PDW + n_flags + 1)
 
-        physics, flags, action = self.prediction_physics(trg), self.prediction_flags(trg), self.prediction_action(trg)
-
-        # Physic.shape = (batch_size, target_len, d_PDW)
-        # Flags.shape = (batch_size, target_len, n_flags)
-        # Action.shape = (batch_size, target_len, 1)
-        PDW = torch.cat((physics, flags), dim=2)
+        PDW, action = trg.split([self.d_PDW + self.n_flags, 1], dim=-1)
 
         return PDW, action
+
+    def HookMatmul(self, x, y):
+        # custom matmul pour pouvoir récupérer entrées et sorties avec un hook
+        return torch.matmul(x, y)
