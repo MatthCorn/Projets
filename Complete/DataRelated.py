@@ -6,9 +6,10 @@ from torch.nn.utils.rnn import pad_sequence
 import torch.nn.functional as F
 import shutil
 from tqdm import tqdm
+from FakeDigitalTwin.SciptData import MakeSets
 
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 # Temps de maintien max d'un mesureur sans voir son impulsion
 holding_time = 0.5
@@ -89,54 +90,56 @@ def Spliter(source, translation, delta_t):
 
     return new_source, new_translation
 
-def FDTDataMaker():
-    for type_data in ['Validation', 'Training']:
-        pulses = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', type_data + 'PulsesAnt.xml'))
-        PDWs = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', type_data + 'PDWsDCI.xml'))
+def FDTDataMaker(list_density):
+    for density in list_density:
+        print('density :', str(density))
+        MakeSets(density)
+        for type_data in ['Validation', 'Training']:
+            pulses = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', type_data + 'PulsesAnt.xml'))
+            PDWs = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', type_data + 'PDWsDCI.xml'))
 
-        source = [
-            [[pulse['TOA'], pulse['LI'], pulse['Level'], pulse['FreqStart'], pulse['FreqEnd']] for pulse in pulses_ant]
-            for pulses_ant in pulses]
-        translation = [[[PDW['TOA'], PDW['LI'], PDW['Level'], PDW['FreqMin'], PDW['FreqMax'], int('CW' in PDW['flags']),
-                         int('TroncAv' in PDW['flags']),
-                         int(len(PDW['flags']) == 0)] for PDW in PDWs_DCI] for PDWs_DCI in PDWs]
+            source = [
+                [[pulse['TOA'], pulse['LI'], pulse['Level'], pulse['FreqStart'], pulse['FreqEnd']] for pulse in pulses_ant]
+                for pulses_ant in pulses]
+            translation = [[[PDW['TOA'], PDW['LI'], PDW['Level'], PDW['FreqMin'], PDW['FreqMax'], int('CW' in PDW['flags']),
+                             int('TroncAv' in PDW['flags']),
+                             int(len(PDW['flags']) == 0)] for PDW in PDWs_DCI] for PDWs_DCI in PDWs]
 
-        # Ici les données sont founies en batch
-        # source est une liste de séquence d'impulsions de même longueur
-        # translation est une liste de séquence de PDWs, elles peuvent être de longueures différentes
-
-
-        source, translation = Spliter(source, translation, delta_t)
-        # On transforme ces listes en tenseur
-        source = torch.tensor(source)
-        # source.shape = (batch_size, len_input, d_input)
-
-        # Rajoute des 0 à la fin des scénarios de PDWs pour qu'ils aient toutes la même longueure
-        translation = pad_sequence([torch.tensor(el) for el in translation], batch_first=True)
-
-        _, temp_len, _ = translation.shape
-        translation = F.pad(translation, (0, 0, 0, n_max_PDWs - temp_len))
-        # translation.shape = (batch_size, n_max_PDWs, d_target + num_flags)
-
-        WriteBatchs(source=source, translation=translation, type_data=type_data)
+            # Ici les données sont founies en batch
+            # source est une liste de séquence d'impulsions de même longueur
+            # translation est une liste de séquence de PDWs, elles peuvent être de longueures différentes
 
 
-def WriteBatchs(source, translation, type_data):
+            source, translation = Spliter(source, translation, delta_t)
+            # On transforme ces listes en tenseur
+            source = torch.tensor(source)
+            # source.shape = (batch_size, len_input, d_input)
+
+            # Rajoute des 0 à la fin des scénarios de PDWs pour qu'ils aient toutes la même longueure
+            translation = pad_sequence([torch.tensor(el) for el in translation], batch_first=True)
+
+            _, temp_len, _ = translation.shape
+            translation = F.pad(translation, (0, 0, 0, n_max_PDWs - temp_len))
+            # translation.shape = (batch_size, n_max_PDWs, d_target + num_flags)
+            Write(source=source, translation=translation, type_data=type_data, density=density)
+
+
+def Write(source, translation, type_data, density):
     save_path = os.path.join(local, 'Complete', 'Data')
     try:
-        shutil.rmtree(os.path.join(save_path, type_data))
+        os.mkdir(os.path.join(save_path, 'D_'+str(density)))
     except:
         None
 
-    os.mkdir(os.path.join(save_path, type_data))
+    os.mkdir(os.path.join(save_path, 'D_'+str(density), type_data))
 
-    name_file_source = os.path.join(save_path, type_data, 'PulsesAnt.npy')
-    name_file_translation = os.path.join(save_path, type_data, 'PDWsDCI.npy')
+    name_file_source = os.path.join(save_path, 'D_'+str(density), type_data, 'PulsesAnt.npy')
+    name_file_translation = os.path.join(save_path, 'D_'+str(density), type_data, 'PDWsDCI.npy')
     np.save(name_file_source, source.numpy())
     np.save(name_file_translation, translation.numpy())
 
 if __name__ == '__main__':
-    FDTDataMaker()
+    FDTDataMaker(list_density=[0.5, 0.7, 1, 1.3, 1.6, 2, 2.5, 3, 4, 5])
 
 
 # Cette fonction ne prend pas en compte le chargement du mode évaluation pour l'instant

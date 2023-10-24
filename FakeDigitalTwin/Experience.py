@@ -6,7 +6,7 @@ import numpy as np
 from tqdm import tqdm
 
 
-def MakeData(Batch_size, seed, name):
+def MakeData(Batch_size, density, seed, name):
     BatchPulses = []
     BatchPDWs = []
 
@@ -28,11 +28,11 @@ def MakeData(Batch_size, seed, name):
         # Temps de maintien max d'un mesureur sans voir son impulsion
         HoldingTime = 0.5
 
-        size = 100
+        size = int(100*density/(2*0.5146))
 
         # On se donne un scénario de 30 unités de temps
         # On a donc en moyenne 3 impulsions en même temps
-        TOA = 30 * np.sort(np.random.random(size=size))
+        TOA = 100 * np.sort(np.random.random(size=size))
 
         ####################################################################################################################
         # Le temps de maintien max d'un mesureur est de 2 unités de temps, on veut que 90% des impulsions soit moins longues
@@ -93,5 +93,10 @@ def MakeData(Batch_size, seed, name):
 
 
     cwd = os.getcwd()
+    (path, dir) = os.path.split(cwd)
+    while dir!='Projets':
+        (path, dir) = os.path.split(path)
+    cwd = os.path.join(path, dir, 'FakeDigitalTwin')
+
     saveObjAsXml(BatchPulses, os.path.join(cwd, 'Data', name+'PulsesAnt.xml'))
     saveObjAsXml(BatchPDWs, os.path.join(cwd, 'Data', name+'PDWsDCI.xml'))

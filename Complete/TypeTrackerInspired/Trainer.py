@@ -1,12 +1,12 @@
-from Complete.Network import TransformerTranslator
-from Complete.Hookers import Hookers
+from Complete.TypeTrackerInspired.TrackerNetwork import TransformerTranslator
+from Complete.TypeTrackerInspired.Hookers import Hookers
+from Complete.TypeTrackerInspired.Error import ErrorAction
 from Complete.DataRelated import FDTDataLoader
 from Tools.XMLTools import saveObjAsXml
 import os
 import torch
 from tqdm import tqdm
 from Complete.PlotError import Plot
-from Complete.Error import ErrorAction
 import datetime
 from GitPush import git_push
 
@@ -43,8 +43,9 @@ validation_source, validation_translation, training_source, training_translation
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 translator = TransformerTranslator(d_pulse=param['d_pulse'], d_PDW=param['d_PDW'], d_att=param['d_att'], len_target=param['len_target'],
-                                   n_encoders=param['n_encoders'],  n_tracker=param['n_trackers'], n_flags=param['n_flags'],
-                                   n_heads=param['n_heads'], n_decoders=param['n_decoders'], n_PDWs_memory=param['n_PDWs_memory'], device=device)
+                                    n_encoders=param['n_encoders'], n_tracker=param['n_trackers'], n_flags=param['n_flags'],
+                                    n_heads=param['n_heads'], n_decoders=param['n_decoders'], n_PDWs_memory=param['n_PDWs_memory'], device=device)
+
 
 hookers = Hookers(translator)
 

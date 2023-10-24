@@ -3,8 +3,12 @@ import torch.nn as nn
 from Complete.Transformer.EncoderTransformer import EncoderLayer
 from Complete.Transformer.EasyFeedForward import FeedForward
 from Complete.Transformer.DecoderTransformer import DecoderLayer
-from Complete.Embedding import TrackerEmbeddingLayer
-from Complete.PositionalEncoding import ClassicPositionalEncoding
+from Complete.TypeTrackerInspired.Embedding import TrackerEmbeddingLayer
+from Complete.TypeTrackerInspired.PositionalEncoding import ClassicPositionalEncoding
+
+'''
+implémentation du réseau de neurones avec une architecture inspirée du fonctionnement avec mesureurs du jumeau numérique
+'''
 
 def MakeDecoderMask(n_tracker, len_target):
     mask = torch.zeros(n_tracker*len_target, n_tracker*len_target)
