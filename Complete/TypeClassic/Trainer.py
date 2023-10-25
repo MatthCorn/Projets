@@ -12,8 +12,8 @@ from GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 param = {
     'd_pulse': 5,
@@ -57,9 +57,9 @@ for dir in os.listdir(os.path.join(local, 'Complete', 'Data')):
     optimizer = torch.optim.Adam(translator.parameters(), lr=3e-4)
 
     # On calcule l'écart type
-    std = np.std(training_translation, axis=(0, 1))
+    std = np.std(training_translation.numpy(), axis=(0, 1))
 
-    n_epochs = 5
+    n_epochs = 100
     for i in tqdm(range(n_epochs)):
         error, error_trans = ErrorAction(training_source, training_translation, training_ended, translator, batch_size, action='Training', optimizer=optimizer)
         TrainingErrList.append(error)

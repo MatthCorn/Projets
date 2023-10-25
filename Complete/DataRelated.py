@@ -8,8 +8,8 @@ import shutil
 from tqdm import tqdm
 from FakeDigitalTwin.SciptData import MakeSets
 
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 # Temps de maintien max d'un mesureur sans voir son impulsion
 holding_time = 0.5
@@ -139,7 +139,7 @@ def Write(source, translation, type_data, density):
     np.save(name_file_translation, translation.numpy())
 
 if __name__ == '__main__':
-    FDTDataMaker(list_density=[0.9, 1.2, 1.5, 1.8, 2.2, 2.6, 3, 3.5, 4])
+    FDTDataMaker(list_density=[0.5, 0.7, 0.9, 1.2, 1.5, 1.8, 2.2, 2.6, 3, 3.5, 4])
 
 
 # Cette fonction ne prend pas en compte le chargement du mode évaluation pour l'instant
