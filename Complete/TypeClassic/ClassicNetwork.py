@@ -63,8 +63,6 @@ class TransformerTranslator(nn.Module):
             trg = decoder(target=trg, source=src, mask=self.mask_decoder)
         # trg.shape = (batch_size, len_target, d_att)
 
-        trg = torch.cat((self.prediction_physics(trg), self.prediction_flags(trg), self.prediction_action(trg)), dim=2)
+        trg = torch.cat((self.prediction_physics(trg), self.prediction_flags(trg)), dim=2)
 
-        PDW, action = trg.split([self.d_PDW + self.n_flags, 1], dim=-1)
-
-        return PDW, action
+        return trg

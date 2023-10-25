@@ -116,7 +116,7 @@ def FDTDataMaker(list_density):
             # source.shape = (batch_size, len_input, d_input)
 
             # Rajoute des 0 à la fin des scénarios de PDWs pour qu'ils aient toutes la même longueure
-            translation = pad_sequence([torch.tensor(el) for el in translation], batch_first=True)
+            translation = pad_sequence([torch.tensor(el, dtype=torch.float32) for el in translation], batch_first=True)
 
             _, temp_len, _ = translation.shape
             translation = F.pad(translation, (0, 0, 0, n_max_PDWs - temp_len))
@@ -139,18 +139,18 @@ def Write(source, translation, type_data, density):
     np.save(name_file_translation, translation.numpy())
 
 if __name__ == '__main__':
-    FDTDataMaker(list_density=[0.5, 0.7, 1, 1.3, 1.6, 2, 2.5, 3, 4, 5])
+    FDTDataMaker(list_density=[0.9, 1.2, 1.5, 1.8, 2.2, 2.6, 3, 3.5, 4])
 
 
 # Cette fonction ne prend pas en compte le chargement du mode évaluation pour l'instant
-def FDTDataLoader(local=''):
+def FDTDataLoader(path=''):
 
     type_data = 'Validation'
-    validation_source = torch.tensor(np.load(os.path.join(local, 'Complete', 'Data', type_data, 'PulsesAnt.npy')))
-    validation_translation = torch.tensor(np.load(os.path.join(local, 'Complete', 'Data', type_data, 'PDWsDCI.npy')))
+    validation_source = torch.tensor(np.load(os.path.join(path, type_data, 'PulsesAnt.npy')))
+    validation_translation = torch.tensor(np.load(os.path.join(path, type_data, 'PDWsDCI.npy')))
 
     type_data = 'Training'
-    training_source = torch.tensor(np.load(os.path.join(local, 'Complete', 'Data', type_data, 'PulsesAnt.npy')))
-    training_translation = torch.tensor(np.load(os.path.join(local, 'Complete', 'Data', type_data, 'PDWsDCI.npy')))
+    training_source = torch.tensor(np.load(os.path.join(path, type_data, 'PulsesAnt.npy')))
+    training_translation = torch.tensor(np.load(os.path.join(path, type_data, 'PDWsDCI.npy')))
 
     return validation_source, validation_translation, training_source, training_translation

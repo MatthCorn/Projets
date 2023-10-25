@@ -8,14 +8,13 @@ def Plot(path, std=False):
 
     TrainingErrList, ValidationErrList = data['Training']['ErrList'], data['Validation']['ErrList']
     TrainingErrTransList, ValidationErrTransList = data['Training']['ErrTransList'], data['Validation']['ErrTransList']
-    TrainingErrActList, ValidationErrActList = data['Training']['ErrActList'], data['Validation']['ErrActList']
 
-    fig, ((ax11, ax12), (ax21, ax22), (ax31, ax32), (ax41, ax42)) = plt.subplots(4, 2)
+    fig, ((ax11, ax12), (ax21, ax22), (ax31, ax32)) = plt.subplots(3, 2)
 
     Std = [1.]*len(TrainingErrTransList[0])
     if std:
         # On calcule l'écart type et on trace sur chaque subplot
-        TransPath = os.path.join(path.split('Save')[0], 'Data', 'Training', 'PDWsDCI.npy')
+        TransPath = os.path.join(path.split('Type')[0], 'Data', 'D_0.5', 'Training', 'PDWsDCI.npy')
         Translation = np.load(TransPath)
         Std = np.std(Translation, axis=(0, 1))
 
@@ -56,12 +55,6 @@ def Plot(path, std=False):
     ax32.legend(loc='upper right')
     ax32.set_ylim(bottom=0)
 
-    ax41.plot(TrainingErrActList, 'r', label="Ensemble d'entrainement")
-    ax41.set_title("Erreur sur l'action")
-    ax41.plot(ValidationErrActList, 'b', label="Ensemble de Validation")
-    ax41.legend(loc='upper right')
-    ax41.set_ylim(bottom=0)
-
     plt.show()
 
 
@@ -69,6 +62,6 @@ if __name__ == '__main__':
     local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
     # local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
-    folder = os.path.join('Complete', 'Save', '2023-10-17__16-30', 'error')
+    folder = os.path.join('Complete', 'TypeClassic', 'Save', '2023-10-25__15-09', 'error')
     Plot(os.path.join(local, folder), std=True)
 

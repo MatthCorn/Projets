@@ -1,12 +1,12 @@
-from Complete.TypeTrackerInspired.TrackerNetwork import TransformerTranslator
-from Complete.TypeTrackerInspired.Hookers import Hookers
+from Complete.TypeClassic.ClassicNetwork import TransformerTranslator
+from Complete.TypeClassic.Error import ErrorAction
 from Complete.DataRelated import FDTDataLoader
 from Tools.XMLTools import saveObjAsXml
 import os
+import numpy as np
 import torch
 from tqdm import tqdm
 from Complete.PlotError import Plot
-from Complete.Error import ErrorAction
 import datetime
 from GitPush import git_push
 
@@ -29,72 +29,68 @@ param = {
     'batch_size': 2048
 }
 
-weights = {
-    'trans': 1,
-    'act': 1,
-    'var': {'mod': 1, 'threshold': 5},
-    'div': {'mod': 1, 'threshold': 0.1875},
-    'sym': 1,
-    'likeli': 1,
-}
-
-validation_source, validation_translation, training_source, training_translation = FDTDataLoader(local=local)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 translator = TransformerTranslator(d_pulse=param['d_pulse'], d_PDW=param['d_PDW'], d_att=param['d_att'], len_target=param['len_target'],
-                                    n_encoders=param['n_encoders'], n_tracker=param['n_trackers'], n_flags=param['n_flags'],
-                                    n_heads=param['n_heads'], n_decoders=param['n_decoders'], n_PDWs_memory=param['n_PDWs_memory'], device=device)
-
-
-hookers = Hookers(translator)
-
-
-training_ended = (torch.norm(training_translation[:, param['n_PDWs_memory']:], dim=-1) == 0).unsqueeze(-1).to(torch.float32)
-
-validation_ended = (torch.norm(validation_translation[:, param['n_PDWs_memory']:], dim=-1) == 0).unsqueeze(-1).to(torch.float32)
+                                   n_encoders=param['n_encoders'], n_flags=param['n_flags'], n_heads=param['n_heads'],
+                                   n_decoders=param['n_decoders'], n_PDWs_memory=param['n_PDWs_memory'], device=device)
 
 batch_size = param['batch_size']
 
 # Procédure d'entrainement
-optimizer = torch.optim.Adam(translator.parameters(), lr=3e-4)
 TrainingErrList = []
 TrainingErrTransList = []
-TrainingErrActList = []
 ValidationErrList = []
 ValidationErrTransList = []
-ValidationErrActList = []
-
-n_epochs = 100
-for i in tqdm(range(n_epochs)):
-    error, error_act, error_trans = ErrorAction(training_source, training_translation, training_ended, translator, hookers, weights, batch_size, action='Training', optimizer=optimizer)
-    TrainingErrList.append(error)
-    TrainingErrActList.append(error_act)
-    TrainingErrTransList.append(error_trans)
-
-    translator.eval()
-    error, error_act, error_trans = ErrorAction(validation_source, validation_translation, validation_ended, translator, hookers, weights, batch_size, action='Validation')
-    ValidationErrList.append(error)
-    ValidationErrActList.append(error_act)
-    ValidationErrTransList.append(error_trans)
-
-
-error = {'Training':
-             {'ErrList': TrainingErrList, 'ErrTransList': TrainingErrTransList, 'ErrActList': TrainingErrActList},
-         'Validation':
-             {'ErrList': ValidationErrList, 'ErrTransList': ValidationErrTransList, 'ErrActList': ValidationErrActList}}
 
 folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
-save_path = os.path.join(local, 'Complete', 'Save', folder)
+save_path = os.path.join(local, 'Complete', 'TypeClassic', 'Save', folder)
 os.mkdir(save_path)
 
-torch.save(translator.state_dict(), os.path.join(save_path, 'Translator'))
-torch.save(optimizer.state_dict(), os.path.join(save_path, 'Optimizer'))
-saveObjAsXml(param, os.path.join(save_path, 'param'))
-saveObjAsXml(error, os.path.join(save_path, 'error'))
+for dir in os.listdir(os.path.join(local, 'Complete', 'Data')):
+    path = os.path.join(local, 'Complete', 'Data', dir)
+    validation_source, validation_translation, training_source, training_translation = FDTDataLoader(path=path)
+    training_ended = (torch.norm(training_translation[:, param['n_PDWs_memory']:], dim=-1) == 0).unsqueeze(-1).to(torch.float32)
+    validation_ended = (torch.norm(validation_translation[:, param['n_PDWs_memory']:], dim=-1) == 0).unsqueeze(-1).to(torch.float32)
+
+    optimizer = torch.optim.Adam(translator.parameters(), lr=3e-4)
+
+    # On calcule l'écart type
+    std = np.std(training_translation, axis=(0, 1))
+
+    n_epochs = 5
+    for i in tqdm(range(n_epochs)):
+        error, error_trans = ErrorAction(training_source, training_translation, training_ended, translator, batch_size, action='Training', optimizer=optimizer)
+        TrainingErrList.append(error)
+        # normalisation de l'erreur par rapport à l'écart-type sur chaque coordonnée physique
+        error_trans[0], error_trans[1], error_trans[2], error_trans[3], error_trans[4] = \
+            error_trans[0]/std[0], error_trans[1]/std[1], error_trans[2]/std[2], error_trans[3]/std[3], error_trans[4]/std[4]
+        TrainingErrTransList.append(error_trans)
+
+        translator.eval()
+        error, error_trans = ErrorAction(validation_source, validation_translation, validation_ended, translator, batch_size, action='Validation')
+        ValidationErrList.append(error)
+        # normalisation de l'erreur par rapport à l'écart-type sur chaque coordonnée physique
+        error_trans[0], error_trans[1], error_trans[2], error_trans[3], error_trans[4] = \
+            error_trans[0]/std[0], error_trans[1]/std[1], error_trans[2]/std[2], error_trans[3]/std[3], error_trans[4]/std[4]
+        ValidationErrTransList.append(error_trans)
+
+
+    error = {'Training':
+                 {'ErrList': TrainingErrList, 'ErrTransList': TrainingErrTransList},
+             'Validation':
+                 {'ErrList': ValidationErrList, 'ErrTransList': ValidationErrTransList}
+             }
+
+    os.mkdir(os.path.join(save_path, dir))
+
+    torch.save(translator.state_dict(), os.path.join(save_path, dir, 'Translator'))
+    torch.save(optimizer.state_dict(), os.path.join(save_path, dir, 'Optimizer'))
+    saveObjAsXml(param, os.path.join(save_path, dir, 'param'))
+    saveObjAsXml(error, os.path.join(save_path, dir, 'error'))
 
 # git_push(local=local, file=save_path, CommitMsg='simu '+folder)
 
-Plot(os.path.join(save_path, 'error'), std=True)
 
 

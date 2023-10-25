@@ -35,7 +35,7 @@ def MakeData(Batch_size, density, seed, name):
         TOA = 100 * np.sort(np.random.random(size=size))
 
         ####################################################################################################################
-        # Le temps de maintien max d'un mesureur est de 2 unités de temps, on veut que 90% des impulsions soit moins longues
+        # Le temps de maintien max d'un mesureur est de 2 unités de temps, on veut que 97.5% des impulsions soit moins longues
 
         # import numpy as np
         # t_max = 2
@@ -49,12 +49,12 @@ def MakeData(Batch_size, density, seed, name):
         #     print(frac)
         #     print('\n')
         #
-        # scale = 0.5146
+        # scale = 0.36
         ####################################################################################################################
-        LI = np.random.gamma(shape=2, scale=0.5146, size=size) + 1e-2
+        LI = np.random.gamma(shape=2, scale=0.36, size=size) + 1e-2
 
         ####################################################################################################################
-        # Le niveau de saturation est de 10 unités, on veut que 90% des impulsions soit moins fortes
+        # Le niveau de saturation est de 10 unités, on veut que 97.5% des impulsions soit moins fortes
 
         # import numpy as np
         # Lvl_max = 10
@@ -68,12 +68,12 @@ def MakeData(Batch_size, density, seed, name):
         #     print(frac)
         #     print('\n')
         #
-        # scale = 2.5716
+        # scale = 1.8
         ####################################################################################################################
-        Level = np.random.gamma(shape=2, scale=2.5716, size=size)
+        Level = np.random.gamma(shape=2, scale=1.8, size=size)
 
-        # Les fréquences se trouvent entre 0 et 10 et peuvent varier le long d'une impulsion de 0.5 unité de fréquence
-        dF = 0.5 * (2 * np.random.random(size=size) - 1)
+        # Les fréquences se trouvent entre 0 et 10 et peuvent varier le long d'une impulsion de 0.05 unité de fréquence
+        dF = 0.05 * (2 * np.random.random(size=size) - 1)
         FreqMoy = 9 * np.random.random(size=size) + 0.5
         FreqStart = FreqMoy + dF
         FreqEnd = FreqMoy - dF
