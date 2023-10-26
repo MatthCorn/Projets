@@ -1,21 +1,20 @@
 from Tools.XMLTools import loadXmlAsObj
 import os
 import torch
+import torch.nn.functional as F
 import numpy as np
 from torch.nn.utils.rnn import pad_sequence
-import torch.nn.functional as F
-import shutil
 from tqdm import tqdm
 from FakeDigitalTwin.SciptData import MakeSets
 
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 # Temps de maintien max d'un mesureur sans voir son impulsion
 holding_time = 0.5
 n_max_pulses = 10
 n_PDWs_memory = 10
-delta_t = 0.5
+delta_t = 3
 n_max_PDWs = 20
 t_max = 35
 
@@ -94,6 +93,7 @@ def FDTDataMaker(list_density):
     for density in list_density:
         print('density :', str(density))
         MakeSets(density)
+
         for type_data in ['Validation', 'Training']:
             pulses = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', type_data + 'PulsesAnt.xml'))
             PDWs = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', type_data + 'PDWsDCI.xml'))
@@ -118,9 +118,6 @@ def FDTDataMaker(list_density):
             # Rajoute des 0 à la fin des scénarios de PDWs pour qu'ils aient toutes la même longueure
             translation = pad_sequence([torch.tensor(el, dtype=torch.float32) for el in translation], batch_first=True)
 
-            _, temp_len, _ = translation.shape
-            translation = F.pad(translation, (0, 0, 0, n_max_PDWs - temp_len))
-            # translation.shape = (batch_size, n_max_PDWs, d_target + num_flags)
             Write(source=source, translation=translation, type_data=type_data, density=density)
 
 
@@ -139,18 +136,27 @@ def Write(source, translation, type_data, density):
     np.save(name_file_translation, translation.numpy())
 
 if __name__ == '__main__':
-    FDTDataMaker(list_density=[0.5, 0.7, 0.9, 1.2, 1.5, 1.8, 2.2, 2.6, 3, 3.5, 4])
+    FDTDataMaker(list_density=[0.3, 0.4, 0.5, 0.7, 0.9, 1.2, 1.5, 1.8, 2.2, 2.6, 3])
 
+if False:
+    for dir in os.listdir(os.path.join(local, 'Complete', 'Data')):
+        s = torch.tensor(np.load(os.path.join(local, 'Complete', 'Data', dir, 'Training', 'PDWsDCI.npy')))
+        print(dir + '/n')
+        print(torch.norm(s, dim=(0, 2), p=1))
 
 # Cette fonction ne prend pas en compte le chargement du mode évaluation pour l'instant
-def FDTDataLoader(path=''):
+def FDTDataLoader(path='', len_target=30):
 
     type_data = 'Validation'
     validation_source = torch.tensor(np.load(os.path.join(path, type_data, 'PulsesAnt.npy')))
     validation_translation = torch.tensor(np.load(os.path.join(path, type_data, 'PDWsDCI.npy')))
+    _, temp_len, _ = validation_translation.shape
+    validation_translation = F.pad(validation_translation, (0, 0, 0, len_target - temp_len))
 
     type_data = 'Training'
     training_source = torch.tensor(np.load(os.path.join(path, type_data, 'PulsesAnt.npy')))
     training_translation = torch.tensor(np.load(os.path.join(path, type_data, 'PDWsDCI.npy')))
+    _, temp_len, _ = training_translation.shape
+    training_translation = F.pad(training_translation, (0, 0, 0, len_target - temp_len))
 
     return validation_source, validation_translation, training_source, training_translation

@@ -6,14 +6,13 @@ import os
 import numpy as np
 import torch
 from tqdm import tqdm
-from Complete.PlotError import Plot
 import datetime
 from GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 param = {
     'd_pulse': 5,
@@ -25,7 +24,7 @@ param = {
     'n_decoders': 3,
     'n_trackers': 4,
     'n_PDWs_memory': 10,
-    'len_target': 20,
+    'len_target': 30,
     'batch_size': 2048
 }
 
@@ -90,7 +89,7 @@ for dir in os.listdir(os.path.join(local, 'Complete', 'Data')):
     saveObjAsXml(param, os.path.join(save_path, dir, 'param'))
     saveObjAsXml(error, os.path.join(save_path, dir, 'error'))
 
-# git_push(local=local, file=save_path, CommitMsg='simu '+folder)
+    # git_push(local=local, file=os.path.join(save_path, dir), CommitMsg='simu '+folder+dir)
 
 
 
