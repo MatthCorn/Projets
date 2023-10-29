@@ -47,6 +47,7 @@ ValidationErrTransList = []
 folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
 save_path = os.path.join(local, 'Complete', 'TypeClassic', 'Save', folder)
 os.mkdir(save_path)
+optimizer = torch.optim.Adam(translator.parameters(), lr=3e-3)
 
 for dir in os.listdir(os.path.join(local, 'Complete', 'Data')):
     path = os.path.join(local, 'Complete', 'Data', dir)
@@ -54,7 +55,6 @@ for dir in os.listdir(os.path.join(local, 'Complete', 'Data')):
     training_ended = training_translation[:, param['n_PDWs_memory']:, param['d_PDW'] + param['n_flags'] + 1].unsqueeze(-1)
     validation_ended = validation_translation[:, param['n_PDWs_memory']:, param['d_PDW'] + param['n_flags'] + 1].unsqueeze(-1)
 
-    optimizer = torch.optim.Adam(translator.parameters(), lr=3e-3)
 
     # On calcule l'écart type
     std = np.std(training_translation.numpy(), axis=(0, 1))

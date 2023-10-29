@@ -15,8 +15,7 @@ class Hookers():
         self.InitHookers()
 
     def InitHookers(self):
-        for decoder in self.model.decoders:
-            self.hookers.append(decoder.register_forward_hook(self.SymetryTrackers))
+        self.hookers.append(self.model.decoders[-1].register_forward_hook(self.SymetryTrackers))
         self.hookers.append(self.model.encoder_decider.register_forward_hook(self.DiversityDecision))
         self.hookers.append(self.model.normalizer_decider.register_forward_hook(self.VarianceTrackers))
         self.hookers.append(self.model.normalizer_decider.register_forward_hook(self.BePrediction))

@@ -75,8 +75,7 @@ error = {'Training':
          'Validation':
              {'ErrList': ValidationErrList, 'ErrTransList': ValidationErrTransList}}
 
-folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
-save_path = os.path.join(save_path, folder)
+save_path = os.path.join(save_path, 'retrain')
 os.mkdir(save_path)
 
 torch.save(translator.state_dict(), os.path.join(save_path, 'Translator'))

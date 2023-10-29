@@ -19,14 +19,18 @@ def MakeDecoderMask(n_tracker, len_target):
 
 class TransformerTranslator(nn.Module):
 
-    def __init__(self, d_pulse, d_PDW, d_att=32, n_heads=4, n_encoders=3, n_tracker=4,
+    def __init__(self, d_pulse, d_PDW, d_att=32, n_heads=4, n_encoders=3, n_tracker=4, len_source=20,
                  n_decoders=3, n_PDWs_memory=10, len_target=20, n_flags=4, device=torch.device('cpu')):
         super().__init__()
         self.device = device
         self.d_PDW = d_PDW
+        self.d_pulse = d_pulse
         self.d_att = d_att
         self.n_tracker = n_tracker
         self.n_flags = n_flags
+
+        self.tokens_encoding = nn.Parameter(torch.randn(3, d_att))
+        self.register_buffer("not_token", torch.tensor([1., 0., 0.]).reshape(3, 1).expand(3, d_att), persistent=False)
 
         self.encoders = nn.ModuleList()
         for i in range(n_encoders):
@@ -46,7 +50,7 @@ class TransformerTranslator(nn.Module):
         self.target_embedding = FeedForward(d_in=d_PDW+n_flags, d_out=d_att, widths=[], dropout=0)
         self.tracker_embedding = TrackerEmbeddingLayer(n_tracker=n_tracker, d_att=d_att)
 
-        self.PE_encoder = ClassicPositionalEncoding(d_att=d_att, dropout=0, max_len=len_target, device=device)
+        self.PE_encoder = ClassicPositionalEncoding(d_att=d_att, dropout=0, max_len=len_source, device=device)
         self.PE_decoder = ClassicPositionalEncoding(d_att=d_att, dropout=0, max_len=len_target, device=device)
 
         self.register_buffer("mask_decoder", MakeDecoderMask(n_tracker, len_target), persistent=False)
@@ -54,22 +58,44 @@ class TransformerTranslator(nn.Module):
         self.prediction_physics = FeedForward(d_in=d_att, d_out=d_PDW, widths=[16], dropout=0)
         self.prediction_flags = FeedForward(d_in=d_att, d_out=n_flags, widths=[16], dropout=0)
 
-        # Ce vecteur a pour but de déterminer l'action a réaliser, mettre fin à la traduction dans notre cas particulier
-        self.prediction_action = FeedForward(d_in=d_att, d_out=1, widths=[32, 8], dropout=0)
 
         self.to(device)
 
     def forward(self, source, target):
-        # target.shape = (batch_size, len_target, d_target+num_flags)
+        # source.shape = (batch_size, len_source, d_pulse+3)
+        # target.shape = (batch_size, len_target, d_PDW+n_flags+3)
+
         batch_size, len_target, _ = target.shape
 
-        trg = self.PE_decoder(self.target_embedding(target))
-        # trg.shape = (batch_size, len_target, d_att)
-        trg = self.tracker_embedding(trg)
-        # trg.shape = (batch_size, n_tracker*len_target, d_att)
+        src, type_source = source.split([self.d_pulse, 3], dim=-1)
+        trg, type_target = target.split([self.d_PDW + self.n_flags, 3], dim=-1)
 
-        src = self.PE_encoder(self.source_embedding(source))
+        trg = self.target_embedding(trg)
+        src = self.source_embedding(src)
+
+        # On fait les opérations suivantes en une seule ligne pour ne pas garder en mémoire des tenseurs qui ne sont plus utiles
+        # token_target = torch.matmul(type_target, self.tokens_encoding)
+        # not_token_mask_target = torch.matmul(type_target, self.not_token)
+        #
+        # token_source = torch.matmul(type_source, self.tokens_encoding)
+        # not_token_mask_source = torch.matmul(type_source, self.not_token)
+        #
+        # trg = not_token_mask_target*trg + (1-not_token_mask_target)*token_target
+        #
+        # src = not_token_mask_source*src + (1-not_token_mask_source)*token_source
+
+        not_token_mask_target = torch.matmul(type_target, self.not_token)
+        not_token_mask_source = torch.matmul(type_source, self.not_token)
+        trg = not_token_mask_target * trg + (1 - not_token_mask_target) * torch.matmul(type_target, self.tokens_encoding)
+        src = not_token_mask_source * src + (1 - not_token_mask_source) * torch.matmul(type_source, self.tokens_encoding)
+
+        trg = self.PE_decoder(trg)
+        src = self.PE_encoder(src)
+
+        # trg.shape = (batch_size, len_target, d_att)
         # src.shape = (batch_size, len_source, d_att)
+
+        trg = self.tracker_embedding(trg)
 
         for encoder in self.encoders:
             src = encoder(src)
@@ -86,7 +112,7 @@ class TransformerTranslator(nn.Module):
         trg = trg.reshape(batch_size, len_target, self.n_tracker, self.d_att)
         # trg.shape = (batch_size, len_target, n_tracker, d_att)
 
-        trg = torch.cat((self.prediction_physics(trg), self.prediction_flags(trg), self.prediction_action(trg)), dim=2)
+        trg = torch.cat((self.prediction_physics(trg), self.prediction_flags(trg)), dim=-1)
 
         decision = decision.reshape(batch_size, len_target, self.n_tracker, self.d_att)
         # decision.shape = (batch_size, len_target, n_tracker, d_att)
@@ -95,11 +121,9 @@ class TransformerTranslator(nn.Module):
         decision = self.normalizer_decider(decision)
 
         trg = self.HookMatmul(trg.transpose(-1, -2), decision).squeeze(-1)
-        # trg.shape = (batch_size, len_target, d_PDW + n_flags + 1)
+        # trg.shape = (batch_size, len_target, d_PDW + n_flags)
 
-        PDW, action = trg.split([self.d_PDW + self.n_flags, 1], dim=-1)
-
-        return PDW, action
+        return trg
 
     def HookMatmul(self, x, y):
         # custom matmul pour pouvoir récupérer entrées et sorties avec un hook

@@ -45,8 +45,6 @@ class TransformerTranslator(nn.Module):
         self.prediction_physics = FeedForward(d_in=d_att, d_out=d_PDW, widths=[16], dropout=0)
         self.prediction_flags = FeedForward(d_in=d_att, d_out=n_flags, widths=[16], dropout=0)
 
-        # Ce vecteur a pour but de déterminer l'action a réaliser, mettre fin à la traduction dans notre cas particulier
-        self.prediction_action = FeedForward(d_in=d_att, d_out=1, widths=[32, 8], dropout=0)
 
         self.to(device)
 
