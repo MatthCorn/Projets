@@ -34,8 +34,8 @@ weights = {
     'trans': 1,
     'var': {'mod': 0, 'threshold': 5},
     'div': {'mod': 0, 'threshold': 0.1875},
-    'sym': 0.5,
-    'likeli': 0.5,
+    'sym': 0.1,
+    'likeli': 0,
 }
 
 
