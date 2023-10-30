@@ -32,21 +32,19 @@ param = {
 
 # Cette ligne crée les variables globales "~TYPE~Source" et "~TYPE~Translation" pour tout ~TYPE~ dans ListTypeData
 TrainingSource = torch.rand(size=(200000, 10, 5))
-TrainingTranslation = torch.rand(size=(200000, 10, 5))
-# TrainingTranslation = TrainingSource.clone()
+TrainingTranslation = TrainingSource.clone()
 
 ValidationSource = torch.rand(size=(6000, 10, 5))
-ValidationTranslation = torch.rand(size=(6000, 10, 5))
-# ValidationTranslation = ValidationSource.clone()
+ValidationTranslation = ValidationSource.clone()
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-Translator = TransformerTranslator(d_source=param['d_source'], d_target=param['d_target'], d_att=param['d_att'], d_input_Enc=param['d_input_Enc'],
-                                   target_len=param['len_target'], num_encoders=param['num_encoders'], d_input_Dec=param['d_input_Dec'],
-                                   num_flags=param['num_flags'], num_heads=param['num_heads'], num_decoders=param['num_decoders'],
-                                   RPR_len_decoder=param['RPR_len_decoder'], NbPDWsMemory=param['NbPDWsMemory'], device=device)
+# Translator = TransformerTranslator(d_source=param['d_source'], d_target=param['d_target'], d_att=param['d_att'], d_input_Enc=param['d_input_Enc'],
+#                                    target_len=param['len_target'], num_encoders=param['num_encoders'], d_input_Dec=param['d_input_Dec'],
+#                                    num_flags=param['num_flags'], num_heads=param['num_heads'], num_decoders=param['num_decoders'],
+#                                    RPR_len_decoder=param['RPR_len_decoder'], NbPDWsMemory=param['NbPDWsMemory'], device=device)
 
-# Translator = Network(d_model=32, d_source=5, d_target=5, max_len=10, nhead=4, num_decoder_layers=3, num_encoder_layers=3, device=device)
+Translator = Network(d_model=512, d_source=5, d_target=5, max_len=10, nhead=4, num_decoder_layers=3, num_encoder_layers=3, dropout=0.5, device=device)
 
 # ValidationTranslation = torch.rand(size=ValidationTranslation.shape)
 # TrainingTranslation = torch.rand(size=TrainingTranslation.shape)
@@ -74,7 +72,7 @@ ValidationSource = ValidationSource/ValidationSdt
 ValidationTranslation = ValidationTranslation/ValidationSdt
 
 
-NbEpochs = 50
+NbEpochs = 20
 
 ScaleMax = 1
 ScaleMin = 1e-2

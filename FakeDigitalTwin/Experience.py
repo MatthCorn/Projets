@@ -10,7 +10,8 @@ def MakeData(Batch_size, density, seed, name):
     BatchPulses = []
     BatchPDWs = []
 
-    np.random.seed(seed)
+    if seed is not None:
+        np.random.seed(seed)
 
     for iter in tqdm(range(Batch_size)):
         # Nombre de mesureurs
