@@ -32,7 +32,7 @@ class Hookers():
         # moyenne afin de ne pas pénaliser la libération de mesureurs entre deux PDWs
         # output.shape = (batch_size, len_target, n_tracker, d_att)
         shape = output.shape
-        symetry_layer_score = torch.norm(torch.norm(output[:, :, 1:] - output[:, :, -1])/math.sqrt(shape[0]*shape[1]*shape[2]*shape[3]) - 2.2)
+        symetry_layer_score = torch.norm(torch.norm(output[:, 1:] - output[:, :-1])/math.sqrt(shape[0]*(shape[1]-1)*shape[2]*shape[3]) - 2.2)
         self.score_symetry_tracker += symetry_layer_score
 
     def VarianceTrackers(self, module, input, output):

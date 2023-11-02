@@ -11,8 +11,8 @@ import numpy as np
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 param = {
     'd_source': 5,
@@ -44,7 +44,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 #                                    num_flags=param['num_flags'], num_heads=param['num_heads'], num_decoders=param['num_decoders'],
 #                                    RPR_len_decoder=param['RPR_len_decoder'], NbPDWsMemory=param['NbPDWsMemory'], device=device)
 
-Translator = Network(d_model=512, d_source=5, d_target=5, max_len=10, nhead=4, num_decoder_layers=3, num_encoder_layers=3, dropout=0.5, device=device)
+Translator = Network(d_model=512, d_source=5, d_target=5, max_len=10, nhead=8, num_decoder_layers=3, num_encoder_layers=3, dropout=0.7, device=device)
 
 # ValidationTranslation = torch.rand(size=ValidationTranslation.shape)
 # TrainingTranslation = torch.rand(size=TrainingTranslation.shape)
@@ -72,7 +72,7 @@ ValidationSource = ValidationSource/ValidationSdt
 ValidationTranslation = ValidationTranslation/ValidationSdt
 
 
-NbEpochs = 20
+NbEpochs = 50
 
 ScaleMax = 1
 ScaleMin = 1e-2
