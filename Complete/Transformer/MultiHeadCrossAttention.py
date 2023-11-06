@@ -19,6 +19,8 @@ class MHCA(nn.Module):
         self.query = nn.Linear(d_att, d_att, bias=False)
         self.dropout = nn.Dropout(dropout)
 
+        self.ResetParam()
+
     def forward(self, x_target, x_source, mask=None):
         # x_source.shape = (batch_size, len_source, d_input)
         batch_size, len_source, _ = x_source.shape
@@ -62,4 +64,10 @@ class MHCA(nn.Module):
         # out.shape = (batch_size, n_heads, len_target, d_head)
         return out
 
-
+    def ResetParam(self):
+        nn.init.xavier_uniform_(self.key.weight)
+        self.key.weight.data /= math.sqrt(self.d_att)
+        nn.init.xavier_uniform_(self.value.weight)
+        self.value.weight.data /= math.sqrt(self.d_att)
+        nn.init.xavier_uniform_(self.query.weight)
+        self.query.weight.data /= math.sqrt(self.d_att)

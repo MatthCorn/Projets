@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from math import sqrt
 from Complete.Transformer.EncoderTransformer import EncoderLayer
 from Complete.Transformer.EasyFeedForward import FeedForward
 from Complete.Transformer.DecoderTransformer import DecoderLayer
@@ -37,12 +38,6 @@ class Network(nn.Module):
         self.register_buffer("mask_decoder", torch.tril(torch.ones(len_target, len_target)).unsqueeze(0).unsqueeze(0), persistent=False)
 
         self.output_dembedding = FeedForward(d_in=d_att, d_out=d_target, widths=[], dropout=0)
-
-        if fixup:
-            for encoder in self.encoders:
-                nn.init.xavier_uniform_(encoder.self_attention.key.weight())
-                nn.init.xavier_uniform_(encoder.self_attention.query.weight())
-                nn.init.xavier_uniform_(encoder.self_attention.value.weight())
 
         self.to(device)
 
