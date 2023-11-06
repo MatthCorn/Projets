@@ -1,5 +1,6 @@
 from StepByStep.S0.Network import TransformerTranslator
 from StepByStep.S0.TorchNetwork import Network
+from StepByStep.S0.TFixup.Network import Network as TNetwork
 from StepByStep.PlotError import Plot
 from StepByStep.S0.Error import ErrorAction
 from Tools.XMLTools import saveObjAsXml
@@ -39,12 +40,8 @@ ValidationTranslation = ValidationSource.clone()
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-# Translator = TransformerTranslator(d_source=param['d_source'], d_target=param['d_target'], d_att=param['d_att'], d_input_Enc=param['d_input_Enc'],
-#                                    target_len=param['len_target'], num_encoders=param['num_encoders'], d_input_Dec=param['d_input_Dec'],
-#                                    num_flags=param['num_flags'], num_heads=param['num_heads'], num_decoders=param['num_decoders'],
-#                                    RPR_len_decoder=param['RPR_len_decoder'], NbPDWsMemory=param['NbPDWsMemory'], device=device)
-
-Translator = Network(d_model=512, d_source=5, d_target=5, max_len=10, nhead=8, num_decoder_layers=3, num_encoder_layers=3, dropout=0.7, device=device)
+# Translator = Network(d_model=64, d_source=5, d_target=5, max_len=10, nhead=4, num_decoder_layers=3, num_encoder_layers=3, dropout=0.2, device=device)
+Translator = TNetwork(d_att=64, d_source=5, d_target=5, len_target=10, len_source=10, n_heads=4, network_depth=3, device=device)
 
 # ValidationTranslation = torch.rand(size=ValidationTranslation.shape)
 # TrainingTranslation = torch.rand(size=TrainingTranslation.shape)

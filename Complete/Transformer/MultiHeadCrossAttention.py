@@ -14,9 +14,9 @@ class MHCA(nn.Module):
         self.d_att = d_att
         self.d_head = d_head
         self.n_heads = n_heads
-        self.key = nn.Linear(d_att, d_att)
-        self.value = nn.Linear(d_att, d_att)
-        self.query = nn.Linear(d_att, d_att)
+        self.key = nn.Linear(d_att, d_att, bias=False)
+        self.value = nn.Linear(d_att, d_att, bias=False)
+        self.query = nn.Linear(d_att, d_att, bias=False)
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x_target, x_source, mask=None):
