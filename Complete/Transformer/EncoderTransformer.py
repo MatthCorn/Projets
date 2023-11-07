@@ -3,14 +3,19 @@ from Complete.Transformer.MultiHeadSelfAttention import MHSA
 from Complete.Transformer.EasyFeedForward import FeedForward
 
 class EncoderLayer(nn.Module):
-    def __init__(self, d_att, n_heads, width_FF=[32], dropout_SA=0., dropout_FF=0.):
+    def __init__(self, d_att, n_heads, width_FF=[32], dropout_SA=0., dropout_FF=0., pre_norm=False):
         super().__init__()
+        self.pre_norm = pre_norm
         self.self_attention = MHSA(d_att, n_heads, dropout=dropout_SA)
         self.first_layer_norm = nn.LayerNorm(d_att)
         self.feed_forward = FeedForward(d_att, d_att, widths=width_FF, dropout=dropout_FF)
         self.second_layer_norm = nn.LayerNorm(d_att)
 
     def forward(self, x, mask=None):
-        y = self.first_layer_norm(self.self_attention(x, mask) + x)
-        y = self.second_layer_norm(self.feed_forward(y) + y)
+        if self.pre_norm:
+            y = self.self_attention(self.first_layer_norm(x), mask) + x
+            y = self.feed_forward(self.second_layer_norm(y) + y)
+        else:
+            y = self.first_layer_norm(self.self_attention(x), mask) + x
+            y = self.second_layer_norm(self.feed_forward(y) + y)
         return y
