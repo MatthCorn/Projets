@@ -34,7 +34,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 translator = TransformerTranslator(d_pulse=param['d_pulse'], d_PDW=param['d_PDW'], d_att=param['d_att'], len_target=param['len_target'],
                                    len_source=param['len_source'], n_encoders=param['n_encoders'], n_flags=param['n_flags'], n_heads=param['n_heads'],
-                                   n_decoders=param['n_decoders'], n_PDWs_memory=param['n_PDWs_memory'], device=device, pre_norm=True)
+                                   n_decoders=param['n_decoders'], n_PDWs_memory=param['n_PDWs_memory'], device=device, norm='pre')
 
 batch_size = param['batch_size']
 

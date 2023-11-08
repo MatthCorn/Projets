@@ -38,7 +38,7 @@ class MHCA(nn.Module):
         # Q.shape = (1, n_heads, len_target, d_head)
 
         CA = self.CrossAttention(Q, Kt, V)
-        # RCA.shape = (batch_size, n_heads, len_target, d_head)
+        # CA.shape = (batch_size, n_heads, len_target, d_head)
 
         concat = CA.transpose(1, 2).reshape(batch_size, len_target, -1)
         # Concat.shape = (batch_size, len_target, d_att)

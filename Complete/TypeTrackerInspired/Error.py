@@ -37,12 +37,12 @@ def ErrorAction(source, target, ended, network, hookers, weights, batch_size=50,
 
             err_trans = TrainingError(source, target, ended, batch_size, j, network)
 
-            # err = torch.norm(err_trans)
+            err = torch.norm(err_trans)
 
-            err = torch.norm(err_trans)*weights['trans'] + \
-                  (1 - F.tanh(hookers.ReleaseError('variance')/weights['var']['threshold']))*weights['var']['mod'] + \
-                  (1 - F.tanh(hookers.ReleaseError('diversity')/weights['div']['threshold']))*weights['div']['mod'] + \
-                  hookers.ReleaseError('symetry')*weights['sym'] + hookers.ReleaseError('likeli')*weights['likeli']
+            # err = torch.norm(err_trans)*weights['trans'] + \
+            #       (1 - F.tanh(hookers.ReleaseError('variance')/weights['var']['threshold']))*weights['var']['mod'] + \
+            #       (1 - F.tanh(hookers.ReleaseError('diversity')/weights['div']['threshold']))*weights['div']['mod'] + \
+            #       hookers.ReleaseError('symetry')*weights['sym'] + hookers.ReleaseError('likeli')*weights['likeli']
 
             err.backward()
             optimizer.step()

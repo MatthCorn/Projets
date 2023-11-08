@@ -29,7 +29,7 @@ def MakeData(Batch_size, density, seed, name):
         # Temps de maintien max d'un mesureur sans voir son impulsion
         HoldingTime = 0.5
 
-        size = int(100*density/(2*0.5146))
+        size = int(100*density/(2*0.36))
 
         # On se donne un scénario de 30 unités de temps
         # On a donc en moyenne 3 impulsions en même temps

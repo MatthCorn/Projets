@@ -12,8 +12,8 @@ from GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 param = {
     'd_pulse': 5,
@@ -34,7 +34,7 @@ weights = {
     'trans': 1,
     'var': {'mod': 0, 'threshold': 5},
     'div': {'mod': 0, 'threshold': 0.1875},
-    'sym': 0.1,
+    'sym': 0.,
     'likeli': 0,
 }
 
@@ -43,11 +43,11 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 translator = TransformerTranslator(d_pulse=param['d_pulse'], d_PDW=param['d_PDW'], d_att=param['d_att'], len_target=param['len_target'],
                                    len_source=param['len_source'], n_encoders=param['n_encoders'], n_tracker=param['n_trackers'], n_flags=param['n_flags'],
-                                   n_heads=param['n_heads'], n_decoders=param['n_decoders'], n_PDWs_memory=param['n_PDWs_memory'], device=device)
+                                   n_heads=param['n_heads'], n_decoders=param['n_decoders'], n_PDWs_memory=param['n_PDWs_memory'], device=device, norm='pre')
 
 
-hookers = Hookers(translator)
-# hookers = None
+# hookers = Hookers(translator)
+hookers = None
 
 batch_size = param['batch_size']
 
@@ -60,7 +60,7 @@ ValidationErrTransList = []
 folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
 save_path = os.path.join(local, 'Complete', 'TypeTrackerInspired', 'Save', folder)
 os.mkdir(save_path)
-optimizer = torch.optim.Adam(translator.parameters(), lr=3e-3)
+optimizer = torch.optim.Adam(translator.parameters(), lr=3e-4)
 
 for dir in os.listdir(os.path.join(local, 'Complete', 'Data')):
     print(dir)
