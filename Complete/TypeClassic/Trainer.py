@@ -17,9 +17,9 @@ local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Doc
 param = {
     'd_pulse': 5,
     'd_PDW': 5,
-    'd_att': 64,
+    'd_att': 256,
     'n_flags': 3,
-    'n_heads': 4,
+    'n_heads': 8,
     'n_encoders': 3,
     'n_decoders': 3,
     'n_trackers': 4,
@@ -34,7 +34,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 translator = TransformerTranslator(d_pulse=param['d_pulse'], d_PDW=param['d_PDW'], d_att=param['d_att'], len_target=param['len_target'],
                                    len_source=param['len_source'], n_encoders=param['n_encoders'], n_flags=param['n_flags'], n_heads=param['n_heads'],
-                                   n_decoders=param['n_decoders'], n_PDWs_memory=param['n_PDWs_memory'], device=device, norm='pre')
+                                   n_decoders=param['n_decoders'], n_PDWs_memory=param['n_PDWs_memory'], device=device, norm='none')
 
 batch_size = param['batch_size']
 
@@ -49,8 +49,10 @@ save_path = os.path.join(local, 'Complete', 'TypeClassic', 'Save', folder)
 os.mkdir(save_path)
 optimizer = torch.optim.Adam(translator.parameters(), lr=3e-4)
 
-for dir in os.listdir(os.path.join(local, 'Complete', 'Data')):
-    # if dir == 'D_3':
+list_dir = os.listdir(os.path.join(local, 'Complete', 'Data'))
+list_dir = ['D_0.3']
+
+for dir in list_dir:
     path = os.path.join(local, 'Complete', 'Data', dir)
     validation_source, validation_translation, training_source, training_translation = FDTDataLoader(path=path, len_target=param['len_target'])
     training_ended = training_translation[:, param['n_PDWs_memory']:, param['d_PDW'] + param['n_flags'] + 1].unsqueeze(-1)
@@ -60,7 +62,7 @@ for dir in os.listdir(os.path.join(local, 'Complete', 'Data')):
     # On calcule l'écart type
     std = np.std(training_translation.numpy(), axis=(0, 1))
 
-    n_epochs = 150
+    n_epochs = 30
     for i in tqdm(range(n_epochs)):
         error, error_trans = ErrorAction(training_source, training_translation, training_ended, translator, batch_size, action='Training', optimizer=optimizer)
         TrainingErrList.append(error)
