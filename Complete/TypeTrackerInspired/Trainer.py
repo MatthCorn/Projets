@@ -12,8 +12,8 @@ from GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 param = {
     'd_pulse': 5,
@@ -104,4 +104,4 @@ for dir in os.listdir(os.path.join(local, 'Complete', 'Data')):
     saveObjAsXml(param, os.path.join(save_path, dir, 'param'))
     saveObjAsXml(error, os.path.join(save_path, dir, 'error'))
 
-    # git_push(local=local, file=os.path.join(save_path, dir), CommitMsg='simu '+folder+dir)
+    git_push(local=local, file=os.path.join(save_path, dir), CommitMsg='simu '+folder+dir)

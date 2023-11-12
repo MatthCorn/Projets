@@ -14,7 +14,7 @@ from GitPush import git_push
 # local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
 local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
-folder = os.path.join('2023-10-27__16-12', 'D_3')
+folder = os.path.join('2023-11-10__13-32', 'D_0.2')
 save_path = os.path.join(local, 'Complete', 'TypeClassic', 'Save', folder)
 
 param = loadXmlAsObj(os.path.join(save_path, 'param'))
@@ -49,7 +49,7 @@ ValidationErrTransList = error['Validation']['ErrTransList']
 # On calcule l'écart type
 std = np.std(training_translation.numpy(), axis=(0, 1))
 
-n_epoch = 150
+n_epoch = 10
 for i in tqdm(range(n_epoch)):
     error, error_trans = ErrorAction(training_source, training_translation, training_ended, translator, batch_size,
                                      action='Training', optimizer=optimizer)

@@ -6,7 +6,7 @@ import numpy as np
 from tqdm import tqdm
 
 
-def MakeData(Batch_size, density, seed, name):
+def MakeData(Batch_size, density, seed, name, return_data=False):
     BatchPulses = []
     BatchPDWs = []
 
@@ -92,6 +92,8 @@ def MakeData(Batch_size, density, seed, name):
 
         BatchPDWs.append(DT.PDWs)
 
+    if return_data:
+        return BatchPulses, BatchPDWs
 
     cwd = os.getcwd()
     (path, dir) = os.path.split(cwd)
@@ -101,3 +103,5 @@ def MakeData(Batch_size, density, seed, name):
 
     saveObjAsXml(BatchPulses, os.path.join(cwd, 'Data', name+'PulsesAnt.xml'))
     saveObjAsXml(BatchPDWs, os.path.join(cwd, 'Data', name+'PDWsDCI.xml'))
+
+
