@@ -11,15 +11,15 @@ from GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 param = {
     'd_pulse': 5,
     'd_PDW': 5,
-    'd_att': 64,
+    'd_att': 512,
     'n_flags': 3,
-    'n_heads': 8,
+    'n_heads': 16,
     'n_encoders': 3,
     'n_decoders': 3,
     'n_trackers': 4,
@@ -31,6 +31,8 @@ param = {
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda' if False else 'cpu')
+
 
 translator = TransformerTranslator(d_pulse=param['d_pulse'], d_PDW=param['d_PDW'], d_att=param['d_att'], len_target=param['len_target'],
                                    len_source=param['len_source'], n_encoders=param['n_encoders'], n_flags=param['n_flags'], n_heads=param['n_heads'],
@@ -47,7 +49,7 @@ ValidationErrTransList = []
 folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
 save_path = os.path.join(local, 'Complete', 'TypeClassic', 'Save', folder)
 os.mkdir(save_path)
-optimizer = torch.optim.Adam(translator.parameters(), lr=3e-4)
+optimizer = torch.optim.Adam(translator.parameters(), lr=1e-4)
 
 list_dir = os.listdir(os.path.join(local, 'Complete', 'Data'))
 list_dir = ['D_0.2']
@@ -62,7 +64,7 @@ for dir in list_dir:
     # On calcule l'écart type
     std = np.std(training_translation.numpy(), axis=(0, 1))
 
-    n_epochs = 300
+    n_epochs = 10
     for i in tqdm(range(n_epochs)):
         error, error_trans = ErrorAction(training_source, training_translation, training_ended, translator, batch_size, action='Training', optimizer=optimizer)
         TrainingErrList.append(error)

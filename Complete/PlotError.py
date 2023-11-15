@@ -44,13 +44,13 @@ def Plot(path, std=False, smoothing_factor=1):
     ax22.set_ylim(bottom=0)
 
     ax31.plot(smooth([el[3]/Std[3] for el in TrainingErrTransList], smoothing_factor), 'r', label="Ensemble d'entrainement")
-    ax31.set_title('Erreur sur FreqMin')
+    ax31.set_title('Erreur sur FreqMoy')
     ax31.plot(smooth([el[3]/Std[3] for el in ValidationErrTransList], smoothing_factor), 'b', label="Ensemble de Validation")
     ax31.legend(loc='upper right')
     ax31.set_ylim(bottom=0)
 
     ax32.plot(smooth([el[4]/Std[4] for el in TrainingErrTransList], smoothing_factor), 'r', label="Ensemble d'entrainement")
-    ax32.set_title('Erreur sur FreqMax')
+    ax32.set_title('Erreur sur DeltaFreq')
     ax32.plot(smooth([el[4]/Std[4] for el in ValidationErrTransList], smoothing_factor), 'b', label="Ensemble de Validation")
     ax32.legend(loc='upper right')
     ax32.set_ylim(bottom=0)
@@ -66,8 +66,8 @@ def smooth(Li, k):
     return resu
 
 if __name__ == '__main__':
-    # local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-    local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+    local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+    # local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
     folder = os.path.join('Complete', 'TypeClassic', 'Save', '2023-11-09__10-55', 'D_0.3', 'error')
     Plot(os.path.join(local, folder), std=False, smoothing_factor=10)

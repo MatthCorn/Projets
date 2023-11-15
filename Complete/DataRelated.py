@@ -7,8 +7,8 @@ from tqdm import tqdm
 from FakeDigitalTwin.SciptData import MakeSets
 from FakeDigitalTwin.Experience import MakeData
 
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 # Temps de maintien max d'un mesureur sans voir son impulsion
 holding_time = 0.5
@@ -100,7 +100,7 @@ def FDTDataMaker(list_density):
             source = [
                 [[pulse['TOA'], pulse['LI'], pulse['Level'], pulse['FreqStart'], pulse['FreqEnd']] for pulse in pulses_ant]
                 for pulses_ant in pulses]
-            translation = [[[PDW['TOA'], PDW['LI'], PDW['Level'], PDW['FreqMin'], PDW['FreqMax'], int('CW' in PDW['flags']),
+            translation = [[[PDW['TOA'], PDW['LI'], PDW['Level'], (PDW['FreqMin']+PDW['FreqMax'])/2, (PDW['FreqMax']-PDW['FreqMin'])/2, int('CW' in PDW['flags']),
                              int('TroncAv' in PDW['flags']),
                              int(len(PDW['flags']) == 0)] for PDW in PDWs_DCI] for PDWs_DCI in PDWs]
 
@@ -174,7 +174,7 @@ def FastDataGen(list_density, batch_size={'Training': 6000, 'Validation': 300}):
             source = [
                 [[pulse['TOA'], pulse['LI'], pulse['Level'], pulse['FreqStart'], pulse['FreqEnd']] for pulse in pulses_ant]
                 for pulses_ant in pulses]
-            translation = [[[PDW['TOA'], PDW['LI'], PDW['Level'], PDW['FreqMin'], PDW['FreqMax'], int('CW' in PDW['flags']),
+            translation = [[[PDW['TOA'], PDW['LI'], PDW['Level'], (PDW['FreqMin']+PDW['FreqMax'])/2, (PDW['FreqMax']-PDW['FreqMin'])/2, int('CW' in PDW['flags']),
                              int('TroncAv' in PDW['flags']),
                              int(len(PDW['flags']) == 0)] for PDW in PDWs_DCI] for PDWs_DCI in PDWs]
 
@@ -195,4 +195,4 @@ def FastDataGen(list_density, batch_size={'Training': 6000, 'Validation': 300}):
 
 if __name__ == '__main__':
     # FDTDataMaker(list_density=[0.3, 0.4, 0.5, 0.7, 0.9, 1.2, 1.5, 1.8, 2.2, 2.6, 3])
-    FastDataGen(list_density=[0.2, 4], batch_size={'Training': 20000, 'Validation': 300})
+    FastDataGen(list_density=[0.3, 0.5, 0.9, 1.5, 2.2, 3], batch_size={'Training': 30000, 'Validation': 300})
