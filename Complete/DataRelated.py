@@ -1,7 +1,6 @@
 from Tools.XMLTools import loadXmlAsObj
 import os
 import torch
-import torch.nn.functional as F
 import numpy as np
 from tqdm import tqdm
 from FakeDigitalTwin.SciptData import MakeSets
@@ -93,31 +92,32 @@ def FDTDataMaker(list_density):
         print('density :', str(density))
         MakeSets(density)
 
-        for type_data in ['Validation', 'Training']:
-            pulses = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', type_data + 'PulsesAnt.xml'))
-            PDWs = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', type_data + 'PDWsDCI.xml'))
+        type_data = 'Training'
 
-            source = [
-                [[pulse['TOA'], pulse['LI'], pulse['Level'], pulse['FreqStart'], pulse['FreqEnd']] for pulse in pulses_ant]
-                for pulses_ant in pulses]
-            translation = [[[PDW['TOA'], PDW['LI'], PDW['Level'], (PDW['FreqMin']+PDW['FreqMax'])/2, (PDW['FreqMax']-PDW['FreqMin'])/2, int('CW' in PDW['flags']),
-                             int('TroncAv' in PDW['flags']),
-                             int(len(PDW['flags']) == 0)] for PDW in PDWs_DCI] for PDWs_DCI in PDWs]
+        pulses = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', type_data + 'PulsesAnt.xml'))
+        PDWs = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', type_data + 'PDWsDCI.xml'))
 
-            # Ici les données sont founies en batch
-            # source est une liste de séquence d'impulsions de même longueur
-            # translation est une liste de séquence de PDWs, elles peuvent être de longueures différentes
+        source = [
+            [[pulse['TOA'], pulse['LI'], pulse['Level'], pulse['FreqStart'], pulse['FreqEnd']] for pulse in pulses_ant]
+            for pulses_ant in pulses]
+        translation = [[[PDW['TOA'], PDW['LI'], PDW['Level'], (PDW['FreqMin']+PDW['FreqMax'])/2, (PDW['FreqMax']-PDW['FreqMin'])/2, int('CW' in PDW['flags']),
+                         int('TroncAv' in PDW['flags']),
+                         int(len(PDW['flags']) == 0)] for PDW in PDWs_DCI] for PDWs_DCI in PDWs]
+
+        # Ici les données sont founies en batch
+        # source est une liste de séquence d'impulsions de même longueur
+        # translation est une liste de séquence de PDWs, elles peuvent être de longueures différentes
 
 
-            source, translation = Spliter(source, translation, delta_t)
-            # On transforme ces listes en tenseur
-            source = torch.tensor(source)
-            # source.shape = (batch_size, len_input, d_input)
+        source, translation = Spliter(source, translation, delta_t)
+        # On transforme ces listes en tenseur
+        source = torch.tensor(source)
+        # source.shape = (batch_size, len_input, d_input)
 
-            # Rajoute des 0 à la fin des scénarios de PDWs pour qu'ils aient toutes la même longueure
-            translation = pad_sequence(translation)
+        # Rajoute des 0 à la fin des scénarios de PDWs pour qu'ils aient toutes la même longueure
+        translation = pad_sequence(translation)
 
-            Write(source=source, translation=translation, type_data=type_data, density=density)
+        Write(source=source, translation=translation, type_data=type_data, density=density)
 
 def pad_sequence(l):
     max_len = max(len(sublist) for sublist in l)  # Trouver la longueur maximale des sous-listes
@@ -164,6 +164,7 @@ def FDTDataLoader(path='', len_target=30):
 
     return validation_source, validation_translation, training_source, training_translation
 
+# Cette fonction permet de créer l'ensemble d'entrainement sans passer par l'écriture des données en format xml par le FDT, on gagne énormement de temps
 def FastDataGen(list_density, batch_size={'Training': 6000, 'Validation': 300}):
     for density in list_density:
 
@@ -193,6 +194,48 @@ def FastDataGen(list_density, batch_size={'Training': 6000, 'Validation': 300}):
 
             Write(source=source, translation=translation, type_data=key, density=density)
 
+
+def MakeWeights(batch_size, density):
+    pulses, PDWs = MakeData(Batch_size=batch_size, seed=None, density=density, name=None, return_data=True)
+
+    source = [
+        [[pulse['TOA'], pulse['LI'], pulse['Level'], pulse['FreqStart'], pulse['FreqEnd']] for pulse in pulses_ant]
+        for pulses_ant in pulses]
+    translation = [[[PDW['TOA'], PDW['LI'], PDW['Level'], (PDW['FreqMin'] + PDW['FreqMax']) / 2,
+                     (PDW['FreqMax'] - PDW['FreqMin']) / 2, int('CW' in PDW['flags']),
+                     int('TroncAv' in PDW['flags']),
+                     int(len(PDW['flags']) == 0)] for PDW in PDWs_DCI] for PDWs_DCI in PDWs]
+
+    # Ici les données sont founies en batch
+    # source est une liste de séquence d'impulsions de même longueur
+    # translation est une liste de séquence de PDWs, elles peuvent être de longueures différentes
+
+    source, translation = Spliter(source, translation, delta_t)
+
+    temp = []
+    for sentence in source:
+        for word in sentence:
+            if word[5] == 1:
+                temp.append(word[:5])
+    source = temp
+
+    temp = []
+    for sentence in translation:
+        for word in sentence:
+            if word[8] == 1:
+                temp.append(word[:8])
+    translation = temp
+
+    source_weights = np.std(np.array(source), axis=0) + np.abs(np.mean(np.array(source), axis=0))
+    translation_weights = np.std(np.array(translation), axis=0) + np.abs(np.mean(np.array(translation), axis=0))
+
+
+    print(source_weights)
+    print(translation_weights)
+
 if __name__ == '__main__':
     # FDTDataMaker(list_density=[0.3, 0.4, 0.5, 0.7, 0.9, 1.2, 1.5, 1.8, 2.2, 2.6, 3])
-    FastDataGen(list_density=[0.3, 0.5, 0.9, 1.5, 2.2, 3], batch_size={'Training': 30000, 'Validation': 300})
+    # FastDataGen(list_density=[0.3, 0.5, 0.9, 1.5, 2.2, 3], batch_size={'Training': 30000, 'Validation': 300})
+    MakeWeights(batch_size=1000, density=0.3)
+    MakeWeights(batch_size=1000, density=1.3)
+    MakeWeights(batch_size=1000, density=3)

@@ -17,7 +17,7 @@ local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Doc
 param = {
     'd_pulse': 5,
     'd_PDW': 5,
-    'd_att': 512,
+    'd_att': 64,
     'n_flags': 3,
     'n_heads': 16,
     'n_encoders': 3,
@@ -31,12 +31,10 @@ param = {
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-device = torch.device('cuda' if False else 'cpu')
-
 
 translator = TransformerTranslator(d_pulse=param['d_pulse'], d_PDW=param['d_PDW'], d_att=param['d_att'], len_target=param['len_target'],
                                    len_source=param['len_source'], n_encoders=param['n_encoders'], n_flags=param['n_flags'], n_heads=param['n_heads'],
-                                   n_decoders=param['n_decoders'], n_PDWs_memory=param['n_PDWs_memory'], device=device, norm='none')
+                                   n_decoders=param['n_decoders'], n_PDWs_memory=param['n_PDWs_memory'], device=device, norm='pre')
 
 batch_size = param['batch_size']
 
@@ -52,7 +50,7 @@ os.mkdir(save_path)
 optimizer = torch.optim.Adam(translator.parameters(), lr=1e-4)
 
 list_dir = os.listdir(os.path.join(local, 'Complete', 'Data'))
-list_dir = ['D_0.2']
+list_dir = ['D_0.3']
 
 for dir in list_dir:
     path = os.path.join(local, 'Complete', 'Data', dir)
@@ -64,7 +62,7 @@ for dir in list_dir:
     # On calcule l'écart type
     std = np.std(training_translation.numpy(), axis=(0, 1))
 
-    n_epochs = 10
+    n_epochs = 20
     for i in tqdm(range(n_epochs)):
         error, error_trans = ErrorAction(training_source, training_translation, training_ended, translator, batch_size, action='Training', optimizer=optimizer)
         TrainingErrList.append(error)
