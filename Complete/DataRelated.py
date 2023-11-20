@@ -195,15 +195,14 @@ def FastDataGen(list_density, batch_size={'Training': 6000, 'Validation': 300}):
             Write(source=source, translation=translation, type_data=key, density=density)
 
 
-def MakeWeights(batch_size, density):
+def MakeWeights(batch_size, density, threshold=-1):
     pulses, PDWs = MakeData(Batch_size=batch_size, seed=None, density=density, name=None, return_data=True)
 
     source = [
         [[pulse['TOA'], pulse['LI'], pulse['Level'], pulse['FreqStart'], pulse['FreqEnd']] for pulse in pulses_ant]
         for pulses_ant in pulses]
-    translation = [[[PDW['TOA'], PDW['LI'], PDW['Level'], (PDW['FreqMin'] + PDW['FreqMax']) / 2,
-                     (PDW['FreqMax'] - PDW['FreqMin']) / 2, int('CW' in PDW['flags']),
-                     int('TroncAv' in PDW['flags']),
+    translation = [[[PDW['TOA'], PDW['LI'], PDW['Level'], PDW['FreqMin'],
+                     PDW['FreqMax'], int('CW' in PDW['flags']), int('TroncAv' in PDW['flags']),
                      int(len(PDW['flags']) == 0)] for PDW in PDWs_DCI] for PDWs_DCI in PDWs]
 
     # Ici les données sont founies en batch
@@ -217,16 +216,27 @@ def MakeWeights(batch_size, density):
         for word in sentence:
             if word[5] == 1:
                 temp.append(word[:5])
-    source = temp
+    source = np.array(temp)
 
     temp = []
     for sentence in translation:
         for word in sentence:
             if word[8] == 1:
                 temp.append(word[:8])
-    translation = temp
+    translation = np.array(temp)
+
+    TOA = np.expand_dims(source[:, 0], axis=-1)
+    acc_TOA, unacc_TOA = np.maximum(TOA, threshold), np.minimum(np.zeros(1), TOA - threshold)
+
+    TOE = np.expand_dims((source[:, 0] + source[:, 1]), axis=-1)
+    acc_TOE, unacc_TOE = np.maximum(TOE, threshold), np.minimum(np.zeros(1), TOE - threshold)
+
+    source = np.concatenate((source[:, :1], acc_TOA, unacc_TOA, TOE, acc_TOE, unacc_TOE, source[:, 2:]), axis=-1)
+
+
 
     source_weights = np.std(np.array(source), axis=0) + np.abs(np.mean(np.array(source), axis=0))
+
     translation_weights = np.std(np.array(translation), axis=0) + np.abs(np.mean(np.array(translation), axis=0))
 
 

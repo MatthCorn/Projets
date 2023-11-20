@@ -7,8 +7,9 @@ les coordonnées à partir de valeurs prédéterminées
 
 class FeaturesAndScaling:
 
-    def __init__(self, divider, weights):
-        self.divider = divider
+    def __init__(self, threshold, weights=[1, 1, 1, 1, 1, 1, 1, 1]):
+        # threshold doit être un nombre négatif, plus grand que -(temps de maintien d'un mesureur + temps d'une fenêtre d'impulsions)
+        self.threshold = torch.tensor(threshold)
         self.weights = torch.tensor(weights)
 
     def __call__(self, x):
@@ -20,6 +21,6 @@ class FeaturesAndScaling:
         # on commence par ajouter le temps de fin de l'impulsion
         TOE = input[:, :, 0] + input[:, :, 1]
         # on prend le quotient et le reste de la division de TOE par self.divider
-        quotient_TOE, remainder_TOE = TOE.div(self.divider, rounding_mode='trunc'), TOE-TOE.div(self.divider, rounding_mode='trunc')*self.divider
-        output = torch.cat((input, quotient_TOE, remainder_TOE), dim=-1)
+        acc_TOE, unacc_TOE = torch.max(TOE, self.threshold), torch.min(torch.zeros(1), TOE - self.threshold)
+        output = torch.cat((input[:, :, :2], TOE, acc_TOE, unacc_TOE, input[:, :, 2:]), dim=-1)
         return output * self.weights
