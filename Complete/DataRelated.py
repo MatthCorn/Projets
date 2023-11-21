@@ -13,6 +13,7 @@ local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Py
 # Temps de maintien max d'un mesureur sans voir son impulsion
 holding_time = 0.5
 threshold = -7
+freq_ech = 3
 n_max_pulses = 32
 n_PDWs_memory = 10
 delta_t = 3
@@ -200,8 +201,8 @@ def FastDataGen(list_density, batch_size={'Training': 6000, 'Validation': 300}):
 def MakeWeights(batch_size, density, threshold=threshold):
     pulses, PDWs = MakeData(Batch_size=batch_size, seed=None, density=density, name=None, return_data=True)
 
-    pulse_pre_embedding = FeaturesAndScaling(threshold, type='source')
-    PDW_pre_embedding = FeaturesAndScaling(threshold, type='target')
+    pulse_pre_embedding = FeaturesAndScaling(threshold, freq_ech, type='source')
+    PDW_pre_embedding = FeaturesAndScaling(threshold, freq_ech, type='target')
 
     source = [
         [[pulse['TOA'], pulse['LI'], pulse['Level'], pulse['FreqStart'], pulse['FreqEnd']] for pulse in pulses_ant]
