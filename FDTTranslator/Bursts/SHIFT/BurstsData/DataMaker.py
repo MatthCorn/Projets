@@ -59,7 +59,7 @@ def Spliter(Source, Translation, DeltaT, Eval=False):
             TranslationBursts = []
             while not TranslationId == len(TranslationSentence):
                 PDW = TranslationSentence[TranslationId]
-                if PDW[0] > t:
+                if TimeRelease(PDW) > t:
                     break
                 PDW[0] -= t
                 TranslationBursts.append(PDW)

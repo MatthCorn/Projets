@@ -7,12 +7,12 @@ from FakeDigitalTwin.SciptData import MakeSets
 from FakeDigitalTwin.Experience import MakeData
 from Complete.PreEmbedding import FeaturesAndScaling
 
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 # Temps de maintien max d'un mesureur sans voir son impulsion
 holding_time = 0.5
-threshold = -7
+threshold = 7
 freq_ech = 3
 n_max_pulses = 32
 n_PDWs_memory = 10
@@ -60,7 +60,7 @@ def Spliter(source, translation, delta_t):
             bursts_translation = []
             while not id_translation == len(translation_sentence):
                 PDW = translation_sentence[id_translation]
-                if PDW[0] > t:
+                if TimeRelease(PDW) > t:
                     break
                 PDW[0] -= t
                 bursts_translation.append(PDW + [1, 0, 0])
@@ -244,5 +244,5 @@ def MakeWeights(batch_size, density, threshold=threshold):
 
 if __name__ == '__main__':
     # FDTDataMaker(list_density=[0.3, 0.4, 0.5, 0.7, 0.9, 1.2, 1.5, 1.8, 2.2, 2.6, 3])
-    # FastDataGen(list_density=[0.3, 0.5, 0.9, 1.5, 2.2, 3], batch_size={'Training': 30000, 'Validation': 300})
-    MakeWeights(batch_size=1000, density=3)
+    FastDataGen(list_density=[0.3, 0.5, 0.9, 1.5, 2.2, 3], batch_size={'Training': 30000, 'Validation': 300})
+    # MakeWeights(batch_size=1000, density=3)
