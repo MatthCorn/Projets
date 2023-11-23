@@ -25,7 +25,7 @@ def TrainingError(source, target, ended, batch_size, batch_indice, network):
     return error_trans
 
 
-def ErrorAction(source, target, ended, network, batch_size=50, action='', optimizer=None):
+def ErrorAction(source, target, ended, network, weights, batch_size=50, action='', optimizer=None):
     data_size, _, d_out = target.shape
     n_batch = int(data_size/batch_size)
 
@@ -37,7 +37,7 @@ def ErrorAction(source, target, ended, network, batch_size=50, action='', optimi
 
             err_trans = TrainingError(source, target, ended, batch_size, j, network)
 
-            err = torch.norm(err_trans)
+            err = torch.norm(err_trans*weights)
             err.backward()
             optimizer.step()
 

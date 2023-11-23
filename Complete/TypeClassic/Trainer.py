@@ -16,7 +16,9 @@ local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Doc
 
 param = {
     'd_pulse': 5,
+    'd_pulse_buffed': 14,
     'd_PDW': 5,
+    'd_PDW_buffed': 14,
     'd_att': 64,
     'n_flags': 3,
     'n_heads': 16,
@@ -26,15 +28,20 @@ param = {
     'n_PDWs_memory': 10,
     'len_target': 30,
     'len_source': 32,
-    'batch_size': 2048
+    'batch_size': 2048,
+    'threshold': 7,
+    'freq_ech': 3
 }
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-translator = TransformerTranslator(d_pulse=param['d_pulse'], d_PDW=param['d_PDW'], d_att=param['d_att'], len_target=param['len_target'],
-                                   len_source=param['len_source'], n_encoders=param['n_encoders'], n_flags=param['n_flags'], n_heads=param['n_heads'],
-                                   n_decoders=param['n_decoders'], n_PDWs_memory=param['n_PDWs_memory'], device=device, norm='pre')
+translator = TransformerTranslator(d_pulse=param['d_pulse'], d_pulse_buffed=param['d_pulse_buffed'], d_PDW_buffed=param['d_PDW_buffed'], d_att=param['d_att'],
+                                   len_target=param['len_target'], freq_ech=param['freq_ech'], weights=os.path.join(local, 'Complete', 'Weights'), norm='pre',
+                                   d_PDW=param['d_PDW'], len_source=param['len_source'], n_encoders=param['n_encoders'], n_flags=param['n_flags'], n_heads=param['n_heads'],
+                                   n_decoders=param['n_decoders'], n_PDWs_memory=param['n_PDWs_memory'], device=device, threshold=param['threshold'])
+
+
 
 batch_size = param['batch_size']
 
@@ -52,6 +59,8 @@ optimizer = torch.optim.Adam(translator.parameters(), lr=1e-4)
 list_dir = os.listdir(os.path.join(local, 'Complete', 'Data'))
 list_dir = ['D_0.3']
 
+weights_error = torch.tensor(np.abs(np.load(os.path.join(local, 'Complete', 'Weights', 'output_average.npy'))), device=device)
+
 for dir in list_dir:
     path = os.path.join(local, 'Complete', 'Data', dir)
     validation_source, validation_translation, training_source, training_translation = FDTDataLoader(path=path, len_target=param['len_target'])
@@ -62,9 +71,9 @@ for dir in list_dir:
     # On calcule l'écart type
     std = np.std(training_translation.numpy(), axis=(0, 1))
 
-    n_epochs = 20
+    n_epochs = 2
     for i in tqdm(range(n_epochs)):
-        error, error_trans = ErrorAction(training_source, training_translation, training_ended, translator, batch_size, action='Training', optimizer=optimizer)
+        error, error_trans = ErrorAction(training_source, training_translation, training_ended, translator, weights, batch_size, action='Training', optimizer=optimizer)
         TrainingErrList.append(error)
         # normalisation de l'erreur par rapport à l'écart-type sur chaque coordonnée physique
         error_trans[0], error_trans[1], error_trans[2], error_trans[3], error_trans[4] = \

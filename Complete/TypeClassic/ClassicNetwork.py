@@ -4,6 +4,7 @@ from Complete.Transformer.EncoderTransformer import EncoderLayer
 from Complete.Transformer.EasyFeedForward import FeedForward
 from Complete.Transformer.DecoderTransformer import DecoderLayer
 from Complete.TypeClassic.PositionalEncoding import PositionalEncoding
+from Complete.PreEmbedding import FeaturesAndScaling
 
 '''
 implémentation du réseau de neurones avec une architecture classique de transformer
@@ -12,11 +13,13 @@ implémentation du réseau de neurones avec une architecture classique de transf
 
 class TransformerTranslator(nn.Module):
 
-    def __init__(self, d_pulse, d_PDW, d_att=32, n_heads=4, n_encoders=3, n_decoders=3, n_PDWs_memory=10,
-                 len_source=10, len_target=20, n_flags=4, device=torch.device('cpu'), norm='post'):
+    def __init__(self, d_pulse, d_pulse_buffed, d_PDW, d_PDW_buffed, d_att=32, n_heads=4, n_encoders=3, n_decoders=3, n_PDWs_memory=10, freq_ech=3,
+                 len_source=10, len_target=20, n_flags=4, threshold=7, device=torch.device('cpu'), norm='post', weights=None):
         super().__init__()
         self.device = device
         self.d_pulse = d_pulse
+        self.d_pulse_buffed = d_pulse_buffed
+        self.d_PDW_buffed = d_PDW_buffed
         self.d_PDW = d_PDW
         self.d_att = d_att
         self.n_flags = n_flags
@@ -34,8 +37,11 @@ class TransformerTranslator(nn.Module):
 
         self.n_PDWs_memory = n_PDWs_memory
 
-        self.source_embedding = FeedForward(d_in=d_pulse, d_out=d_att, widths=[], dropout=0)
-        self.target_embedding = FeedForward(d_in=d_PDW+n_flags, d_out=d_att, widths=[], dropout=0)
+        self.source_pre_embedding = FeaturesAndScaling(threshold, freq_ech, type='source', weights=weights)
+        self.target_pre_embedding = FeaturesAndScaling(threshold, freq_ech, type='target', weights=weights)
+
+        self.source_embedding = FeedForward(d_in=d_pulse_buffed, d_out=d_att, widths=[], dropout=0)
+        self.target_embedding = FeedForward(d_in=d_PDW_buffed+n_flags, d_out=d_att, widths=[], dropout=0)
 
         self.PE_encoder = PositionalEncoding(d_att=d_att, dropout=0, max_len=len_source, device=device)
         self.PE_decoder = PositionalEncoding(d_att=d_att, dropout=0, max_len=len_target, device=device)
@@ -56,6 +62,9 @@ class TransformerTranslator(nn.Module):
 
         src, type_source = source.split([self.d_pulse, 3], dim=-1)
         trg, type_target = target.split([self.d_PDW + self.n_flags, 3], dim=-1)
+
+        src = self.source_pre_embedding(src)
+        trg = self.target_pre_embedding(trg)
 
         trg = self.target_embedding(trg)
         src = self.source_embedding(src)

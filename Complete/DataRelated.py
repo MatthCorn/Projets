@@ -199,6 +199,7 @@ def FastDataGen(list_density, batch_size={'Training': 6000, 'Validation': 300}):
 
 
 def MakeWeights(batch_size, density, threshold=threshold):
+    path = os.path.join(local, 'Complete', 'Weights')
     pulses, PDWs = MakeData(Batch_size=batch_size, seed=None, density=density, name=None, return_data=True)
 
     pulse_pre_embedding = FeaturesAndScaling(threshold, freq_ech, type='source')
@@ -221,28 +222,37 @@ def MakeWeights(batch_size, density, threshold=threshold):
     for sentence in source:
         for word in sentence:
             if word[5] == 1:
-                temp.append(word)
+                temp.append(word[:5])
     source = torch.tensor(temp)
 
     temp = []
     for sentence in translation:
         for word in sentence:
             if word[8] == 1:
-                temp.append(word)
+                temp.append(word[:8])
     translation = torch.tensor(temp)
+
+    translation_average = np.std(np.array(translation), axis=0)
+    translation_std = np.mean(np.array(translation), axis=0)
+
+    np.save(os.path.join(path, 'output_average'), translation_average)
+    np.save(os.path.join(path, 'output_std'), translation_std)
 
     source = pulse_pre_embedding(source).numpy()
     translation = PDW_pre_embedding(translation).numpy()
 
-    source_weights = np.std(np.array(source), axis=0) + np.abs(np.mean(np.array(source), axis=0))
+    source_average = np.std(np.array(source), axis=0)
+    source_std = np.mean(np.array(source), axis=0)
 
-    translation_weights = np.std(np.array(translation), axis=0) + np.abs(np.mean(np.array(translation), axis=0))
+    translation_average = np.std(np.array(translation), axis=0)
+    translation_std = np.mean(np.array(translation), axis=0)
 
-
-    print(source_weights)
-    print(translation_weights)
+    np.save(os.path.join(path, 'source_average'), source_average)
+    np.save(os.path.join(path, 'source_std'), source_std)
+    np.save(os.path.join(path, 'target_average'), translation_average)
+    np.save(os.path.join(path, 'target_std'), translation_std)
 
 if __name__ == '__main__':
     # FDTDataMaker(list_density=[0.3, 0.4, 0.5, 0.7, 0.9, 1.2, 1.5, 1.8, 2.2, 2.6, 3])
-    FastDataGen(list_density=[0.3, 0.5, 0.9, 1.5, 2.2, 3], batch_size={'Training': 30000, 'Validation': 300})
-    # MakeWeights(batch_size=1000, density=3)
+    # FastDataGen(list_density=[0.3, 0.5, 0.9, 1.5, 2.2, 3], batch_size={'Training': 30000, 'Validation': 300})
+    MakeWeights(batch_size=5000, density=3)
