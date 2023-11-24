@@ -19,13 +19,15 @@ def TrainingError(source, target, ended, batch_size, batch_indice, network):
     predicted_target = predicted_target[:, network.n_PDWs_memory-1:-1]
     # predicted_target.shape = (batch_size, len_target-PDWsMemory, d_target+num_flags)
 
+    # new_rep.shape = (d_PDW, d_PDW)
+
     error_trans = torch.norm((batch_target[:, network.n_PDWs_memory:, :(network.d_PDW + network.n_flags)] - predicted_target) * (1 - batch_ended), dim=(0, 1))/float(torch.norm((1 - batch_ended)))
     # error_trans.shape = d_PDW+n_flags
 
     return error_trans
 
 
-def ErrorAction(source, target, ended, network, weights, batch_size=50, action='', optimizer=None):
+def ErrorAction(source, target, ended, network, weights=None, batch_size=50, action='', optimizer=None):
     data_size, _, d_out = target.shape
     n_batch = int(data_size/batch_size)
 

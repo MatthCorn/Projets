@@ -73,7 +73,7 @@ for dir in list_dir:
 
     n_epochs = 2
     for i in tqdm(range(n_epochs)):
-        error, error_trans = ErrorAction(training_source, training_translation, training_ended, translator, weights, batch_size, action='Training', optimizer=optimizer)
+        error, error_trans = ErrorAction(training_source, training_translation, training_ended, translator, weights_error, batch_size, action='Training', optimizer=optimizer)
         TrainingErrList.append(error)
         # normalisation de l'erreur par rapport à l'écart-type sur chaque coordonnée physique
         error_trans[0], error_trans[1], error_trans[2], error_trans[3], error_trans[4] = \

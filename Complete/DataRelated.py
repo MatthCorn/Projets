@@ -232,10 +232,11 @@ def MakeWeights(batch_size, density, threshold=threshold):
                 temp.append(word[:8])
     translation = torch.tensor(temp)
 
-    translation_average = np.std(np.array(translation), axis=0)
-    translation_std = np.mean(np.array(translation), axis=0)
+    alt_rep = torch.eye(8)
+    alt_rep[-5:-3, -5:-3] = torch.tensor([[1/2, 1/2], [1/2, -1/2]])
 
-    np.save(os.path.join(path, 'output_average'), translation_average)
+    translation_std = np.mean(np.array(torch.matmul(translation, alt_rep.t())), axis=0)
+
     np.save(os.path.join(path, 'output_std'), translation_std)
 
     source = pulse_pre_embedding(source).numpy()
