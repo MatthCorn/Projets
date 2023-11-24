@@ -1,0 +1,235 @@
+<?xml version="1.0" ?>
+<Dictionary>
+ <Dictionary Key="Training">
+  <List Key="ErrList">
+   <Object Value="2.0112032890319824"/>
+   <Object Value="1.6338648796081543"/>
+   <Object Value="1.6176258325576782"/>
+   <Object Value="1.6102153062820435"/>
+   <Object Value="1.5487329959869385"/>
+   <Object Value="1.450446367263794"/>
+   <Object Value="1.395871877670288"/>
+   <Object Value="1.3484373092651367"/>
+   <Object Value="1.2613836526870728"/>
+   <Object Value="1.211973786354065"/>
+  </List>
+  <List Key="ErrTransList">
+   <List>
+    <Object Value="1.086231190544406"/>
+    <Object Value="1.9057083647602433"/>
+    <Object Value="1.2960735987738026"/>
+    <Object Value="1.135981072498825"/>
+    <Object Value="1.345530806343846"/>
+    <Object Value="0.34280169010162354"/>
+    <Object Value="0.3266640305519104"/>
+    <Object Value="0.40620139241218567"/>
+   </List>
+   <List>
+    <Object Value="0.7570946843172205"/>
+    <Object Value="1.195113436039275"/>
+    <Object Value="1.2021218331696046"/>
+    <Object Value="0.9828742798088872"/>
+    <Object Value="0.9777351377896282"/>
+    <Object Value="0.216250479221344"/>
+    <Object Value="0.16683493554592133"/>
+    <Object Value="0.2455533742904663"/>
+   </List>
+   <List>
+    <Object Value="0.7595293856900882"/>
+    <Object Value="1.1965667371985265"/>
+    <Object Value="1.2041274199529741"/>
+    <Object Value="0.9661181047982833"/>
+    <Object Value="0.9609340366327364"/>
+    <Object Value="0.22784601151943207"/>
+    <Object Value="0.16864517331123352"/>
+    <Object Value="0.24679014086723328"/>
+   </List>
+   <List>
+    <Object Value="0.7692849320280689"/>
+    <Object Value="1.2037591889631936"/>
+    <Object Value="1.206792222488402"/>
+    <Object Value="0.9574459788402437"/>
+    <Object Value="0.9522397711843533"/>
+    <Object Value="0.207487553358078"/>
+    <Object Value="0.15439073741436005"/>
+    <Object Value="0.24335604906082153"/>
+   </List>
+   <List>
+    <Object Value="0.7485857851470661"/>
+    <Object Value="1.1982886960684014"/>
+    <Object Value="1.2009607157904894"/>
+    <Object Value="0.9025769141858141"/>
+    <Object Value="0.8974679192155702"/>
+    <Object Value="0.2045019119977951"/>
+    <Object Value="0.14791205525398254"/>
+    <Object Value="0.2332325130701065"/>
+   </List>
+   <List>
+    <Object Value="0.7589400896963638"/>
+    <Object Value="1.211719149974667"/>
+    <Object Value="1.2052604855979592"/>
+    <Object Value="0.7989515351515185"/>
+    <Object Value="0.7959431430508148"/>
+    <Object Value="0.20314493775367737"/>
+    <Object Value="0.14363063871860504"/>
+    <Object Value="0.2476586401462555"/>
+   </List>
+   <List>
+    <Object Value="0.7352794961660277"/>
+    <Object Value="1.1874233117080824"/>
+    <Object Value="1.196408143755039"/>
+    <Object Value="0.7503167626831219"/>
+    <Object Value="0.7465077697056324"/>
+    <Object Value="0.1986473649740219"/>
+    <Object Value="0.13754647970199585"/>
+    <Object Value="0.22720500826835632"/>
+   </List>
+   <List>
+    <Object Value="0.7521263377096393"/>
+    <Object Value="1.200354766706958"/>
+    <Object Value="1.1528067723618607"/>
+    <Object Value="0.7201195777436316"/>
+    <Object Value="0.71591450607548"/>
+    <Object Value="0.19753049314022064"/>
+    <Object Value="0.13575805723667145"/>
+    <Object Value="0.2252434641122818"/>
+   </List>
+   <List>
+    <Object Value="0.7525400822721623"/>
+    <Object Value="1.2311688334655253"/>
+    <Object Value="0.9984352742702202"/>
+    <Object Value="0.7043523016644065"/>
+    <Object Value="0.6980068783694487"/>
+    <Object Value="0.2045329213142395"/>
+    <Object Value="0.14159531891345978"/>
+    <Object Value="0.22348934412002563"/>
+   </List>
+   <List>
+    <Object Value="0.7256002389573873"/>
+    <Object Value="1.2123297088858649"/>
+    <Object Value="0.9224881775966508"/>
+    <Object Value="0.6924456173286541"/>
+    <Object Value="0.6858032544972452"/>
+    <Object Value="0.19654390215873718"/>
+    <Object Value="0.1356625258922577"/>
+    <Object Value="0.21626496315002441"/>
+   </List>
+  </List>
+ </Dictionary>
+ <Dictionary Key="Validation">
+  <List Key="ErrList">
+   <Object Value="1.6356927156448364"/>
+   <Object Value="1.6283262968063354"/>
+   <Object Value="1.5742744207382202"/>
+   <Object Value="1.5966410636901855"/>
+   <Object Value="1.6142706871032715"/>
+   <Object Value="1.3866560459136963"/>
+   <Object Value="1.3615267276763916"/>
+   <Object Value="1.3087894916534424"/>
+   <Object Value="1.2305421829223633"/>
+   <Object Value="1.2259132862091064"/>
+  </List>
+  <List Key="ErrTransList">
+   <List>
+    <Object Value="0.7715252940088423"/>
+    <Object Value="1.2580108777635417"/>
+    <Object Value="1.2091884016177996"/>
+    <Object Value="0.9803553428750128"/>
+    <Object Value="0.9735823633155066"/>
+    <Object Value="0.22397390007972717"/>
+    <Object Value="0.1653691977262497"/>
+    <Object Value="0.23829615116119385"/>
+   </List>
+   <List>
+    <Object Value="0.7496742131188006"/>
+    <Object Value="1.1790665537213736"/>
+    <Object Value="1.2045828679083113"/>
+    <Object Value="0.9785710733139186"/>
+    <Object Value="0.9726762560845267"/>
+    <Object Value="0.20307815074920654"/>
+    <Object Value="0.150823175907135"/>
+    <Object Value="0.23129139840602875"/>
+   </List>
+   <List>
+    <Object Value="0.7608976769436965"/>
+    <Object Value="1.1884936687855698"/>
+    <Object Value="1.2030084923819906"/>
+    <Object Value="0.9227252503794969"/>
+    <Object Value="0.9219941434817344"/>
+    <Object Value="0.2223769873380661"/>
+    <Object Value="0.16407448053359985"/>
+    <Object Value="0.24159400165081024"/>
+   </List>
+   <List>
+    <Object Value="0.7396768798264702"/>
+    <Object Value="1.2270469344873087"/>
+    <Object Value="1.2038733834486914"/>
+    <Object Value="0.9488093270531714"/>
+    <Object Value="0.9434593038786975"/>
+    <Object Value="0.19870033860206604"/>
+    <Object Value="0.14045119285583496"/>
+    <Object Value="0.22377607226371765"/>
+   </List>
+   <List>
+    <Object Value="0.7725423914171864"/>
+    <Object Value="1.2299945796870013"/>
+    <Object Value="1.2063638164047663"/>
+    <Object Value="0.9525056815089213"/>
+    <Object Value="0.9651511033254072"/>
+    <Object Value="0.19446532428264618"/>
+    <Object Value="0.1385536938905716"/>
+    <Object Value="0.2249581515789032"/>
+   </List>
+   <List>
+    <Object Value="0.7375160368666194"/>
+    <Object Value="1.1846615752862022"/>
+    <Object Value="1.2017808362895186"/>
+    <Object Value="0.7383118699554804"/>
+    <Object Value="0.7336802598914162"/>
+    <Object Value="0.19073252379894257"/>
+    <Object Value="0.12688373029232025"/>
+    <Object Value="0.21945440769195557"/>
+   </List>
+   <List>
+    <Object Value="0.7283457832764584"/>
+    <Object Value="1.1764734099604661"/>
+    <Object Value="1.193368121223886"/>
+    <Object Value="0.7166289373734653"/>
+    <Object Value="0.7127349595493295"/>
+    <Object Value="0.18851414322853088"/>
+    <Object Value="0.12692326307296753"/>
+    <Object Value="0.2177143394947052"/>
+   </List>
+   <List>
+    <Object Value="0.7578487502730623"/>
+    <Object Value="1.2166989704352726"/>
+    <Object Value="1.0948909376628755"/>
+    <Object Value="0.7081126540520033"/>
+    <Object Value="0.6987773074688253"/>
+    <Object Value="0.21553225815296173"/>
+    <Object Value="0.15778230130672455"/>
+    <Object Value="0.22582104802131653"/>
+   </List>
+   <List>
+    <Object Value="0.7317945796232418"/>
+    <Object Value="1.21724660184102"/>
+    <Object Value="0.8978434387835421"/>
+    <Object Value="0.7221884530580586"/>
+    <Object Value="0.7122469762229238"/>
+    <Object Value="0.19182370603084564"/>
+    <Object Value="0.12845008075237274"/>
+    <Object Value="0.21035271883010864"/>
+   </List>
+   <List>
+    <Object Value="0.7236787264146266"/>
+    <Object Value="1.2069859552292168"/>
+    <Object Value="0.8781451183530715"/>
+    <Object Value="0.7230198394491376"/>
+    <Object Value="0.7206896848971922"/>
+    <Object Value="0.18968775868415833"/>
+    <Object Value="0.128195121884346"/>
+    <Object Value="0.206846684217453"/>
+   </List>
+  </List>
+ </Dictionary>
+</Dictionary>
