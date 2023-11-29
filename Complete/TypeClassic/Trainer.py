@@ -21,10 +21,9 @@ param = {
     'd_PDW_buffed': 5,
     'd_att': 64,
     'n_flags': 3,
-    'n_heads': 16,
+    'n_heads': 4,
     'n_encoders': 3,
     'n_decoders': 3,
-    'n_trackers': 4,
     'n_PDWs_memory': 10,
     'len_target': 30,
     'len_source': 32,
@@ -54,10 +53,10 @@ ValidationErrTransList = []
 folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
 save_path = os.path.join(local, 'Complete', 'TypeClassic', 'Save', folder)
 os.mkdir(save_path)
-optimizer = torch.optim.Adam(translator.parameters(), lr=1e-3)
+optimizer = torch.optim.Adam(translator.parameters(), lr=3e-4)
 
 list_dir = os.listdir(os.path.join(local, 'Complete', 'Data'))
-list_dir = ['D_0.2']
+# list_dir = ['D_0.2']
 
 weights_error = torch.tensor((np.load(os.path.join(local, 'Complete', 'Weights', 'output_std.npy')) + 1e-10)**-1, device=device)
 weights_error = torch.tensor([1]*8, device=device)
@@ -72,7 +71,7 @@ for dir in list_dir:
     # On calcule l'écart type
     std = np.std(training_translation.numpy(), axis=(0, 1))
 
-    n_epochs = 10
+    n_epochs = 90
     for i in tqdm(range(n_epochs)):
         error, error_trans = ErrorAction(training_source, training_translation, training_ended, translator, weights_error, batch_size, action='Training', optimizer=optimizer)
         TrainingErrList.append(error)

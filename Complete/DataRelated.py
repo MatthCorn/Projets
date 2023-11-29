@@ -103,7 +103,7 @@ def FDTDataMaker(list_density):
         source = [
             [[pulse['TOA'], pulse['LI'], pulse['Level'], pulse['FreqStart'], pulse['FreqEnd']] for pulse in pulses_ant]
             for pulses_ant in pulses]
-        translation = [[[PDW['TOA'], PDW['LI'], PDW['Level'], (PDW['FreqMin']+PDW['FreqMax'])/2, (PDW['FreqMax']-PDW['FreqMin'])/2, int('CW' in PDW['flags']),
+        translation = [[[PDW['TOA'], PDW['LI'], PDW['Level'], PDW['FreqMin'], PDW['FreqMax'], int('CW' in PDW['flags']),
                          int('TroncAv' in PDW['flags']),
                          int(len(PDW['flags']) == 0)] for PDW in PDWs_DCI] for PDWs_DCI in PDWs]
 
@@ -255,5 +255,5 @@ def MakeWeights(batch_size, density, threshold=threshold):
 
 if __name__ == '__main__':
     # FDTDataMaker(list_density=[0.3, 0.4, 0.5, 0.7, 0.9, 1.2, 1.5, 1.8, 2.2, 2.6, 3])
-    FastDataGen(list_density=[0.2], batch_size={'Training': 3000, 'Validation': 300})
+    FastDataGen(list_density=[0.3, 0.4, 0.5], batch_size={'Training': 6000, 'Validation': 300})
     # MakeWeights(batch_size=5000, density=3)

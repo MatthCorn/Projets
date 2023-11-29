@@ -14,7 +14,7 @@ implémentation du réseau de neurones avec une architecture classique de transf
 class TransformerTranslator(nn.Module):
 
     def __init__(self, d_pulse, d_pulse_buffed, d_PDW, d_PDW_buffed, d_att=32, n_heads=4, n_encoders=3, n_decoders=3, n_PDWs_memory=10, freq_ech=3,
-                 len_source=10, len_target=20, n_flags=4, threshold=7, device=torch.device('cpu'), norm='post', weights=None):
+                 len_source=10, len_target=20, n_flags=4, threshold=7, device=torch.device('cpu'), norm='pre', weights=None):
         super().__init__()
         self.device = device
         self.d_pulse = d_pulse
