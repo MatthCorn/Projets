@@ -53,27 +53,32 @@ ValidationErrTransList = []
 folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
 save_path = os.path.join(local, 'Complete', 'TypeClassic', 'Save', folder)
 os.mkdir(save_path)
-optimizer = torch.optim.Adam(translator.parameters(), lr=3e-4)
+optimizer = torch.optim.Adam(translator.parameters(), lr=3e-3)
 
-list_dir = os.listdir(os.path.join(local, 'Complete', 'Data'))
-# list_dir = ['D_0.2']
+size = 'Small'
+
+list_dir = os.listdir(os.path.join(local, 'Complete', 'Data', size))
 
 weights_error = torch.tensor((np.load(os.path.join(local, 'Complete', 'Weights', 'output_std.npy')) + 1e-10)**-1, device=device)
 weights_error = torch.tensor([1]*8, device=device)
 
+alt_rep = torch.eye(11)
+alt_rep[-5:-3, -5:-3] = torch.tensor([[1 / 2, 1 / 2], [1 / 2, -1 / 2]])
+alt_rep = alt_rep.to(device)
+
 for dir in list_dir:
-    path = os.path.join(local, 'Complete', 'Data', dir)
+    path = os.path.join(local, 'Complete', 'Data', size, dir)
     validation_source, validation_translation, training_source, training_translation = FDTDataLoader(path=path, len_target=param['len_target'])
     training_ended = training_translation[:, param['n_PDWs_memory']:, param['d_PDW'] + param['n_flags'] + 1].unsqueeze(-1)
     validation_ended = validation_translation[:, param['n_PDWs_memory']:, param['d_PDW'] + param['n_flags'] + 1].unsqueeze(-1)
 
-
     # On calcule l'écart type
-    std = np.std(training_translation.numpy(), axis=(0, 1))
+    std = np.std(torch.matmul(training_translation, alt_rep.t().to(torch.device('cpu'))).numpy(), axis=(0, 1))
 
-    n_epochs = 90
+    n_epochs = 10
     for i in tqdm(range(n_epochs)):
-        error, error_trans = ErrorAction(training_source, training_translation, training_ended, translator, weights_error, batch_size, action='Training', optimizer=optimizer)
+        error, error_trans = ErrorAction(training_source, training_translation, training_ended, translator, weights=weights_error,
+                                         batch_size=batch_size, action='Training', optimizer=optimizer, alt_rep=alt_rep[:8, :8])
         TrainingErrList.append(error)
         # normalisation de l'erreur par rapport à l'écart-type sur chaque coordonnée physique
         error_trans[0], error_trans[1], error_trans[2], error_trans[3], error_trans[4] = \
@@ -81,7 +86,8 @@ for dir in list_dir:
         TrainingErrTransList.append(error_trans)
 
         translator.eval()
-        error, error_trans = ErrorAction(validation_source, validation_translation, validation_ended, translator, batch_size, action='Validation')
+        error, error_trans = ErrorAction(validation_source, validation_translation, validation_ended, translator,
+                                         batch_size=batch_size, action='Validation', alt_rep=alt_rep[:8, :8])
         ValidationErrList.append(error)
         # normalisation de l'erreur par rapport à l'écart-type sur chaque coordonnée physique
         error_trans[0], error_trans[1], error_trans[2], error_trans[3], error_trans[4] = \

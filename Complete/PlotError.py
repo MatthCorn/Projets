@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
+
+
 def Plot(path, std=False, smoothing_factor=1):
     data = loadXmlAsObj(path)
 
@@ -69,8 +71,7 @@ if __name__ == '__main__':
     local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
     # local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
-    folder = os.path.join('Complete', 'TypeClassic', 'Save', '2023-11-30__10-31', 'D_0.3', 'error')
-    Plot(os.path.join(local, folder), std=False, smoothing_factor=10)
-
+    folder = os.path.join('Complete', 'TypeClassic', 'Save', '2023-11-30__16-55', 'D_0.5', 'error')
+    Plot(os.path.join(local, folder), std=False, smoothing_factor=1)
 
 

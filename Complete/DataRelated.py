@@ -127,8 +127,8 @@ def pad_sequence(l):
     l = [sublist + [[0.] * 8 + [0., 1., 0.]] * (max_len - len(sublist)) for sublist in l]
     return torch.tensor(l)
 
-def Write(source, translation, type_data, density):
-    save_path = os.path.join(local, 'Complete', 'Data')
+def Write(source, translation, type_data, density, size='Large'):
+    save_path = os.path.join(local, 'Complete', 'Data', size)
     try:
         os.mkdir(os.path.join(save_path, 'D_'+str(density)))
     except:
@@ -168,7 +168,7 @@ def FDTDataLoader(path='', len_target=30):
     return validation_source, validation_translation, training_source, training_translation
 
 # Cette fonction permet de créer l'ensemble d'entrainement sans passer par l'écriture des données en format xml par le FDT, on gagne énormement de temps
-def FastDataGen(list_density, batch_size={'Training': 6000, 'Validation': 300}):
+def FastDataGen(list_density, batch_size={'Training': 6000, 'Validation': 300}, size='Large'):
     for density in list_density:
 
         for key in batch_size.keys():
@@ -195,7 +195,7 @@ def FastDataGen(list_density, batch_size={'Training': 6000, 'Validation': 300}):
             # Rajoute des 0 à la fin des scénarios de PDWs pour qu'ils aient toutes la même longueure
             translation = pad_sequence(translation)
 
-            Write(source=source, translation=translation, type_data=key, density=density)
+            Write(source=source, translation=translation, type_data=key, density=density, size=size)
 
 
 def MakeWeights(batch_size, density, threshold=threshold):

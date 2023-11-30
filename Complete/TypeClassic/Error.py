@@ -1,8 +1,7 @@
 import torch
-from torch.nn import functional as F
 import math
 
-def TrainingError(source, target, ended, batch_size, batch_indice, network):
+def TrainingError(source, target, ended, batch_size, batch_indice, network, alt_rep=None):
     j = batch_indice
     batch_source = source[j * batch_size: (j + 1) * batch_size].detach().to(device=network.device, dtype=torch.float32)
     batch_target = target[j * batch_size: (j + 1) * batch_size].detach().to(device=network.device, dtype=torch.float32)
@@ -19,15 +18,20 @@ def TrainingError(source, target, ended, batch_size, batch_indice, network):
     predicted_target = predicted_target[:, network.n_PDWs_memory-1:-1]
     # predicted_target.shape = (batch_size, len_target-PDWsMemory, d_target+num_flags)
 
-    # new_rep.shape = (d_PDW, d_PDW)
+    # diff.shape = (d_PDW, d_PDW)
+    if alt_rep is not None:
 
-    error_trans = torch.norm((batch_target[:, network.n_PDWs_memory:, :(network.d_PDW + network.n_flags)] - predicted_target) * (1 - batch_ended), dim=(0, 1))/float(torch.norm((1 - batch_ended)))
+        diff = torch.matmul(batch_target[:, network.n_PDWs_memory:, :(network.d_PDW + network.n_flags)] - predicted_target, alt_rep.t().to(network.device))
+    else:
+        diff = batch_target[:, network.n_PDWs_memory:, :(network.d_PDW + network.n_flags)] - predicted_target
+
+    error_trans = torch.norm(diff * (1 - batch_ended), dim=(0, 1))/float(torch.norm((1 - batch_ended)))
     # error_trans.shape = d_PDW+n_flags
 
     return error_trans
 
 
-def ErrorAction(source, target, ended, network, weights=None, batch_size=50, action='', optimizer=None):
+def ErrorAction(source, target, ended, network, weights=None, batch_size=50, action='', optimizer=None, alt_rep=None):
     data_size, _, d_out = target.shape
     n_batch = int(data_size/batch_size)
 
@@ -37,7 +41,7 @@ def ErrorAction(source, target, ended, network, weights=None, batch_size=50, act
         for j in range(n_batch):
             optimizer.zero_grad(set_to_none=True)
 
-            err_trans = TrainingError(source, target, ended, batch_size, j, network)
+            err_trans = TrainingError(source, target, ended, batch_size, j, network, alt_rep=alt_rep)
 
             err = torch.norm(err_trans*weights)
             err.backward()
@@ -49,7 +53,7 @@ def ErrorAction(source, target, ended, network, weights=None, batch_size=50, act
     elif action == 'Validation':
         for j in range(n_batch):
             with torch.no_grad():
-                err_trans = TrainingError(source, target, ended, batch_size, j, network)
+                err_trans = TrainingError(source, target, ended, batch_size, j, network, alt_rep=alt_rep)
 
             error_trans.append(err_trans**2)
 
