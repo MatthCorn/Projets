@@ -242,11 +242,11 @@ def MakeWeights(batch_size, density, threshold=threshold):
     source = pulse_pre_embedding(source).numpy()
     translation = PDW_pre_embedding(translation).numpy()
 
-    source_average = np.std(np.array(source), axis=0)
-    source_std = np.mean(np.array(source), axis=0)
+    source_std = np.std(np.array(source), axis=0)
+    source_average = np.mean(np.array(source), axis=0)
 
-    translation_average = np.std(np.array(translation), axis=0)
-    translation_std = np.mean(np.array(translation), axis=0)
+    translation_std = np.std(np.array(translation), axis=0)
+    translation_average = np.mean(np.array(translation), axis=0)
 
     np.save(os.path.join(path, 'source_average'), source_average)
     np.save(os.path.join(path, 'source_std'), source_std)
@@ -255,5 +255,5 @@ def MakeWeights(batch_size, density, threshold=threshold):
 
 if __name__ == '__main__':
     # FDTDataMaker(list_density=[0.3, 0.4, 0.5, 0.7, 0.9, 1.2, 1.5, 1.8, 2.2, 2.6, 3])
-    FastDataGen(list_density=[0.3, 0.4, 0.5], batch_size={'Training': 6000, 'Validation': 300})
-    # MakeWeights(batch_size=5000, density=3)
+    # FastDataGen(list_density=[0.3, 0.4, 0.5], batch_size={'Training': 6000, 'Validation': 300})
+    MakeWeights(batch_size=5000, density=3)
