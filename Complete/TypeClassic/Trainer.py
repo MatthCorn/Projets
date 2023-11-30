@@ -16,9 +16,9 @@ local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Doc
 
 param = {
     'd_pulse': 5,
-    'd_pulse_buffed': 5,
+    'd_pulse_buffed': 14,
     'd_PDW': 5,
-    'd_PDW_buffed': 5,
+    'd_PDW_buffed': 14,
     'd_att': 64,
     'n_flags': 3,
     'n_heads': 4,

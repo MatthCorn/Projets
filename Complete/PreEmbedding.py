@@ -100,7 +100,6 @@ class FeaturesAndScaling(torch.nn.Module):
         self.register_buffer('std', torch.tensor(np.load(os.path.join(path, self.type + '_std.npy')) + 1e-10))
 
     def forward(self, input):
-        return input
         # on crée le temps de fin d'impulsion (TOE) et on crée 1 copie de TOA et TOE (pour remplacer par le quotien de la division euclidienne)
         # on crée Fmoy et -Fmoy pour les fréquences repliées
         input = torch.matmul(input, self.mat_1.t())
@@ -113,7 +112,6 @@ class FeaturesAndScaling(torch.nn.Module):
         # on remplace le quotien de la division euclidienne de Fmoy et -Fmoy par self.freq_ech par leurs restent
         # on crée Fmoy et DeltaF
         input = torch.matmul(input, self.mat_2.t())
-
 
         input = (input - self.average) / self.std
 
