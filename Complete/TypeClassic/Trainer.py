@@ -11,8 +11,8 @@ from GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 param = {
     'd_pulse': 5,
@@ -53,9 +53,9 @@ ValidationErrTransList = []
 folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
 save_path = os.path.join(local, 'Complete', 'TypeClassic', 'Save', folder)
 os.mkdir(save_path)
-optimizer = torch.optim.Adam(translator.parameters(), lr=3e-3)
+optimizer = torch.optim.Adam(translator.parameters(), lr=3e-4)
 
-size = 'Small'
+size = 'Large'
 
 list_dir = os.listdir(os.path.join(local, 'Complete', 'Data', size))
 
@@ -75,7 +75,7 @@ for dir in list_dir:
     # On calcule l'écart type
     std = np.std(torch.matmul(training_translation, alt_rep.t().to(torch.device('cpu'))).numpy(), axis=(0, 1))
 
-    n_epochs = 10
+    n_epochs = 30
     for i in tqdm(range(n_epochs)):
         error, error_trans = ErrorAction(training_source, training_translation, training_ended, translator, weights=weights_error,
                                          batch_size=batch_size, action='Training', optimizer=optimizer, alt_rep=alt_rep[:8, :8])
