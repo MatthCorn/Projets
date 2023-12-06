@@ -16,9 +16,8 @@ def TrainingError(source, target, ended, batch_size, batch_indice, network, alt_
     # faites à l'arrivée de la dernière salve.
 
     predicted_target = predicted_target[:, network.n_PDWs_memory-1:-1]
-    # predicted_target.shape = (batch_size, len_target-PDWsMemory, d_target+num_flags)
+    # predicted_target.shape = (batch_size, len_target-PDWsMemory, d_PDW+n_flags)
 
-    # diff.shape = (d_PDW, d_PDW)
     if alt_rep is not None:
 
         diff = torch.matmul(batch_target[:, network.n_PDWs_memory:, :(network.d_PDW + network.n_flags)] - predicted_target, alt_rep.t().to(network.device))
