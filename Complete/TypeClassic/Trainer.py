@@ -12,17 +12,17 @@ from GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 param = {
     'd_pulse': 5,
     'd_pulse_buffed': 14,
     'd_PDW': 5,
     'd_PDW_buffed': 14,
-    'd_att': 64,
+    'd_att': 128,
     'n_flags': 3,
-    'n_heads': 4,
+    'n_heads': 8,
     'n_encoders': 3,
     'n_decoders': 3,
     'n_PDWs_memory': 10,
@@ -55,7 +55,7 @@ folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
 save_path = os.path.join(local, 'Complete', 'TypeClassic', 'Save', folder)
 os.mkdir(save_path)
 
-size = 'Small'
+size = 'Large'
 
 list_dir = os.listdir(os.path.join(local, 'Complete', 'Data', size))
 
@@ -67,8 +67,8 @@ alt_rep[-5:-3, -5:-3] = torch.tensor([[1 / 2, 1 / 2], [1 / 2, -1 / 2]])
 alt_rep = alt_rep.to(device)
 
 for dir in list_dir:
-    optimizer = torch.optim.Adam(translator.parameters(), lr=3e-4)
-    lr_scheduler = Scheduler(optimizer, param['d_att'], 2)
+    optimizer = torch.optim.Adam(translator.parameters(), lr=1e-3, betas=(0.9, 0.98), eps=1e-9)
+    lr_scheduler = Scheduler(optimizer, param['d_att'], 20)
 
     path = os.path.join(local, 'Complete', 'Data', size, dir)
     validation_source, validation_translation, training_source, training_translation = FDTDataLoader(path=path, len_target=param['len_target'])
@@ -78,7 +78,7 @@ for dir in list_dir:
     # On calcule l'écart type
     std = np.std(torch.matmul(training_translation, alt_rep.t().to(torch.device('cpu'))).numpy(), axis=(0, 1))
 
-    n_epochs = 5
+    n_epochs = 60
     for i in tqdm(range(n_epochs)):
         error, error_trans = ErrorAction(training_source, training_translation, training_ended, translator, weights=weights_error,
                                          batch_size=batch_size, action='Training', optimizer=optimizer, alt_rep=alt_rep[:8, :8])
