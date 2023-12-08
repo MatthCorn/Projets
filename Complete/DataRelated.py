@@ -255,5 +255,5 @@ def MakeWeights(batch_size, density, threshold=threshold):
 
 if __name__ == '__main__':
     # FDTDataMaker(list_density=[0.3, 0.4, 0.5, 0.7, 0.9, 1.2, 1.5, 1.8, 2.2, 2.6, 3])
-    # FastDataGen(list_density=[0.3, 0.4, 0.5], batch_size={'Training': 6000, 'Validation': 300})
-    MakeWeights(batch_size=5000, density=3)
+    FastDataGen(list_density=[0.3, 0.5, 0.8, 1.3, 1.7, 2.2, 2.6, 3], batch_size={'Training': 30000, 'Validation': 300})
+    # MakeWeights(batch_size=5000, density=3)

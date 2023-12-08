@@ -7,12 +7,13 @@ import numpy as np
 import torch
 from tqdm import tqdm
 import datetime
+from Complete.LRScheduler import Scheduler
 from GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 param = {
     'd_pulse': 5,
@@ -53,9 +54,8 @@ ValidationErrTransList = []
 folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
 save_path = os.path.join(local, 'Complete', 'TypeClassic', 'Save', folder)
 os.mkdir(save_path)
-optimizer = torch.optim.Adam(translator.parameters(), lr=3e-4)
 
-size = 'Large'
+size = 'Small'
 
 list_dir = os.listdir(os.path.join(local, 'Complete', 'Data', size))
 
@@ -67,6 +67,9 @@ alt_rep[-5:-3, -5:-3] = torch.tensor([[1 / 2, 1 / 2], [1 / 2, -1 / 2]])
 alt_rep = alt_rep.to(device)
 
 for dir in list_dir:
+    optimizer = torch.optim.Adam(translator.parameters(), lr=3e-4)
+    lr_scheduler = Scheduler(optimizer, param['d_att'], 2)
+
     path = os.path.join(local, 'Complete', 'Data', size, dir)
     validation_source, validation_translation, training_source, training_translation = FDTDataLoader(path=path, len_target=param['len_target'])
     training_ended = training_translation[:, param['n_PDWs_memory']:, param['d_PDW'] + param['n_flags'] + 1].unsqueeze(-1)
@@ -75,7 +78,7 @@ for dir in list_dir:
     # On calcule l'écart type
     std = np.std(torch.matmul(training_translation, alt_rep.t().to(torch.device('cpu'))).numpy(), axis=(0, 1))
 
-    n_epochs = 30
+    n_epochs = 5
     for i in tqdm(range(n_epochs)):
         error, error_trans = ErrorAction(training_source, training_translation, training_ended, translator, weights=weights_error,
                                          batch_size=batch_size, action='Training', optimizer=optimizer, alt_rep=alt_rep[:8, :8])
@@ -84,6 +87,7 @@ for dir in list_dir:
         error_trans[0], error_trans[1], error_trans[2], error_trans[3], error_trans[4] = \
             error_trans[0]/std[0], error_trans[1]/std[1], error_trans[2]/std[2], error_trans[3]/std[3], error_trans[4]/std[4]
         TrainingErrTransList.append(error_trans)
+        lr_scheduler.step()
 
         translator.eval()
         error, error_trans = ErrorAction(validation_source, validation_translation, validation_ended, translator,
