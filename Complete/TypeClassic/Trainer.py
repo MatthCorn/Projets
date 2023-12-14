@@ -12,23 +12,23 @@ from GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 param = {
     'd_pulse': 5,
-    'd_pulse_buffed': 14,
+    'd_pulse_buffed': 5,
     'd_PDW': 5,
-    'd_PDW_buffed': 14,
-    'd_att': 128,
+    'd_PDW_buffed': 5,
+    'd_att': 64,
     'n_flags': 3,
-    'n_heads': 8,
+    'n_heads': 4,
     'n_encoders': 3,
     'n_decoders': 3,
     'n_PDWs_memory': 10,
     'len_target': 30,
     'len_source': 32,
-    'batch_size': 2048,
+    'batch_size': 512,
     'threshold': 7,
     'freq_ech': 3
 }
@@ -57,7 +57,8 @@ os.mkdir(save_path)
 
 size = 'Large'
 
-list_dir = os.listdir(os.path.join(local, 'Complete', 'Data', size))
+# list_dir = os.listdir(os.path.join(local, 'Complete', 'Data', size))
+list_dir = ['D_3']
 
 weights_error = torch.tensor((np.load(os.path.join(local, 'Complete', 'Weights', 'output_std.npy')) + 1e-10)**-1, device=device)
 weights_error = torch.tensor([1]*8, device=device)
@@ -68,26 +69,31 @@ alt_rep = alt_rep.to(device)
 
 for dir in list_dir:
     optimizer = torch.optim.Adam(translator.parameters(), lr=1e-3, betas=(0.9, 0.98), eps=1e-9)
-    lr_scheduler = Scheduler(optimizer, param['d_att'], 20)
 
     path = os.path.join(local, 'Complete', 'Data', size, dir)
     validation_source, validation_translation, training_source, training_translation = FDTDataLoader(path=path, len_target=param['len_target'])
     training_ended = training_translation[:, param['n_PDWs_memory']:, param['d_PDW'] + param['n_flags'] + 1].unsqueeze(-1)
     validation_ended = validation_translation[:, param['n_PDWs_memory']:, param['d_PDW'] + param['n_flags'] + 1].unsqueeze(-1)
 
+    n_epochs = 30
+    n_updates = int(len(training_source)/param['batch_size']) * n_epochs
+    warmup_frac = 0.2
+    warmup_steps = warmup_frac * n_updates
+    lr_scheduler = None
+    # lr_scheduler = Scheduler(optimizer, param['d_att'], warmup_steps)
+
     # On calcule l'écart type
     std = np.std(torch.matmul(training_translation, alt_rep.t().to(torch.device('cpu'))).numpy(), axis=(0, 1))
 
-    n_epochs = 60
     for i in tqdm(range(n_epochs)):
         error, error_trans = ErrorAction(training_source, training_translation, training_ended, translator, weights=weights_error,
-                                         batch_size=batch_size, action='Training', optimizer=optimizer, alt_rep=alt_rep[:8, :8])
+                                         batch_size=batch_size, action='Training', optimizer=optimizer, alt_rep=alt_rep[:8, :8],
+                                         lr_scheduler=lr_scheduler)
         TrainingErrList.append(error)
         # normalisation de l'erreur par rapport à l'écart-type sur chaque coordonnée physique
         error_trans[0], error_trans[1], error_trans[2], error_trans[3], error_trans[4] = \
             error_trans[0]/std[0], error_trans[1]/std[1], error_trans[2]/std[2], error_trans[3]/std[3], error_trans[4]/std[4]
         TrainingErrTransList.append(error_trans)
-        lr_scheduler.step()
 
         translator.eval()
         error, error_trans = ErrorAction(validation_source, validation_translation, validation_ended, translator,
