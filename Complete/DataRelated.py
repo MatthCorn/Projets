@@ -4,7 +4,7 @@ import torch
 import numpy as np
 from tqdm import tqdm
 from FakeDigitalTwin.SciptData import MakeSets
-from FakeDigitalTwin.Experience import MakeData
+from FakeDigitalTwin.Experience import MakeData, MakeDataHI
 from Complete.PreEmbedding import FeaturesAndScaling
 
 local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
@@ -168,12 +168,18 @@ def FDTDataLoader(path='', len_target=30):
     return validation_source, validation_translation, training_source, training_translation
 
 # Cette fonction permet de créer l'ensemble d'entrainement sans passer par l'écriture des données en format xml par le FDT, on gagne énormement de temps
-def FastDataGen(list_density, batch_size={'Training': 6000, 'Validation': 300}, size='Large'):
+def FastDataGen(list_density, batch_size={'Training': 6000, 'Validation': 300}, type='Large'):
+    if type == 'High_Interaction':
+        Method = MakeDataHI
+        list_density = [5]
+    else:
+        Method = MakeData
+
     for density in list_density:
 
         for key in batch_size.keys():
 
-            pulses, PDWs = MakeData(Batch_size=batch_size[key], seed=None, density=density, name=None, return_data=True)
+            pulses, PDWs = Method(Batch_size=batch_size[key], seed=None, density=density, name=None, return_data=True)
 
             source = [
                 [[pulse['TOA'], pulse['LI'], pulse['Level'], pulse['FreqStart'], pulse['FreqEnd']] for pulse in pulses_ant]
@@ -195,10 +201,10 @@ def FastDataGen(list_density, batch_size={'Training': 6000, 'Validation': 300}, 
             # Rajoute des 0 à la fin des scénarios de PDWs pour qu'ils aient toutes la même longueure
             translation = pad_sequence(translation)
 
-            Write(source=source, translation=translation, type_data=key, density=density, size=size)
+            Write(source=source, translation=translation, type_data=key, density=density, size=type)
 
 
-def MakeWeights(batch_size, density, threshold=threshold):
+def MakeWeights(batch_size, density, threshold=threshold, type=None):
     path = os.path.join(local, 'Complete', 'Weights')
     pulses, PDWs = MakeData(Batch_size=batch_size, seed=None, density=density, name=None, return_data=True)
 
@@ -255,5 +261,5 @@ def MakeWeights(batch_size, density, threshold=threshold):
 
 if __name__ == '__main__':
     # FDTDataMaker(list_density=[0.3, 0.4, 0.5, 0.7, 0.9, 1.2, 1.5, 1.8, 2.2, 2.6, 3])
-    FastDataGen(list_density=[0.3, 0.5, 0.8, 1.3, 1.7, 2.2, 2.6, 3], batch_size={'Training': 30000, 'Validation': 300})
+    FastDataGen(list_density=[0.3, 0.5, 0.8, 1.3, 1.7, 2.2, 2.6, 3], batch_size={'Training': 30000, 'Validation': 300}, type='High_Interaction')
     # MakeWeights(batch_size=5000, density=3)

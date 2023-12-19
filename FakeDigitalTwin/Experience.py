@@ -31,8 +31,8 @@ def MakeData(Batch_size, density, seed, name, return_data=False):
 
         size = int(100*density/(2*0.36))
 
-        # On se donne un scénario de 30 unités de temps
-        # On a donc en moyenne 3 impulsions en même temps
+        # On se donne un scénario de 100 unités de temps
+        # On a donc en moyenne "density" impulsions en même temps
         TOA = 100 * np.sort(np.random.random(size=size))
 
         ####################################################################################################################
@@ -97,11 +97,83 @@ def MakeData(Batch_size, density, seed, name, return_data=False):
 
     cwd = os.getcwd()
     (path, dir) = os.path.split(cwd)
-    while dir!='Projets':
+    while dir != 'Projets':
         (path, dir) = os.path.split(path)
     cwd = os.path.join(path, dir, 'FakeDigitalTwin')
 
     saveObjAsXml(BatchPulses, os.path.join(cwd, 'Data', name+'PulsesAnt.xml'))
     saveObjAsXml(BatchPDWs, os.path.join(cwd, 'Data', name+'PDWsDCI.xml'))
 
+
+def MakeDataHI(Batch_size, density, seed, name, return_data=False):
+    BatchPulses = []
+    BatchPDWs = []
+
+    if seed is not None:
+        np.random.seed(seed)
+
+    # Nombre de mesureurs
+    NbMaxTrackers = 4
+    # Seuil de différence de fréquences repliées en dessous duquel deux impulsions se gênent
+    FreqSensibility = 0.1
+    # Seuil de différence de fréquence entre un mesureur et une impulsion en dessous duquel ces derniers sont associés
+    FreqThreshold = 0.2
+    # Fréquence d'échantillionage du système
+    Fe = 3
+    # Temps de maintien d'un mesureur (fermé automatiquement dès que plus vieux)
+    MaxAgeTracker = 2
+    # Seuil du niveau au dessus duquel les impulsions saturent le palier
+    SaturationThreshold = 10
+    # Temps de maintien max d'un mesureur sans voir son impulsion
+    HoldingTime = 0.5
+
+
+    LI_max = 3 * MaxAgeTracker
+    size = int(100*density/(LI_max/2))
+
+    for iter in tqdm(range(Batch_size)):
+
+        TOA = 100 * np.sort(np.random.random(size=size))
+        LI = LI_max * np.random.random(size=size) + 1e-2
+        Level = 0.8 * SaturationThreshold * np.random.random(size=size) + 0.5 * SaturationThreshold
+
+
+        FreqRepMoy = Fe * np.random.rand()
+        FreqRep = (0.4 * np.random.random(size=size) - 0.2 + FreqRepMoy) % Fe
+
+        FreqMax, FreqVar = 10, 0.1
+        FreqMoy = []
+        for freq in FreqRep:
+            FreqPossible = [-freq + k*Fe for k in range(1, FreqMax//Fe + 2)] + [freq + k*Fe for k in range(FreqMax//Fe + 1)]
+            FreqPossible = [freq for freq in FreqPossible if FreqVar < freq < (FreqMax - FreqVar)]
+            FreqMoy.append(FreqPossible[np.random.randint(len(FreqPossible))])
+        FreqMoy = np.array(FreqMoy)
+        dF = FreqVar * (2 * np.random.random(size=size) - 1)
+        FreqStart = FreqMoy + dF
+        FreqEnd = FreqMoy - dF
+
+        AntP = [Pulse(TOA=round(TOA[k], 3), LI=round(LI[k], 3), Level=round(Level[k], 3), FreqStart=round(FreqStart[k], 3), FreqEnd=round(FreqEnd[k], 3), Id=k) for k in range(size)]
+
+
+        DT = DigitalTwin(NbMaxTrackers=NbMaxTrackers, FreqThreshold=FreqThreshold, Fe=Fe, MaxAgeTracker=MaxAgeTracker,
+                         FreqSensibility=FreqSensibility, SaturationThreshold=SaturationThreshold, HoldingTime=HoldingTime)
+
+        DT.forward(AntP)
+
+        BatchPulses.append([{'TOA': Pulse.TOA, 'LI': Pulse.LI, 'Level': Pulse.Level, 'FreqStart': Pulse.FreqStart,
+                       'FreqEnd': Pulse.FreqEnd, 'Id': Pulse.Id} for Pulse in AntP])
+
+        BatchPDWs.append(DT.PDWs)
+
+    if return_data:
+        return BatchPulses, BatchPDWs
+
+    cwd = os.getcwd()
+    (path, dir) = os.path.split(cwd)
+    while dir != 'Projets':
+        (path, dir) = os.path.split(path)
+    cwd = os.path.join(path, dir, 'FakeDigitalTwin')
+
+    saveObjAsXml(BatchPulses, os.path.join(cwd, 'Data', name+'PulsesAnt.xml'))
+    saveObjAsXml(BatchPDWs, os.path.join(cwd, 'Data', name+'PDWsDCI.xml'))
 
