@@ -1,6 +1,6 @@
 from Complete.TypeClassic.ClassicNetwork import TransformerTranslator
 from Complete.TypeClassic.Error import ErrorAction
-from Complete.DataRelated import FDTDataLoader
+from Complete.DataRelated import FDTDataLoader, GetStd
 from Tools.XMLTools import saveObjAsXml
 import os
 import numpy as np
@@ -17,9 +17,9 @@ local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Doc
 
 param = {
     'd_pulse': 5,
-    'd_pulse_buffed': 5,
+    'd_pulse_buffed': 14,
     'd_PDW': 5,
-    'd_PDW_buffed': 5,
+    'd_PDW_buffed': 14,
     'd_att': 64,
     'n_flags': 3,
     'n_heads': 4,
@@ -55,10 +55,10 @@ folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
 save_path = os.path.join(local, 'Complete', 'TypeClassic', 'Save', folder)
 os.mkdir(save_path)
 
-size = 'Large'
+size = 'High_Interaction'
 
 # list_dir = os.listdir(os.path.join(local, 'Complete', 'Data', size))
-list_dir = ['D_3']
+list_dir = ['D_5']
 
 weights_error = torch.tensor((np.load(os.path.join(local, 'Complete', 'Weights', 'output_std.npy')) + 1e-10)**-1, device=device)
 weights_error = torch.tensor([1]*8, device=device)
@@ -75,7 +75,7 @@ for dir in list_dir:
     training_ended = training_translation[:, param['n_PDWs_memory']:, param['d_PDW'] + param['n_flags'] + 1].unsqueeze(-1)
     validation_ended = validation_translation[:, param['n_PDWs_memory']:, param['d_PDW'] + param['n_flags'] + 1].unsqueeze(-1)
 
-    n_epochs = 30
+    n_epochs = 3
     n_updates = int(len(training_source)/param['batch_size']) * n_epochs
     warmup_frac = 0.2
     warmup_steps = warmup_frac * n_updates
@@ -83,7 +83,8 @@ for dir in list_dir:
     # lr_scheduler = Scheduler(optimizer, param['d_att'], warmup_steps)
 
     # On calcule l'écart type
-    std = np.std(torch.matmul(training_translation, alt_rep.t().to(torch.device('cpu'))).numpy(), axis=(0, 1))
+    # std = np.std(torch.matmul(training_translation, alt_rep.t().to(torch.device('cpu'))).numpy(), axis=(0, 1))
+    std = GetStd(torch.matmul(training_translation[:, param['n_PDWs_memory']:], alt_rep.t().to(torch.device('cpu'))))
 
     for i in tqdm(range(n_epochs)):
         error, error_trans = ErrorAction(training_source, training_translation, training_ended, translator, weights=weights_error,

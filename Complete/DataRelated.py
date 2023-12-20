@@ -204,7 +204,7 @@ def FastDataGen(list_density, batch_size={'Training': 6000, 'Validation': 300}, 
             Write(source=source, translation=translation, type_data=key, density=density, size=type)
 
 
-def MakeWeights(batch_size, density, threshold=threshold, type=None):
+def MakeWeights(batch_size, density, threshold=threshold):
     path = os.path.join(local, 'Complete', 'Weights')
     pulses, PDWs = MakeData(Batch_size=batch_size, seed=None, density=density, name=None, return_data=True)
 
@@ -258,6 +258,16 @@ def MakeWeights(batch_size, density, threshold=threshold, type=None):
     np.save(os.path.join(path, 'source_std'), source_std)
     np.save(os.path.join(path, 'target_average'), translation_average)
     np.save(os.path.join(path, 'target_std'), translation_std)
+
+def GetStd(target):
+    # target.shape = (batch_size, len_target, d_PDWs + n_flags + 3)
+    _, len_target, _ = target.shape
+    target, ended = target[..., :-3], target[..., -3]
+    mean = target.mean(dim=1) * len_target / (ended.sum(dim=1) + 1e-9).unsqueeze(-1)
+    target += mean.unsqueeze(1).expand(-1, len_target, -1) * (1 - ended.unsqueeze(-1))
+    std = target.std(dim=1) * torch.sqrt((len_target-1)/(torch.abs(ended.sum(dim=1) - 1) + 1e-9)).unsqueeze(-1)
+    std = (std * ended.sum(dim=1).unsqueeze(-1)).sum(dim=0) / ended.sum()
+    return std.numpy()
 
 if __name__ == '__main__':
     # FDTDataMaker(list_density=[0.3, 0.4, 0.5, 0.7, 0.9, 1.2, 1.5, 1.8, 2.2, 2.6, 3])
