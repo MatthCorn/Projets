@@ -12,8 +12,8 @@ from GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 param = {
     'd_pulse': 5,
@@ -28,7 +28,7 @@ param = {
     'n_PDWs_memory': 10,
     'len_target': 30,
     'len_source': 32,
-    'batch_size': 512,
+    'batch_size': 256,
     'threshold': 7,
     'freq_ech': 3
 }
@@ -68,19 +68,19 @@ alt_rep[-5:-3, -5:-3] = torch.tensor([[1 / 2, 1 / 2], [1 / 2, -1 / 2]])
 alt_rep = alt_rep.to(device)
 
 for dir in list_dir:
-    optimizer = torch.optim.Adam(translator.parameters(), lr=1e-3, betas=(0.9, 0.98), eps=1e-9)
+    optimizer = torch.optim.Adam(translator.parameters(), lr=1e-4, betas=(0.9, 0.98), eps=1e-9)
 
     path = os.path.join(local, 'Complete', 'Data', size, dir)
     validation_source, validation_translation, training_source, training_translation = FDTDataLoader(path=path, len_target=param['len_target'])
     training_ended = training_translation[:, param['n_PDWs_memory']:, param['d_PDW'] + param['n_flags'] + 1].unsqueeze(-1)
     validation_ended = validation_translation[:, param['n_PDWs_memory']:, param['d_PDW'] + param['n_flags'] + 1].unsqueeze(-1)
 
-    n_epochs = 3
+    n_epochs = 100
     n_updates = int(len(training_source)/param['batch_size']) * n_epochs
     warmup_frac = 0.2
     warmup_steps = warmup_frac * n_updates
-    lr_scheduler = None
-    # lr_scheduler = Scheduler(optimizer, param['d_att'], warmup_steps)
+    # lr_scheduler = None
+    lr_scheduler = Scheduler(optimizer, param['d_att'], warmup_steps, max=50)
 
     # On calcule l'écart type
     # std = np.std(torch.matmul(training_translation, alt_rep.t().to(torch.device('cpu'))).numpy(), axis=(0, 1))

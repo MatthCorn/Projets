@@ -68,9 +68,9 @@ def smooth(Li, k):
     return resu
 
 if __name__ == '__main__':
-    local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-    # local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+    # local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+    local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
-    folder = os.path.join('Complete', 'TypeClassic', 'Save', '2023-12-20__11-53', 'D_5', 'error')
+    folder = os.path.join('Complete', 'TypeClassic', 'Save', '2023-12-20__14-47', 'D_5', 'error')
     Plot(os.path.join(local, folder), std=False, smoothing_factor=1)
 
