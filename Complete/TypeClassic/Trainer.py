@@ -12,8 +12,8 @@ from GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 param = {
     'd_pulse': 5,
@@ -23,8 +23,8 @@ param = {
     'd_att': 64,
     'n_flags': 3,
     'n_heads': 4,
-    'n_encoders': 3,
-    'n_decoders': 3,
+    'n_encoders': 2,
+    'n_decoders': 2,
     'n_PDWs_memory': 10,
     'len_target': 30,
     'len_source': 32,

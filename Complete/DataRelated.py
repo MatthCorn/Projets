@@ -1,4 +1,4 @@
-from Tools.XMLTools import loadXmlAsObj
+from Tools.XMLTools import loadXmlAsObj, saveObjAsXml
 import os
 import torch
 import numpy as np
@@ -169,6 +169,7 @@ def FDTDataLoader(path='', len_target=30):
 
 # Cette fonction permet de créer l'ensemble d'entrainement sans passer par l'écriture des données en format xml par le FDT, on gagne énormement de temps
 def FastDataGen(list_density, batch_size={'Training': 6000, 'Validation': 300}, type='Large'):
+
     if type == 'High_Interaction':
         Method = MakeDataHI
         list_density = [5]
@@ -202,6 +203,9 @@ def FastDataGen(list_density, batch_size={'Training': 6000, 'Validation': 300}, 
             translation = pad_sequence(translation)
 
             Write(source=source, translation=translation, type_data=key, density=density, size=type)
+
+    save_path = os.path.join(local, 'Complete', 'Data', type, 'batch_size')
+    saveObjAsXml(batch_size, save_path)
 
 
 def MakeWeights(batch_size, density, threshold=threshold):
