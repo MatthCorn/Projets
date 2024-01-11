@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 import torch
 import pickle
 
-local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 def unpickle(file):
     with open(file, 'rb') as fo:

@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<Dictionary>
+ <Object Key="d_pulse" Value="5"/>
+ <Object Key="d_pulse_buffed" Value="14"/>
+ <Object Key="d_PDW" Value="5"/>
+ <Object Key="d_PDW_buffed" Value="14"/>
+ <Object Key="d_att" Value="64"/>
+ <Object Key="n_flags" Value="3"/>
+ <Object Key="n_heads" Value="4"/>
+ <Object Key="n_encoders" Value="2"/>
+ <Object Key="n_decoders" Value="2"/>
+ <Object Key="n_PDWs_memory" Value="10"/>
+ <Object Key="len_target" Value="30"/>
+ <Object Key="len_source" Value="32"/>
+ <Object Key="batch_size" Value="256"/>
+ <Object Key="threshold" Value="7"/>
+ <Object Key="freq_ech" Value="3"/>
+</Dictionary>

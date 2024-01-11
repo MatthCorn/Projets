@@ -4,8 +4,9 @@ import idx2numpy
 import torch
 import torch.nn as nn
 
-# local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
-local = r'C:\Users\Matthieu\Documents\Python\Projets'
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+
 def MakeLabelSet(x):
     out = torch.zeros(x.shape[0],10)
     for i in range(len(x)):

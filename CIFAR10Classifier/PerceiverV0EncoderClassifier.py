@@ -7,8 +7,8 @@ import torch.nn as nn
 from torch.cuda.amp import GradScaler
 from tqdm import tqdm
 
-local = r'C:\Users\matth\OneDrive\Documents\Python\Projets'
-# local = r'C:\Users\Matthieu\Documents\Python\Projets'
+local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
+# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
 
 LocalConfig = config(config=2)
 LocalConfig.AddParam(d_latent=10, d_att=10, num_heads=1, latent_len=64, max_len=32, d_out=10, normalized=True)
