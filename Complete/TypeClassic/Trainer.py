@@ -36,12 +36,12 @@ param = {
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-translator = TransformerTranslator(d_pulse=param['d_pulse'], d_pulse_buffed=param['d_pulse_buffed'], d_PDW_buffed=param['d_PDW_buffed'], d_att=param['d_att'],
+translator = TransformerTranslator(d_pulse=param['d_pulse'], d_pulse_buffed=param['d_pulse_buffed'], d_PDW=param['d_PDW'], d_PDW_buffed=param['d_PDW_buffed'], d_att=param['d_att'],
                                    len_target=param['len_target'], freq_ech=param['freq_ech'], weights=os.path.join(local, 'Complete', 'Weights'), norm='pre',
-                                   d_PDW=param['d_PDW'], len_source=param['len_source'], n_encoders=param['n_encoders'], n_flags=param['n_flags'], n_heads=param['n_heads'],
-                                   n_decoders=param['n_decoders'], n_PDWs_memory=param['n_PDWs_memory'], device=device, threshold=param['threshold'])
+                                   len_source=param['len_source'], n_encoders=param['n_encoders'], n_decoders=param['n_decoders'], n_flags=param['n_flags'],
+                                   n_heads=param['n_heads'], n_PDWs_memory=param['n_PDWs_memory'], device=device, threshold=param['threshold'])
 
-
+print('nombre de paramètres : ', sum(p.numel() for p in translator.parameters() if p.requires_grad))
 
 batch_size = param['batch_size']
 
@@ -61,7 +61,6 @@ size = 'High_Interaction'
 list_dir = ['D_5']
 
 weights_error = torch.tensor((np.load(os.path.join(local, 'Complete', 'Weights', 'output_std.npy')) + 1e-10)**-1, device=device)
-weights_error = torch.tensor([1]*8, device=device)
 
 alt_rep = torch.eye(11)
 alt_rep[-5:-3, -5:-3] = torch.tensor([[1 / 2, 1 / 2], [1 / 2, -1 / 2]])
@@ -87,7 +86,7 @@ for dir in list_dir:
     std = GetStd(torch.matmul(training_translation[:, param['n_PDWs_memory']:], alt_rep.t().to(torch.device('cpu'))))
 
     for i in tqdm(range(n_epochs)):
-        error, error_trans = ErrorAction(training_source, training_translation, training_ended, translator, weights=weights_error,
+        error, error_trans = ErrorAction(training_source, training_translation, training_ended, translator, weights_error=weights_error,
                                          batch_size=batch_size, action='Training', optimizer=optimizer, alt_rep=alt_rep[:8, :8],
                                          lr_scheduler=lr_scheduler)
         TrainingErrList.append(error)
@@ -120,6 +119,3 @@ for dir in list_dir:
     saveObjAsXml(error, os.path.join(save_path, dir, 'error'))
 
     # git_push(local=local, file=os.path.join(save_path, dir), CommitMsg='simu '+folder+dir)
-
-
-

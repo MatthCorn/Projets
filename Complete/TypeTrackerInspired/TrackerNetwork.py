@@ -4,29 +4,33 @@ from Complete.Transformer.EncoderTransformer import EncoderLayer
 from Complete.Transformer.EasyFeedForward import FeedForward
 from Complete.Transformer.DecoderTransformer import DecoderLayer
 from Complete.TypeTrackerInspired.Embedding import TrackerEmbeddingLayer
-from Complete.TypeTrackerInspired.PositionalEncoding import ClassicPositionalEncoding
+from Complete.TypeTrackerInspired.PositionalEncoding import PositionalEncoding
+from Complete.PreEmbedding import FeaturesAndScaling
+
 
 '''
 implémentation du réseau de neurones avec une architecture inspirée du fonctionnement avec mesureurs du jumeau numérique
 '''
 
-def MakeDecoderMask(n_tracker, len_target):
-    mask = torch.zeros(n_tracker*len_target, n_tracker*len_target)
+def MakeDecoderMask(n_trackers, len_target):
+    mask = torch.zeros(n_trackers*len_target, n_trackers*len_target)
     for i in range(len_target):
-        mask[i*n_tracker:, i*n_tracker:(i+1)*n_tracker] = 1
+        mask[i*n_trackers:, i*n_trackers:(i+1)*n_trackers] = 1
     return mask.unsqueeze(0).unsqueeze(0)
 
 
 class TransformerTranslator(nn.Module):
 
-    def __init__(self, d_pulse, d_PDW, d_att=32, n_heads=4, n_encoders=3, n_tracker=4, len_source=20,
-                 n_decoders=3, n_PDWs_memory=10, len_target=20, n_flags=4, device=torch.device('cpu'), norm='post'):
+    def __init__(self, d_pulse, d_pulse_buffed, d_PDW, d_PDW_buffed, d_att=32, n_heads=4, n_encoders=3, n_decoders=3, n_PDWs_memory=10, freq_ech=3,
+                 len_source=20, len_target=20, n_flags=4, threshold=7, device=torch.device('cpu'), norm='pre', weights=None, n_trackers=4):
         super().__init__()
         self.device = device
-        self.d_PDW = d_PDW
         self.d_pulse = d_pulse
+        self.d_pulse_buffed = d_pulse_buffed
+        self.d_PDW_buffed = d_PDW_buffed
+        self.d_PDW = d_PDW
         self.d_att = d_att
-        self.n_tracker = n_tracker
+        self.n_trackers = n_trackers
         self.n_flags = n_flags
 
         self.tokens_encoding = nn.Parameter(torch.randn(3, d_att))
@@ -46,14 +50,18 @@ class TransformerTranslator(nn.Module):
 
         self.n_PDWs_memory = n_PDWs_memory
 
-        self.source_embedding = FeedForward(d_in=d_pulse, d_out=d_att, widths=[], dropout=0)
-        self.target_embedding = FeedForward(d_in=d_PDW+n_flags, d_out=d_att, widths=[], dropout=0)
-        self.tracker_embedding = TrackerEmbeddingLayer(n_tracker=n_tracker, d_att=d_att)
+        self.source_pre_embedding = FeaturesAndScaling(threshold, freq_ech, type='source', weights=weights)
+        self.target_pre_embedding = FeaturesAndScaling(threshold, freq_ech, type='target', weights=weights)
 
-        self.PE_encoder = ClassicPositionalEncoding(d_att=d_att, dropout=0, max_len=len_source, device=device)
-        self.PE_decoder = ClassicPositionalEncoding(d_att=d_att, dropout=0, max_len=len_target, device=device)
+        self.source_embedding = FeedForward(d_in=d_pulse_buffed, d_out=d_att, widths=[], dropout=0)
+        self.target_embedding = FeedForward(d_in=d_PDW_buffed+n_flags, d_out=d_att, widths=[], dropout=0)
 
-        self.register_buffer("mask_decoder", MakeDecoderMask(n_tracker, len_target), persistent=False)
+        self.tracker_embedding = TrackerEmbeddingLayer(n_trackers=n_trackers, d_att=d_att)
+
+        self.PE_encoder = PositionalEncoding(d_att=d_att, dropout=0, max_len=len_source, device=device)
+        self.PE_decoder = PositionalEncoding(d_att=d_att, dropout=0, max_len=len_target, device=device)
+
+        self.register_buffer("mask_decoder", MakeDecoderMask(n_trackers, len_target), persistent=False)
 
         self.prediction_physics = FeedForward(d_in=d_att, d_out=d_PDW, widths=[16], dropout=0)
         self.prediction_flags = FeedForward(d_in=d_att, d_out=n_flags, widths=[16], dropout=0)
@@ -69,6 +77,9 @@ class TransformerTranslator(nn.Module):
 
         src, type_source = source.split([self.d_pulse, 3], dim=-1)
         trg, type_target = target.split([self.d_PDW + self.n_flags, 3], dim=-1)
+
+        src = self.source_pre_embedding(src)
+        trg = self.target_pre_embedding(trg)
 
         trg = self.target_embedding(trg)
         src = self.source_embedding(src)
@@ -91,33 +102,33 @@ class TransformerTranslator(nn.Module):
 
         trg = self.PE_decoder(trg)
         src = self.PE_encoder(src)
-
         # trg.shape = (batch_size, len_target, d_att)
         # src.shape = (batch_size, len_source, d_att)
 
         trg = self.tracker_embedding(trg)
+        # trg.shape = (batch_size, n_trackers*len_target, d_att)
 
         for encoder in self.encoders:
             src = encoder(src)
 
         for decoder in self.decoders:
             trg = decoder(target=trg, source=src, mask=self.mask_decoder)
-        # trg.shape = (batch_size, n_tracker*len_target, d_att)
-        trg = trg.reshape(batch_size*len_target, self.n_tracker, self.d_att)
-        # trg.shape = (batch_size*len_target, n_tracker, d_att)
+        # trg.shape = (batch_size, n_trackers*len_target, d_att)
+        trg = trg.reshape(batch_size*len_target, self.n_trackers, self.d_att)
+        # trg.shape = (batch_size*len_target, n_trackers, d_att)
 
         decision = self.encoder_decider(trg)
-        # decision.shape = (batch_size*len_target, n_tracker, d_att)
+        # decision.shape = (batch_size*len_target, n_trackers, d_att)
 
-        trg = trg.reshape(batch_size, len_target, self.n_tracker, self.d_att)
-        # trg.shape = (batch_size, len_target, n_tracker, d_att)
+        trg = trg.reshape(batch_size, len_target, self.n_trackers, self.d_att)
+        # trg.shape = (batch_size, len_target, n_trackers, d_att)
 
         trg = torch.cat((self.prediction_physics(trg), self.prediction_flags(trg)), dim=-1)
 
-        decision = decision.reshape(batch_size, len_target, self.n_tracker, self.d_att)
-        # decision.shape = (batch_size, len_target, n_tracker, d_att)
+        decision = decision.reshape(batch_size, len_target, self.n_trackers, self.d_att)
+        # decision.shape = (batch_size, len_target, n_trackers, d_att)
         decision = self.resizer_decider(decision)
-        # decision.shape = (batch_size, len_target, n_tracker, 1)
+        # decision.shape = (batch_size, len_target, n_trackers, 1)
         decision = self.normalizer_decider(decision)
 
         trg = self.HookMatmul(trg.transpose(-1, -2), decision).squeeze(-1)

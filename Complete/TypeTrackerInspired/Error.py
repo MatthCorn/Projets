@@ -2,7 +2,7 @@ import torch
 from torch.nn import functional as F
 import math
 
-def TrainingError(source, target, ended, batch_size, batch_indice, network):
+def TrainingError(source, target, ended, batch_size, batch_indice, network, alt_rep=None):
     j = batch_indice
     batch_source = source[j * batch_size: (j + 1) * batch_size].detach().to(device=network.device, dtype=torch.float32)
     batch_target = target[j * batch_size: (j + 1) * batch_size].detach().to(device=network.device, dtype=torch.float32)
@@ -17,17 +17,26 @@ def TrainingError(source, target, ended, batch_size, batch_indice, network):
     # faites à l'arrivée de la dernière salve.
 
     predicted_target = predicted_target[:, network.n_PDWs_memory-1:-1]
-    # predicted_target.shape = (batch_size, len_target-PDWsMemory, d_target+num_flags)
+    # predicted_target.shape = (batch_size, len_target-PDWsMemory, d_PDW+n_flags)
 
-    error_trans = torch.norm((batch_target[:, network.n_PDWs_memory:, :(network.d_PDW + network.n_flags)] - predicted_target) * (1 - batch_ended), dim=(0, 1))/float(torch.norm((1 - batch_ended)))
+    if alt_rep is not None:
+
+        diff = torch.matmul(batch_target[:, network.n_PDWs_memory:, :(network.d_PDW + network.n_flags)] - predicted_target, alt_rep.t().to(network.device))
+    else:
+        diff = batch_target[:, network.n_PDWs_memory:, :(network.d_PDW + network.n_flags)] - predicted_target
+
+    error_trans = torch.norm(diff * (1 - batch_ended), dim=(0, 1))/float(torch.norm((1 - batch_ended)))
     # error_trans.shape = d_PDW+n_flags
 
     return error_trans
 
 
-def ErrorAction(source, target, ended, network, hookers, weights, batch_size=50, action='', optimizer=None):
+def ErrorAction(source, target, ended, network, hookers=None, weights_hookers=None, weights_error=None, batch_size=50, action='', optimizer=None, lr_scheduler=None, alt_rep=None):
     data_size, _, d_out = target.shape
     n_batch = int(data_size/batch_size)
+
+    if weights_error is None:
+        weights_error = torch.tensor([1]*d_out, device=network.device)
 
     error_trans = []
 
@@ -35,17 +44,21 @@ def ErrorAction(source, target, ended, network, hookers, weights, batch_size=50,
         for j in range(n_batch):
             optimizer.zero_grad(set_to_none=True)
 
-            err_trans = TrainingError(source, target, ended, batch_size, j, network)
+            err_trans = TrainingError(source, target, ended, batch_size, j, network, alt_rep=alt_rep)
 
-            err = torch.norm(err_trans)
+            if hookers is None:
+                err = torch.norm(err_trans * weights_error)
 
-            # err = torch.norm(err_trans)*weights['trans'] + \
-            #       (1 - F.tanh(hookers.ReleaseError('variance')/weights['var']['threshold']))*weights['var']['mod'] + \
-            #       (1 - F.tanh(hookers.ReleaseError('diversity')/weights['div']['threshold']))*weights['div']['mod'] + \
-            #       hookers.ReleaseError('symetry')*weights['sym'] + hookers.ReleaseError('likeli')*weights['likeli']
+            else:
+                err = torch.norm(err_trans * weights_error)*weights_hookers['trans'] + \
+                  (1 - F.tanh(hookers.ReleaseError('variance')/weights_hookers['var']['threshold']))*weights_hookers['var']['mod'] + \
+                  (1 - F.tanh(hookers.ReleaseError('diversity')/weights_hookers['div']['threshold']))*weights_hookers['div']['mod'] + \
+                  hookers.ReleaseError('symetry')*weights_hookers['sym'] + hookers.ReleaseError('likeli')*weights_hookers['likeli']
 
             err.backward()
             optimizer.step()
+            if lr_scheduler is not None:
+                lr_scheduler.step()
 
             error_trans.append(err_trans**2)
 
@@ -53,7 +66,7 @@ def ErrorAction(source, target, ended, network, hookers, weights, batch_size=50,
     elif action == 'Validation':
         for j in range(n_batch):
             with torch.no_grad():
-                err_trans = TrainingError(source, target, ended, batch_size, j, network)
+                err_trans = TrainingError(source, target, ended, batch_size, j, network, alt_rep=alt_rep)
 
             error_trans.append(err_trans**2)
 

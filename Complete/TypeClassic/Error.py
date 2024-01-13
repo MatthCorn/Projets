@@ -30,9 +30,12 @@ def TrainingError(source, target, ended, batch_size, batch_indice, network, alt_
     return error_trans
 
 
-def ErrorAction(source, target, ended, network, weights=None, batch_size=50, action='', optimizer=None, lr_scheduler=None, alt_rep=None):
+def ErrorAction(source, target, ended, network, weights_error=None, batch_size=50, action='', optimizer=None, lr_scheduler=None, alt_rep=None):
     data_size, _, d_out = target.shape
     n_batch = int(data_size/batch_size)
+
+    if weights_error is None:
+        weights_error = torch.tensor([1]*d_out, device=network.device)
 
     error_trans = []
 
@@ -42,7 +45,7 @@ def ErrorAction(source, target, ended, network, weights=None, batch_size=50, act
 
             err_trans = TrainingError(source, target, ended, batch_size, j, network, alt_rep=alt_rep)
 
-            err = torch.norm(err_trans*weights)
+            err = torch.norm(err_trans*weights_error)
             err.backward()
             optimizer.step()
             if lr_scheduler is not None:

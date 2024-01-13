@@ -87,7 +87,6 @@ class TransformerTranslator(nn.Module):
 
         trg = self.PE_decoder(trg)
         src = self.PE_encoder(src)
-
         # trg.shape = (batch_size, len_target, d_att)
         # src.shape = (batch_size, len_source, d_att)
 
