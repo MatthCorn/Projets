@@ -108,7 +108,7 @@ def PlotPropError(path, deg=4):
 
 
 if __name__ == '__main__':
-    local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projet')
+    local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projets')
 
     folder = os.path.join('FDTTranslator', 'Bursts', 'FPII', 'Save', '2023-09-29__15-15', 'error')
     Plot(os.path.join(local, folder), eval=True, std=True)

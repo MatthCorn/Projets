@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 # Ce script sert à analyser les paramètres des IA entrainées
 
-local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projet')
+local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projets')
 
 type1 = 'TypeClassic'
 type2 = 'TypeTrackerInspired'

@@ -5,7 +5,7 @@ import numpy as np
 from torch.nn.utils.rnn import pad_sequence
 import shutil
 
-local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projet')
+local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projets')
 
 
 # Temps de maintien max d'un mesureur sans voir son impulsion

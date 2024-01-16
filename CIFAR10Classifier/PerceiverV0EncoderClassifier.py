@@ -8,7 +8,7 @@ from torch.cuda.amp import GradScaler
 from tqdm import tqdm
 import os
 
-local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projet')
+local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projets')
 
 LocalConfig = config(config=2)
 LocalConfig.AddParam(d_latent=10, d_att=10, num_heads=1, latent_len=64, max_len=32, d_out=10, normalized=True)

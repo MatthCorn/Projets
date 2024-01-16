@@ -4,7 +4,7 @@ import torch
 import pickle
 import os
 
-local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projet')
+local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projets')
 
 def unpickle(file):
     with open(file, 'rb') as fo:

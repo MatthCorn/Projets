@@ -7,7 +7,7 @@ from FakeDigitalTwin.SciptData import MakeSets
 from FakeDigitalTwin.Experience import MakeData, MakeDataHI
 from Complete.PreEmbedding import FeaturesAndScaling
 
-local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projet')
+local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projets')
 
 # Temps de maintien max d'un mesureur sans voir son impulsion
 holding_time = 0.5

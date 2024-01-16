@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 import os
 
-local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projet')
+local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projets')
 
 def MakeLabelSet(x):
     out = torch.zeros(x.shape[0],10)

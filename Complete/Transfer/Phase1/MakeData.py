@@ -12,7 +12,7 @@ import torch.nn.functional as F
 import shutil
 from tqdm import tqdm
 
-local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projet')
+local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projets')
 
 n_max_pulses = 10
 n_PDWs_memory = 10

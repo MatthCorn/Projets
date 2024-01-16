@@ -92,7 +92,7 @@ def PlotPropError(path, deg=4):
 
 
 if __name__ == '__main__':
-    local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projet')
+    local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projets')
 
     folder = os.path.join('StepByStep', 'S1', 'Save', '2023-10-03__14-22', 'error')
     Plot(os.path.join(local, folder), std=False)
