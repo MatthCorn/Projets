@@ -7,8 +7,7 @@ from FakeDigitalTwin.SciptData import MakeSets
 from FakeDigitalTwin.Experience import MakeData, MakeDataHI
 from Complete.PreEmbedding import FeaturesAndScaling
 
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projet')
 
 # Temps de maintien max d'un mesureur sans voir son impulsion
 holding_time = 0.5
@@ -149,7 +148,7 @@ if False:
         print(torch.norm(s, dim=(0, 2), p=1))
 
 # Cette fonction ne prend pas en compte le chargement du mode évaluation pour l'instant
-def FDTDataLoader(path='', len_target=30):
+def FDTDataLoader(path='', len_target=30, device=torch.device('cpu'), dtype=torch.float32):
 
     type_data = 'Validation'
     validation_source = torch.tensor(np.load(os.path.join(path, type_data, 'PulsesAnt.npy')))
@@ -165,7 +164,8 @@ def FDTDataLoader(path='', len_target=30):
     pad = torch.tensor([[0.] * 8 + [0., 1., 0.]] * (len_target - temp_len)).unsqueeze(0).expand(batch_size, -1, -1)
     training_translation = torch.cat((training_translation, pad), dim=1)
 
-    return validation_source, validation_translation, training_source, training_translation
+    return validation_source.to(device=device, dtype=dtype), validation_translation.to(device=device, dtype=dtype), \
+           training_source.to(device=device, dtype=dtype), training_translation.to(device=device, dtype=dtype)
 
 # Cette fonction permet de créer l'ensemble d'entrainement sans passer par l'écriture des données en format xml par le FDT, on gagne énormement de temps
 def FastDataGen(list_density, batch_size={'Training': 6000, 'Validation': 300}, type='Large'):

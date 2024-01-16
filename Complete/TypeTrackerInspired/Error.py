@@ -2,11 +2,17 @@ import torch
 from torch.nn import functional as F
 import math
 
-def TrainingError(source, target, ended, batch_size, batch_indice, network, alt_rep=None):
+def TrainingError(source, target, ended, batch_size, batch_indice, network, alt_rep=None, switch_device=False):
     j = batch_indice
-    batch_source = source[j * batch_size: (j + 1) * batch_size].detach().to(device=network.device, dtype=torch.float32)
-    batch_target = target[j * batch_size: (j + 1) * batch_size].detach().to(device=network.device, dtype=torch.float32)
-    batch_ended = ended[j * batch_size: (j + 1) * batch_size].detach().to(device=network.device, dtype=torch.float32)
+
+    if switch_device:
+        batch_source = source[j * batch_size: (j + 1) * batch_size].detach().to(device=network.device)
+        batch_target = target[j * batch_size: (j + 1) * batch_size].detach().to(device=network.device)
+        batch_ended = ended[j * batch_size: (j + 1) * batch_size].detach().to(device=network.device)
+    else:
+        batch_source = source[j * batch_size: (j + 1) * batch_size].detach()
+        batch_target = target[j * batch_size: (j + 1) * batch_size].detach()
+        batch_ended = ended[j * batch_size: (j + 1) * batch_size].detach()
     # batch_ended.shape = (batch_size, len_target, 1)
 
     predicted_target = network.forward(source=batch_source, target=batch_target)
@@ -40,11 +46,13 @@ def ErrorAction(source, target, ended, network, hookers=None, weights_hookers=No
 
     error_trans = []
 
+    switch_device = (network.device != source.device)
+
     if action == 'Training':
         for j in range(n_batch):
             optimizer.zero_grad(set_to_none=True)
 
-            err_trans = TrainingError(source, target, ended, batch_size, j, network, alt_rep=alt_rep)
+            err_trans = TrainingError(source, target, ended, batch_size, j, network, alt_rep=alt_rep, switch_device=switch_device)
 
             if hookers is None:
                 err = torch.norm(err_trans * weights_error)

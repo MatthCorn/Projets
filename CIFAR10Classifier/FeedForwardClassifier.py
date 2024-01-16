@@ -1,10 +1,10 @@
-from Projets.Transformer.EasyFeedForward import FeedForward
+from Transformer.EasyFeedForward import FeedForward
 import matplotlib.pyplot as plt
 import torch
 import pickle
+import os
 
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projet')
 
 def unpickle(file):
     with open(file, 'rb') as fo:

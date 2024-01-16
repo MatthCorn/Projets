@@ -4,8 +4,7 @@ from tqdm import tqdm
 import os
 import shutil
 
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projet')
 
 def MakeData(batch_size, decay=0.8):
     Source = torch.randn(size=(batch_size, 10, 5))

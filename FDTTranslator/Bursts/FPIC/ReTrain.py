@@ -11,8 +11,7 @@ from GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projet')
 
 folder = '2023-09-07__10-30'
 save_path = os.path.join(local, 'FDTTranslator', 'Bursts', 'FPIC', 'Save', folder)

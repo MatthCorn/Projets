@@ -1,6 +1,6 @@
 '''
 Pour cette phase, on pré-entraîne en mode auto-encoder :
-Les entrées et les sorties sont sensiblement les mêmes mais en face de chaque PDW en sortie, on prédit les n_tracker PDWs suivants
+Les entrées et les sorties sont sensiblement les mêmes mais en face de chaque PDW en sortie, on prédit les n_trackers PDWs suivants
 '''
 
 from Tools.XMLTools import loadXmlAsObj
@@ -12,8 +12,7 @@ import torch.nn.functional as F
 import shutil
 from tqdm import tqdm
 
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projet')
 
 n_max_pulses = 10
 n_PDWs_memory = 10

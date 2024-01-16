@@ -15,8 +15,7 @@ from GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projet')
 
 param = {
     'd_source': 5,
@@ -50,7 +49,7 @@ Translator = Network(d_source=param['d_source'], d_target=param['d_target']+para
                      device=device)
 
 # Translator = TTT(d_pulse=param['d_source'], d_PDW=param['d_target'], d_latent=param['d_att'], num_heads=param['num_heads'], num_encoders=param['num_encoders'],
-#                  n_tracker=4, num_decoders=param['num_decoders'], NbPDWsMemory=param['NbPDWsMemory'], target_len=param['len_target'], num_flags=param['num_flags'],
+#                  n_trackers=4, num_decoders=param['num_decoders'], NbPDWsMemory=param['NbPDWsMemory'], target_len=param['len_target'], num_flags=param['num_flags'],
 #                  device=device, FPIC=False)
 
 

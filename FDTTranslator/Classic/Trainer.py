@@ -10,8 +10,7 @@ from FDTTranslator.PlotError import Plot
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projet')
 
 param = {
     'd_source': 5,

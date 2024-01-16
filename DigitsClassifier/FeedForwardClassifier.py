@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 import idx2numpy
 import torch
 from tqdm import tqdm
+import os
 
-local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'OneDrive', 'Documents', 'Python', 'Projets')
-# local = os.path.join(os.path.abspath(os.sep), 'Users', 'matth', 'Documents', 'Python', 'Projets')
+local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projet')
 
 def MakeLabelSet(x):
     out = torch.zeros(x.shape[0],10)
