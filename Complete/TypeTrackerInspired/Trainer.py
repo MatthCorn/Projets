@@ -82,7 +82,7 @@ def TrainWithHookers(weights_hookers, n_epochs=50):
         optimizer = torch.optim.Adam(translator.parameters(), lr=1e-4, betas=(0.9, 0.98), eps=1e-9)
 
         path = os.path.join(local, 'Complete', 'Data', size, dir)
-        validation_source, validation_translation, training_source, training_translation = FDTDataLoader(path=path, len_target=param['len_target'])
+        validation_source, validation_translation, training_source, training_translation = FDTDataLoader(path=path, len_target=param['len_target'], device=device)
         training_ended = training_translation[:, param['n_PDWs_memory']:, param['d_PDW'] + param['n_flags'] + 1].unsqueeze(-1)
         validation_ended = validation_translation[:, param['n_PDWs_memory']:, param['d_PDW'] + param['n_flags'] + 1].unsqueeze(-1)
 

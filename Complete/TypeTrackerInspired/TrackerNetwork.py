@@ -4,7 +4,7 @@ from Complete.Transformer.EncoderTransformer import EncoderLayer
 from Complete.Transformer.EasyFeedForward import FeedForward
 from Complete.Transformer.DecoderTransformer import DecoderLayer
 from Complete.TypeTrackerInspired.Embedding import TrackerEmbeddingLayer
-from Complete.TypeTrackerInspired.PositionalEncoding import PositionalEncoding
+from Complete.PositionalEncoding import PositionalEncoding
 from Complete.PreEmbedding import FeaturesAndScaling
 
 

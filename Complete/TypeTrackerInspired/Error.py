@@ -74,7 +74,7 @@ def ErrorAction(source, target, ended, network, hookers=None, weights_hookers=No
     elif action == 'Validation':
         for j in range(n_batch):
             with torch.no_grad():
-                err_trans = TrainingError(source, target, ended, batch_size, j, network, alt_rep=alt_rep)
+                err_trans = TrainingError(source, target, ended, batch_size, j, network, alt_rep=alt_rep, switch_device=switch_device)
 
             error_trans.append(err_trans**2)
 
