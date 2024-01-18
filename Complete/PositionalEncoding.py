@@ -23,39 +23,29 @@ class PositionalEncoding(nn.Module):
         return self.dropout(x)
 
 
-class RotaryPositionalEncoding(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-
 class Rotary(torch.nn.Module):
-    def __init__(self, dim, base=10000):
+    def __init__(self, dim, seq_len, base=10000):
         super().__init__()
-        inv_freq = 1.0 / (base ** (torch.arange(0, dim, 2).float() / dim))
-        self.register_buffer("inv_freq", inv_freq)
-        self.seq_len_cached = None
-        self.cos_cached = None
-        self.sin_cached = None
+        self.dim = dim
+        self.seq_len = seq_len
+        self.make_cached(base)
 
-    def forward(self, x, seq_dim=1):
-        seq_len = x.shape[seq_dim]
-        if seq_len != self.seq_len_cached:
-            self.seq_len_cached = seq_len
-            t = torch.arange(x.shape[seq_dim], device=x.device).type_as(self.inv_freq)
-            freqs = torch.einsum("i,j->ij", t, self.inv_freq)
-            emb = torch.cat((freqs, freqs), dim=-1).to(x.device)
-            self.cos_cached = emb.cos()[:, None, None, :]
-            self.sin_cached = emb.sin()[:, None, None, :]
-        return self.cos_cached, self.sin_cached
+    def forward(self, x):
+        # x.shape = (batch_size, len_seq, dim)
+        batch_size, seq_len, dim = x.shape
 
+        # rotate_half
+        rotate_half_x = (x.reshape(batch_size, seq_len, dim//2, 2) * self.rotator)[..., [1, 0]].reshape(batch_size, seq_len, dim)
 
-# rotary pos emb helpers:
+        return (x * self.cos_cached) + (rotate_half_x * self.sin_cached)
 
-def rotate_half(x):
-    x1, x2 = x[..., : x.shape[-1] // 2], x[..., x.shape[-1] // 2 :]
-    return torch.cat(
-        (-x2, x1), dim=x1.ndim - 1
-    )  # dim=-1 triggers a bug in torch < 1.8.0
-
-def apply_rotary_pos_emb(q, k, cos, sin):
-    return (q * cos) + (rotate_half(q) * sin), (k * cos) + (rotate_half(k) * sin)
+    def make_cached(self, base):
+        pulse = 1.0 / (base ** (torch.arange(0, self.dim, 2).float() / self.dim))
+        t = torch.arange(self.seq_len).type_as(pulse)
+        emb = torch.einsum("i,j->ij", t, pulse)
+        emb = emb.unsqueeze(-1).expand(self.seq_len, -1, 2).reshape(self.seq_len, -1)
+        cos_cached = emb.cos()[None, :, :]
+        sin_cached = emb.sin()[None, :, :]
+        self.register_buffer("cos_cached", cos_cached)
+        self.register_buffer("sin_cached", sin_cached)
+        self.register_buffer('rotator', torch.tensor([[[[-1, 1]]]]))
