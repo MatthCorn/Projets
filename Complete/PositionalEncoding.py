@@ -24,26 +24,44 @@ class PositionalEncoding(nn.Module):
 
 
 class Rotary(torch.nn.Module):
-    def __init__(self, dim, seq_len, base=10000):
+    def __init__(self, dim, len_seq, len_seq_y=1, base=10000):
         super().__init__()
         self.dim = dim
-        self.seq_len = seq_len
+        self.len_seq = len_seq
+        self.len_seq_y = len_seq_y
         self.make_cached(base)
 
     def forward(self, x):
         # x.shape = (batch_size, len_seq, dim)
-        batch_size, seq_len, dim = x.shape
+        len_seq = self.len_seq * self.len_seq_y
 
         # rotate_half
-        rotate_half_x = (x.reshape(batch_size, seq_len, dim//2, 2) * self.rotator)[..., [1, 0]].reshape(batch_size, seq_len, dim)
+        rotate_half_x = (x.reshape(-1, len_seq, self.dim//2, 2) * self.rotator)[..., [1, 0]].reshape(-1, len_seq, self.dim)
 
         return (x * self.cos_cached) + (rotate_half_x * self.sin_cached)
 
     def make_cached(self, base):
-        pulse = 1.0 / (base ** (torch.arange(0, self.dim, 2).float() / self.dim))
-        t = torch.arange(self.seq_len).type_as(pulse)
-        emb = torch.einsum("i,j->ij", t, pulse)
-        emb = emb.unsqueeze(-1).expand(self.seq_len, -1, 2).reshape(self.seq_len, -1)
+        if self.len_seq_y == 1:
+            pulse = 1.0 / (base ** (torch.arange(0, self.dim, 2).float() / self.dim))
+            t = torch.arange(self.len_seq).type_as(pulse)
+            emb = torch.einsum("i,j->ij", t, pulse)
+            # emb.shape = (len_seq * len_seq_y, dim//2)
+        else:
+            pulse = 1.0 / (base ** (torch.arange(0, self.dim // 2, 2).float() / self.dim // 2))
+            t_x = torch.arange(self.len_seq).type_as(pulse)
+            t_y = torch.arange(self.len_seq_y).type_as(pulse)
+            emb_x = torch.einsum("i,j->ij", t_x, pulse)
+            # emb_x.shape = (len_seq, dim//4)
+            emb_x = emb_x.expand(self.len_seq_y, self.len_seq, self.dim // 4).transpose(0, 1).reshape(self.len_seq * self.len_seq_y, self.dim // 4)
+            # emb_x.shape = (len_seq * len_seq_y, dim//4)
+            emb_y = torch.einsum("i,j->ij", t_y, pulse)
+            # emb_y.shape = (len_seq_y, dim//2)
+            emb_y = emb_y.expand(self.len_seq, self.len_seq_y, self.dim // 4).reshape(self.len_seq * self.len_seq_y, self.dim // 4)
+            # emb_y.shape = (len_seq * len_seq_y, dim//4)
+            emb = torch.cat((emb_x, emb_y), dim=-1)
+            # emb.shape = (len_seq * len_seq_y, dim//2)
+        emb = emb.unsqueeze(-1).expand(self.len_seq * self.len_seq_y, -1, 2).reshape(self.len_seq * self.len_seq_y, -1)
+        # emb.shape = (len_seq * len_seq_y, dim)
         cos_cached = emb.cos()[None, :, :]
         sin_cached = emb.sin()[None, :, :]
         self.register_buffer("cos_cached", cos_cached)
