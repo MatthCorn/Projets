@@ -31,7 +31,8 @@ param = {
     'batch_size': 256,
     'threshold': 7,
     'freq_ech': 3,
-    'n_trackers': 4
+    'n_trackers': 4,
+    'is_RoPE': True
 }
 
 weights_hookers = {
@@ -48,7 +49,7 @@ def TrainWithHookers(weights_hookers, n_epochs=50):
 
     translator = TransformerTranslator(d_pulse=param['d_pulse'], d_pulse_buffed=param['d_pulse_buffed'], d_PDW=param['d_PDW'], d_PDW_buffed=param['d_PDW_buffed'], d_att=param['d_att'],
                                        len_target=param['len_target'], freq_ech=param['freq_ech'], weights=os.path.join(local, 'Complete', 'Weights'), norm='pre',
-                                       len_source=param['len_source'], n_encoders=param['n_encoders'], n_decoders=param['n_decoders'], n_flags=param['n_flags'],
+                                       len_source=param['len_source'], n_encoders=param['n_encoders'], n_decoders=param['n_decoders'], n_flags=param['n_flags'], is_RoPE=param['is_RoPE'],
                                        n_heads=param['n_heads'], n_PDWs_memory=param['n_PDWs_memory'], device=device, threshold=param['threshold'], n_trackers=param['n_trackers'])
 
     print('nombre de paramètres : ', sum(p.numel() for p in translator.parameters() if p.requires_grad))
@@ -89,8 +90,8 @@ def TrainWithHookers(weights_hookers, n_epochs=50):
         n_updates = int(len(training_source)/param['batch_size']) * n_epochs
         warmup_frac = 0.2
         warmup_steps = warmup_frac * n_updates
-        # lr_scheduler = None
-        lr_scheduler = Scheduler(optimizer, param['d_att'], warmup_steps, max=50)
+        lr_scheduler = None
+        # lr_scheduler = Scheduler(optimizer, param['d_att'], warmup_steps, max=50)
 
         # On calcule l'écart type
         # std = np.std(torch.matmul(training_translation, alt_rep.t().to(torch.device('cpu'))).numpy(), axis=(0, 1))
@@ -139,9 +140,9 @@ if __name__ == '__main__':
     'trans': 1,
     'var': {'mod': 0, 'threshold': 5},
     'div': {'mod': 0, 'threshold': 0.1875},
-    'sym': i/20.,
+    'sym': i/200.,
     'likeli': 0
-} for i in range(10)]
+} for i in range(1)]
     
     for weights_hookers in list_weights_hookers:
-        TrainWithHookers(weights_hookers=weights_hookers, n_epochs=30)
+        TrainWithHookers(weights_hookers=weights_hookers, n_epochs=15)

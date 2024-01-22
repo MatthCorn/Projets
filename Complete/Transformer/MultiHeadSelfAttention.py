@@ -21,13 +21,13 @@ class MHSA(nn.Module):
 
         self.ResetParam()
 
-    def forward(self, x, mask=None, RoPE=lambda x:x):
+    def forward(self, x, mask=None, RoPE=lambda u: u):
         # x.shape = (batch_size, len_seq, d_model)
         batch_size, len_seq, _ = x.shape
 
         Kt = RoPE(self.key(x)).reshape(batch_size, len_seq, self.n_heads, self.d_head).permute(0, 2, 3, 1)
         # Kt.shape = (batch_size, n_heads, d_head, len_seq)
-        V = RoPE(self.value(x)).reshape(batch_size, len_seq, self.n_heads, self.d_head).transpose(1, 2)
+        V = self.value(x).reshape(batch_size, len_seq, self.n_heads, self.d_head).transpose(1, 2)
         # V.shape = (batch_size, n_heads, len_seq, d_head)
         Q = RoPE(self.query(x)).reshape(batch_size, len_seq, self.n_heads, self.d_head).transpose(1, 2)
         # Q.shape = (batch_size, n_heads, len_seq, d_head)

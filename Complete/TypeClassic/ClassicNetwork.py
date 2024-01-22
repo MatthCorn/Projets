@@ -3,7 +3,7 @@ import torch.nn as nn
 from Complete.Transformer.EncoderTransformer import EncoderLayer
 from Complete.Transformer.EasyFeedForward import FeedForward
 from Complete.Transformer.DecoderTransformer import DecoderLayer
-from Complete.PositionalEncoding import PositionalEncoding
+from Complete.Transformer.PositionalEncoding import PositionalEncoding
 from Complete.PreEmbedding import FeaturesAndScaling
 
 '''

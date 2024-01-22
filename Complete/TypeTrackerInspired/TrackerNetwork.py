@@ -4,7 +4,7 @@ from Complete.Transformer.EncoderTransformer import EncoderLayer
 from Complete.Transformer.EasyFeedForward import FeedForward
 from Complete.Transformer.DecoderTransformer import DecoderLayer
 from Complete.TypeTrackerInspired.Embedding import TrackerEmbeddingLayer
-from Complete.PositionalEncoding import PositionalEncoding
+from Complete.Transformer.PositionalEncoding import PositionalEncoding, Rotary
 from Complete.PreEmbedding import FeaturesAndScaling
 
 
@@ -21,8 +21,8 @@ def MakeDecoderMask(n_trackers, len_target):
 
 class TransformerTranslator(nn.Module):
 
-    def __init__(self, d_pulse, d_pulse_buffed, d_PDW, d_PDW_buffed, d_att=32, n_heads=4, n_encoders=3, n_decoders=3, n_PDWs_memory=10, freq_ech=3,
-                 len_source=20, len_target=20, n_flags=4, threshold=7, device=torch.device('cpu'), norm='pre', weights=None, n_trackers=4):
+    def __init__(self, d_pulse, d_pulse_buffed, d_PDW, d_PDW_buffed, is_RoPE=False, d_att=32, n_heads=4, n_encoders=3, n_decoders=3, n_PDWs_memory=10, freq_ech=3,
+                 len_source=20, len_target=20, n_flags=4, threshold=7, device=torch.device('cpu'), norm='pre', weights=None, n_trackers=4, dropout_att=0, dropout_FF=0):
         super().__init__()
         self.device = device
         self.d_pulse = d_pulse
@@ -33,18 +33,25 @@ class TransformerTranslator(nn.Module):
         self.n_trackers = n_trackers
         self.n_flags = n_flags
 
+        if is_RoPE:
+            self.RoPE_source = Rotary(dim=self.d_att, len_seq=len_source)
+            self.RoPE_target = Rotary(dim=self.d_att, len_seq=len_target, len_seq_y=n_trackers)
+        else:
+            self.RoPE_source = lambda u: u
+            self.RoPE_target = lambda u: u
+
         self.tokens_encoding = nn.Parameter(torch.randn(3, d_att))
         self.register_buffer("not_token", torch.tensor([1., 0., 0.]).reshape(3, 1).expand(3, d_att), persistent=False)
 
         self.encoders = nn.ModuleList()
         for i in range(n_encoders):
-            self.encoders.append(EncoderLayer(d_att=d_att, n_heads=n_heads, norm=norm))
+            self.encoders.append(EncoderLayer(d_att=d_att, n_heads=n_heads, norm=norm, dropout_SA=dropout_att, dropout_FF=dropout_FF))
 
         self.decoders = nn.ModuleList()
         for i in range(n_decoders):
-            self.decoders.append(DecoderLayer(d_att=d_att, n_heads=n_heads, norm=norm))
+            self.decoders.append(DecoderLayer(d_att=d_att, n_heads=n_heads, norm=norm, dropout_A=dropout_att, dropout_FF=dropout_FF))
 
-        self.encoder_decider = EncoderLayer(d_att=d_att, n_heads=n_heads, norm=norm)
+        self.encoder_decider = EncoderLayer(d_att=d_att, n_heads=n_heads, norm=norm, dropout_SA=dropout_att, dropout_FF=dropout_FF)
         self.resizer_decider = nn.Linear(d_att, 1)
         self.normalizer_decider = nn.Softmax(dim=2)
 
@@ -53,18 +60,18 @@ class TransformerTranslator(nn.Module):
         self.source_pre_embedding = FeaturesAndScaling(threshold, freq_ech, type='source', weights=weights)
         self.target_pre_embedding = FeaturesAndScaling(threshold, freq_ech, type='target', weights=weights)
 
-        self.source_embedding = FeedForward(d_in=d_pulse_buffed, d_out=d_att, widths=[], dropout=0)
-        self.target_embedding = FeedForward(d_in=d_PDW_buffed+n_flags, d_out=d_att, widths=[], dropout=0)
+        self.source_embedding = FeedForward(d_in=d_pulse_buffed, d_out=d_att, widths=[], dropout=dropout_FF)
+        self.target_embedding = FeedForward(d_in=d_PDW_buffed+n_flags, d_out=d_att, widths=[], dropout=dropout_FF)
 
         self.tracker_embedding = TrackerEmbeddingLayer(n_trackers=n_trackers, d_att=d_att)
 
-        self.PE_encoder = PositionalEncoding(d_att=d_att, dropout=0, max_len=len_source, device=device)
-        self.PE_decoder = PositionalEncoding(d_att=d_att, dropout=0, max_len=len_target, device=device)
+        self.PE_encoder = PositionalEncoding(d_att=d_att, dropout=dropout_FF, max_len=len_source, device=device)
+        self.PE_decoder = PositionalEncoding(d_att=d_att, dropout=dropout_FF, max_len=len_target, device=device)
 
         self.register_buffer("mask_decoder", MakeDecoderMask(n_trackers, len_target), persistent=False)
 
-        self.prediction_physics = FeedForward(d_in=d_att, d_out=d_PDW, widths=[16], dropout=0)
-        self.prediction_flags = FeedForward(d_in=d_att, d_out=n_flags, widths=[16], dropout=0)
+        self.prediction_physics = FeedForward(d_in=d_att, d_out=d_PDW, widths=[16], dropout=dropout_FF)
+        self.prediction_flags = FeedForward(d_in=d_att, d_out=n_flags, widths=[16], dropout=dropout_FF)
 
 
         self.to(device)
@@ -109,10 +116,10 @@ class TransformerTranslator(nn.Module):
         # trg.shape = (batch_size, n_trackers*len_target, d_att)
 
         for encoder in self.encoders:
-            src = encoder(src)
+            src = encoder(src, RoPE=self.RoPE_source)
 
         for decoder in self.decoders:
-            trg = decoder(target=trg, source=src, mask=self.mask_decoder)
+            trg = decoder(target=trg, source=src, mask=self.mask_decoder, RoPE_source=self.RoPE_source, RoPE_target=self.RoPE_target)
         # trg.shape = (batch_size, n_trackers*len_target, d_att)
         trg = trg.reshape(batch_size*len_target, self.n_trackers, self.d_att)
         # trg.shape = (batch_size*len_target, n_trackers, d_att)

@@ -21,16 +21,16 @@ class MHCA(nn.Module):
 
         self.ResetParam()
 
-    def forward(self, x_target, x_source, RoPE_Q=lambda u:u, RoPE_KV=lambda u:u):
+    def forward(self, x_target, x_source, RoPE_Q=lambda u: u, RoPE_K=lambda u: u):
         # x_source.shape = (batch_size, len_source, d_input)
         batch_size, len_source, _ = x_source.shape
         # x_target.shape = (batch_size, len_target, d_latent)
         # OR
         # x_target.shape = (1, len_target, d_latent)
         _, len_target, d_latent = x_target.shape
-        Kt = RoPE_KV(self.key(x_source)).reshape(batch_size, len_source, self.n_heads, -1).permute(0, 2, 3, 1)
+        Kt = RoPE_K(self.key(x_source)).reshape(batch_size, len_source, self.n_heads, -1).permute(0, 2, 3, 1)
         # Kt.shape = (batch_size, n_heads, d_head, len_source)
-        V = RoPE_KV(self.value(x_source)).reshape(batch_size, len_source, self.n_heads, -1).transpose(1, 2)
+        V = self.value(x_source).reshape(batch_size, len_source, self.n_heads, -1).transpose(1, 2)
         # V.shape = (batch_size, n_heads, len_source, d_head)
         Q = RoPE_Q(self.query(x_target)).reshape(-1, len_target, self.n_heads, self.d_head).transpose(1, 2)
         # Q.shape = (batch_size, n_heads, len_target, d_head)

@@ -14,18 +14,18 @@ class DecoderLayer(nn.Module):
         self.feed_forward = FeedForward(d_att, d_att, widths=width_FF, dropout=dropout_FF)
         self.third_layer_norm = nn.LayerNorm(d_att)
 
-    def forward(self, target, source, mask=None):
+    def forward(self, target, source, mask=None, RoPE_source=lambda u: u, RoPE_target=lambda u: u):
         if self.norm == 'pre':
-            y = self.self_attention(self.first_layer_norm(target), mask=mask) + target
-            y = self.cross_attention(x_target=self.second_layer_norm(y), x_source=self.second_layer_norm(source)) + y
+            y = self.self_attention(self.first_layer_norm(target), mask=mask, RoPE=RoPE_target) + target
+            y = self.cross_attention(x_target=self.second_layer_norm(y), x_source=self.second_layer_norm(source), RoPE_Q=RoPE_target, RoPE_K=RoPE_source) + y
             y = self.feed_forward(self.third_layer_norm(y)) + y
         elif self.norm == 'post':
-            y = self.first_layer_norm(self.self_attention(target, mask=mask) + target)
-            y = self.second_layer_norm(self.cross_attention(x_target=y, x_source=source) + y)
+            y = self.first_layer_norm(self.self_attention(target, mask=mask, RoPE=RoPE_target) + target)
+            y = self.second_layer_norm(self.cross_attention(x_target=y, x_source=source, RoPE_Q=RoPE_target, RoPE_K=RoPE_source) + y)
             y = self.third_layer_norm(self.feed_forward(y) + y)
         else:
-            y = self.self_attention(target, mask=mask) + target
-            y = self.cross_attention(x_target=y, x_source=source) + y
+            y = self.self_attention(target, mask=mask, RoPE=RoPE_target) + target
+            y = self.cross_attention(x_target=y, x_source=source, RoPE_Q=RoPE_target, RoPE_K=RoPE_source) + y
             y = self.feed_forward(y) + y
         return y
 
