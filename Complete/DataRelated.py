@@ -3,7 +3,6 @@ import os
 import torch
 import numpy as np
 from tqdm import tqdm
-from FakeDigitalTwin.SciptData import MakeSets
 from FakeDigitalTwin.Experience import MakeData, MakeDataHI
 from Complete.PreEmbedding import FeaturesAndScaling
 
@@ -89,37 +88,6 @@ def Spliter(source, translation, delta_t):
 
     return new_source, new_translation
 
-def FDTDataMaker(list_density):
-    for density in list_density:
-        print('density :', str(density))
-        MakeSets(density)
-
-        type_data = 'Training'
-
-        pulses = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', type_data + 'PulsesAnt.xml'))
-        PDWs = loadXmlAsObj(os.path.join(local, 'FakeDigitalTwin', 'Data', type_data + 'PDWsDCI.xml'))
-
-        source = [
-            [[pulse['TOA'], pulse['LI'], pulse['Level'], pulse['FreqStart'], pulse['FreqEnd']] for pulse in pulses_ant]
-            for pulses_ant in pulses]
-        translation = [[[PDW['TOA'], PDW['LI'], PDW['Level'], PDW['FreqMin'], PDW['FreqMax'], int('CW' in PDW['flags']),
-                         int('TroncAv' in PDW['flags']),
-                         int(len(PDW['flags']) == 0)] for PDW in PDWs_DCI] for PDWs_DCI in PDWs]
-
-        # Ici les données sont founies en batch
-        # source est une liste de séquence d'impulsions de même longueur
-        # translation est une liste de séquence de PDWs, elles peuvent être de longueures différentes
-
-
-        source, translation = Spliter(source, translation, delta_t)
-        # On transforme ces listes en tenseur
-        source = torch.tensor(source)
-        # source.shape = (batch_size, len_input, d_input)
-
-        # Rajoute des 0 à la fin des scénarios de PDWs pour qu'ils aient toutes la même longueure
-        translation = pad_sequence(translation)
-
-        Write(source=source, translation=translation, type_data=type_data, density=density)
 
 def pad_sequence(l):
     max_len = max(len(sublist) for sublist in l)  # Trouver la longueur maximale des sous-listes
