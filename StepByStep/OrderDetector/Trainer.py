@@ -14,7 +14,7 @@ N.to(device)
 
 optimizer = torch.optim.Adam(N.parameters(), weight_decay=1e-3, lr=3e-4)
 
-Max = 100000
+Max = 10
 Min = 0
 
 NDataT = 10000
@@ -24,21 +24,12 @@ ValidationInput, ValidationOutput, _ = MakeData(NVec=5, DVec=10, sigma=1, NData=
 batch_size = 10000
 n_batch = 1
 
-n_iter = 2000
+n_iter = 500
 TrainingError = []
 ValidationError = []
 
-fig, (ax1, ax2) = plt.subplots(1, 2)
 
-# ShiftList = 20*np.array(list(range(50)))
-# ShiftIntervals = [[ShiftList[i], ShiftList[i+1]] for i in range(len(ShiftList)-1)] + [[0, 200]] + [[0, 1000]] + [[0, 1000]]
-
-
-# ShiftList = [0] + list(np.logspace(1, log10(Max), 10))
-# ShiftList = list(map(int, ShiftList))
-# ShiftIntervals = [[ShiftList[i], ShiftList[i+1]] for i in range(len(ShiftList)-1)] + [[Min, Max]]
-
-ShiftList = list(np.logspace(1, log10(Max), 31))
+ShiftList = list(np.logspace(1, log10(Max), 1))
 ShiftList = list(map(int, ShiftList))
 ShiftIntervals = [[Min, ShiftList[i]] for i in range(len(ShiftList))]
 
@@ -73,32 +64,10 @@ for ShiftInterval in ShiftIntervals:
 
     Input, Output, Shift = MakeData(NVec=5, DVec=10, sigma=1, NData=10000, ShiftInterval=[Min, Max])
 
-    if i % 5 == 0:
-        with torch.no_grad():
-            Input = Input.to(device)
-            Output = Output.to(device)
-            Prediction = N(Input)
-            ErrShift = torch.norm(Output - Prediction, dim=(1, 2)).cpu().numpy() / sqrt(5)
-        Shift = Shift[:, 0, 0].numpy()
 
-
-        p = np.poly1d(np.polyfit(Shift, ErrShift, deg=4))
-
-        x = np.linspace(0, ShiftList[-1], 100)
-        y = p(x)
-        ax2.plot(x, y, label=str(ShiftInterval[1]))
-
-    i += 1
-
-
-
-ax1.plot(TrainingError, 'r', label="Ensemble d'entrainement")
-ax1.set_title('Erreur gobale')
-ax1.plot(ValidationError, 'b', label="Ensemble de Validation")
-ax1.legend(loc='upper right')
-
-ax2.set_title('Erreur Shift')
-ax2.legend(loc='upper right')
+plt.plot(TrainingError, 'r', label="Ensemble d'entrainement")
+plt.plot(ValidationError, 'b', label="Ensemble de Validation")
+plt.legend(loc='upper right')
 
 plt.show()
 
