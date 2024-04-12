@@ -3,7 +3,7 @@ import os
 import torch
 import numpy as np
 from tqdm import tqdm
-from FakeDigitalTwin.Experience import MakeData, MakeDataHI
+from FakeDigitalTwin.DataMaker import MakeData, MakeDataHI
 from Complete.PreEmbedding import FeaturesAndScaling
 
 local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projets')
@@ -16,6 +16,8 @@ n_max_pulses = 32
 n_PDWs_memory = 10
 delta_t = 3
 t_max = 105
+dim_PDW = 5
+dim_pulse = 5
 
 # Cette fonction donne un majorant de la date de publication d'un PDW donné
 def TimeRelease(PDW):
@@ -73,25 +75,25 @@ def Spliter(source, translation, delta_t):
 
 
         # On reconstruit les phrases telles qu'elles seront données au traducteur
-        remain = [[0] * 5 + [0, 1, 0]] * (n_max_pulses - 1) + [[0] * 5 + [0, 0, 1]]
+        remain = [[0] * dim_pulse + [0, 1, 0]] * (n_max_pulses - 1) + [[0] * dim_pulse + [0, 0, 1]]
         t = 0
         for bursts_source in splitted_source_sentence:
             t += delta_t
             remain = (remain + bursts_source)[-n_max_pulses:]
             new_source.append((np.array(remain) - ([t, 0, 0, 0, 0] + [0, 0, 0])).tolist())
 
-        remain = [[0] * 8 + [0, 1, 0]] * (n_PDWs_memory - 1) + [[0] * 8 + [0, 0, 1]]
+        remain = [[0] * dim_PDW + [0, 1, 0]] * (n_PDWs_memory - 1) + [[0] * dim_PDW + [0, 0, 1]]
         t = 0
         for bursts_translation in splitted_translation_sentence:
             remain = remain[-n_PDWs_memory:] + bursts_translation
-            new_translation.append((np.array(remain) - ([t, 0, 0, 0, 0, 0, 0, 0] + [0, 0, 0])).tolist())
+            new_translation.append((np.array(remain) - ([t, 0, 0, 0, 0] + [0, 0, 0])).tolist())
 
     return new_source, new_translation
 
 
 def pad_sequence(l):
     max_len = max(len(sublist) for sublist in l)  # Trouver la longueur maximale des sous-listes
-    l = [sublist + [[0.] * 8 + [0., 1., 0.]] * (max_len - len(sublist)) for sublist in l]
+    l = [sublist + [[0.] * dim_PDW + [0., 1., 0.]] * (max_len - len(sublist)) for sublist in l]
     return torch.tensor(l)
 
 def Write(source, translation, type_data, density, size='Large'):
@@ -122,14 +124,14 @@ def FDTDataLoader(path='', len_target=30, device=torch.device('cpu'), dtype=torc
     validation_source = torch.tensor(np.load(os.path.join(path, type_data, 'PulsesAnt.npy')))
     validation_translation = torch.tensor(np.load(os.path.join(path, type_data, 'PDWsDCI.npy')))
     batch_size, temp_len, _ = validation_translation.shape
-    pad = torch.tensor([[0.] * 8 + [0., 1., 0.]] * (len_target - temp_len)).unsqueeze(0).expand(batch_size, -1, -1)
+    pad = torch.tensor([[0.] * dim_PDW + [0., 1., 0.]] * (len_target - temp_len)).unsqueeze(0).expand(batch_size, -1, -1)
     validation_translation = torch.cat((validation_translation, pad), dim=1)
 
     type_data = 'Training'
     training_source = torch.tensor(np.load(os.path.join(path, type_data, 'PulsesAnt.npy')))
     training_translation = torch.tensor(np.load(os.path.join(path, type_data, 'PDWsDCI.npy')))
     batch_size, temp_len, _ = training_translation.shape
-    pad = torch.tensor([[0.] * 8 + [0., 1., 0.]] * (len_target - temp_len)).unsqueeze(0).expand(batch_size, -1, -1)
+    pad = torch.tensor([[0.] * dim_PDW + [0., 1., 0.]] * (len_target - temp_len)).unsqueeze(0).expand(batch_size, -1, -1)
     training_translation = torch.cat((training_translation, pad), dim=1)
 
     return validation_source.to(device=device, dtype=dtype), validation_translation.to(device=device, dtype=dtype), \
@@ -153,9 +155,7 @@ def FastDataGen(list_density, batch_size={'Training': 6000, 'Validation': 300}, 
             source = [
                 [[pulse['TOA'], pulse['LI'], pulse['Level'], pulse['FreqStart'], pulse['FreqEnd']] for pulse in pulses_ant]
                 for pulses_ant in pulses]
-            translation = [[[PDW['TOA'], PDW['LI'], PDW['Level'], PDW['FreqMin'], PDW['FreqMax'], int('CW' in PDW['flags']),
-                             int('TroncAv' in PDW['flags']),
-                             int(len(PDW['flags']) == 0)] for PDW in PDWs_DCI] for PDWs_DCI in PDWs]
+            translation = [[[PDW['TOA'], PDW['LI'], PDW['Level'], PDW['FreqMin'], PDW['FreqMax']] for PDW in PDWs_DCI] for PDWs_DCI in PDWs]
 
             # Ici les données sont founies en batch
             # source est une liste de séquence d'impulsions de même longueur
@@ -187,8 +187,7 @@ def MakeWeights(batch_size, density, threshold=threshold):
         [[pulse['TOA'], pulse['LI'], pulse['Level'], pulse['FreqStart'], pulse['FreqEnd']] for pulse in pulses_ant]
         for pulses_ant in pulses]
     translation = [[[PDW['TOA'], PDW['LI'], PDW['Level'], PDW['FreqMin'],
-                     PDW['FreqMax'], int('CW' in PDW['flags']), int('TroncAv' in PDW['flags']),
-                     int(len(PDW['flags']) == 0)] for PDW in PDWs_DCI] for PDWs_DCI in PDWs]
+                     PDW['FreqMax']] for PDW in PDWs_DCI] for PDWs_DCI in PDWs]
 
     # Ici les données sont founies en batch
     # source est une liste de séquence d'impulsions de même longueur
@@ -199,18 +198,18 @@ def MakeWeights(batch_size, density, threshold=threshold):
     temp = []
     for sentence in source:
         for word in sentence:
-            if word[5] == 1:
-                temp.append(word[:5])
+            if word[dim_pulse + 0] == 1:
+                temp.append(word[:(dim_pulse + 0)])
     source = torch.tensor(temp)
 
     temp = []
     for sentence in translation:
         for word in sentence:
-            if word[8] == 1:
-                temp.append(word[:8])
+            if word[dim_PDW + 0] == 1:
+                temp.append(word[:(dim_PDW + 0)])
     translation = torch.tensor(temp)
 
-    alt_rep = torch.eye(8)
+    alt_rep = torch.eye(dim_PDW)
     alt_rep[-5:-3, -5:-3] = torch.tensor([[1/2, 1/2], [1/2, -1/2]])
 
     translation_std = np.std(np.array(torch.matmul(translation, alt_rep.t())), axis=0)
