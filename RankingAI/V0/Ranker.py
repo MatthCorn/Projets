@@ -10,21 +10,15 @@ class Network(nn.Module):
         self.Encoders = nn.ModuleList()
         for i in range(n_encoder):
             self.Encoders.append(EncoderLayer(d_att=d_att, n_heads=n_heads, norm='pre'))
-        self.LastEncoder = EncoderLayer(d_att=d_att, n_heads=n_heads, norm='pre')
         self.Embedding = FeedForward(d_in=d_in, d_out=d_att, widths=WidthsEmbedding, dropout=0)
-        self.Decoding = FeedForward(d_in=d_att, d_out=d_in, widths=WidthsEmbedding, dropout=0)
         self.Classifier = FeedForward(d_in=d_att, d_out=1, widths=[32, 16], dropout=0)
 
-    def forward(self, x, type='Ranks'):
+    def forward(self, x):
         x = self.Embedding(x)
         x = self.PosEncoding(x)
         for Encoder in self.Encoders:
             x = Encoder(x)
-        if type == 'Ranks':
-            return self.Classifier(x)
-        if type == 'Sort':
-            return self.Decoding(x)
+        return self.Classifier(x)
 
-        return self.Classifier(x), self.Decoding(x)
 
 

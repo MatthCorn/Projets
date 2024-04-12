@@ -1,7 +1,7 @@
 import numpy as np
 
-from RankingAI.Ranker import Network
-from RankingAI.DataMaker import MakeData
+from RankingAI.V0.Ranker import Network
+from RankingAI.V0.DataMaker import MakeData
 from math import sqrt, log10
 import torch
 from tqdm import tqdm
@@ -10,9 +10,6 @@ import matplotlib.pyplot as plt
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 N = Network(n_encoder=5, max_len=5, d_in=10, d_att=64, WidthsEmbedding=[32], n_heads=4)
 N.to(device)
-
-# type = 'Ranks'
-type = 'Sort'
 
 optimizer = torch.optim.Adam(N.parameters(), weight_decay=1e-3, lr=3e-4)
 
