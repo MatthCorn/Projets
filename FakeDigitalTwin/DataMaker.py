@@ -129,7 +129,7 @@ def MakeDataHI(Batch_size, density, seed, name, return_data=False):
         FreqMax, FreqVar = 10, 0.1
         FreqMoy = []
         for freq in FreqRep:
-            FreqPossible = [-freq + k*Fe for k in range(1, FreqMax//Fe + 2)] + [freq + k*Fe for k in range(FreqMax//Fe + 1)]
+            FreqPossible = [-freq + k*Fe for k in range(1, int(FreqMax//Fe) + 2)] + [freq + k*Fe for k in range(int(FreqMax//Fe) + 1)]
             FreqPossible = [freq for freq in FreqPossible if FreqVar < freq < (FreqMax - FreqVar)]
             FreqMoy.append(FreqPossible[np.random.randint(len(FreqPossible))])
         FreqMoy = np.array(FreqMoy)
