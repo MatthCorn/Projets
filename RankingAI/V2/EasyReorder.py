@@ -24,12 +24,14 @@ NDataV = 1000
 DVec = 10
 weights = torch.rand(DVec, device=device)
 # weights = torch.tensor([1., 0, 0, 0, 0, 0, 0, 0, 0, 0], device=device)
-InputV, InitialPEV, FinalPEV, OutputV, RanksV = CheatedData(NVec=5, DVec=DVec, sigma=1, NData=NDataV, ShiftInterval=[Min, Max], d_att=64, weights=weights, device=device)
+InputV, InitialPEV, FinalPEV, OutputV, RanksV = CheatedData(NVec=5, DVec=DVec, sigma=1, NData=NDataV, ShiftInterval=[Min, Max], d_att=64, weights=weights)
 
 batch_size = 10000
 n_batch = int(NDataT/batch_size)
 
-n_iter = 500
+lmd = 0
+
+n_iter = 50
 TrainingErrorR = []
 TrainingErrorS = []
 ValidationErrorR = []
@@ -41,7 +43,7 @@ ShiftIntervals = [[Min, ShiftList[i]] for i in range(len(ShiftList))]
 
 i = 0
 for ShiftInterval in ShiftIntervals:
-    InputT, InitialPET, FinalPET, OutputT, RanksT = CheatedData(NVec=5, DVec=10, sigma=1, NData=NDataT, d_att=64, ShiftInterval=ShiftInterval, weights=weights, device=device)
+    InputT, InitialPET, FinalPET, OutputT, RanksT = CheatedData(NVec=5, DVec=10, sigma=1, NData=NDataT, d_att=64, ShiftInterval=ShiftInterval, weights=weights)
 
     for j in tqdm(range(n_iter)):
         errorR = 0
@@ -59,7 +61,7 @@ for ShiftInterval in ShiftIntervals:
 
             errS = torch.norm(OutputBatch-Prediction, p=2)
             errR = torch.norm(RanksBatch - Ranks, p=2)
-            err = errS + errR
+            err = lmd * errS + (1 - lmd) * errR
             err.backward()
             optimizer.step()
 

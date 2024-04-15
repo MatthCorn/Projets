@@ -6,17 +6,17 @@ import torch
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-torch.cuda.set_device(1)
+torch.cuda.set_device(0)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 Relative = False
 
 if Relative:
-    from RankingAI.Detector import Network
+    from RankingAI.V1.Detector import Network
     N = Network(n_encoder=6, d_in=10, d_model=64, d_att=64, WidthsEmbedding=[32], num_heads=4, relative=True, masked=False)
 else:
-    from RankingAI.Ranker import Network
+    from RankingAI.V1.Ranker import Network
     N = Network(n_encoder=6, max_len=5, d_in=10, d_att=64, WidthsEmbedding=[32], n_heads=4)
 
 N.to(device)
@@ -26,12 +26,12 @@ optimizer = torch.optim.Adam(N.parameters(), weight_decay=1e-3, lr=3e-4)
 Max = 10
 Min = 0
 
-NDataT = 200000
+NDataT = 100000
 NDataV = 1000
 DVec = 10
 weights = torch.rand(DVec, device=device)
 # weights = torch.tensor([1., 0, 0, 0, 0, 0, 0, 0, 0, 0], device=device)
-ValidationInput, _, ValidationRanks, ValidationSorted = MakeData(NVec=5, DVec=DVec, sigma=1, NData=NDataV, ShiftInterval=[Min, Max], weights=weights, device=device)
+ValidationInput, _, ValidationRanks, ValidationSorted = MakeData(NVec=5, DVec=DVec, sigma=1, NData=NDataV, ShiftInterval=[Min, Max], weights=weights)
 
 batch_size = 10000
 n_batch = int(NDataT/batch_size)
@@ -48,10 +48,10 @@ ShiftList = list(np.logspace(1, log10(Max), 1))
 ShiftList = list(map(int, ShiftList))
 ShiftIntervals = [[Min, ShiftList[i]] for i in range(len(ShiftList))]
 
-lmbd = 0.0
+lmd = 0
 
 for ShiftInterval in ShiftIntervals:
-    TrainingInput, _, TrainingRanks, TrainingSorted = MakeData(NVec=5, DVec=10, sigma=1, NData=NDataT, ShiftInterval=ShiftInterval, weights=weights, device=device)
+    TrainingInput, _, TrainingRanks, TrainingSorted = MakeData(NVec=5, DVec=10, sigma=1, NData=NDataT, ShiftInterval=ShiftInterval, weights=weights)
 
     for j in tqdm(range(n_iter)):
         errorR = 0
@@ -66,7 +66,7 @@ for ShiftInterval in ShiftIntervals:
 
             errR = torch.norm(RanksBatch-RanksPrediction, p=2)
             errS = torch.norm(SortedBatch-SortedPrediction, p=2)
-            err = errR + lmbd * errS
+            err = lmd * errS + (1 - lmd) * errR
             err.backward()
             optimizer.step()
 
@@ -75,6 +75,8 @@ for ShiftInterval in ShiftIntervals:
 
         with torch.no_grad():
             Input = ValidationInput.to(device)
+            ValidationRanks = ValidationRanks.to(device)
+            ValidationSorted = ValidationSorted.to(device)
             RanksPrediction, SortedPrediction = N(Input)
 
             errR = torch.norm(ValidationRanks - RanksPrediction, p=2)

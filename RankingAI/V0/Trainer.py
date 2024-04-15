@@ -26,7 +26,7 @@ ValidationInput, _, ValidationOutput = MakeData(NVec=5, DVec=DVec, sigma=1, NDat
 batch_size = 10000
 n_batch = int(NDataT/batch_size)
 
-n_iter = 150
+n_iter = 1500
 TrainingError = []
 ValidationError = []
 
@@ -54,7 +54,7 @@ for ShiftInterval in ShiftIntervals:
 
             InputBatch = TrainingInput[k*batch_size:(k+1)*batch_size].to(device)
             OutputBatch = TrainingOutput[k*batch_size:(k+1)*batch_size].to(device)
-            Prediction = N(InputBatch, type)
+            Prediction = N(InputBatch)
 
             err = torch.norm(OutputBatch-Prediction, p=2)
             err.backward()
@@ -65,7 +65,7 @@ for ShiftInterval in ShiftIntervals:
         with torch.no_grad():
             Input = ValidationInput.to(device)
             Output = ValidationOutput.to(device)
-            Prediction = N(Input, type)
+            Prediction = N(Input)
 
             err = torch.norm(Output - Prediction, p=2)
             ValidationError.append(float(err)/sqrt(NDataV*5))
@@ -78,7 +78,7 @@ for ShiftInterval in ShiftIntervals:
         with torch.no_grad():
             Input = Input.to(device)
             Output = Output.to(device)
-            Prediction = N(Input, type)
+            Prediction = N(Input)
             ErrShift = torch.norm(Output - Prediction, dim=(1, 2)).cpu().numpy() / sqrt(5)
         Shift = Shift[:, 0, 0].numpy()
 
