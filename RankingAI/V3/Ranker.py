@@ -12,7 +12,6 @@ class Network(nn.Module):
             self.Encoders.append(EncoderLayer(d_att=d_att, n_heads=n_heads, norm=norm))
         self.Embedding = FeedForward(d_in=d_in, d_out=d_att, widths=WidthsEmbedding, dropout=0)
         self.Decoding = FeedForward(d_in=d_att, d_out=d_in, widths=WidthsEmbedding, dropout=0)
-        self.Classifier = FeedForward(d_in=d_att, d_out=1, widths=[32, 16], dropout=0)
 
     def forward(self, x):
         x = self.Embedding(x)
@@ -20,6 +19,6 @@ class Network(nn.Module):
         for Encoder in self.Encoders:
             x = Encoder(x)
 
-        return self.Classifier(x), self.Decoding(x)
+        return self.Decoding(x)
 
 
