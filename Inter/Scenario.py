@@ -45,7 +45,7 @@ if __name__ == '__main__':
     from matplotlib.patches import Polygon
     import random
     import math
-    S = Simulator(5, 30, 4, sensitivity_fourier=0.0001, sensitivity_sensor=0.0001)
+    S = Simulator(5, 30, 4, sensitivity_fourier=0.1, sensitivity_sensor=0.05)
     S.Run()
 
     fig, (ax1, ax2) = plt.subplots(2)

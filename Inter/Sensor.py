@@ -64,13 +64,13 @@ class Simulator:
                 if correlation[i, j] and (self.TM[j] < self.T):
                     selected_instance.append(j)
             if selected_instance == []:
-                self.P.append(list(V[i]))
+                self.P.append(V[i].tolist())
                 self.TM.append(self.T)
                 self.TI.append(self.T - 1)
             else:
                 Levels = lP[selected_instance]
                 j = torch.argmax(Levels)
-                self.TM[j] = self.T
+                self.TM[selected_instance[j]] = self.T
 
         j = 0
         while j < len(self.TM):
