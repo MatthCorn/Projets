@@ -27,7 +27,6 @@ class Network(nn.Module):
         y = self.Latent
         for Encoder in self.Encoders:
             y = Encoder(y, x)
-
         return self.Decoding(y)
 
 

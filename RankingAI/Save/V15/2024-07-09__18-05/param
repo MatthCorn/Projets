@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<Dictionary>
+ <Object Key="n_encoder" Value="9"/>
+ <String Key="path_ini" Value="RankingAI/Save/V15/2024-07-08__14-35/ParamObs.pkl"/>
+ <Object Key="len_in" Value="10"/>
+ <Object Key="d_in" Value="10"/>
+ <Object Key="d_att" Value="256"/>
+ <List Key="WidthsEmbedding">
+  <Object Value="32"/>
+ </List>
+ <Object Key="n_heads" Value="8"/>
+ <String Key="norm" Value="post"/>
+ <Object Key="lr" Value="1e-05"/>
+ <Object Key="weight_decay" Value="1e-05"/>
+ <Object Key="NDataT" Value="3000000"/>
+ <Object Key="NDataV" Value="1000"/>
+ <Object Key="DVec" Value="10"/>
+ <Object Key="NInput" Value="10"/>
+ <Object Key="LenOut" Value="5"/>
+ <Object Key="batch_size" Value="5000"/>
+ <Object Key="n_iter" Value="500"/>
+ <Object Key="max_lr" Value="1"/>
+ <Object Key="FreqGradObs" Value="0.1"/>
+ <Object Key="warmup" Value="200"/>
+</Dictionary>

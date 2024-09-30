@@ -14,4 +14,3 @@ class EncoderLayer(nn.Module):
         y = self.FirstLayerNorm(self.MultiHeadAttention(x) + x)
         y = self.SecondLayerNorm(self.FeedForward(y) + y)
         return y
-

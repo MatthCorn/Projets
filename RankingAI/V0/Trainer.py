@@ -1,11 +1,11 @@
 import numpy as np
-
 from RankingAI.V0.Ranker import Network
 from RankingAI.V0.DataMaker import MakeData
 from math import sqrt, log10
 import torch
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 N = Network(n_encoder=5, max_len=5, d_in=10, d_att=64, WidthsEmbedding=[32], n_heads=4)
@@ -90,8 +90,6 @@ for ShiftInterval in ShiftIntervals:
         ax2.plot(x, y, label=str(ShiftInterval[1]))
 
     i += 1
-
-
 
 ax1.plot(TrainingError, 'r', label="Ensemble d'entrainement")
 ax1.set_title('Erreur gobale')

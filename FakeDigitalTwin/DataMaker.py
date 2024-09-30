@@ -5,29 +5,29 @@ import numpy as np
 import os
 from tqdm import tqdm
 
+
 Param = {
-    'Fe list': [5.1, 5, 4.9, 4.8],
-    'Durée max impulsion': 1,
-    'Seuil mono': 10,
-    'Seuil harmo': 8,
-    'Seuil IM': 8,
-    'Seuil sensi traitement': 6,
-    'Seuil sensi': 1,
-    'Contraste geneur': 0.2,
+    'Fe_List': [5.1, 5, 4.9, 4.8],
+    'Duree_max_impulsion': 4,
+    'Seuil_mono': 10,
+    'Seuil_harmo': 8,
+    'Seuil_IM': 8,
+    'Seuil_sensi_traitement': 6,
+    'Seuil_sensi': 1,
+    'Contraste_geneur': 0.2,
     'Nint': 500,
-    'Contraste geneur 2': 1,
-    'M1 aveugle': 2,
-    'M2 aveugle': 2,
-    'M local': 2,
-    'N DetEl': 12,
-    'Seuil écart freq': 5e-3,
-    'Durée maintien max': 0.2,
-    'N mesureurs max': 8,
-    'PDW triés': False,
+    'Contraste_geneur_2': 1,
+    'M1_aveugle': 2,
+    'M2_aveugle': 2,
+    'M_local': 5,
+    'N_DetEl': 12,
+    'Seuil_ecart_freq': 5e-3,
+    'Duree_maintien_max': 0.2,
+    'N_mesureurs_max': 8,
+    'PDW_tries': False,
 }
 
-
-def MakeData(Batch_size, density, seed, name, return_data=False):
+def MakeData(Batch_size, density, seed, name, param=Param, return_data=False):
     BatchPulses = []
     BatchPDWs = []
 
@@ -79,7 +79,7 @@ def MakeData(Batch_size, density, seed, name, return_data=False):
         AntP = [Pulse(TOA=round(TOA[k], 3), LI=round(LI[k], 3), Level=round(Level[k], 3), FreqStart=round(FreqStart[k], 3),
                       FreqEnd=round(FreqEnd[k], 3), Id=k) for k in range(size)]
 
-        DT = DigitalTwin(Param=Param)
+        DT = DigitalTwin(Param=param)
 
         DT.forward(AntP)
 
@@ -101,7 +101,7 @@ def MakeData(Batch_size, density, seed, name, return_data=False):
     saveObjAsXml(BatchPDWs, os.path.join(cwd, 'Data', name+'PDWsDCI.xml'))
 
 
-def MakeDataHI(Batch_size, density, seed, name, return_data=False):
+def MakeDataHI(Batch_size, density, seed, name, param=Param, return_data=False):
     BatchPulses = []
     BatchPDWs = []
 
@@ -122,9 +122,9 @@ def MakeDataHI(Batch_size, density, seed, name, return_data=False):
 
         Level = np.random.gamma(shape=2, scale=1.725, size=size)
 
-        Fe = Param['Fe list'][0]
-        FreqRepMoy = Fe * np.random.rand()
-        FreqRep = (0.4 * np.random.random(size=size) - 0.2 + FreqRepMoy) % Fe
+        Fe = Param['Fe_List'][0]
+        FreqRepMoy = Fe/2 * np.random.rand()
+        FreqRep = (0.4 * np.random.random(size=size) - 0.2 + FreqRepMoy) % Fe/2
 
         FreqMax, FreqVar = 10, 0.1
         FreqMoy = []
@@ -139,7 +139,7 @@ def MakeDataHI(Batch_size, density, seed, name, return_data=False):
 
         AntP = [Pulse(TOA=round(TOA[k], 3), LI=round(LI[k], 3), Level=round(Level[k], 3), FreqStart=round(FreqStart[k], 3), FreqEnd=round(FreqEnd[k], 3), Id=k) for k in range(size)]
 
-        DT = DigitalTwin(Param=Param)
+        DT = DigitalTwin(Param=param)
 
         DT.forward(AntP)
 

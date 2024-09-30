@@ -3,54 +3,59 @@ import numpy as np
 class Processor():
     def __init__(self, Parent=None):
         self.Param = Parent.Param
+        self.Mono, self.HarmoTreat, self.IMTreat = False, False, False
+        self.RejectHThreshold, self.RejectIMThreshold = 0, 0
 
     # This function determines which pulse is visible or annoying based on its level
     # It also determines if mono-signal, harmonic or inter-modulation treatment will be needed
     # It returns those information in addition of thresholds for the treatment
     def TrackTreatment(self, Plateau):
+        self.Mono, self.HarmoTreat, self.IMTreat = False, False, False
+        self.RejectHThreshold, self.RejectIMThreshold = 0, 0
 
         # We determine whether there will be a mono-signal, harmonic or inter-modulation treatment
-        Mono, HarmoTreat, IMTreat = False, False, False
-        RejectHThreshold, RejectIMThreshold = 0, 0
+
         try:
-            FirstPulse, SecondPulse = Plateau.LevelPulses[-2:]
+            SecondPulse, FirstPulse = Plateau.LevelPulses[-2:]
 
             # We determine if the plateau is mono-signal
-            if FirstPulse.Level > self.Param['Seuil mono']:
-                Mono = True
+            if FirstPulse.Level > self.Param['Seuil_mono']:
+                self.Mono = True
+                self.VisibleId = len(Plateau.Pulses)-1
+                self.InteractingId = len(Plateau.Pulses)-1
+                return
 
             # We determine if there is a need of a harmonic or an inter-modulation processing
-            HarmoTreat = FirstPulse.Level > self.Param['Seuil harmo']
-            if HarmoTreat:
-                RejectHThreshold = self.Param['Seuil sensi traitement'] + 2 * (FirstPulse.Level - self.Param['Seuil harmo'])
+            self.HarmoTreat = FirstPulse.Level > self.Param['Seuil_harmo']
+            if self.HarmoTreat:
+                self.RejectHThreshold = self.Param['Seuil_sensi_traitement'] + 2 * (FirstPulse.Level - self.Param['Seuil_harmo'])
 
-            IMTreat = SecondPulse.Level > self.Param['Seuil IM'] - (FirstPulse.Level - self.Param['Seuil IM'])
-            if IMTreat:
-                RejectIMThreshold = self.Param['Seuil sensi traitement'] + 2 * (FirstPulse.Level - self.Param['Seuil IM'])
+            self.IMTreat = SecondPulse.Level > self.Param['Seuil_IM'] - (FirstPulse.Level - self.Param['Seuil_IM'])
+            if self.IMTreat:
+                self.RejectIMThreshold = self.Param['Seuil_sensi_traitement'] + 2 * (FirstPulse.Level - self.Param['Seuil_IM'])
         except:
             pass
 
         # This first index informs on the first pulse that can interact with other (annoying or visible pulses)
-        InteractingId = len(Plateau.Pulses)
+        self.InteractingId = len(Plateau.Pulses)
 
         # This second index informs on the first pulse that can be seen (only visible pulses)
-        VisibleId = len(Plateau.Pulses)
+        self.VisibleId = len(Plateau.Pulses)
 
         for pulse in list(reversed(Plateau.LevelPulses)):
-            ThresholdVisibility = self.Param['Seuil sensi']
-            ThresholdInteracting = self.Param['Seuil sensi'] - self.Param['Contraste geneur']
-            if IMTreat:
-                ThresholdVisibility = RejectIMThreshold
+            ThresholdVisibility = self.Param['Seuil_sensi']
+            ThresholdInteracting = self.Param['Seuil_sensi'] - self.Param['Contraste_geneur']
+            if self.IMTreat:
+                ThresholdVisibility = self.RejectIMThreshold
 
             if pulse.Level > ThresholdInteracting:
-                InteractingId -= 1
+                self.InteractingId -= 1
             else:
                 break
 
             if pulse.Level > ThresholdVisibility:
-                VisibleId -= 1
+                self.VisibleId -= 1
 
-        return InteractingId, VisibleId, Mono, HarmoTreat, RejectHThreshold
 
     # This function computes the interaction between pulses on a track with frequency Fe
     # Its outputs inform on the elementary detections on this track
@@ -58,71 +63,72 @@ class Processor():
         if Plateau.IsEmpty():
             return []
 
-        Ts = Plateau.StartingTime
+        FoldFun = lambda Freq: min(Freq - (Freq // Fe) * Fe, -Freq - (-Freq // Fe) * Fe)
+        CanalFun = lambda Freq: round(self.Param['Nint'] * Freq / Fe)
 
-        InteractingId, VisibleId, Mono, HarmoTreat, RejectHThreshold = self.TrackTreatment(Plateau)
+        Ts = Plateau.StartingTime
 
         # We compute the frequency of the folded spectrum between 0 et Fe/2 for each interacting pulse and store the corresponding canal
         CanalList = []
 
-        for Pulse in Plateau.LevelPulses[InteractingId:]:
+        for Pulse in Plateau.LevelPulses[self.InteractingId:]:
             # We compute the frequency of the folded spectrum between 0 et Fe/2
             PulseFreq = Pulse.GetFreq(Ts)
-            FoldFreq = min(PulseFreq - (PulseFreq // Fe) * Fe, -PulseFreq - (-PulseFreq // Fe) * Fe)
+            FoldFreq = FoldFun(PulseFreq)
 
             # We compute the canal corresponding
-            Canal = round(self.Param['Nint'] * FoldFreq / Fe)
+            Canal = CanalFun(FoldFreq)
             CanalList.append(Canal)
 
         # In case of harmonic processing
-        if HarmoTreat:
+        if self.HarmoTreat:
             # We compute the folded frequency of the 2nd and 3rd harmonic of the brightest pulse
             # Those harmonics can mask other pulses
             PulseFreq = Plateau.LevelPulses[-1].GetFreq(Ts)
-            FoldH2 = min(2 * PulseFreq - (2 * PulseFreq // Fe) * Fe, -2 * PulseFreq - (-2 * PulseFreq // Fe) * Fe)
-            FoldH3 = min(3 * PulseFreq - (3 * PulseFreq // Fe) * Fe, -3 * PulseFreq - (-3 * PulseFreq // Fe) * Fe)
+            FoldH2 = FoldFun(2*PulseFreq)
+            FoldH3 = FoldFun(3*PulseFreq)
 
         # We built a list informing of which visible pulse is in fact masked or polluted
         MaskedList = []
         PollutedList = []
 
-        for i in range(VisibleId, len(Plateau.Pulses)):
+        for i in range(self.VisibleId, len(Plateau.Pulses)):
             VisiblePulse = Plateau.LevelPulses[i]
             Polluted = False
             Masked = False
 
-            VisibleCanal = CanalList[i - InteractingId]
+            VisibleCanal = CanalList[i - self.InteractingId]
 
             # First and last canals are masked
-            if VisibleCanal < self.Param['M1 aveugle'] or VisibleCanal > self.Param['Nint']/2 - self.Param['M2 aveugle']:
+            if VisibleCanal < self.Param['M1_aveugle'] or VisibleCanal > self.Param['Nint']/2 - self.Param['M2_aveugle']:
                 PollutedList.append(True)
                 MaskedList.append(True)
                 continue
 
             # We check for the harmonic interaction
-            if HarmoTreat:
-                if abs(VisibleCanal - FoldH2) < 2 or abs(VisibleCanal - FoldH3) < 2:
-                    if VisiblePulse.Level < RejectHThreshold:
+            if self.HarmoTreat:
+                if abs(VisibleCanal - CanalFun(FoldH2)) < 2 or abs(VisibleCanal - CanalFun(FoldH3)) < 2:
+                    if VisiblePulse.Level < self.RejectHThreshold:
                         PollutedList.append(True)
                         MaskedList.append(True)
                         continue
 
             # We check for interaction with other pulses by decreasing level
-            for j in reversed(range(InteractingId, len(Plateau.Pulses))):
+            for j in reversed(range(self.InteractingId, len(Plateau.Pulses))):
                 InteractingPulse = Plateau.LevelPulses[j]
-                InteractingCanal = CanalList[j - InteractingId]
+                InteractingCanal = CanalList[j - self.InteractingId]
 
                 if InteractingPulse is VisiblePulse:
                     continue
 
                 # if a pulse level is too low, the following pulse levels in the loop will be too low
-                if VisiblePulse.Level - InteractingPulse.Level > self.Param['Contraste geneur 2']:
+                if VisiblePulse.Level - InteractingPulse.Level > self.Param['Contraste_geneur_2']:
                     Masked = False
                     break
 
                 else:
                     # if pulse canals are close, they will interact
-                    if abs(VisibleCanal - InteractingCanal) < self.Param['M local']:
+                    if abs(VisibleCanal - InteractingCanal) < self.Param['M_local']:
                         if VisiblePulse.Level < InteractingPulse.Level:
                             Polluted = True
                             Masked = True
@@ -133,12 +139,12 @@ class Processor():
             PollutedList.append(Polluted)
             MaskedList.append(Masked)
 
-        # We make sure there is not more than "N DetEl" pulses transmitted
+        # We make sure there is not more than "N_DetEl" pulses transmitted
         # It has to be the strongest pulses in terms of level
         NDetEl = 0
         for i in reversed(range(len(MaskedList))):
             if not MaskedList[i]:
-                if NDetEl == self.Param['N DetEl']:
+                if NDetEl == self.Param['N_DetEl']:
                     MaskedList[i] = True
                     PollutedList[i] = True
                 else:
@@ -148,17 +154,24 @@ class Processor():
 
     # This function takes the elementary detections of each canal and fuse them into
     # NAD, simulating the behavior of the frequency ambiguity removal module
-    def FreqAmbRemoval(self, Plateau, FeList):
-        # We create scores which will determine whether a pulse is a NAD
+    def FreqAmbRemoval(self, Plateau):
+        FeList = self.Param['Fe_List']
+        # We create 2 scores which will determine whether a pulse is a NAD or not
         # Both of them must stay above 0 for a pulse to be a NAD
         ScoreMask = 1
         ScorePollution = 1
+
+        self.TrackTreatment(Plateau)
+
+        if self.Mono:
+            return Plateau.LevelPulses[-1:]
+
         for Fe in FeList:
             MaskedList, PollutedList = self.TrackDetection(Plateau, Fe)
             ScoreMask -= np.array(MaskedList) / 2
             ScorePollution -= np.array(PollutedList) / 2
-        IsNAD = np.multiply(ScorePollution > 0 , ScoreMask > 0)
-
+        # IsNAD = np.multiply(ScorePollution > 0, ScoreMask > 0)
+        IsNAD = ScoreMask > 0
         # We build the list of NAD and return it
         NVisible = len(IsNAD)
         VisiblePulses = np.array(Plateau.LevelPulses[-NVisible:])
@@ -185,7 +198,7 @@ class Processor():
             BestMatchingId = None
             for i in range(len(OpenedMeters)):
                 meter = OpenedMeters[i]
-                if abs(Pulse.GetFreq(Ts) - meter.FreqCur) < self.Param['Seuil écart freq']:
+                if abs(Pulse.GetFreq(Ts) - meter.FreqCur) < self.Param['Seuil_ecart_freq']:
                     try:
                         if meter.Level > OpenedMeters[BestMatchingId].Level:
                             BestMatchingId = i
@@ -207,7 +220,7 @@ class Processor():
         # We try to link the lost NAD to meters that will be freed during the plateau
         OpenedMeters.sort(key=lambda meter: meter.Tc)
         for meter in OpenedMeters:
-            Tp = meter.Tc + self.Param['Durée maintien max']
+            Tp = meter.Tc + self.Param['Duree_maintien_max']
             # If the meter did lose its pulse
             if Tp < Te:
                 # We release it

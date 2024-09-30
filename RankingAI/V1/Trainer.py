@@ -1,11 +1,11 @@
 import numpy as np
-
 from RankingAI.V1.DataMaker import MakeData
 from Complete.LRScheduler import Scheduler
 from math import sqrt, log10
 import torch
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+
 
 if torch.cuda.is_available():
     torch.cuda.set_device(2)

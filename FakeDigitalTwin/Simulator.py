@@ -9,7 +9,7 @@ class DigitalTwin():
         self.Param = Param
         # Making meters to follow the pulses through the plateaus, all initially free
         self.Meters = []
-        for i in range(Param['N mesureurs max']):
+        for i in range(Param['N_mesureurs_max']):
             self.Meters.append(Meter(Id=str(i), Parent=self))
 
         # We use only one object to represente the plateaus, this object is updated to represent a change of plateau
@@ -71,7 +71,7 @@ class DigitalTwin():
         else:
             # We compute the NAD on the current plateau
             t = time()
-            NAD = self.Processor.FreqAmbRemoval(self.Plateau, FeList=self.Param['Fe list'])
+            NAD = self.Processor.FreqAmbRemoval(self.Plateau)
             self.NADCounter += time() - t
 
             # We link the NAD to the meters and start updating them
@@ -95,7 +95,7 @@ class DigitalTwin():
         # print('\n')
 
     def AddPDW(self, PDW, Tp=0):
-        if self.Param['PDW triés']:
+        if self.Param['PDW_tries']:
             TpList = [x[1] for x in self.PDWs]
 
             # We're looking for the place of the new pulse in self.PDWs emitted at the time Tp
@@ -111,9 +111,154 @@ class DigitalTwin():
 
 if __name__ == '__main__':
     import numpy as np
-    # AntP = [Pulse(TOA=1, LI=16, FreqStart=10, FreqEnd=12, Level=1), Pulse(TOA=7, LI=12, FreqStart=9, FreqEnd=6, Level=1)]
-    AntP = [Pulse(TOA=5*k, LI=k, FreqStart=np.random.randint(7, 13), FreqEnd=np.random.randint(7, 13), Level=5.5*np.random.random()) for k in range(4, 13)]
+    TOA = 0
+    Dt = 0
+    AntP = []
+    for k in range(20):
+        DF = 0.1 * np.random.random() - 0.05
+        F = 10 + 0.5 * np.random.random()
+        AntP.append(Pulse(TOA=TOA, LI=0.5 + 2 * np.random.random(), FreqStart=F, FreqEnd=F + DF, Level=5.5 * np.random.random()))
+        TOA += np.random.random()
 
-    DT = DigitalTwin()
+    Param = {
+        'Fe_List': [5.1, 5, 4.9, 4.8],
+        'Duree_max_impulsion': 4,
+        'Seuil_mono': 10,
+        'Seuil_harmo': 8,
+        'Seuil_IM': 8,
+        'Seuil_sensi_traitement': 6,
+        'Seuil_sensi': 1,
+        'Contraste_geneur': 0.2,
+        'Nint': 500,
+        'Contraste_geneur_2': 1,
+        'M1_aveugle': 2,
+        'M2_aveugle': 2,
+        'M_local': 5,
+        'N_DetEl': 12,
+        'Seuil_ecart_freq': 5e-3,
+        'Duree_maintien_max': 0.2,
+        'N_mesureurs_max': 8,
+        'PDW_tries': False,
+    }
+
+    DT = DigitalTwin(Param)
     DT.forward(AntPulses=AntP)
 
+    def value_to_rgb(value, min_val=0, max_val=5.5, colormap='plasma'):
+        # Normalize the value between 0 and 1
+        normalized_value = (value - min_val) / (max_val - min_val)
+
+        # Clip the normalized value to ensure it stays within [0, 1]
+        normalized_value = np.clip(normalized_value, 0, 1)
+
+        # Get the colormap
+        cmap = plt.get_cmap(colormap)
+
+        # Map the normalized value to an RGB color
+        rgb = cmap(normalized_value)  # Returns an RGBA tuple, we need the RGB part
+
+        return rgb
+
+    import matplotlib.pyplot as plt
+    import random
+    df = Param['M_local'] * Param['Fe_List'][1] / Param['Nint']
+
+    from matplotlib import colors
+    fig, (ax1, ax2) = plt.subplots(1, 2, subplot_kw={'projection': '3d'})
+
+    L = AntP
+    for pulse in L:
+        T1 = pulse.TOA
+        T2 = T1 + pulse.LI
+        F1 = pulse.FreqStart
+        F2 = pulse.FreqEnd
+        DF = abs(pulse.FreqStart - pulse.FreqEnd) + df
+        N = pulse.Level
+        sommets = [
+            [T1, F1, N],
+            [T2, F2, N],
+            [T1, F1-df, 0],
+            [T1, F1+df, 0],
+            [T2, F2+df, 0],
+            [T2, F2-df, 0]
+        ]
+
+        surf = np.array([[sommets[0], sommets[0], sommets[0], sommets[0]],
+                         [sommets[0], sommets[2], sommets[3], sommets[0]],
+                         [sommets[1], sommets[5], sommets[4], sommets[1]],
+                         [sommets[1], sommets[1], sommets[1], sommets[1]]])
+
+        # Plot the surface
+        r, g, b, a = value_to_rgb(N)
+        ax1.plot_surface(surf[..., 0], surf[..., 1], surf[..., 2], color=(r, g, b, a))
+
+
+
+    R = DT.PDWs
+    for pulse in R:
+        T1 = pulse['TOA']
+        T2 = T1 + pulse['LI']
+        F = (pulse['FreqMin'] + pulse['FreqMax']) / 2
+        DF = abs(pulse['FreqMin'] - pulse['FreqMax']) + df
+        N = pulse['Level']
+
+        sommets = [
+            [T1, F, N],
+            [T2, F, N],
+            [T1, F-df, 0],
+            [T1, F+df, 0],
+            [T2, F+df, 0],
+            [T2, F-df, 0]
+        ]
+
+        surf = np.array([[sommets[0], sommets[0], sommets[0], sommets[0]],
+                         [sommets[0], sommets[2], sommets[3], sommets[0]],
+                         [sommets[1], sommets[5], sommets[4], sommets[1]],
+                         [sommets[1], sommets[1], sommets[1], sommets[1]]])
+
+        # Plot the surface
+        r, g, b, a = value_to_rgb(N)
+        ax2.plot_surface(surf[..., 0], surf[..., 1], surf[..., 2], color=(r, g, b, a))
+
+
+    # Define the colormap and normalization (vmin, vmax)
+    cmap = plt.get_cmap('plasma')  # You can choose 'plasma', 'coolwarm', etc.
+    norm = colors.Normalize(vmin=0, vmax=5.5)  # Define the range for the colorbar
+
+    # Create a ScalarMappable to be used for the colorbar
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+    sm.set_array([])  # Optional, required in some cases to avoid warnings
+
+    # Add the colorbar to the figure without any plot
+    fig.colorbar(sm, ax=ax2, shrink=0.4)
+    fig.colorbar(sm, ax=ax1, shrink=0.4)
+
+    ax1.set_xlim(-0.1, 11)
+    ax1.set_ylim(9.9, 10.6)
+    ax1.set_zlim(0, 5.5)
+    ax1.set_box_aspect([2, 2, 0.5])
+    ax1.zaxis.set_ticks([])  # Remove z-axis ticks
+    ax1.zaxis.set_ticklabels([])  # Remove z-axis tick labels
+    ax1.zaxis.label.set_visible(False)  # Hide z-axis label
+    ax1.zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
+    ax1.set_xlabel('temps')
+    ax1.set_ylabel('fréquence')
+    ax1.set_title("Impulsions d'entrée")
+    ax1.set_proj_type('ortho')
+    ax1.view_init(elev=90, azim=-90)
+    ax2.set_xlim(-0.1, 11)
+    ax2.set_ylim(9.9, 10.6)
+    ax2.set_zlim(0, 5.5)
+    ax2.set_box_aspect([2, 2, 0.5])
+    ax2.zaxis.set_ticks([])  # Remove z-axis ticks
+    ax2.zaxis.set_ticklabels([])  # Remove z-axis tick labels
+    ax2.zaxis.label.set_visible(False)  # Hide z-axis label
+    ax2.zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
+    ax2.set_xlabel('temps')
+    ax2.set_ylabel('fréquence')
+    ax2.set_title("Impulsions de sortie")
+    ax2.set_proj_type('ortho')
+    ax2.view_init(elev=90, azim=-90)
+    plt.show()
+
+    print('end')

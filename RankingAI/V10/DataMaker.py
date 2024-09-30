@@ -11,7 +11,7 @@ def GetSelected(Input, WeightsCut, LimCut=0, LenOut=5):
 
     return Mask
 
-def GetSorted(Input, Mask, WeightsSort, LenOut):
+def GetSorted(Input, Mask, WeightsSort):
     if WeightsSort is None:
         WeightsSort = torch.tensor([1.]*Input.shape[-1])
     Values = torch.matmul(Input, WeightsSort)
@@ -27,7 +27,7 @@ def MakeData(NInput=5, DVec=10, sigma=1, NData=1000, WeightsCut=None, WeightsSor
     Input = torch.normal(torch.zeros(NData, NInput, DVec), sigma*torch.ones(NData, NInput, DVec))
 
     Mask = GetSelected(Input, WeightsCut, LimCut=0, LenOut=LenOut)
-    Output = GetSorted(Input, Mask, WeightsSort, LenOut=LenOut)
+    Output = GetSorted(Input, Mask, WeightsSort)
     return Input, Output[:, :LenOut]
 
 

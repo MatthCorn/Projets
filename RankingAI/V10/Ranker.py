@@ -1,6 +1,7 @@
 from Complete.Transformer.DecoderTransformer import DecoderLayer as EncoderLayer
 from Complete.Transformer.PositionalEncoding import PositionalEncoding
 from Complete.Transformer.EasyFeedForward import FeedForward
+from Complete.Transformer.LearnableModule import LearnableParameters
 import torch.nn as nn
 import torch
 
@@ -9,7 +10,7 @@ class Network(nn.Module):
         super().__init__()
         self.PEIn = PositionalEncoding(d_att=d_att, dropout=0, max_len=len_in)
 
-        self.Latent = nn.parameter.Parameter(torch.normal(mean=torch.zeros(1, len_latent, d_att)))
+        self.Latent = LearnableParameters(nn.parameter.Parameter(torch.normal(mean=torch.zeros(1, len_latent, d_att))))
 
         self.Encoders = nn.ModuleList()
         for i in range(n_encoder):
@@ -22,10 +23,9 @@ class Network(nn.Module):
     def forward(self, x):
         x = self.Embedding(x)
         x = self.PEIn(x)
-        y = self.Latent
+        y = self.Latent()
         for Encoder in self.Encoders:
             y = Encoder(y, x)
-
         return self.Decoding(y)
 
 

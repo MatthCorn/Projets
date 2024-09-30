@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+<Dictionary>
+ <List Key="TrainingError">
+  <Object Value="4.953839015708342"/>
+  <Object Value="2.9974467605822186"/>
+  <Object Value="2.871263059456579"/>
+  <Object Value="2.8678375249317036"/>
+  <Object Value="2.809225055422854"/>
+  <Object Value="2.599120429794538"/>
+  <Object Value="2.498955321378197"/>
+  <Object Value="2.449917737014413"/>
+  <Object Value="2.409690742340471"/>
+  <Object Value="2.365831362975897"/>
+ </List>
+ <List Key="ValidationError">
+  <Object Value="3.7433926034643648"/>
+  <Object Value="2.850211986346708"/>
+  <Object Value="2.8497931354204384"/>
+  <Object Value="2.8413147130988072"/>
+  <Object Value="2.6837739296210374"/>
+  <Object Value="2.5046451479379264"/>
+  <Object Value="2.449793114154816"/>
+  <Object Value="2.4057802235849937"/>
+  <Object Value="2.3655152155222767"/>
+  <Object Value="2.321037163801706"/>
+ </List>
+ <List Key="TrainingPerf">
+  <Object Value="0.100352"/>
+  <Object Value="0.10006"/>
+  <Object Value="0.09998"/>
+  <Object Value="0.09998"/>
+  <Object Value="0.100616"/>
+  <Object Value="0.109896"/>
+  <Object Value="0.116124"/>
+  <Object Value="0.1211"/>
+  <Object Value="0.127692"/>
+  <Object Value="0.136248"/>
+ </List>
+ <List Key="ValidationPerf">
+  <Object Value="0.0962"/>
+  <Object Value="0.1008"/>
+  <Object Value="0.1008"/>
+  <Object Value="0.1008"/>
+  <Object Value="0.1052"/>
+  <Object Value="0.117"/>
+  <Object Value="0.1232"/>
+  <Object Value="0.1308"/>
+  <Object Value="0.1346"/>
+  <Object Value="0.1436"/>
+ </List>
+</Dictionary>

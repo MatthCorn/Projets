@@ -18,7 +18,6 @@ class Network(nn.Module):
         x = self.PosEncoding(x)
         for Encoder in self.Encoders:
             x = Encoder(x)
-
         return self.Decoding(x)
 
 

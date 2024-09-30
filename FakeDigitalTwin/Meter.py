@@ -47,7 +47,7 @@ class Meter():
     def Maintenance(self):
         Param = self.Parent.Param
 
-        Tcw = self.Ts + Param['Durée max impulsion']
+        Tcw = self.Ts + Param['Duree_max_impulsion']
         # If the meter is opened for too long, we update and release it
 
         if Tcw < self.Tc:

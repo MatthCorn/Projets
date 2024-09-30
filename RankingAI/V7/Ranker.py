@@ -21,7 +21,6 @@ class Network(nn.Module):
         x = self.PEIn(x)
         for Encoder in self.Encoders:
             x = Encoder(x)
-
         return self.Classifier(x)
 
 
