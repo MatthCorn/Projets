@@ -83,14 +83,22 @@ class DictGradObserver(dict):
 
     def NetToDict(self, network):
         for name, module in network.named_children():
-            if module._get_name() in ['Dropout', 'LayerNorm', ]:
-                self.__setitem__(name, module._get_name())
-
-            elif module._get_name() in ['Linear', 'LearnableParameters', ]:
-                self.__setitem__(name, GradObserver(module))
-
+            if list(module.named_children()) == []:
+                if list(module.parameters()) == []:
+                    self.__setitem__(name, module._get_name())
+                else:
+                    self.__setitem__(name, GradObserver(module))
             else:
                 self.__setitem__(name, DictGradObserver(module))
+
+            # if module._get_name() in ['Dropout', 'LayerNorm', ]:
+            #     self.__setitem__(name, module._get_name())
+            #
+            # elif module._get_name() in ['Linear', 'LearnableParameters', ]:
+            #     self.__setitem__(name, GradObserver(module))
+            #
+            # else:
+            #     self.__setitem__(name, DictGradObserver(module))
 
 
     def update(self):

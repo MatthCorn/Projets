@@ -24,14 +24,14 @@ if save:
     save_path = os.path.join(local, 'Base', 'Save', folder)
 ################################################################################################################################################
 
-param = {'n_encoder': 10,
-         'n_decoder': 8,
+param = {'n_encoder': 4,
+         'n_decoder': 2,
          'len_in': 20,
          'len_out': 25,
          'path_ini': None,
          # 'path_ini': os.path.join('Base', 'Save', '2024-09-23__16-53'),
-         # 'retrain': None,
-         'retrain': os.path.join('Base', 'Save', '2024-09-23__16-53'),
+         'retrain': None,
+         # 'retrain': os.path.join('Base', 'Save', '2024-09-23__16-53'),
          'd_att': 128,
          'widths_embedding': [32],
          'n_heads': 4,
@@ -149,8 +149,8 @@ if save:
         os.mkdir(save_path)
 
     DictGrad.del_module()
-    error = {'TrainingError': TrainingError,
-             'ValidationError': ValidationError}
+    error = {'Training': TrainingError,
+             'Validation': ValidationError}
     saveObjAsXml(param, os.path.join(save_path, 'param'))
     saveObjAsXml(error, os.path.join(save_path, 'error'))
     torch.save(N.state_dict(), os.path.join(save_path, 'Network_weights'))
