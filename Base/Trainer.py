@@ -113,7 +113,7 @@ for j in tqdm(range(n_iter)):
                                TargetMaskMiniBatch[1][k * batch_size:(k + 1) * batch_size].to(device)]
             Prediction = N(InputBatch, OutputBatch, TargetMaskBatch)[:, :-1, :]
 
-            err = torch.norm(Prediction-OutputBatch, p=2)/sqrt(batch_size*d_out*len_out)
+            err = torch.norm(Prediction-OutputBatch, p=2) / sqrt(batch_size*d_out*len_out)
             err.backward()
             optimizer.step()
             if lr_scheduler is not None:
