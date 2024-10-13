@@ -7,11 +7,15 @@ class Scheduler(LambdaLR):
                  optimizer: Optimizer,
                  dim_embed: int,
                  warmup_steps: int,
+                 dropping_step: int = -1,
+                 dropping_factor: float = 10,
                  max: float = 1.,
                  last_epoch: int = -1,
                  verbose: bool = False) -> None:
         self.dim_embed = dim_embed
         self.warmup_steps = warmup_steps
+        self.dropping_step = dropping_step
+        self.dropping_factor = dropping_factor
         self.max = max
         self.last_lr = 0
         self.target_lr = 0
@@ -22,6 +26,8 @@ class Scheduler(LambdaLR):
         if step == 0:
             return 0
         self.target_lr = self.max * min(step / self.warmup_steps, (step / self.warmup_steps) ** (-0.5))
+        if step > self.dropping_step and self.dropping_step > 0:
+            self.target_lr = self.target_lr / self.dropping_factor
         new_lr = 0.9 * self.last_lr + 0.1 * self.target_lr
         self.last_lr = new_lr
         return new_lr
@@ -53,7 +59,7 @@ if __name__ == '__main__':
     # model = torch.nn.Sequential(torch.nn.Linear(1, 4, bias=False), torch.nn.Linear(4, 3, bias=False))
     model = modeltest()
     opt = torch.optim.Adam(model.parameters())
-    sch = Scheduler(opt, 1, 10, 5)
+    sch = Scheduler(opt, 1, 10, max=5, dropping_step=100)
     lr_list = []
     for i in range(500):
         opt.zero_grad()

@@ -1,4 +1,4 @@
-from Base.DataMaker import GetData
+from Split.DataMaker import GetData
 from Base.Network import TransformerTranslator
 from VisualExample import Plot_inplace
 from Complete.LRScheduler import Scheduler
@@ -21,13 +21,15 @@ if save:
 
     local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projets')
     folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
-    save_path = os.path.join(local, 'Base', 'Save', folder)
+    save_path = os.path.join(local, 'Split', 'Save', folder)
 ################################################################################################################################################
 
 param = {'n_encoder': 4,
          'n_decoder': 2,
-         'len_in': 20,
-         'len_out': 25,
+         'len_in_full': 200,
+         'len_in_window': 20,
+         'len_out': 35,
+         'len_out_temp': 8,
          'path_ini': None,
          # 'path_ini': os.path.join('Base', 'Save', '2024-09-23__16-53'),
          'retrain': None,
@@ -53,7 +55,8 @@ if torch.cuda.is_available():
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 [ValidationInput, ValidationOutput, ValidationMasks], [TrainingInput, TrainingOutput, TrainingMasks] = GetData(
-    param['len_in'], param['len_out'], param['NDataT'], param['NDataV'], save_path=os.path.join(local, 'Base', 'Data'))
+    param['len_in_full'], param['len_in_window'], param['len_out'], param['len_out_temp'],
+    param['NDataT'], param['NDataV'], save_path=os.path.join(local, 'Split', 'Data'))
 
 d_in = ValidationInput.size(-1)
 d_out = ValidationOutput.size(-1)
@@ -111,9 +114,9 @@ for j in tqdm(range(n_iter)):
             OutputBatch = OutputMiniBatch[k * batch_size:(k + 1) * batch_size].to(device)
             TargetMaskBatch = [TargetMaskMiniBatch[0][k * batch_size:(k + 1) * batch_size].to(device),
                                TargetMaskMiniBatch[1][k * batch_size:(k + 1) * batch_size].to(device)]
-            Prediction = N(InputBatch, OutputBatch, TargetMaskBatch)[:, :-1, :]
+            Prediction = N(InputBatch, OutputBatch, TargetMaskBatch)
 
-            err = torch.norm(Prediction-OutputBatch, p=2)/sqrt(batch_size*d_out*len_out)
+            err = torch.norm(Prediction[:, :-1, :]-OutputBatch[:, 1:, :], p=2)/sqrt(batch_size*d_out*len_out)
             err.backward()
             optimizer.step()
             if lr_scheduler is not None:

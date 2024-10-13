@@ -1,10 +1,8 @@
 from Base.DataMaker import GetData
 from Base.Network import TransformerTranslator
-from VisualExample import Plot_inplace
 from Complete.LRScheduler import Scheduler
 from GradObserver.GradObserverClass import DictGradObserver
 from Tools.ParamObs import DictParamObserver, RecInitParam
-from Tools.XMLTools import loadXmlAsObj
 from math import sqrt
 import torch
 from tqdm import tqdm
@@ -24,28 +22,30 @@ if save:
     save_path = os.path.join(local, 'Base', 'Save', folder)
 ################################################################################################################################################
 
-param = {'n_encoder': 4,
-         'n_decoder': 2,
+param = {'n_encoder': 10,
+         'n_decoder': 10,
          'len_in': 20,
          'len_out': 25,
          'path_ini': None,
-         # 'path_ini': os.path.join('Base', 'Save', '2024-09-23__16-53'),
+         # 'path_ini': os.path.join('Base', 'Save', '2024-09-23__16-53', 'ParamObs.pkl'),
          'retrain': None,
-         # 'retrain': os.path.join('Base', 'Save', '2024-09-23__16-53'),
+         # 'retrain': os.path.join('Base', 'Save', '2024-10-02__11-07', 'Network_weights'),
          'd_att': 128,
          'widths_embedding': [32],
          'n_heads': 4,
          'norm': 'post',
          'dropout': 0,
-         'lr': 1e-5,
-         'weight_decay': 1e-3,
-         'NDataT': 20000,
+         'lr': 3e-4,
+         'mult_grad': 10000,
+         'weight_decay': 3e-4,
+         'NDataT': 2000000,
          'NDataV': 5000,
          'batch_size': 1000,
-         'n_iter': 10,
+         'n_iter': 80,
          'max_lr': 5,
-         'FreqGradObs': 1/3,
-         'warmup': 1}
+         'FreqGradObs': 1/5,
+         'warmup': 2,
+         'dropping_step': 50}
 
 if torch.cuda.is_available():
     torch.cuda.set_device(0)
@@ -64,14 +64,14 @@ N = TransformerTranslator(d_in, d_out, d_att=param['d_att'], n_heads=param['n_he
 DictGrad = DictGradObserver(N)
 
 if param['path_ini'] is not None:
-    path_to_load = os.path.join(local, param['path_ini'], 'ParamObs.pkl')
+    path_to_load = os.path.join(local, param['path_ini'])
     with open(path_to_load, 'rb') as file:
         ParamObs = pickle.load(file)
     RecInitParam(N, ParamObs)
 
 if param['retrain'] is not None:
-    path_to_load = os.path.join(local, param['retrain'], 'Network_weights')
-    N.load_state_dict(torch.load(path_to_load, map_location=device))
+    path_to_load = os.path.join(local, param['retrain'])
+    N.load_state_dict(torch.load(path_to_load))
 
 N.to(device)
 
@@ -81,7 +81,7 @@ NDataT = param['NDataT']
 NDataV = param['NDataV']
 len_out = param['len_out']
 
-mini_batch_size = 10000
+mini_batch_size = 5000
 n_minibatch = int(NDataT/mini_batch_size)
 batch_size = param['batch_size']
 n_batch = int(mini_batch_size/batch_size)
@@ -92,7 +92,8 @@ ValidationError = []
 
 n_updates = int(NDataT / batch_size) * n_iter
 warmup_steps = int(NDataT / batch_size) * param['warmup']
-lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param['max_lr'])
+dropping_step = int(NDataT / batch_size) * param['dropping_step']
+lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param['max_lr'], dropping_step=dropping_step)
 
 
 for j in tqdm(range(n_iter)):
@@ -113,8 +114,8 @@ for j in tqdm(range(n_iter)):
                                TargetMaskMiniBatch[1][k * batch_size:(k + 1) * batch_size].to(device)]
             Prediction = N(InputBatch, OutputBatch, TargetMaskBatch)[:, :-1, :]
 
-            err = torch.norm(Prediction-OutputBatch, p=2) / sqrt(batch_size*d_out*len_out)
-            err.backward()
+            err = torch.norm(Prediction - OutputBatch, p=2) / sqrt(batch_size*d_out*len_out)
+            (param['mult_grad'] * err).backward()
             optimizer.step()
             if lr_scheduler is not None:
                 lr_scheduler.step()

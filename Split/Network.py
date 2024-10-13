@@ -25,7 +25,9 @@ class TransformerTranslator(nn.Module):
         self.dec_pos_encoding = PositionalEncoding(d_att=d_att, dropout=dropout, max_len=len_out + 1)
 
         self.end_token = LearnableParameters(torch.normal(0, 1, [1, 1, d_att]))
-        self.start_token = LearnableParameters(torch.normal(0, 1, [1, 1, d_att]))
+        self.start_token_enc = LearnableParameters(torch.normal(0, 1, [1, 1, d_att]))
+        self.start_token_dec = LearnableParameters(torch.normal(0, 1, [1, 1, d_att]))
+
 
 
         self.encoders = nn.ModuleList()
@@ -41,7 +43,7 @@ class TransformerTranslator(nn.Module):
         self.last_decoder = FeedForward(d_in=d_att, d_out=d_out, widths=[16], dropout=0)
 
 
-    def forward(self, source, target, target_mask=None):
+    def forward(self, source, target, source_mask=None, target_mask=None):
         # source.shape = (batch_size, len_in, d_in)
         # target.shape = (batch_size, len_out, d_out)
 
@@ -51,7 +53,15 @@ class TransformerTranslator(nn.Module):
         # source.shape = (batch_size, len_in, d_att)
         # target.shape = (batch_size, len_out, d_att)
 
-        trg = torch.concat((self.start_token().expand(trg.size(0), 1, -1), trg), dim=1)
+        if source_mask is not None:
+
+            src = src * (1 - source_mask) + self.start_token_enc() * source_mask
+
+        if target_mask is not None:
+            mask = target_mask[2]
+
+            trg = trg * (1 - mask) + self.start_token_dec() * mask
+
 
         trg = self.dec_pos_encoding(trg)
         src = self.enc_pos_encoding(src)
@@ -66,7 +76,7 @@ class TransformerTranslator(nn.Module):
         # trg.shape = (batch_size, len_out + 1, d_att)
 
         if target_mask is not None:
-            add_mask, mult_mask = target_mask
+            add_mask, mult_mask = target_mask[0:2]
 
             trg = trg - self.end_token() * add_mask
             trg = self.last_decoder(trg)

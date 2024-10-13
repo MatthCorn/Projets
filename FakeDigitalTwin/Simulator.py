@@ -40,7 +40,11 @@ class DigitalTwin():
         self.TrackingCounter = self.TrackingCounter/self.PlateauCounter
         self.NADCounter = self.NADCounter/self.PlateauCounter
 
-        return self.PDWs
+        if self.Param['PDW_tries']:
+            self.Tplist = [x[1] for x in self.PDWs]
+            self.PDWs = [x[0] for x in self.PDWs]
+
+
 
     def PlateauProcessing(self):
 
@@ -100,10 +104,14 @@ class DigitalTwin():
 
             # We're looking for the place of the new pulse in self.PDWs emitted at the time Tp
             # It is more likely to be added at the end of self.PDWs
-            for i in reversed(range(len(self.PDWs))):
-                if TpList[i] < Tp:
-                    self.PDWs.append([PDW, Tp])
-                    break
+            if self.PDWs == []:
+                self.PDWs.append([PDW, Tp])
+
+            else:
+                for i in reversed(range(len(self.PDWs))):
+                    if TpList[i] < Tp:
+                        self.PDWs.insert(i+1, [PDW, Tp])
+                        break
 
         else:
             self.PDWs.append(PDW)
@@ -138,7 +146,7 @@ if __name__ == '__main__':
         'Seuil_ecart_freq': 5e-3,
         'Duree_maintien_max': 0.2,
         'N_mesureurs_max': 8,
-        'PDW_tries': False,
+        'PDW_tries': True,
     }
 
     DT = DigitalTwin(Param)
