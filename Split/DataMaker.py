@@ -22,7 +22,8 @@ def MakeData(arg_simulateur, len_in_full, len_in_window, len_out, len_out_temp, 
     # le facteur 0.5 permet d'avoir un glissement sur les impulsions d'entrée entre 2 fenêtres
     t_win = 0.5 * len_in_window * 1.06 / 4
 
-    for _ in tqdm(range(n_data)):
+    while len(input_data) < n_data:
+
         # On se donne un scénario de TMax unités de temps
         # On a donc en moyenne "density" impulsions en même temps
         TOA = t_max * np.sort(np.random.random(size=len_in_full))
@@ -78,7 +79,7 @@ def MakeData(arg_simulateur, len_in_full, len_in_window, len_out, len_out_temp, 
         output_win = [[0.] * 5] * len_out_temp
         nb_temp = len_out_temp
 
-        while input or output:
+        while (input or output) and (len(input_data) < n_data):
 
             while input and (input[0][0] < t_win * i):
                 input_win.append(input.pop(0))
@@ -103,8 +104,10 @@ def MakeData(arg_simulateur, len_in_full, len_in_window, len_out, len_out_temp, 
 
             i += 1
 
+        print(str(100 * len(input_data) / n_data) + ' %', end='\r')
+
     len_element_output = torch.tensor(len_element_output).unsqueeze(-1)
-    arange = torch.arange(len_out + 1).unsqueeze(0).expand(len(output_data), -1)
+    arange = torch.arange(len_out).unsqueeze(0).expand(len(output_data), -1)
     add_mask_output_end = torch.tensor((len_element_output + 1) == arange, dtype=torch.float).unsqueeze(-1)
     mult_mask_output_end = torch.tensor((len_element_output + 1) >= arange, dtype=torch.float).unsqueeze(-1)
 
@@ -112,7 +115,7 @@ def MakeData(arg_simulateur, len_in_full, len_in_window, len_out, len_out_temp, 
     mult_mask_output_start = torch.tensor(len_start_output > arange, dtype=torch.float).unsqueeze(-1)
 
     len_element_input = torch.tensor(len_element_input).unsqueeze(-1)
-    arange = torch.arange(len_in_window + 1).unsqueeze(0).expand(len(input_data), -1)
+    arange = torch.arange(len_in_window).unsqueeze(0).expand(len(input_data), -1)
     mult_mask_input_start = torch.tensor((len_element_input + 1) <= arange.flip(-1), dtype=torch.float).unsqueeze(-1)
 
     return torch.tensor(input_data, dtype=torch.float), torch.tensor(output_data, dtype=torch.float), \
@@ -174,69 +177,80 @@ def GetData(len_in_full, len_in_window, len_out, len_out_temp, n_data_training, 
             if arg_file == arg:
                 InputTraining = torch.load(os.path.join(save_path, file, 'InputTraining'))
                 OutputTraining = torch.load(os.path.join(save_path, file, 'OutputTraining'))
-                AddMaskOutTraining = torch.load(os.path.join(save_path, file, 'AddMaskOutTraining'))
-                MultMaskOutTraining = torch.load(os.path.join(save_path, file, 'MultMaskOutTraining'))
-                MultMaskInTraining = torch.load(os.path.join(save_path, file, 'MultMaskInTraining'))
+                AddMaskOutEndTraining = torch.load(os.path.join(save_path, file, 'AddMaskOutEndTraining'))
+                MultMaskOutEndTraining = torch.load(os.path.join(save_path, file, 'MultMaskOutEndTraining'))
+                MultMaskOutStartTraining = torch.load(os.path.join(save_path, file, 'MultMaskOutStartTraining'))
+                MultMaskInStartTraining = torch.load(os.path.join(save_path, file, 'MultMaskInStartTraining'))
 
                 if len(InputTraining) < n_data_training:
                     Input, Output, Mask = MakeData(arg_simulateur, arg['len_in_full'], arg['len_in_window'],
                                                    arg['len_out'], arg['len_out_temp'], n_data_training - len(InputTraining))
                     InputTraining = torch.cat((InputTraining, Input), dim=0)
                     OutputTraining = torch.cat((OutputTraining, Output), dim=0)
-                    AddMaskOutTraining = torch.cat((AddMaskOutTraining, Mask[0]), dim=0)
-                    MultMaskOutTraining = torch.cat((MultMaskOutTraining, Mask[1]), dim=0)
-                    MultMaskInTraining = torch.cat((MultMaskInTraining, Mask[2]), dim=0)
+                    AddMaskOutEndTraining = torch.cat((AddMaskOutEndTraining, Mask[0]), dim=0)
+                    MultMaskOutEndTraining = torch.cat((MultMaskOutEndTraining, Mask[1]), dim=0)
+                    MultMaskOutStartTraining = torch.cat((MultMaskOutStartTraining, Mask[2]), dim=0)
+                    MultMaskInStartTraining = torch.cat((MultMaskInStartTraining, Mask[3]), dim=0)
                     torch.save(InputTraining, os.path.join(save_path, file, 'InputTraining'))
                     torch.save(OutputTraining, os.path.join(save_path, file, 'OutputTraining'))
-                    torch.save(AddMaskOutTraining, os.path.join(save_path, file, 'AddMaskOutTraining'))
-                    torch.save(MultMaskOutTraining, os.path.join(save_path, file, 'MultMaskOutTraining'))
-                    torch.save(MultMaskInTraining, os.path.join(save_path, file, 'MultMaskInTraining'))
+                    torch.save(AddMaskOutEndTraining, os.path.join(save_path, file, 'AddMaskOutEndTraining'))
+                    torch.save(MultMaskOutEndTraining, os.path.join(save_path, file, 'MultMaskOutEndTraining'))
+                    torch.save(MultMaskOutStartTraining, os.path.join(save_path, file, 'MultMaskOutStartTraining'))
+                    torch.save(MultMaskInStartTraining, os.path.join(save_path, file, 'MultMaskInStartTraining'))
 
                 InputValidation = torch.load(os.path.join(save_path, file, 'InputValidation'))
                 OutputValidation = torch.load(os.path.join(save_path, file, 'OutputValidation'))
-                AddMaskOutValidation = torch.load(os.path.join(save_path, file, 'AddMaskOutValidation'))
-                MultMaskOutValidation = torch.load(os.path.join(save_path, file, 'MultMaskOutValidation'))
-                MultMaskInValidation = torch.load(os.path.join(save_path, file, 'MultMaskInValidation'))
+                AddMaskOutEndValidation = torch.load(os.path.join(save_path, file, 'AddMaskOutEndValidation'))
+                MultMaskOutEndValidation = torch.load(os.path.join(save_path, file, 'MultMaskOutEndValidation'))
+                MultMaskOutStartValidation = torch.load(os.path.join(save_path, file, 'MultMaskOutStartValidation'))
+                MultMaskInStartValidation = torch.load(os.path.join(save_path, file, 'MultMaskInStartValidation'))
 
                 if len(InputValidation) < n_data_validation:
                     Input, Output, Mask = MakeData(arg_simulateur, arg['len_in_full'], arg['len_in_window'],
                                                    arg['len_out'], arg['len_out_temp'], n_data_validation - len(InputValidation))
                     InputValidation = torch.cat((InputValidation, Input), dim=0)
                     OutputValidation = torch.cat((OutputValidation, Output), dim=0)
-                    AddMaskOutValidation = torch.cat((AddMaskOutValidation, Mask[0]), dim=0)
-                    MultMaskOutValidation = torch.cat((MultMaskOutValidation, Mask[1]), dim=0)
-                    MultMaskInValidation = torch.cat((MultMaskInValidation, Mask[2]), dim=0)
+                    AddMaskOutEndValidation = torch.cat((AddMaskOutEndValidation, Mask[0]), dim=0)
+                    MultMaskOutEndValidation = torch.cat((MultMaskOutEndValidation, Mask[1]), dim=0)
+                    MultMaskOutStartValidation = torch.cat((MultMaskOutStartValidation, Mask[2]), dim=0)
+                    MultMaskInStartValidation = torch.cat((MultMaskInStartValidation, Mask[3]), dim=0)
                     torch.save(InputValidation, os.path.join(save_path, file, 'InputValidation'))
                     torch.save(OutputValidation, os.path.join(save_path, file, 'OutputValidation'))
-                    torch.save(AddMaskOutValidation, os.path.join(save_path, file, 'AddMaskOutValidation'))
-                    torch.save(MultMaskOutValidation, os.path.join(save_path, file, 'MultMaskOutValidation'))
-                    torch.save(MultMaskInValidation, os.path.join(save_path, file, 'MultMaskInValidation'))
+                    torch.save(AddMaskOutEndValidation, os.path.join(save_path, file, 'AddMaskOutEndValidation'))
+                    torch.save(MultMaskOutEndValidation, os.path.join(save_path, file, 'MultMaskOutEndValidation'))
+                    torch.save(MultMaskOutStartValidation, os.path.join(save_path, file, 'MultMaskOutStartValidation'))
+                    torch.save(MultMaskInStartValidation, os.path.join(save_path, file, 'MultMaskInStartValidation'))
 
 
                 return [[InputValidation[:n_data_validation], OutputValidation[:n_data_validation],
-                         [AddMaskOutValidation[:n_data_validation], MultMaskOutValidation[:n_data_validation], MultMaskInValidation[:n_data_validation]]],
+                         [AddMaskOutEndValidation[:n_data_validation], MultMaskOutEndValidation[:n_data_validation],
+                          MultMaskOutStartValidation[:n_data_validation], MultMaskInStartValidation[:n_data_validation]]],
                         [InputTraining[:n_data_training], OutputTraining[:n_data_training],
-                         [AddMaskOutTraining[:n_data_training], MultMaskOutTraining[:n_data_training], MultMaskInTraining[:n_data_training]]]]
+                         [AddMaskOutEndTraining[:n_data_training], MultMaskOutEndTraining[:n_data_training],
+                          MultMaskOutStartTraining[:n_data_training], MultMaskInStartTraining[:n_data_training]]]]
 
         file = 'config' + str(len(os.listdir(save_path)))
         os.mkdir(os.path.join(save_path, file))
         saveObjAsXml(arg, os.path.join(save_path, file, 'arg.xml'))
         InputValidation, OutputValidation, MaskValidation = MakeData(arg_simulateur, arg['len_in_full'], arg['len_in_window'],
                                                                      arg['len_out'], arg['len_out_temp'], n_data_validation)
-        AddMaskOutValidation, MultMaskOutValidation, MultMaskInValidation = MaskValidation
+        AddMaskOutEndValidation, MultMaskOutEndValidation, MultMaskOutStartValidation, MultMaskInStartValidation = MaskValidation
         torch.save(InputValidation, os.path.join(save_path, file, 'InputValidation'))
         torch.save(OutputValidation, os.path.join(save_path, file, 'OutputValidation'))
-        torch.save(AddMaskOutValidation, os.path.join(save_path, file, 'AddMaskOutValidation'))
-        torch.save(MultMaskOutValidation, os.path.join(save_path, file, 'MultMaskOutValidation'))
-        torch.save(MultMaskInValidation, os.path.join(save_path, file, 'MultMaskInValidation'))
+        torch.save(AddMaskOutEndValidation, os.path.join(save_path, file, 'AddMaskOutEndValidation'))
+        torch.save(MultMaskOutEndValidation, os.path.join(save_path, file, 'MultMaskOutEndValidation'))
+        torch.save(MultMaskOutStartValidation, os.path.join(save_path, file, 'MultMaskOutStartValidation'))
+        torch.save(MultMaskInStartValidation, os.path.join(save_path, file, 'MultMaskInStartValidation'))
         InputTraining, OutputTraining, MaskTraining = MakeData(arg_simulateur, arg['len_in_full'], arg['len_in_window'],
                                                                arg['len_out'], arg['len_out_temp'], n_data_training)
-        AddMaskOutTraining, MultMaskOutTraining, MultMaskInTraining = MaskTraining
+        AddMaskOutEndTraining, MultMaskOutEndTraining, MultMaskOutStartTraining, MultMaskInStartTraining = MaskTraining
         torch.save(InputTraining, os.path.join(save_path, file, 'InputTraining'))
         torch.save(OutputTraining, os.path.join(save_path, file, 'OutputTraining'))
-        torch.save(AddMaskOutTraining, os.path.join(save_path, file, 'AddMaskOutTraining'))
-        torch.save(MultMaskOutTraining, os.path.join(save_path, file, 'MultMaskOutTraining'))
-        torch.save(MultMaskInTraining, os.path.join(save_path, file, 'MultMaskInTraining'))
+        torch.save(AddMaskOutEndTraining, os.path.join(save_path, file, 'AddMaskOutEndTraining'))
+        torch.save(MultMaskOutEndTraining, os.path.join(save_path, file, 'MultMaskOutEndTraining'))
+        torch.save(MultMaskOutStartTraining, os.path.join(save_path, file, 'MultMaskOutStartTraining'))
+        torch.save(MultMaskInStartTraining, os.path.join(save_path, file, 'MultMaskInStartTraining'))
+
 
 
         return [[InputValidation, OutputValidation, MaskValidation],
@@ -264,4 +278,4 @@ if __name__ == '__main__':
         'PDW_tries': True,
     }
 
-    MakeData(arg_simulateur, 50, 10, 15, 5, 50, seed=0)
+    MakeData(arg_simulateur, 50, 10, 15, 5, 5000, seed=0)

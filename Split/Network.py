@@ -65,7 +65,7 @@ class TransformerTranslator(nn.Module):
 
         trg = self.dec_pos_encoding(trg)
         src = self.enc_pos_encoding(src)
-        # trg.shape = (batch_size, len_out + 1, d_att)
+        # trg.shape = (batch_size, len_out, d_att)
         # src.shape = (batch_size, len_in, d_att)
 
         for encoder in self.encoders:
@@ -73,14 +73,14 @@ class TransformerTranslator(nn.Module):
 
         for decoder in self.decoders:
             trg = decoder(target=trg, source=src, mask=self.mask_decoder)
-        # trg.shape = (batch_size, len_out + 1, d_att)
+        # trg.shape = (batch_size, len_out, d_att)
 
         if target_mask is not None:
             add_mask, mult_mask = target_mask[0:2]
 
             trg = trg - self.end_token() * add_mask
             trg = self.last_decoder(trg)
-            # trg.shape = (batch_size, len_out + 1, d_out)
+            # trg.shape = (batch_size, len_out, d_out)
 
             trg = trg * mult_mask
 

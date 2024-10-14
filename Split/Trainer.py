@@ -1,5 +1,5 @@
 from Split.DataMaker import GetData
-from Base.Network import TransformerTranslator
+from Split.Network import TransformerTranslator
 from VisualExample import Plot_inplace
 from Complete.LRScheduler import Scheduler
 from GradObserver.GradObserverClass import DictGradObserver
@@ -31,15 +31,16 @@ param = {'n_encoder': 4,
          'len_out': 35,
          'len_out_temp': 8,
          'path_ini': None,
-         # 'path_ini': os.path.join('Base', 'Save', '2024-09-23__16-53'),
+         # 'path_ini': os.path.join('Split', 'Save', '2024-09-23__16-53'),
          'retrain': None,
-         # 'retrain': os.path.join('Base', 'Save', '2024-09-23__16-53'),
-         'd_att': 128,
-         'widths_embedding': [32],
+         # 'retrain': os.path.join('Split', 'Save', '2024-09-23__16-53'),
+         'd_att': 64,
+         'widths_embedding': [16],
          'n_heads': 4,
          'norm': 'post',
          'dropout': 0,
-         'lr': 1e-5,
+         'lr': 3e-4,
+         'mult_grad': 10000,
          'weight_decay': 1e-3,
          'NDataT': 20000,
          'NDataV': 5000,
@@ -47,7 +48,10 @@ param = {'n_encoder': 4,
          'n_iter': 10,
          'max_lr': 5,
          'FreqGradObs': 1/3,
-         'warmup': 1}
+         'warmup': 1,
+         'dropping_step_list': [-1]}
+
+freq_checkpoint = 1/20
 
 if torch.cuda.is_available():
     torch.cuda.set_device(0)
@@ -62,7 +66,7 @@ d_in = ValidationInput.size(-1)
 d_out = ValidationOutput.size(-1)
 
 N = TransformerTranslator(d_in, d_out, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
-                          n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], len_in=param['len_in'],
+                          n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], len_in=param['len_in_window'],
                           len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'])
 DictGrad = DictGradObserver(N)
 
@@ -95,29 +99,33 @@ ValidationError = []
 
 n_updates = int(NDataT / batch_size) * n_iter
 warmup_steps = int(NDataT / batch_size) * param['warmup']
-lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param['max_lr'])
+dropping_step_list = list(int(NDataT / batch_size) * torch.tensor(param['dropping_step_list']))
+lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param['max_lr'], dropping_step_list=dropping_step_list)
 
+best_stat = N.state_dict().copy()
 
 for j in tqdm(range(n_iter)):
     error = 0
     time_to_observ = (int(j * param['FreqGradObs']) == (j * param['FreqGradObs']))
+    time_for_checkpoint = (int(j * freq_checkpoint) == (j * freq_checkpoint))
     for p in range(n_minibatch):
         InputMiniBatch = TrainingInput[p*mini_batch_size:(p+1)*mini_batch_size].to(device)
         OutputMiniBatch = TrainingOutput[p*mini_batch_size:(p+1)*mini_batch_size].to(device)
-        TargetMaskMiniBatch = [TrainingMasks[0][p * mini_batch_size:(p + 1) * mini_batch_size].to(device),
-                               TrainingMasks[1][p * mini_batch_size:(p + 1) * mini_batch_size].to(device)]
+        MaskMiniBatch = [Mask[p * mini_batch_size:(p + 1) * mini_batch_size].to(device) for Mask in TrainingMasks]
 
         for k in range(n_batch):
             optimizer.zero_grad(set_to_none=True)
 
             InputBatch = InputMiniBatch[k*batch_size:(k+1)*batch_size].to(device)
             OutputBatch = OutputMiniBatch[k * batch_size:(k + 1) * batch_size].to(device)
-            TargetMaskBatch = [TargetMaskMiniBatch[0][k * batch_size:(k + 1) * batch_size].to(device),
-                               TargetMaskMiniBatch[1][k * batch_size:(k + 1) * batch_size].to(device)]
-            Prediction = N(InputBatch, OutputBatch, TargetMaskBatch)
+            TargetMaskBatch = [MaskMiniBatch[0][k * batch_size:(k + 1) * batch_size].to(device),
+                               MaskMiniBatch[1][k * batch_size:(k + 1) * batch_size].to(device),
+                               MaskMiniBatch[2][k * batch_size:(k + 1) * batch_size].to(device)]
+            SourceMaskBatch = MaskMiniBatch[3][k * batch_size:(k + 1) * batch_size].to(device)
+            Prediction = N(InputBatch, OutputBatch, SourceMaskBatch, TargetMaskBatch)
 
-            err = torch.norm(Prediction[:, :-1, :]-OutputBatch[:, 1:, :], p=2)/sqrt(batch_size*d_out*len_out)
-            err.backward()
+            err = torch.norm(Prediction[:, :-1, :]-OutputBatch[:, 1:, :], p=2) / sqrt(batch_size*d_out*(len_out-1))
+            (param['mult_grad'] * err).backward()
             optimizer.step()
             if lr_scheduler is not None:
                 lr_scheduler.step()
@@ -133,23 +141,40 @@ for j in tqdm(range(n_iter)):
     with torch.no_grad():
         Input = ValidationInput.to(device)
         Output = ValidationOutput.to(device)
-        TargetMask = [ValidationMasks[0].to(device), ValidationMasks[1].to(device)]
-        Prediction = N(Input, Output, TargetMask)[:, :-1, :]
+        TargetMasks = [Mask.to(device) for Mask in ValidationMasks[:-1]]
+        SourceMask = ValidationMasks[3].to(device)
+        Prediction = N(Input, Output, SourceMask, TargetMasks)
 
-        err = torch.norm(Prediction - Output, p=2)
-        ValidationError.append(float(err) / sqrt(NDataV*d_out*len_out))
+        err = torch.norm(Prediction[:, :-1, :] - Output[:, 1:, :], p=2)
+        ValidationError.append(float(err) / sqrt(NDataV*d_out*(len_out-1)))
 
     TrainingError.append(error)
+
+    if error == min(TrainingError):
+        best_state_dict = N.state_dict().copy()
+
+    if time_for_checkpoint:
+        try:
+            os.mkdir(save_path)
+        except:
+            pass
+        error = {'Training': TrainingError,
+                 'Validation': ValidationError}
+        saveObjAsXml(param, os.path.join(save_path, 'param'))
+        saveObjAsXml(error, os.path.join(save_path, 'error'))
+        torch.save(best_state_dict, os.path.join(save_path, 'Best_network'))
+        with open(os.path.join(save_path, 'DictGrad.pkl'), 'wb') as file:
+            pickle.dump(DictGrad, file)
+        with open(os.path.join(save_path, 'ParamObs.pkl'), 'wb') as file:
+            ParamObs = DictParamObserver(N)
+            pickle.dump(ParamObs, file)
 
 ################################################################################################################################################
 if save:
     try:
         os.mkdir(save_path)
     except:
-        for file in os.listdir(save_path):
-            os.remove(os.path.join(save_path, file))
-        os.rmdir(save_path)
-        os.mkdir(save_path)
+        pass
 
     DictGrad.del_module()
     error = {'Training': TrainingError,
@@ -157,6 +182,7 @@ if save:
     saveObjAsXml(param, os.path.join(save_path, 'param'))
     saveObjAsXml(error, os.path.join(save_path, 'error'))
     torch.save(N.state_dict(), os.path.join(save_path, 'Network_weights'))
+    torch.save(best_state_dict, os.path.join(save_path, 'Best_network'))
     with open(os.path.join(save_path, 'DictGrad.pkl'), 'wb') as file:
         pickle.dump(DictGrad, file)
     with open(os.path.join(save_path, 'ParamObs.pkl'), 'wb') as file:

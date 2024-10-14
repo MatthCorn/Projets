@@ -22,15 +22,15 @@ if save:
     save_path = os.path.join(local, 'Base', 'Save', folder)
 ################################################################################################################################################
 
-param = {'n_encoder': 10,
-         'n_decoder': 10,
+param = {'n_encoder': 2,
+         'n_decoder': 2,
          'len_in': 20,
          'len_out': 25,
          'path_ini': None,
          # 'path_ini': os.path.join('Base', 'Save', '2024-09-23__16-53', 'ParamObs.pkl'),
          'retrain': None,
          # 'retrain': os.path.join('Base', 'Save', '2024-10-02__11-07', 'Network_weights'),
-         'd_att': 128,
+         'd_att': 32,
          'widths_embedding': [32],
          'n_heads': 4,
          'norm': 'post',
@@ -38,14 +38,16 @@ param = {'n_encoder': 10,
          'lr': 3e-4,
          'mult_grad': 10000,
          'weight_decay': 3e-4,
-         'NDataT': 2000000,
+         'NDataT': 20000,
          'NDataV': 5000,
          'batch_size': 1000,
-         'n_iter': 80,
+         'n_iter': 30,
          'max_lr': 5,
          'FreqGradObs': 1/5,
          'warmup': 2,
-         'dropping_step': 50}
+         'dropping_step_list': [-1]}
+
+freq_checkpoint = 1/10
 
 if torch.cuda.is_available():
     torch.cuda.set_device(0)
@@ -92,13 +94,15 @@ ValidationError = []
 
 n_updates = int(NDataT / batch_size) * n_iter
 warmup_steps = int(NDataT / batch_size) * param['warmup']
-dropping_step = int(NDataT / batch_size) * param['dropping_step']
-lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param['max_lr'], dropping_step=dropping_step)
+dropping_step_list = list(int(NDataT / batch_size) * torch.tensor(param['dropping_step_list']))
+lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param['max_lr'], dropping_step_list=dropping_step_list)
 
+best_stat = N.state_dict().copy()
 
 for j in tqdm(range(n_iter)):
     error = 0
     time_to_observ = (int(j * param['FreqGradObs']) == (j * param['FreqGradObs']))
+    time_for_checkpoint = (int(j * freq_checkpoint) == (j * freq_checkpoint))
     for p in range(n_minibatch):
         InputMiniBatch = TrainingInput[p*mini_batch_size:(p+1)*mini_batch_size].to(device)
         OutputMiniBatch = TrainingOutput[p*mini_batch_size:(p+1)*mini_batch_size].to(device)
@@ -139,15 +143,31 @@ for j in tqdm(range(n_iter)):
 
     TrainingError.append(error)
 
+    if error == min(TrainingError):
+        best_state_dict = N.state_dict().copy()
+
+    if time_for_checkpoint:
+        try:
+            os.mkdir(save_path)
+        except:
+            pass
+        error = {'Training': TrainingError,
+                 'Validation': ValidationError}
+        saveObjAsXml(param, os.path.join(save_path, 'param'))
+        saveObjAsXml(error, os.path.join(save_path, 'error'))
+        torch.save(best_state_dict, os.path.join(save_path, 'Best_network'))
+        with open(os.path.join(save_path, 'DictGrad.pkl'), 'wb') as file:
+            pickle.dump(DictGrad, file)
+        with open(os.path.join(save_path, 'ParamObs.pkl'), 'wb') as file:
+            ParamObs = DictParamObserver(N)
+            pickle.dump(ParamObs, file)
+
 ################################################################################################################################################
 if save:
     try:
         os.mkdir(save_path)
     except:
-        for file in os.listdir(save_path):
-            os.remove(os.path.join(save_path, file))
-        os.rmdir(save_path)
-        os.mkdir(save_path)
+        pass
 
     DictGrad.del_module()
     error = {'Training': TrainingError,
@@ -155,6 +175,7 @@ if save:
     saveObjAsXml(param, os.path.join(save_path, 'param'))
     saveObjAsXml(error, os.path.join(save_path, 'error'))
     torch.save(N.state_dict(), os.path.join(save_path, 'Network_weights'))
+    torch.save(best_state_dict, os.path.join(save_path, 'Best_network'))
     with open(os.path.join(save_path, 'DictGrad.pkl'), 'wb') as file:
         pickle.dump(DictGrad, file)
     with open(os.path.join(save_path, 'ParamObs.pkl'), 'wb') as file:
