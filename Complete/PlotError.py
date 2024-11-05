@@ -1,6 +1,7 @@
 from Tools.XMLTools import loadXmlAsObj
 import matplotlib.pyplot as plt
 import numpy as np
+import torch
 import os
 
 
@@ -59,6 +60,29 @@ def Plot(path, std=False, smoothing_factor=1):
 
     plt.show()
 
+def Plot_2(path, std=False, smoothing_factor=1):
+    data = loadXmlAsObj(path)
+
+    TrainingErrList, ValidationErrList = data['Training'], data['Validation']
+
+    fig, ax = plt.subplots(1, 1)
+
+    Std = [1.]*len(TrainingErrList)
+    if std:
+        # On calcule l'écart type et on trace sur chaque subplot
+        TransPath = os.path.join(path.split('Save')[0], 'Data', 'config0', 'OutputValidation')
+        Translation = torch.load(TransPath)
+        Std = torch.std(Translation) * np.array(Std)
+
+    ax.plot(smooth(TrainingErrList, smoothing_factor), 'r', label="Training")
+    ax.plot(smooth(ValidationErrList, smoothing_factor), 'b', label="Validation")
+    ax.plot(Std, 'black')
+    ax.set_title('Error through epochs')
+    ax.legend(loc='upper right')
+    ax.set_ylim(bottom=0)
+
+    plt.show()
+
 def smooth(Li, k):
     resu = []
     for i in range(k):
@@ -70,6 +94,6 @@ def smooth(Li, k):
 if __name__ == '__main__':
     local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projets')
 
-    folder = os.path.join('Complete', 'TypeTrackerInspired', 'Save', '2024-01-12__14-45', 'D_5', 'error')
-    Plot(os.path.join(local, folder), std=False, smoothing_factor=1)
+    folder = os.path.join('Base', 'Save', '2024-10-10__13-29', 'error')
+    Plot_2(os.path.join(local, folder), std=True, smoothing_factor=1)
 

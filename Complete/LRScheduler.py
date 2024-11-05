@@ -1,5 +1,6 @@
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import LambdaLR
+import math
 
 
 class Scheduler(LambdaLR):
@@ -7,13 +8,19 @@ class Scheduler(LambdaLR):
                  optimizer: Optimizer,
                  dim_embed: int,
                  warmup_steps: int,
+                 max_steps: int = 1000,
+                 ramp_steps: int = 100,
                  dropping_step_list: int = [-1],
                  dropping_factor: float = 10,
                  max: float = 1.,
+                 type=None,
                  last_epoch: int = -1,
                  verbose: bool = False) -> None:
         self.dim_embed = dim_embed
         self.warmup_steps = warmup_steps
+        self.max_steps = max_steps
+        self.ramp_steps = ramp_steps
+        self.type = type
         self.dropping_step_list = dropping_step_list
         self.dropping_factor = dropping_factor
         self.max = max
@@ -24,8 +31,22 @@ class Scheduler(LambdaLR):
         super().__init__(optimizer, self.calc_lr, last_epoch, verbose)
 
     def calc_lr(self, step):
-        if step == 0:
-            return 1e-5
+        step += 1
+
+        if self.type == 'cos':
+            self.last_lr = self.max * min(step / self.warmup_steps,
+                                  math.cos(math.pi / 2 * ((step - self.warmup_steps) / (self.max_steps - self.warmup_steps))) ** 2)
+            return self.last_lr
+
+        if self.type == 'ramp':
+            if step - 1 < self.warmup_steps:
+                self.last_lr = self.max * step / self.warmup_steps
+            elif step - 1 > self.max_steps - self.ramp_steps:
+                self.last_lr = self.max * (1 - (step - (self.max_steps - self.ramp_steps)) / self.ramp_steps)
+            else:
+                self.last_lr = self.max
+            return self.last_lr
+
         self.target_lr = self.max * min(step / self.warmup_steps, (step / self.warmup_steps) ** (-0.5))
         if step in self.dropping_step_list:
             self.mult_fact /= self.dropping_factor
@@ -61,9 +82,9 @@ if __name__ == '__main__':
     # model = torch.nn.Sequential(torch.nn.Linear(1, 4, bias=False), torch.nn.Linear(4, 3, bias=False))
     model = modeltest()
     opt = torch.optim.Adam(model.parameters())
-    sch = Scheduler(opt, 1, 10, max=5, dropping_step_list=[100, 150])
+    sch = Scheduler(opt, 1, warmup_steps=10, max=5, max_steps=100, ramp_steps=15, dropping_step_list=[100, 150], type='ramp')
     lr_list = []
-    for i in range(500):
+    for i in range(100):
         opt.zero_grad()
         o = model(torch.normal(torch.zeros(30, 1)))
         o.norm().backward()
