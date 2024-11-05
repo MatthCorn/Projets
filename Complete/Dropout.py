@@ -27,7 +27,7 @@ if __name__ == '__main__':
     vec = torch.normal(0, 1, (5, 5), device=device)
 
     optim = torch.optim.Adam(Model.parameters(), lr=3e-5)
-    sch = Scheduler(optim, 1, warmup_steps=10, max=1, max_steps=50000, dropping_step_list=[100, 150], type='cos')
+    sch = Scheduler(optim, 1, warmup_steps=10, max=1, max_steps=50000, ramp_steps=5000, dropping_step_list=[100, 150], type='cos')
     batch_size = 5000
     dim = 5
     err_list = []
@@ -44,15 +44,17 @@ if __name__ == '__main__':
         pred_mean = torch.mean(prediction, dim=-1)
         pred_red = (prediction - pred_mean.unsqueeze(-1)).detach().requires_grad_(False)
         pred_cov = (pred_red @ pred_red.transpose(1, 2)) / (N - 1)
+        pred_cov += 0.1 * torch.mean(abs(pred_cov)) * torch.eye(dim, dim, device=device).unsqueeze(0).expand(batch_size, -1, -1)
+        pred_cov_det_log = torch.log(torch.linalg.det(pred_cov)).unsqueeze(-1).unsqueeze(-1)
         pred_inv_cov = torch.linalg.inv(pred_cov + 0.01 * torch.mean(abs(pred_cov)) * torch.eye(dim, dim, device=device).unsqueeze(0).expand(batch_size, -1, -1))
 
-        err = torch.mean((output - pred_mean).unsqueeze(-1).transpose(1, 2) @ pred_inv_cov @ (output - pred_mean).unsqueeze(-1))
+        err = torch.mean((output - pred_mean).unsqueeze(-1).transpose(1, 2) @ pred_inv_cov @ (output - pred_mean).unsqueeze(-1) + pred_cov_det_log ** -0.5)
 
         pred = Model(input)
-        err2 = torch.norm(pred-output)
+        err2 = torch.nn.functional.mse_loss(pred, output, reduction='mean')
 
         optim.zero_grad(set_to_none=True)
-        (0.01 * err).backward()
+        (1e-2 * err).backward()
         optim.step()
         sch.step()
 
