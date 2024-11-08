@@ -42,13 +42,16 @@ if __name__ == '__main__':
         prediction = prediction.reshape(N, batch_size, -1).permute(1, 2, 0)
 
         pred_mean = torch.mean(prediction, dim=-1)
-        pred_red = (prediction - pred_mean.unsqueeze(-1)).detach().requires_grad_(False)
+        pred_var = torch.var(prediction, dim=-1)
+        pred_red = (prediction - pred_mean.unsqueeze(-1))#.detach().requires_grad_(False)
         pred_cov = (pred_red @ pred_red.transpose(1, 2)) / (N - 1)
-        pred_cov += 0.1 * torch.mean(abs(pred_cov)) * torch.eye(dim, dim, device=device).unsqueeze(0).expand(batch_size, -1, -1)
-        pred_cov_det_log = torch.log(torch.linalg.det(pred_cov)).unsqueeze(-1).unsqueeze(-1)
-        pred_inv_cov = torch.linalg.inv(pred_cov + 0.01 * torch.mean(abs(pred_cov)) * torch.eye(dim, dim, device=device).unsqueeze(0).expand(batch_size, -1, -1))
+        pred_cov_mod = pred_cov + 0.01 * torch.mean(abs(pred_cov)) * torch.eye(dim, dim, device=device)
+        pred_cov_det_log = torch.log(torch.linalg.det(pred_cov_mod))
+        pred_inv_cov = torch.linalg.inv(pred_cov_mod)
 
-        err = torch.mean((output - pred_mean).unsqueeze(-1).transpose(1, 2) @ pred_inv_cov @ (output - pred_mean).unsqueeze(-1) + pred_cov_det_log ** -0.5)
+        err = torch.mean(0.5 * (output - pred_mean).unsqueeze(-1).transpose(1, 2) @ pred_inv_cov @ (output - pred_mean).unsqueeze(-1) + 0.5 * pred_cov_det_log)
+        err = torch.mean(0.5 * (output - pred_mean).unsqueeze(-1).transpose(1, 2) @ (output - pred_mean).unsqueeze(-1) / torch.mean(pred_var, dim=-1)
+                         + 0.5 * torch.prod(pred_var, dim=-1))
 
         pred = Model(input)
         err2 = torch.nn.functional.mse_loss(pred, output, reduction='mean')
