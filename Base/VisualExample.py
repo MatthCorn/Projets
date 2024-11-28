@@ -44,8 +44,12 @@ def value_to_rgb(value, min_val=0, max_val=5.5, colormap='plasma'):
 
     return rgb
 
-def Plot_inplace(Simulateur, device, Param=Param, seed=None, rec=None):
+def Plot_inplace(Simulateur, device, Param=Param, seed=None, rec=None, dense=True):
     if seed is not None:
+        np.random.seed(seed)
+    else :
+        seed = np.random.randint(0, 10000000)
+        print(seed)
         np.random.seed(seed)
 
     len_in = Simulateur.len_in
@@ -58,8 +62,12 @@ def Plot_inplace(Simulateur, device, Param=Param, seed=None, rec=None):
     LI = np.concatenate([LILongue, LIcourte])
     np.random.shuffle(LI)
     Level = np.random.gamma(shape=2, scale=1.725, size=len_in)
+
     dF = 0.01 * (2 * np.random.random(size=len_in) - 1)
-    FreqMoy = 0.3 * np.random.random(size=len_in) + 9.5
+    if dense:
+        FreqMoy = 0.3 * np.random.random(size=len_in) + 9.5
+    else:
+        FreqMoy = 5 * np.random.random(size=len_in) + 10
     FreqStart = FreqMoy + dF
     FreqEnd = FreqMoy - dF
 
@@ -282,7 +290,7 @@ def Plot_inplace(Simulateur, device, Param=Param, seed=None, rec=None):
         ax4.view_init(elev=90, azim=-90)
     plt.show()
 
-def Plot_afterwards(path_simulateur, path_data, seed=None, rec=False):
+def Plot_afterwards(path_simulateur, path_data, seed=None, rec=False, dense=True):
     param = loadXmlAsObj(os.path.join(path_simulateur, 'param'))
     from Base.Network import TransformerTranslator
 
@@ -296,14 +304,15 @@ def Plot_afterwards(path_simulateur, path_data, seed=None, rec=False):
 
     device = torch.device('cpu')
 
-    Plot_inplace(N, device, Param=Param, seed=seed, rec=rec)
+    Plot_inplace(N, device, Param=Param, seed=seed, rec=rec, dense=dense)
 
 if __name__ == '__main__':
     good_seeds = [1278, 785, ]
     good_network = ['2024-09-19__19-28', '2024-09-21__16-28', '2024-09-23__16-53', '2024-09-24__13-55', '2024-09-25__09-37', '2024-09-26__12-48']
     Plot_afterwards(
-        os.path.join(local, 'Base', 'Save', good_network[-2]),
+        os.path.join(local, 'Base', 'Save', good_network[1]),
         os.path.join(local, 'Base', 'Data', 'config0'),
-        seed=1278,
-        rec=None
+        seed=785,
+        rec=True,
+        dense=True
     )
