@@ -7,62 +7,82 @@ from PointTransformer.PositionalEncoding import PositionalEncoding
 from Complete.Transformer.LearnableModule import LearnableParameters
 
 
-class TransformerTranslator(nn.Module):
+class PointTransformer(nn.Module):
 
-    def __init__(self, d_in, d_out, d_att=32, n_heads=4, n_encoders=3, n_decoders=3, widths_embedding=[32],
+    def __init__(self, d_in, d_out, d_att=32, d_group=1, n_encoders=3, n_decoders=3, widths_embedding=[32],
                  len_in=10, len_out=20, norm='post', dropout=0):
         super().__init__()
         self.d_in = d_in
         self.d_out = d_out
         self.d_att = d_att
+        self.d_group = d_group
+        n_group, remainder = divmod(d_att, d_group)
+        if remainder:
+            raise ValueError("incompatible `d_att` and `d_group`")
+        self.n_group = n_group
         self.len_in = len_in
         self.len_out = len_out
 
         self.enc_embedding = FeedForward(d_in=d_in, d_out=d_att, widths=widths_embedding, dropout=dropout)
         self.dec_embedding = FeedForward(d_in=d_out, d_out=d_att, widths=widths_embedding, dropout=dropout)
 
-        self.enc_pos_encoding = PositionalEncoding(d_att=d_att, dropout=dropout, max_len=len_in)
-        self.dec_pos_encoding = PositionalEncoding(d_att=d_att, dropout=dropout, max_len=len_out + 1)
-
         self.end_token = LearnableParameters(torch.normal(0, 1, [1, 1, d_att]))
-        self.start_token = LearnableParameters(torch.normal(0, 1, [1, 1, d_att]))
+        self.start_token = LearnableParameters(torch.normal(0, 1, [1, 1, d_in]))
 
+        self.positional_encoding = PositionalEncoding(d_pos=3, n_group=n_group)
 
         self.encoders = nn.ModuleList()
         for i in range(n_encoders):
-            self.encoders.append(EncoderLayer(d_att=d_att, n_heads=n_heads, norm=norm, dropout_FF=dropout, dropout_SA=dropout))
-
+            self.encoders.append(EncoderLayer(d_att=d_att, d_group=d_group, norm=norm, dropout_FF=dropout, dropout_SA=dropout))
         self.decoders = nn.ModuleList()
         for i in range(n_decoders):
-            self.decoders.append(DecoderLayer(d_att=d_att, n_heads=n_heads, norm=norm, dropout_A=dropout, dropout_FF=dropout))
+            self.decoders.append(DecoderLayer(d_att=d_att, d_group=d_group, norm=norm, dropout_A=dropout, dropout_FF=dropout))
 
-        self.register_buffer("mask_decoder", torch.tril(torch.ones(len_out + 1, len_out + 1)).unsqueeze(0).unsqueeze(0), persistent=False)
+        self.register_buffer("mask_decoder", torch.tril(torch.ones(len_out + 1, len_out + 1)).unsqueeze(0).unsqueeze(0).unsqueeze(0), persistent=False)
 
         self.last_decoder = FeedForward(d_in=d_att, d_out=d_out, widths=[16], dropout=0)
 
 
     def forward(self, source, target, target_mask=None):
         # source.shape = (batch_size, len_in, d_in)
-        # target.shape = (batch_size, len_out, d_out)
+        trg = torch.concat((self.start_token().expand(target.size(0), 1, -1), target), dim=1)
+        # target.shape = (batch_size, len_out + 1, d_out)
 
-        trg = self.dec_embedding(target)
+
+        ts_pos_diff = trg[:, :, [0, 2, 3]].unsqueeze(-2) - source[:, :, [0, 2, 3]].unsqueeze(-3)
+        # ts_pos_diff.shape = (batch_size, len_out, len_in, d_pos = 3)
+        positional_adding_bias_ts = self.positional_encoding.add(ts_pos_diff).permute(0, 1, 3, 2).unsqueeze(2)
+        # positional_adding_bias_ts.shape = (batch_size, len_out, 1, n_group, len_in)
+        positional_multiplying_bias_ts = self.positional_encoding.mult(ts_pos_diff).permute(0, 1, 3, 2).unsqueeze(2)
+        # positional_multiplying_bias_ts.shape = (batch_size, len_out, 1, n_group, len_in)
+
+        tt_pos_diff = trg[:, :, [0, 2, 3]].unsqueeze(-2) - trg[:, :, [0, 2, 3]].unsqueeze(-3)
+        # tt_pos_diff.shape = (batch_size, len_seq, len_seq, d_pos = 3)
+        positional_adding_bias_tt = self.positional_encoding.add(tt_pos_diff).permute(0, 3, 1, 2).unsqueeze(2)
+        # positional_adding_bias_tt.shape = (batch_size, n_group, 1, len_seq, len_seq)
+        positional_multiplying_bias_tt = self.positional_encoding.mult(tt_pos_diff).permute(0, 3, 1, 2).unsqueeze(2)
+        # positional_multiplying_bias_tt.shape = (batch_size, n_group, 1, len_seq, len_seq)
+
+
+        ss_pos_diff = source[:, :, [0, 2, 3]].unsqueeze(-2) - source[:, :, [0, 2, 3]].unsqueeze(-3)
+        positional_adding_bias_ss = self.positional_encoding.add(ss_pos_diff).permute(0, 3, 1, 2).unsqueeze(2)
+        positional_multiplying_bias_ss = self.positional_encoding.mult(ss_pos_diff).permute(0, 3, 1, 2).unsqueeze(2)
+
+        trg = self.dec_embedding(trg)
         src = self.enc_embedding(source)
 
         # source.shape = (batch_size, len_in, d_att)
         # target.shape = (batch_size, len_out, d_att)
 
-        trg = torch.concat((self.start_token().expand(trg.size(0), 1, -1), trg), dim=1)
 
-        trg = self.dec_pos_encoding(trg)
-        src = self.enc_pos_encoding(src)
         # trg.shape = (batch_size, len_out + 1, d_att)
-        # src.shape = (batch_size, len_in, d_att)
 
         for encoder in self.encoders:
-            src = encoder(src)
+            src = encoder(src, positional_adding_bias_ss, positional_multiplying_bias_ss)
 
         for decoder in self.decoders:
-            trg = decoder(target=trg, source=src, mask=self.mask_decoder)
+            trg = decoder(trg, src, positional_adding_bias_tt, positional_multiplying_bias_tt,
+                          positional_adding_bias_ts, positional_multiplying_bias_ts, mask=self.mask_decoder)
         # trg.shape = (batch_size, len_out + 1, d_att)
 
         if target_mask is not None:

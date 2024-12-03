@@ -33,60 +33,61 @@ class SA(nn.Module):
 
         self.ResetParam()
 
-    def forward(self, x, mask=None):
+    def forward(self, x, positional_adding_bias, positional_multiplying_bias, mask=None):
         # x.shape = (batch_size, len_seq, d_att)
         batch_size, len_seq, d_att = x.shape
 
         K = self.key(x)
-        # K.shape = (batch_size, len_seq_2, d_att)
+        # K.shape = (batch_size, len_seq, d_att)
         V = self.value(x)
-        # V.shape = (batch_size, len_seq_2, d_att)
+        # V.shape = (batch_size, len_seq, d_att)
         Q = self.query(x)
-        # Q.shape = (batch_size, len_seq_1, d_att)
+        # Q.shape = (batch_size, len_seq, d_att)
 
         if mask is not None:
             mask = mask[:, :, :, :len_seq, :len_seq]
             # mask.shape = (1, 1, 1, len_seq, len_seq)
 
-        GVA = self.GroupedVectorAttention(Q, K, V, mask=mask)
-        # GVA.shape = (batch_size, len_seq_1, d_group, n_group)
+        GVA = self.GroupedVectorAttention(Q, K, V, positional_adding_bias, positional_multiplying_bias, mask=mask)
+        # GVA.shape = (batch_size, len_seq, d_group, n_group)
 
         concat = GVA.reshape(batch_size, len_seq, d_att)
         # concat.shape = (batch_size, len_seq, d_att)
 
         return self.dropout(concat)
 
-    def GroupedVectorAttention(self, Q, K, V, mask):
+    def GroupedVectorAttention(self, Q, K, V, positional_adding_bias, positional_multiplying_bias, mask):
         d_group = self.d_group
         n_group = self.n_group
 
-        # K.shape = (batch_size, len_seq_2, d_att)
-        # V.shape = (batch_size, len_seq_2, d_att)
-        # Q.shape = (batch_size, len_seq_1, d_att)
+        # K.shape = (batch_size, len_seq, d_att)
+        # V.shape = (batch_size, len_seq, d_att)
+        # Q.shape = (batch_size, len_seq, d_att)
 
         diff_Q_K = Q.transpose(1, 2).unsqueeze(-1) - K.transpose(1, 2).unsqueeze(-2)
-        (batch_size, d_att, len_seq_1, len_seq_2) = diff_Q_K.shape
+        (batch_size, d_att, len_seq, _) = diff_Q_K.shape
         diff_Q_K = diff_Q_K.permute(0, 2, 3, 1)
-        diff_Q_K = diff_Q_K.reshape(batch_size, len_seq_1, len_seq_2, n_group, d_group)
+        diff_Q_K = diff_Q_K.reshape(batch_size, len_seq, len_seq, n_group, d_group)
 
         attention = self.group_MLP(diff_Q_K)
-        # attention.shape = (batch_size, len_seq_1, len_seq_2, n_group, 1)
+        # attention.shape = (batch_size, len_seq, len_seq, n_group, 1)
         attention = attention.permute(0, 3, 4, 1, 2)
-        # attention.shape = (batch_size, n_group, 1, len_seq_1, len_seq_2)
+        # attention.shape = (batch_size, n_group, 1, len_seq, len_seq)
+        attention = attention * positional_multiplying_bias + positional_adding_bias
         if mask is not None:
-            # Mask.shape = (1, 1, 1, len_seq_1, len_seq_2)
+            # Mask.shape = (1, 1, 1, len_seq, len_seq)
             attention = attention.masked_fill(mask == 0, float("-inf"))
         attention = F.softmax(attention, dim=-1)
         attention = attention.transpose(1, 3)
-        # attention.shape = (batch_size, len_seq_1, 1, n_group, len_seq_2)
+        # attention.shape = (batch_size, len_seq, 1, n_group, len_seq)
 
 
-        V = V.reshape(batch_size, 1, len_seq_2, d_group, n_group)
+        V = V.reshape(batch_size, 1, len_seq, d_group, n_group)
         V = V.permute(0, 1, 3, 4, 2)
-        # V.shape = (batch_size, 1, d_group, n_group, len_seq_2)
+        # V.shape = (batch_size, 1, d_group, n_group, len_seq)
 
         out = torch.matmul(attention.unsqueeze(-2), V.unsqueeze(-1))
-        out = out.reshape(batch_size, len_seq_1, d_att)
+        out = out.reshape(batch_size, len_seq, d_att)
 
         return out
 

@@ -1,5 +1,6 @@
 from Base.DataMaker import GetData
 from Base.Network import TransformerTranslator
+from PointTransformer.Network import PointTransformer
 from Complete.LRScheduler import Scheduler
 from GradObserver.GradObserverClass import DictGradObserver
 from Tools.ParamObs import DictParamObserver, RecInitParam
@@ -63,6 +64,11 @@ d_out = ValidationOutput.size(-1)
 N = TransformerTranslator(d_in, d_out, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
                           n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], len_in=param['len_in'],
                           len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'])
+
+N = PointTransformer(d_in, d_out, d_att=param['d_att'], d_group=4, n_encoders=param['n_encoder'],
+                     n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], len_in=param['len_in'],
+                     len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'])
+
 DictGrad = DictGradObserver(N)
 
 if param['path_ini'] is not None:

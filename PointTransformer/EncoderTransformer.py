@@ -11,13 +11,12 @@ class EncoderLayer(nn.Module):
         self.feed_forward = FeedForward(d_att, d_att, widths=width_FF, dropout=dropout_FF)
         self.second_layer_norm = nn.LayerNorm(d_att)
 
-    def forward(self, x, mask=None):
-        mask = mask.unsqueeze(0)
+    def forward(self, x, positional_adding_bias, positional_multiplying_bias, mask=None):
         if self.norm == 'pre':
-            y = self.self_attention(self.first_layer_norm(x), mask) + x
+            y = self.self_attention(self.first_layer_norm(x), positional_adding_bias, positional_multiplying_bias, mask) + x
             y = self.feed_forward(self.second_layer_norm(y) + y)
         elif self.norm == 'post':
-            y = self.first_layer_norm(self.self_attention(x, mask) + x)
+            y = self.first_layer_norm(self.self_attention(x, positional_adding_bias, positional_multiplying_bias, mask) + x)
             y = self.second_layer_norm(self.feed_forward(y) + y)
         else:
             y = self.self_attention(x, mask) + x

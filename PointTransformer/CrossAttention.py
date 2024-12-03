@@ -33,7 +33,7 @@ class CA(nn.Module):
 
         self.ResetParam()
 
-    def forward(self, x_source, x_target, mask=None):
+    def forward(self, x_source, x_target, positional_adding_bias_ts, positional_multiplying_bias_ts):
         # x_target.shape = (batch_size, len_seq_1, d_att)
         # x_source.shape = (batch_size, len_seq_2, d_att)
         batch_size, len_seq_1, d_att = x_target.shape
@@ -45,7 +45,7 @@ class CA(nn.Module):
         Q = self.query(x_target)
         # Q.shape = (batch_size, len_seq_1, d_att)
 
-        GVA = self.GroupedVectorAttention(Q, K, V)
+        GVA = self.GroupedVectorAttention(Q, K, V, positional_adding_bias_ts, positional_multiplying_bias_ts)
         # GVA.shape = (batch_size, len_seq_1, d_group, n_group)
 
         concat = GVA.reshape(batch_size, len_seq_1, d_att)
@@ -53,7 +53,7 @@ class CA(nn.Module):
 
         return self.dropout(concat)
 
-    def GroupedVectorAttention(self, Q, K, V, mask):
+    def GroupedVectorAttention(self, Q, K, V, positional_adding_bias_ts, positional_multiplying_bias_ts):
         d_group = self.d_group
         n_group = self.n_group
 
@@ -70,6 +70,7 @@ class CA(nn.Module):
         # attention.shape = (batch_size, len_seq_1, len_seq_2, n_group, 1)
         attention = attention.permute(0, 1, 4, 3, 2)
         # attention.shape = (batch_size, len_seq_1, 1, n_group, len_seq_2)
+        attention = attention * positional_multiplying_bias_ts + positional_adding_bias_ts
         attention = F.softmax(attention, dim=-1)
 
         V = V.reshape(batch_size, 1, len_seq_2, d_group, n_group)
