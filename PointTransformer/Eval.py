@@ -1,6 +1,5 @@
 from PointTransformer.TSelfAttentionEval import SA as TSA
 from PointTransformer.SelfAttention import SA as PSA
-from PointTransformer.GPTSelfAttention import SA as GSA
 from PointTransformer.OpSelfAttentionEval import SA as OSA
 import time
 import torch
