@@ -5,8 +5,10 @@ class MemoryEfficientReLU(torch.autograd.Function):
     @staticmethod
     def forward(ctx, input):
         # Store the sign of the input as a boolean tensor for backward
-        ctx.save_for_backward(input)
-        return input**2
+        sign = input > 0
+        input *= sign
+        ctx.save_for_backward(sign)
+        return input
 
     @staticmethod
     def backward(ctx, grad_output):

@@ -20,7 +20,7 @@ class SA(nn.Module):
         self.query = nn.Linear(d_att, d_att, bias=False)
         self.dropout = nn.Dropout(dropout)
 
-        self.group_MLP = nn.Sequential(CustomReLU() ,nn.Linear(d_group, 1), nn.ReLU())
+        self.group_MLP = nn.Sequential(CustomReLU(), nn.Linear(d_group, 1), nn.ReLU())
 
         self.ResetParam()
 
