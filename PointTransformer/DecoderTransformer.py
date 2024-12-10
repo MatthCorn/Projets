@@ -1,6 +1,6 @@
 import torch.nn as nn
-from PointTransformer.SelfAttention import SA
-from PointTransformer.CrossAttention import CA
+from PointTransformer.OpSelfAttention import SA
+from PointTransformer.OpCrossAttention import CA
 from Complete.Transformer.EasyFeedForward import FeedForward
 
 class DecoderLayer(nn.Module):

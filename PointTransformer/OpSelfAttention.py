@@ -40,7 +40,7 @@ class SA(nn.Module):
             # mask.shape = (len_seq, len_seq, 1)
 
         GVA = self.GroupedVectorAttention(Q, K, V, positional_adding_bias, positional_multiplying_bias, mask=mask)
-        # GVA.shape = (batch_size, len_seq, d_group, n_group)
+        # GVA.shape = (batch_size, len_seq, d_att)
 
         return self.dropout(GVA)
 
@@ -72,7 +72,6 @@ class SA(nn.Module):
         out = out.reshape(batch_size, len_seq, d_att)
 
         return out
-
 
     def ResetParam(self):
         nn.init.xavier_uniform_(self.key.weight)

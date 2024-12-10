@@ -38,7 +38,7 @@ class PointTransformer(nn.Module):
         for i in range(n_decoders):
             self.decoders.append(DecoderLayer(d_att=d_att, d_group=d_group, norm=norm, dropout_A=dropout, dropout_FF=dropout))
 
-        self.register_buffer("mask_decoder", torch.tril(torch.ones(len_out + 1, len_out + 1)).unsqueeze(0).unsqueeze(0).unsqueeze(0), persistent=False)
+        self.register_buffer("mask_decoder", torch.tril(torch.ones(len_out + 1, len_out + 1)).unsqueeze(-1), persistent=False)
 
         self.last_decoder = FeedForward(d_in=d_att, d_out=d_out, widths=[16], dropout=0)
 
@@ -51,22 +51,22 @@ class PointTransformer(nn.Module):
 
         ts_pos_diff = trg[:, :, [0, 2, 3]].unsqueeze(-2) - source[:, :, [0, 2, 3]].unsqueeze(-3)
         # ts_pos_diff.shape = (batch_size, len_out, len_in, d_pos = 3)
-        positional_adding_bias_ts = self.positional_encoding.add(ts_pos_diff).permute(0, 1, 3, 2).unsqueeze(2)
-        # positional_adding_bias_ts.shape = (batch_size, len_out, 1, n_group, len_in)
-        positional_multiplying_bias_ts = self.positional_encoding.mult(ts_pos_diff).permute(0, 1, 3, 2).unsqueeze(2)
-        # positional_multiplying_bias_ts.shape = (batch_size, len_out, 1, n_group, len_in)
+        positional_adding_bias_ts = self.positional_encoding.add(ts_pos_diff)
+        # positional_adding_bias_ts.shape = (batch_size, len_out, len_in, n_group)
+        positional_multiplying_bias_ts = self.positional_encoding.mult(ts_pos_diff)
+        # positional_multiplying_bias_ts.shape = (batch_size, len_out, len_in, n_group)
 
         tt_pos_diff = trg[:, :, [0, 2, 3]].unsqueeze(-2) - trg[:, :, [0, 2, 3]].unsqueeze(-3)
         # tt_pos_diff.shape = (batch_size, len_seq, len_seq, d_pos = 3)
-        positional_adding_bias_tt = self.positional_encoding.add(tt_pos_diff).permute(0, 3, 1, 2).unsqueeze(2)
-        # positional_adding_bias_tt.shape = (batch_size, n_group, 1, len_seq, len_seq)
-        positional_multiplying_bias_tt = self.positional_encoding.mult(tt_pos_diff).permute(0, 3, 1, 2).unsqueeze(2)
-        # positional_multiplying_bias_tt.shape = (batch_size, n_group, 1, len_seq, len_seq)
+        positional_adding_bias_tt = self.positional_encoding.add(tt_pos_diff)
+        # positional_adding_bias_tt.shape = (batch_size, len_seq, len_seq, n_group)
+        positional_multiplying_bias_tt = self.positional_encoding.mult(tt_pos_diff)
+        # positional_multiplying_bias_tt.shape = (batch_size, len_seq, len_seq, n_group)
 
 
         ss_pos_diff = source[:, :, [0, 2, 3]].unsqueeze(-2) - source[:, :, [0, 2, 3]].unsqueeze(-3)
-        positional_adding_bias_ss = self.positional_encoding.add(ss_pos_diff).permute(0, 3, 1, 2).unsqueeze(2)
-        positional_multiplying_bias_ss = self.positional_encoding.mult(ss_pos_diff).permute(0, 3, 1, 2).unsqueeze(2)
+        positional_adding_bias_ss = self.positional_encoding.add(ss_pos_diff)
+        positional_multiplying_bias_ss = self.positional_encoding.mult(ss_pos_diff)
 
         trg = self.dec_embedding(trg)
         src = self.enc_embedding(source)

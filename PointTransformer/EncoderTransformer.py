@@ -1,5 +1,5 @@
 import torch.nn as nn
-from PointTransformer.SelfAttention import SA
+from PointTransformer.OpSelfAttention import SA
 from Complete.Transformer.EasyFeedForward import FeedForward
 
 class EncoderLayer(nn.Module):

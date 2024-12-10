@@ -39,10 +39,10 @@ param = {'n_encoder': 2,
          'lr': 3e-4,
          'mult_grad': 10000,
          'weight_decay': 3e-4,
-         'NDataT': 20000,
-         'NDataV': 5000,
+         'NDataT': 4000,
+         'NDataV': 1000,
          'batch_size': 1000,
-         'n_iter': 30,
+         'n_iter': 5,
          'max_lr': 5,
          'FreqGradObs': 1/5,
          'warmup': 2,
@@ -89,7 +89,7 @@ NDataT = param['NDataT']
 NDataV = param['NDataV']
 len_out = param['len_out']
 
-mini_batch_size = 5000
+mini_batch_size = 2000
 n_minibatch = int(NDataT/mini_batch_size)
 batch_size = param['batch_size']
 n_batch = int(mini_batch_size/batch_size)
