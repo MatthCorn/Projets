@@ -4,7 +4,7 @@ from PointTransformer.OpSelfAttentionEval import SA as OSA
 import time
 import torch
 
-device = torch.device('cuda')
+device = torch.device('cpu')
 
 point = True
 
