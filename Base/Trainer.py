@@ -33,7 +33,8 @@ param = {'n_encoder': 2,
          # 'retrain': os.path.join('Base', 'Save', '2024-10-02__11-07', 'Network_weights'),
          'd_att': 32,
          'widths_embedding': [32],
-         'n_heads': 4,
+         # 'n_heads': 4,
+         'd_group': 4,
          'norm': 'post',
          'dropout': 0,
          'lr': 3e-4,
@@ -61,13 +62,17 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 d_in = ValidationInput.size(-1)
 d_out = ValidationOutput.size(-1)
 
-N = TransformerTranslator(d_in, d_out, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
-                          n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], len_in=param['len_in'],
-                          len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'])
+if 'd_group' in param.keys():
+    N = PointTransformer(d_in, d_out, d_att=param['d_att'], d_group=param['d_group'], n_encoders=param['n_encoder'],
+                         n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'],
+                         len_in=param['len_in'],
+                         len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'])
 
-N = PointTransformer(d_in, d_out, d_att=param['d_att'], d_group=4, n_encoders=param['n_encoder'],
-                     n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], len_in=param['len_in'],
-                     len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'])
+if 'n_heads' in param.keys():
+    N = TransformerTranslator(d_in, d_out, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
+                              n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], len_in=param['len_in'],
+                              len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'])
+
 
 DictGrad = DictGradObserver(N)
 
