@@ -22,7 +22,7 @@ if save:
     save_path = os.path.join(local, 'RankAI', 'Save', 'V0', 'Indices', folder)
 ################################################################################################################################################
 
-param = {'n_encoder': 1,
+param = {'n_encoder': 3,
          'path_ini': None,
          # 'path_ini': os.path.join('RankAI', 'Save', 'V0', 'Indices', 'XXXXXXXXXX', 'ParamObs.pkl'),
          'len_in': 10,
@@ -34,10 +34,10 @@ param = {'n_encoder': 1,
          'dropout': 0,
          'lr': 3e-4,
          'weight_decay': 1e-3,
-         'NDataT': 50000,
+         'NDataT': 500000,
          'NDataV': 1000,
          'batch_size': 1000,
-         'n_iter': 10,
+         'n_iter': 100,
          'max_lr': 5,
          'FreqGradObs': 1/3,
          'warmup': 2}
@@ -49,6 +49,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 N = Network(n_encoder=param['n_encoder'], len_in=param['len_in'], d_in=param['d_in'], d_att=param['d_att'],
             WidthsEmbedding=param['WidthsEmbedding'], n_heads=param['n_heads'], norm=param['norm'], dropout=param['dropout'])
+
 DictGrad = DictGradObserver(N)
 
 if param['path_ini'] is not None:

@@ -22,8 +22,8 @@ def GetSorted(Input, Mask, WeightN):
     return Output[torch.arange(Output.size(0)).unsqueeze(1), Orders]
 
 
-def MakeData(NInput=10, DVec=10, sigma=1, NData=1000, WeightF=None, WeightN=None, Threshold=0.14):
-    Input = torch.normal(torch.zeros(NData, NInput, DVec), sigma*torch.ones(NData, NInput, DVec))
+def MakeData(NInput=10, DVec=10, mean=0, sigma=1, NData=1000, WeightF=None, WeightN=None, Threshold=0.14):
+    Input = torch.normal(mean, sigma, (NData, NInput, DVec))
 
     Mask = GetSelected(Input, WeightF, Threshold=Threshold)
     Output = GetSorted(Input, Mask, WeightN)

@@ -20,8 +20,8 @@ def GetSorted(SelectedVectors, SelectedIndices, WeightSort):
     return OutputIndices
 
 
-def MakeData(NInput=5, DVec=10, sigma=1, NData=1000, WeightCut=None, WeightSort=None, NOutput=5, device=torch.device('cpu')):
-    Input = torch.normal(0, sigma, (NData, NInput, DVec))
+def MakeData(NInput=5, DVec=10, mean=0, sigma=1, NData=1000, WeightCut=None, WeightSort=None, NOutput=5, device=torch.device('cpu')):
+    Input = torch.normal(mean, sigma, (NData, NInput, DVec))
 
     SelectedVectors, SelectedIndices = GetSelected(Input, WeightCut, NOutput)
     Output = GetSorted(SelectedVectors, SelectedIndices, WeightSort)

@@ -11,7 +11,7 @@ class Network(nn.Module):
         self.PosEncoding = PositionalEncoding(d_att=d_att, dropout=dropout, max_len=len_in)
         self.Encoders = nn.ModuleList()
         for i in range(n_encoder):
-            self.Encoders.append(EncoderLayer(d_att=d_att, n_heads=n_heads, norm=norm))
+            self.Encoders.append(EncoderLayer(d_att=d_att, n_heads=n_heads, norm=norm, dropout_FF=dropout, dropout_SA=dropout))
         self.Embedding = FeedForward(d_in=d_in, d_out=d_att, widths=WidthsEmbedding, dropout=dropout)
         self.Classifier = FeedForward(d_in=d_att, d_out=len_in+1, widths=WidthsEmbedding, dropout=dropout)
 

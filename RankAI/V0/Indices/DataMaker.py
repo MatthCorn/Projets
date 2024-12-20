@@ -7,8 +7,8 @@ def GetRanks(Input, Weight):
     Orders = Values.argsort(dim=-1)
     return Orders
 
-def MakeData(NVec=5, DVec=10, sigma=1, NData=1000, Weight=None, device=torch.device('cpu')):
-    Input = torch.normal(0, sigma, (NData, NVec, DVec))
+def MakeData(NVec=5, DVec=10, mean=0, sigma=1, NData=1000, Weight=None, device=torch.device('cpu')):
+    Input = torch.normal(mean, sigma, (NData, NVec, DVec))
 
     Output = GetRanks(Input, Weight).unsqueeze(dim=-1)
     return Input.to(device), Output.to(device)

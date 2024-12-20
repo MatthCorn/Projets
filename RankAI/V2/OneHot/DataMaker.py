@@ -23,8 +23,8 @@ def GetSorted(Input, Mask, WeightSort):
     return Indices[torch.arange(Input.size(0)).unsqueeze(1), Orders].to(int)
 
 
-def MakeData(NInput=5, DVec=10, sigma=1, NData=1000, WeightCut=None, WeightSort=None, NOutput=5):
-    Input = torch.normal(torch.zeros(NData, NInput, DVec), sigma*torch.ones(NData, NInput, DVec))
+def MakeData(NInput=5, DVec=10, mean=0, sigma=1, NData=1000, WeightCut=None, WeightSort=None, NOutput=5):
+    Input = torch.normal(mean, sigma, (NData, NInput, DVec))
 
     Mask = GetSelected(Input, WeightCut, LimCut=0, NOutput=NOutput)
     Indices = GetSorted(Input, Mask, WeightSort)

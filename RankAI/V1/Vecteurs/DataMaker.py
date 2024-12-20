@@ -18,8 +18,8 @@ def GetSorted(Input, WeightSort):
     return Output
 
 
-def MakeData(NInput=5, DVec=10, sigma=1, NData=1000, WeightCut=None, WeightSort=None, NOutput=5):
-    Input = torch.normal(0, sigma, (NData, NInput, DVec))
+def MakeData(NInput=5, DVec=10, mean=0, sigma=1, NData=1000, WeightCut=None, WeightSort=None, NOutput=5):
+    Input = torch.normal(mean, sigma, (NData, NInput, DVec))
 
     Selected = GetSelected(Input, WeightCut, NOutput)
     Output = GetSorted(Selected, WeightSort)
