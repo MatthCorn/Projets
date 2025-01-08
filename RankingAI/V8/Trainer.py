@@ -90,7 +90,7 @@ TrainingInput, TrainingOutput = MakeData(NInput=10, LimCut=0, DVec=10, sigma=1, 
 for j in tqdm(range(n_iter)):
     error = 0
     error_class = 0
-    time_to_observ = (int(j * param['FreqGradObs']) == (j * param['FreqGradObs']))
+    time_to_observe = (int(j * param['FreqGradObs']) == (j * param['FreqGradObs']))
     for p in range(n_minibatch):
         InputMiniBatch = TrainingInput[p*mini_batch_size:(p+1)*mini_batch_size].to(device)
         OutputMiniBatch = TrainingOutput[p*mini_batch_size:(p+1)*mini_batch_size].to(device)
@@ -108,7 +108,7 @@ for j in tqdm(range(n_iter)):
             err.backward()
             optimizer.step()
 
-            if p == 0 and time_to_observ:
+            if p == 0 and time_to_observe:
                 DictGrad.update()
 
             ClassPrediction = F.one_hot(Prediction.argmax(dim=-1), num_classes=Prediction.size(-1))
@@ -120,7 +120,7 @@ for j in tqdm(range(n_iter)):
             error += float(err)/(n_batch*n_minibatch)
             error_class += float(ErrorClassTraining)/(n_batch*n_minibatch)
 
-    if time_to_observ:
+    if time_to_observe:
         DictGrad.next(j)
 
     with torch.no_grad():

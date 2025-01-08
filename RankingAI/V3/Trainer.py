@@ -84,7 +84,7 @@ TrainingInput, TrainingOutput = MakeData(NVec=NVec, DVec=DVec, sigma=1, NData=ND
 
 for j in tqdm(range(n_iter)):
     error = 0
-    time_to_observ = (int(j * param['FreqGradObs']) == (j * param['FreqGradObs']))
+    time_to_observe = (int(j * param['FreqGradObs']) == (j * param['FreqGradObs']))
     for k in range(n_batch):
         optimizer.zero_grad(set_to_none=True)
 
@@ -98,12 +98,12 @@ for j in tqdm(range(n_iter)):
         if lr_scheduler is not None:
             lr_scheduler.step()
 
-        if k == 0 and time_to_observ:
+        if k == 0 and time_to_observe:
             DictGrad.update()
 
         error += float(err)/n_batch
 
-    if time_to_observ:
+    if time_to_observe:
         DictGrad.next(j)
 
     with torch.no_grad():
