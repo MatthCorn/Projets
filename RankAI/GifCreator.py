@@ -23,10 +23,10 @@ def MakeGIF(PlottingData, NData, training_strategy, distrib, save_path):
     std_max = max([window['std'][1] for window in training_strategy])
 
 
-    log_x_ticks = g(np.linspace(f(std_min), f(std_max), 10))
-    x_ticks = np.linspace(0, NData+1, 10)
-    log_y_ticks = g(np.linspace(f(mean_min), f(mean_max), 10))
-    y_ticks = np.linspace(0, NData+1, 10)
+    log_x_ticks = g(np.linspace(f(std_min), f(std_max), 7))
+    x_ticks = np.linspace(0, NData+1, 7)
+    log_y_ticks = g(np.linspace(f(mean_min), f(mean_max), 7))
+    y_ticks = np.linspace(0, NData+1, 7)
 
     # Prepare the figure
     fig, ax = plt.subplots(1, 2, figsize=(8, 4))

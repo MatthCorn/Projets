@@ -35,20 +35,23 @@ param = {'n_encoder': 3,
          'dropout': 0,
          'lr': 1e-4,
          'weight_decay': 1e-3,
-         'NDataT': 50000,
+         'NDataT': 5000,
          'NDataV': 1000,
          'batch_size': 1000,
-         'n_iter': 2,
+         'n_iter': 50,
          'training_strategy': [
-             {'mean': [1, 10], 'std': [0.1, 1]}, 
-             {'mean': [1, 10], 'std': [0.1, 10]},
+             {'mean': [1, 10], 'std': [0.1, 5]},
+             {'mean': [1, 100], 'std': [0.1, 5]},
+             {'mean': [1, 100], 'std': [0.1, 20]}
          ],
-         'distrib': 'log',
+         'distrib': 'uniform',
          'max_lr': 5,
          'FreqGradObs': 1/3,
          'warmup': 2}
 
-freq_checkpoint = 1/2
+freq_checkpoint = 1/10
+nb_frames_GIF = 30
+nb_frames_window = int(nb_frames_GIF / len(param['training_strategy']))
 
 if torch.cuda.is_available():
     torch.cuda.set_device(0)
@@ -139,6 +142,7 @@ for window in param['training_strategy']:
         perf = 0
         time_to_observe = (int(j * param['FreqGradObs']) == (j * param['FreqGradObs']))
         time_for_checkpoint = (int(j * freq_checkpoint) == (j * freq_checkpoint))
+        time_for_GIF = (j in torch.linspace(0, n_iter, nb_frames_window, dtype=int))
 
         for p in range(n_minibatch):
             InputMiniBatch = TrainingInput[p*mini_batch_size:(p+1)*mini_batch_size].to(device)
@@ -199,15 +203,16 @@ for window in param['training_strategy']:
                 ParamObs = DictParamObserver(N)
                 pickle.dump(ParamObs, file)
 
-        with torch.no_grad():
-            Input = PlottingInput.to(device)
-            Output = PlottingOutput.to(device)
-            Prediction = N(Input)
+        if time_for_GIF:
+            with torch.no_grad():
+                Input = PlottingInput.to(device)
+                Output = PlottingOutput.to(device)
+                Prediction = N(Input)
 
-            err = torch.norm(Prediction - Output, p=2, dim=[-1, -2]) / sqrt(NVec)
-            perf = torch.sum(ChoseOutput(Prediction, NVec) == Output, dim=[-1, -2]) / NVec
-            PlottingError.append(err)
-            PlottingPerf.append(perf)
+                err = torch.norm(Prediction - Output, p=2, dim=[-1, -2]) / sqrt(NVec)
+                perf = torch.sum(ChoseOutput(Prediction, NVec) == Output, dim=[-1, -2]) / NVec
+                PlottingError.append(err)
+                PlottingPerf.append(perf)
 
 MakeGIF([PlottingError, PlottingPerf], 100, param['training_strategy'], param['distrib'], save_path)
 
