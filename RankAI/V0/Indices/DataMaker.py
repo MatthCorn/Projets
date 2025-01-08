@@ -46,7 +46,7 @@ def MakeTargetedData(NVec=5, DVec=10, mean_min=1e-1, mean_max=1e1, sigma_min=1e0
 
     alpha = torch.normal(0, 1, (NData, NVec)) * sigma + mean
 
-    Input = torch.normal(0, 1, (NData, NVec, DVec)) * sigma.unsqueeze(-1) + mean.unsqueeze(-1)
+    # Input = torch.normal(0, 1, (NData, NVec, DVec)) * sigma.unsqueeze(-1) + mean.unsqueeze(-1)
     uncontroled_values = torch.matmul(Input, Weight.to(Input.device))
     Input = Input + (alpha - uncontroled_values).unsqueeze(-1) * Weight.view(1, 1, DVec)
 
