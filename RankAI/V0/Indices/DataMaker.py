@@ -22,9 +22,9 @@ def MakeTargetedData(NVec=5, DVec=10, mean_min=1e-1, mean_max=1e1, sigma_min=1e0
         Weight = torch.tensor([1.] * DVec)
     Weight = Weight / torch.norm(Weight)
     if plot:
-        spacing = torch.linspace(0, 1, NData)
+        spacing = lambda x: torch.linspace(0, 1, x)
     else:
-        spacing = torch.rand(NData)
+        spacing = lambda x: torch.rand(x)
 
     if distrib == 'uniform':
         f = lambda x: x
@@ -35,8 +35,8 @@ def MakeTargetedData(NVec=5, DVec=10, mean_min=1e-1, mean_max=1e1, sigma_min=1e0
     elif distrib == 'exp':
         f = lambda x: math.exp(x)
         g = lambda x: torch.log(x)
-    mean = g((f(mean_max) - f(mean_min)) * spacing + f(mean_min))
-    sigma = g((f(sigma_max) - f(sigma_min)) * spacing + f(sigma_min))
+    mean = g((f(mean_max) - f(mean_min)) * spacing(NData) + f(mean_min))
+    sigma = g((f(sigma_max) - f(sigma_min)) * spacing(NData) + f(sigma_min))
 
     if plot:
         mean, sigma = torch.meshgrid(mean, sigma)
@@ -46,7 +46,7 @@ def MakeTargetedData(NVec=5, DVec=10, mean_min=1e-1, mean_max=1e1, sigma_min=1e0
 
     alpha = torch.normal(0, 1, (NData, NVec)) * sigma + mean
 
-    # Input = torch.normal(0, 1, (NData, NVec, DVec)) * sigma.unsqueeze(-1) + mean.unsqueeze(-1)
+    Input = torch.normal(0, 1, (NData, NVec, DVec)) * alpha.unsqueeze(-1)
     uncontroled_values = torch.matmul(Input, Weight.to(Input.device))
     Input = Input + (alpha - uncontroled_values).unsqueeze(-1) * Weight.view(1, 1, DVec)
 

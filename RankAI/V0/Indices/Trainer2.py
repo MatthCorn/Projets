@@ -38,11 +38,9 @@ param = {'n_encoder': 3,
          'NDataT': 500000,
          'NDataV': 1000,
          'batch_size': 1000,
-         'n_iter': 50,
+         'n_iter': 200,
          'training_strategy': [
-             {'mean': [50, 100], 'std': [5, 20]},
-             {'mean': [1, 100], 'std': [0.1, 5]},
-             {'mean': [1, 100], 'std': [0.1, 20]}
+             {'mean': [-10000, 10000], 'std': [0.1, 100]},
          ],
          'distrib': 'uniform',
          'max_lr': 5,
@@ -50,8 +48,9 @@ param = {'n_encoder': 3,
          'warmup': 2}
 
 freq_checkpoint = 1/10
-nb_frames_GIF = 30
+nb_frames_GIF = 50
 nb_frames_window = int(nb_frames_GIF / len(param['training_strategy']))
+n_iter_window = int(param['n_iter'] / len(param['training_strategy']))
 
 if torch.cuda.is_available():
     torch.cuda.set_device(0)
@@ -137,12 +136,12 @@ for window in param['training_strategy']:
         Weight=Weight,
     )
 
-    for j in tqdm(range(n_iter)):
+    for j in tqdm(range(n_iter_window)):
         error = 0
         perf = 0
         time_to_observe = (int(j * param['FreqGradObs']) == (j * param['FreqGradObs']))
         time_for_checkpoint = (int(j * freq_checkpoint) == (j * freq_checkpoint))
-        time_for_GIF = (j in torch.linspace(0, n_iter, nb_frames_window, dtype=int))
+        time_for_GIF = (j in torch.linspace(0, n_iter_window, nb_frames_window, dtype=int))
 
         for p in range(n_minibatch):
             InputMiniBatch = TrainingInput[p*mini_batch_size:(p+1)*mini_batch_size].to(device)

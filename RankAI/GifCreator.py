@@ -82,8 +82,8 @@ def MakeGIF(PlottingData, NData, training_strategy, distrib, save_path):
             NData * (1 - alpha_std_max) - 0.5,
             NData * (1 - alpha_std_min) - 0.5
         ]
-        ax0 = ax[0].plot(square_x, square_y, 'r', linewidth=5)
-        ax1 = ax[1].plot(square_x, square_y, 'r', linewidth=5)
+        ax0 = ax[0].plot(square_x, square_y, 'black', linewidth=5)
+        ax1 = ax[1].plot(square_x, square_y, 'black', linewidth=5)
 
         if not hasattr(update, "cbar0"):
             update.cbar0 = plt.colorbar(im0, ax=ax[0])
@@ -91,6 +91,8 @@ def MakeGIF(PlottingData, NData, training_strategy, distrib, save_path):
         else:
             update.cbar0.update_normal(im0)
             update.cbar1.update_normal(im1)
+
+        plt.tight_layout()
 
         return ax0, ax1
 
