@@ -22,7 +22,7 @@ if save:
     save_path = os.path.join(local, 'RankAI', 'Save', 'V0', 'Vecteurs', folder)
 ################################################################################################################################################
 
-param = {'n_encoder': 1,
+param = {'n_encoder': 3,
          'len_in': 10,
          'path_ini': None,
          # 'path_ini': os.path.join('RankAI', 'Save', 'V0', 'Vecteurs', 'XXXXXXXXXX', 'ParamObs.pkl'),
@@ -33,6 +33,7 @@ param = {'n_encoder': 1,
          'norm': 'post',
          'dropout': 0,
          'lr': 3e-4,
+         'mult_grad': 10000,
          'weight_decay': 1e-3,
          'NDataT': 50000,
          'NDataV': 1000,
@@ -101,8 +102,8 @@ for j in tqdm(range(n_iter)):
             OutputBatch = OutputMiniBatch[k * batch_size:(k + 1) * batch_size].to(device)
             Prediction = N(InputBatch)
 
-            err = torch.norm(Prediction-OutputBatch, p=2)
-            err.backward()
+            err = torch.norm(Prediction-OutputBatch, p=2) / sqrt(batch_size * DVec * NVec)
+            (param['mult_grad'] * err).backward()
             optimizer.step()
             if lr_scheduler is not None:
                 lr_scheduler.step()
@@ -110,8 +111,8 @@ for j in tqdm(range(n_iter)):
             if k == 0 and time_to_observe:
                 DictGrad.update()
 
-            error += float(err)/(n_batch*n_minibatch)
-            perf += float(torch.sum(ChoseOutput(Prediction, InputBatch) == ChoseOutput(OutputBatch, InputBatch)))
+            error += float(err) / (n_batch * n_minibatch)
+            perf += float(torch.sum(ChoseOutput(Prediction, InputBatch) == ChoseOutput(OutputBatch, InputBatch)))/(NDataT*NVec)
 
     if time_to_observe:
         DictGrad.next(j)
@@ -121,12 +122,12 @@ for j in tqdm(range(n_iter)):
         Output = ValidationOutput.to(device)
         Prediction = N(Input)
 
-        err = torch.norm(Prediction - Output, p=2)
-        ValidationError.append(float(err) / sqrt(NDataV*DVec*NVec))
+        err = torch.norm(Prediction - Output, p=2) / sqrt(NDataV*DVec*NVec)
+        ValidationError.append(float(err))
         ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input)))/(NDataV*NVec))
 
-    TrainingError.append(error/sqrt(batch_size*DVec*NVec))
-    TrainingPerf.append(perf/(NDataT*NVec))
+    TrainingError.append(error)
+    TrainingPerf.append(perf)
 
 ################################################################################################################################################
 if save:

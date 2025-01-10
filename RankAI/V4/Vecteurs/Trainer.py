@@ -34,6 +34,7 @@ param = {'n_encoder': 1,
          'norm': 'post',
          'dropout': 0,
          'lr': 3e-4,
+         'mult_grad': 10000,
          'weight_decay': 1e-3,
          'NDataT': 50000,
          'NDataV': 1000,
@@ -105,8 +106,8 @@ for j in tqdm(range(n_iter)):
             OutputBatch = OutputMiniBatch[k * batch_size:(k + 1) * batch_size].to(device)
             Prediction = N(InputBatch)
 
-            err = torch.norm(Prediction-OutputBatch, p=2)
-            err.backward()
+            err = torch.norm(Prediction-OutputBatch, p=2) / sqrt(batch_size*NVec)
+            (param['mult_grad'] * err).backward()
             optimizer.step()
             if lr_scheduler is not None:
                 lr_scheduler.step()
@@ -125,7 +126,7 @@ for j in tqdm(range(n_iter)):
         Output = ValidationOutput.to(device)
         Prediction = N(Input)
 
-        err = torch.norm(Prediction - Output, p=2)
+        err = torch.norm(Prediction - Output, p=2) / sqrt(NDataV*NVec)
         ValidationError.append(float(err) / sqrt(NDataV*DVec*NOutput))
         ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input)))/(NDataV*NOutput))
 

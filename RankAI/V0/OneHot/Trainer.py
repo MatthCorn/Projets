@@ -33,6 +33,7 @@ param = {'n_encoder': 1,
          'norm': 'post',
          'dropout': 0,
          'lr': 3e-4,
+         'mult_grad': 10000,
          'weight_decay': 1e-3,
          'NDataT': 50000,
          'NDataV': 1000,
@@ -41,7 +42,7 @@ param = {'n_encoder': 1,
          'max_lr': 5,
          'FreqGradObs': 1/3,
          'warmup': 2,
-         'type_error': 'MSE'}
+         'type_error': 'CE'}
 
 if torch.cuda.is_available():
     torch.cuda.set_device(0)
@@ -104,8 +105,8 @@ for j in tqdm(range(n_iter)):
             if param['type_error'] == 'CE':
                 err = torch.nn.functional.cross_entropy(Prediction, OutputBatch)
             elif param['type_error'] == 'MSE':
-                err = torch.norm(Prediction-OutputBatch, p=2)
-            err.backward()
+                err = torch.norm(Prediction-OutputBatch, p=2) / sqrt(batch_size*NVec*NVec)
+            (param['mult_grad'] * err).backward()
             optimizer.step()
 
             if p == 0 and time_to_observe:
@@ -115,7 +116,7 @@ for j in tqdm(range(n_iter)):
                 lr_scheduler.step()
 
             error += float(err)/(n_batch*n_minibatch)
-            perf += float(torch.sum(ChoseOutput(Prediction) == ChoseOutput(OutputBatch)))
+            perf += float(torch.sum(ChoseOutput(Prediction) == ChoseOutput(OutputBatch)))/(NDataT*NVec)
 
     if time_to_observe:
         DictGrad.next(j)
@@ -128,19 +129,16 @@ for j in tqdm(range(n_iter)):
         if param['type_error'] == 'CE':
             err = torch.nn.functional.cross_entropy(Prediction, Output)
         elif param['type_error'] == 'MSE':
-            err = torch.norm(Prediction - Output, p=2)
+            err = torch.norm(Prediction - Output, p=2) / sqrt(NDataV*NVec*NVec)
 
-        if param['type_error'] == 'CE':
-            ValidationError.append(float(err))
-        else:
-            ValidationError.append(float(err)/sqrt(NDataV*NVec*NVec))
+        ValidationError.append(float(err))
         ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction) == ChoseOutput(Output)))/(NDataV*NVec))
 
     if param['type_error'] == 'CE':
         TrainingError.append(error)
     else:
-        TrainingError.append(error/sqrt(batch_size*NVec*NVec))
-    TrainingPerf.append(perf/(NDataT*NVec))
+        TrainingError.append(error)
+    TrainingPerf.append(perf)
 
 ################################################################################################################################################
 if save:

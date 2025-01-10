@@ -34,6 +34,7 @@ param = {'n_encoder': 3,
          'norm': 'post',
          'dropout': 0,
          'lr': 3e-4,
+         'mult_grad': 10000,
          'weight_decay': 1e-3,
          'NDataT': 50000,
          'NDataV': 1000,
@@ -104,8 +105,8 @@ for j in tqdm(range(n_iter)):
             OutputBatch = OutputMiniBatch[k*batch_size:(k+1)*batch_size]
             Prediction = N(InputBatch)
 
-            err = torch.norm(Prediction-OutputBatch, p=2)
-            err.backward()
+            err = torch.norm(Prediction-OutputBatch, p=2) / sqrt(batch_size*NOutput)
+            (param['mult_grad'] * err).backward()
             optimizer.step()
 
             if p == 0 and time_to_observe:
@@ -115,7 +116,7 @@ for j in tqdm(range(n_iter)):
                 lr_scheduler.step()
 
             error += float(err)/(n_batch*n_minibatch)
-            perf += float(torch.sum(ChoseOutput(Prediction, NOutput) == OutputBatch))
+            perf += float(torch.sum(ChoseOutput(Prediction, NOutput) == OutputBatch))/(NDataT*NOutput)
 
     if time_to_observe:
         DictGrad.next(j)
@@ -125,12 +126,12 @@ for j in tqdm(range(n_iter)):
         Output = ValidationOutput.to(device)
         Prediction = N(Input)
 
-        err = torch.norm(Prediction - Output, p=2)
-        ValidationError.append(float(err)/sqrt(NDataV*NOutput))
+        err = torch.norm(Prediction - Output, p=2) / sqrt(NDataV*NOutput)
+        ValidationError.append(float(err))
         ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction, NOutput) == Output))/(NDataV*NOutput))
 
-    TrainingError.append(error/sqrt(batch_size*NOutput))
-    TrainingPerf.append(perf/(NDataT*NOutput))
+    TrainingError.append(error)
+    TrainingPerf.append(perf)
 
 ################################################################################################################################################
 if save:

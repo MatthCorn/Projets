@@ -15,7 +15,7 @@ class Network(nn.Module):
 
         self.Encoders = nn.ModuleList()
         for i in range(n_encoder):
-            self.Encoders.append(EncoderLayer(d_att=d_att, n_heads=n_heads, norm=norm, dropout_FF=dropout, dropout_SA=dropout))
+            self.Encoders.append(EncoderLayer(d_att=d_att, n_heads=n_heads, norm=norm, dropout_FF=dropout, dropout_A=dropout))
 
         self.Embedding = FeedForward(d_in=d_in, d_out=d_att, widths=WidthsEmbedding, dropout=dropout)
 

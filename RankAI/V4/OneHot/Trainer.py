@@ -34,6 +34,7 @@ param = {'n_encoder': 1,
          'norm': 'post',
          'dropout': 0,
          'lr': 3e-4,
+         'mult_grad': 10000,
          'weight_decay': 1e-3,
          'NDataT': 50000,
          'NDataV': 1000,
@@ -108,8 +109,8 @@ for j in tqdm(range(n_iter)):
             if param['type_error'] == 'CE':
                 err = torch.nn.functional.cross_entropy(Prediction, OutputBatch)
             elif param['type_error'] == 'MSE':
-                err = torch.norm(Prediction-OutputBatch, p=2)
-            err.backward()
+                err = torch.norm(Prediction-OutputBatch, p=2) / sqrt(batch_size*NVec)
+            (param['mult_grad'] * err).backward()
             optimizer.step()
 
             if p == 0 and time_to_observe:
@@ -132,7 +133,7 @@ for j in tqdm(range(n_iter)):
         if param['type_error'] == 'CE':
             err = torch.nn.functional.cross_entropy(Prediction, Output)
         elif param['type_error'] == 'MSE':
-            err = torch.norm(Prediction - Output, p=2)
+            err = torch.norm(Prediction - Output, p=2) / sqrt(NDataV*NVec)
 
         if param['type_error'] == 'CE':
             ValidationError.append(float(err))
