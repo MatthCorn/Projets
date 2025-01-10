@@ -33,6 +33,7 @@ param = {'n_encoder': 1,
          'norm': 'post',
          'dropout': 0,
          'lr': 3e-4,
+         'mult_grad': 10000,
          'weight_decay': 1e-3,
          'NDataT': 50000,
          'NDataV': 1000,
@@ -106,8 +107,8 @@ for j in tqdm(range(n_iter)):
             if param['type_error'] == 'CE':
                 err = torch.nn.functional.cross_entropy(Prediction, OutputBatch)
             elif param['type_error'] == 'MSE':
-                err = torch.norm(Prediction-OutputBatch, p=2)
-            err.backward()
+                err = torch.norm(Prediction-OutputBatch, p=2)/sqrt(batch_size*NInput*NInput)
+            (param['mult_grad'] * err).backward()
             optimizer.step()
 
             if p == 0 and time_to_observe:
@@ -117,7 +118,7 @@ for j in tqdm(range(n_iter)):
                 lr_scheduler.step()
 
             error += float(err)/(n_batch*n_minibatch)
-            perf += float(torch.sum(ChoseOutput(Prediction) == ChoseOutput(OutputBatch)))
+            perf += float(torch.sum(ChoseOutput(Prediction) == ChoseOutput(OutputBatch)))/(NDataT*NInput)
 
     if time_to_observe:
         DictGrad.next(j)
@@ -130,19 +131,13 @@ for j in tqdm(range(n_iter)):
         if param['type_error'] == 'CE':
             err = torch.nn.functional.cross_entropy(Prediction, Output)
         elif param['type_error'] == 'MSE':
-            err = torch.norm(Prediction - Output, p=2)
+            err = torch.norm(Prediction - Output, p=2)/sqrt(NDataV*NInput*NInput)
 
-        if param['type_error'] == 'CE':
-            ValidationError.append(float(err))
-        else:
-            ValidationError.append(float(err)/sqrt(NDataV*NInput*NInput))
+        ValidationError.append(float(err))
         ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction) == ChoseOutput(Output)))/(NDataV*NInput))
 
-    if param['type_error'] == 'CE':
-        TrainingError.append(error)
-    else:
-        TrainingError.append(error/sqrt(batch_size*NInput*NInput))
-    TrainingPerf.append(perf/(NDataT*NInput))
+    TrainingError.append(error)
+    TrainingPerf.append(perf)
 
 ################################################################################################################################################
 if save:

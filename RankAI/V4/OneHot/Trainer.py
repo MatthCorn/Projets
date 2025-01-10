@@ -22,7 +22,7 @@ if save:
     save_path = os.path.join(local, 'RankAI', 'Save', 'V4', 'OneHot', folder)
 ################################################################################################################################################
 
-param = {'n_encoder': 1,
+param = {'n_encoder': 3,
          'path_ini': None,
          # 'path_ini': os.path.join('RankAI', 'Save', 'V4', 'OneHot', 'XXXXXXXXXX', 'ParamObs.pkl'),
          'len_in': 10,
@@ -109,7 +109,7 @@ for j in tqdm(range(n_iter)):
             if param['type_error'] == 'CE':
                 err = torch.nn.functional.cross_entropy(Prediction, OutputBatch)
             elif param['type_error'] == 'MSE':
-                err = torch.norm(Prediction-OutputBatch, p=2) / sqrt(batch_size*NVec)
+                err = torch.norm(Prediction-OutputBatch, p=2)/sqrt(batch_size*NOutput*NInput)
             (param['mult_grad'] * err).backward()
             optimizer.step()
 
@@ -120,7 +120,7 @@ for j in tqdm(range(n_iter)):
                 lr_scheduler.step()
 
             error += float(err)/(n_batch*n_minibatch)
-            perf += float(torch.sum(ChoseOutput(Prediction) == ChoseOutput(OutputBatch)))
+            perf += float(torch.sum(ChoseOutput(Prediction) == ChoseOutput(OutputBatch)))/(NDataT*NOutput)
 
     if time_to_observe:
         DictGrad.next(j)
@@ -133,19 +133,13 @@ for j in tqdm(range(n_iter)):
         if param['type_error'] == 'CE':
             err = torch.nn.functional.cross_entropy(Prediction, Output)
         elif param['type_error'] == 'MSE':
-            err = torch.norm(Prediction - Output, p=2) / sqrt(NDataV*NVec)
+            err = torch.norm(Prediction - Output, p=2)/sqrt(NDataV*NOutput*NInput)
 
-        if param['type_error'] == 'CE':
-            ValidationError.append(float(err))
-        else:
-            ValidationError.append(float(err)/sqrt(NDataV*NOutput*NInput))
+        ValidationError.append(float(err))
         ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction) == ChoseOutput(Output)))/(NDataV*NOutput))
 
-    if param['type_error'] == 'CE':
-        TrainingError.append(error)
-    else:
-        TrainingError.append(error/sqrt(batch_size*NOutput*NInput))
-    TrainingPerf.append(perf/(NDataT*NOutput))
+    TrainingError.append(error)
+    TrainingPerf.append(perf)
 
 ################################################################################################################################################
 if save:
