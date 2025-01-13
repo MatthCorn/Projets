@@ -1,5 +1,5 @@
 from RankAI.V0.Indices.Ranker import Network, ChoseOutput
-from RankAI.V0.Indices.DataMaker import MakeData, MakeTargetedData
+from RankAI.V0.Indices.DataMaker import MakeTargetedData
 from RankAI.GifCreator import MakeGIF
 from Complete.LRScheduler import Scheduler
 from math import sqrt

@@ -102,8 +102,8 @@ for j in tqdm(range(n_iter)):
         for k in range(n_batch):
             optimizer.zero_grad(set_to_none=True)
 
-            InputBatch = InputMiniBatch[k*batch_size:(k+1)*batch_size].to(device)
-            OutputBatch = OutputMiniBatch[k * batch_size:(k + 1) * batch_size].to(device)
+            InputBatch = InputMiniBatch[k*batch_size:(k+1)*batch_size]
+            OutputBatch = OutputMiniBatch[k * batch_size:(k + 1) * batch_size]
             Prediction = N(InputBatch)
 
             err = torch.norm(Prediction-OutputBatch, p=2) / sqrt(batch_size*DVec*NOutput)

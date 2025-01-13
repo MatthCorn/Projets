@@ -1,6 +1,6 @@
-from RankAI.V0.Vecteurs.DataMaker import MakeTargetedData
+from RankAI.V1.Vecteurs.DataMaker import MakeTargetedData
 from RankAI.GifCreator import MakeGIF
-from RankAI.V0.Vecteurs.Ranker import Network, ChoseOutput
+from RankAI.V1.Vecteurs.Ranker import Network, ChoseOutput
 from Complete.LRScheduler import Scheduler
 from GradObserver.GradObserverClass import DictGradObserver
 from Tools.ParamObs import DictParamObserver, RecInitParam
@@ -20,13 +20,14 @@ if save:
 
     local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projets')
     folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
-    save_path = os.path.join(local, 'RankAI', 'Save', 'V0', 'Vecteurs', folder)
+    save_path = os.path.join(local, 'RankAI', 'Save', 'V1', 'Vecteurs', folder)
 ################################################################################################################################################
 
 param = {'n_encoder': 5,
          'len_in': 10,
+         'len_out': 5,
          'path_ini': None,
-         # 'path_ini': os.path.join('RankAI', 'Save', 'V0', 'Vecteurs', 'XXXXXXXXXX', 'ParamObs.pkl'),
+         # 'path_ini': os.path.join('RankAI', 'Save', 'V1', 'Vecteurs', 'XXXXXXXXXX', 'ParamObs.pkl'),
          'd_in': 10,
          'd_att': 128,
          'WidthsEmbedding': [32],
@@ -36,27 +37,13 @@ param = {'n_encoder': 5,
          'lr': 3e-4,
          'mult_grad': 10000,
          'weight_decay': 1e-3,
-         'NDataT': 500000,
+         'NDataT': 50000,
          'NDataV': 1000,
          'batch_size': 1000,
-         'n_iter': 800,
+         'n_iter': 80,
          'training_strategy': [
              {'mean': [-50, 50], 'std': [0.1, 10]},
              {'mean': [-200, 200], 'std': [0.1, 50]},
-             {'mean': [-500, 500], 'std': [0.1, 50]},
-             {'mean': [-800, 800], 'std': [0.1, 50]},
-             {'mean': [-1000, 1000], 'std': [0.1, 50]},
-             {'mean': [-1000, 1000], 'std': [0.1, 80]},
-             {'mean': [-1000, 1000], 'std': [0.1, 100]},
-             {'mean': [-1500, 1500], 'std': [0.1, 100]},
-             {'mean': [-2000, 2000], 'std': [0.1, 100]},
-             {'mean': [-2500, 2500], 'std': [0.1, 100]},
-             {'mean': [-3000, 3000], 'std': [0.1, 100]},
-             {'mean': [-4000, 4000], 'std': [0.1, 100]},
-             {'mean': [-5000, 5000], 'std': [0.1, 100]},
-             {'mean': [-7000, 7000], 'std': [0.1, 100]},
-             {'mean': [-9000, 9000], 'std': [0.1, 100]},
-             {'mean': [-10000, 10000], 'std': [0.1, 100]},
          ],
          'distrib': 'uniform',
          'max_lr': 5,
@@ -73,7 +60,7 @@ if torch.cuda.is_available():
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-N = Network(n_encoder=param['n_encoder'], len_in=param['len_in'], d_in=param['d_in'], d_att=param['d_att'],
+N = Network(n_encoder=param['n_encoder'], len_in=param['len_in'], len_latent=param['len_out'], d_in=param['d_in'], d_att=param['d_att'],
             WidthsEmbedding=param['WidthsEmbedding'], n_heads=param['n_heads'], norm=param['norm'], dropout=param['dropout'])
 
 DictGrad = DictGradObserver(N)
@@ -91,9 +78,12 @@ optimizer = torch.optim.Adam(N.parameters(), weight_decay=param['weight_decay'],
 NDataT = param['NDataT']
 NDataV = param['NDataV']
 DVec = param['d_in']
-NVec = param['len_in']
-Weight = 2 * torch.rand(DVec) - 1
-Weight = Weight / torch.norm(Weight)
+NInput = param['len_in']
+NOutput = param['len_out']
+WeightCut = 2 * torch.rand(DVec) - 1
+WeightCut = WeightCut / torch.norm(WeightCut)
+WeightSort = 2 * torch.rand(DVec) - 1
+WeightSort = WeightSort / torch.norm(WeightSort)
 
 mini_batch_size = 50000
 n_minibatch = int(NDataT/mini_batch_size)
@@ -113,7 +103,8 @@ warmup_steps = int(NDataT / batch_size) * param['warmup']
 lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param['max_lr'])
 
 PlottingInput, PlottingOutput = MakeTargetedData(
-    NVec=NVec,
+    NInput=NInput,
+    NOutput=NOutput,
     DVec=DVec,
     mean_min=min([window['mean'][0] for window in param['training_strategy']]),
     mean_max=max([window['mean'][1] for window in param['training_strategy']]),
@@ -121,7 +112,8 @@ PlottingInput, PlottingOutput = MakeTargetedData(
     sigma_max=max([window['std'][1] for window in param['training_strategy']]),
     distrib=param['distrib'],
     NData=100,
-    Weight=Weight,
+    WeightCut=WeightCut,
+    WeightSort=WeightSort,
     plot=True,
 )
 
@@ -129,7 +121,8 @@ best_state_dict = N.state_dict().copy()
 
 for window in param['training_strategy']:
     TrainingInput, TrainingOutput = MakeTargetedData(
-        NVec=NVec,
+        NInput=NInput,
+        NOutput=NOutput,
         DVec=DVec,
         mean_min=window['mean'][0],
         mean_max=window['mean'][1],
@@ -137,11 +130,13 @@ for window in param['training_strategy']:
         sigma_max=window['std'][1],
         distrib=param['distrib'],
         NData=NDataT,
-        Weight=Weight,
+        WeightCut=WeightCut,
+        WeightSort=WeightSort,
     )
 
     ValidationInput, ValidationOutput = MakeTargetedData(
-        NVec=NVec,
+        NInput=NInput,
+        NOutput=NOutput,
         DVec=DVec,
         mean_min=window['mean'][0],
         mean_max=window['mean'][1],
@@ -149,7 +144,8 @@ for window in param['training_strategy']:
         sigma_max=window['std'][1],
         distrib=param['distrib'],
         NData=NDataV,
-        Weight=Weight,
+        WeightCut=WeightCut,
+        WeightSort=WeightSort,
     )
 
     base_std = float(torch.std(ValidationOutput.to(torch.float)))
@@ -172,7 +168,7 @@ for window in param['training_strategy']:
                 OutputBatch = OutputMiniBatch[k * batch_size:(k + 1) * batch_size]
                 Prediction = N(InputBatch)
 
-                err = torch.norm(Prediction - OutputBatch, p=2) / sqrt(batch_size * DVec * NVec) / base_std
+                err = torch.norm(Prediction - OutputBatch, p=2) / sqrt(batch_size * DVec * NOutput) / base_std
                 (param['mult_grad'] * err).backward()
                 optimizer.step()
                 if lr_scheduler is not None:
@@ -182,7 +178,7 @@ for window in param['training_strategy']:
                     DictGrad.update()
 
                 error += float(err) / (n_batch * n_minibatch)
-                perf += float(torch.sum(ChoseOutput(Prediction, InputBatch) == ChoseOutput(OutputBatch, InputBatch))) / (NDataT * NVec)
+                perf += float(torch.sum(ChoseOutput(Prediction, InputBatch) == ChoseOutput(OutputBatch, InputBatch))) / (NDataT * NOutput)
 
         if time_to_observe:
             DictGrad.next(j)
@@ -192,9 +188,9 @@ for window in param['training_strategy']:
             Output = ValidationOutput.to(device)
             Prediction = N(Input)
 
-            err = torch.norm(Prediction - Output, p=2) / sqrt(NDataV * DVec * NVec) / base_std
+            err = torch.norm(Prediction - Output, p=2) / sqrt(NDataV * DVec * NOutput) / base_std
             ValidationError.append(float(err))
-            ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input))) / (NDataV * NVec))
+            ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input))) / (NDataV * NOutput))
 
         TrainingError.append(error)
         TrainingPerf.append(perf)
@@ -226,8 +222,8 @@ for window in param['training_strategy']:
                 Output = PlottingOutput.to(device)
                 Prediction = N(Input)
 
-                err = torch.norm(Prediction - Output, p=2, dim=[-1, -2]) / sqrt(DVec * NVec) / base_std
-                perf = torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input), dim=[-1]) / NVec
+                err = torch.norm(Prediction - Output, p=2, dim=[-1, -2]) / sqrt(DVec * NOutput) / base_std
+                perf = torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input), dim=[-1]) / NOutput
                 PlottingError.append(err)
                 PlottingPerf.append(perf)
 
@@ -241,13 +237,13 @@ if True:
     ax1.plot([1.] * len(ValidationError), 'black')
     ax1.set_ylim(bottom=0)
     ax1.legend(loc='upper right')
-    ax1.set_title('V0' + '-' + 'Vecteurs' + " : Erreur")
+    ax1.set_title('V1' + '-' + 'Vecteurs' + " : Erreur")
 
     ax2.plot(TrainingPerf, 'r', label="Ensemble d'entrainement")
     ax2.plot(ValidationPerf, 'b', label="Ensemble de Validation")
     ax2.set_ylim(bottom=0)
     ax2.legend(loc='upper right')
-    ax2.set_title('V0' + '-' + 'Vecteurs' + " : Performance")
+    ax2.set_title('V1' + '-' + 'Vecteurs' + " : Performance")
 
     fig.tight_layout(pad=1.0)
 

@@ -1,11 +1,11 @@
 <?xml version="1.0" ?>
 <Dictionary>
- <Object Key="n_encoder" Value="3"/>
- <Object Key="path_ini" Value="None"/>
+ <Object Key="n_encoder" Value="5"/>
  <Object Key="len_in" Value="10"/>
  <Object Key="len_out" Value="5"/>
+ <Object Key="path_ini" Value="None"/>
  <Object Key="d_in" Value="10"/>
- <Object Key="d_att" Value="64"/>
+ <Object Key="d_att" Value="128"/>
  <List Key="WidthsEmbedding">
   <Object Value="32"/>
  </List>
@@ -18,8 +18,32 @@
  <Object Key="NDataT" Value="50000"/>
  <Object Key="NDataV" Value="1000"/>
  <Object Key="batch_size" Value="1000"/>
- <Object Key="n_iter" Value="30"/>
+ <Object Key="n_iter" Value="80"/>
+ <List Key="training_strategy">
+  <Dictionary>
+   <List Key="mean">
+    <Object Value="-50"/>
+    <Object Value="50"/>
+   </List>
+   <List Key="std">
+    <Object Value="0.1"/>
+    <Object Value="10"/>
+   </List>
+  </Dictionary>
+  <Dictionary>
+   <List Key="mean">
+    <Object Value="-200"/>
+    <Object Value="200"/>
+   </List>
+   <List Key="std">
+    <Object Value="0.1"/>
+    <Object Value="50"/>
+   </List>
+  </Dictionary>
+ </List>
+ <String Key="distrib" Value="uniform"/>
  <Object Key="max_lr" Value="5"/>
  <Object Key="FreqGradObs" Value="0.3333333333333333"/>
  <Object Key="warmup" Value="2"/>
+ <String Key="type_error" Value="CE"/>
 </Dictionary>
