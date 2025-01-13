@@ -1,4 +1,5 @@
-from RankAI.V0.Vecteurs.DataMaker import MakeData
+from RankAI.V0.Vecteurs.DataMaker import MakeData, MakeTargetedData
+from RankAI.GifCreator import MakeGIF
 from RankAI.V0.Vecteurs.Ranker import Network, ChoseOutput
 from Complete.LRScheduler import Scheduler
 from GradObserver.GradObserverClass import DictGradObserver
@@ -22,12 +23,12 @@ if save:
     save_path = os.path.join(local, 'RankAI', 'Save', 'V0', 'Vecteurs', folder)
 ################################################################################################################################################
 
-param = {'n_encoder': 3,
+param = {'n_encoder': 5,
          'len_in': 10,
          'path_ini': None,
          # 'path_ini': os.path.join('RankAI', 'Save', 'V0', 'Vecteurs', 'XXXXXXXXXX', 'ParamObs.pkl'),
          'd_in': 10,
-         'd_att': 64,
+         'd_att': 128,
          'WidthsEmbedding': [32],
          'n_heads': 4,
          'norm': 'post',
@@ -35,11 +36,26 @@ param = {'n_encoder': 3,
          'lr': 3e-4,
          'mult_grad': 10000,
          'weight_decay': 1e-3,
-         'NDataT': 50000,
+         'NDataT': 500000,
          'NDataV': 1000,
          'batch_size': 1000,
-         'n_iter': 200,
+         'n_iter': 800,
          'training_strategy': [
+             {'mean': [-50, 50], 'std': [0.1, 10]},
+             {'mean': [-200, 200], 'std': [0.1, 50]},
+             {'mean': [-500, 500], 'std': [0.1, 50]},
+             {'mean': [-800, 800], 'std': [0.1, 50]},
+             {'mean': [-1000, 1000], 'std': [0.1, 50]},
+             {'mean': [-1000, 1000], 'std': [0.1, 80]},
+             {'mean': [-1000, 1000], 'std': [0.1, 100]},
+             {'mean': [-1500, 1500], 'std': [0.1, 100]},
+             {'mean': [-2000, 2000], 'std': [0.1, 100]},
+             {'mean': [-2500, 2500], 'std': [0.1, 100]},
+             {'mean': [-3000, 3000], 'std': [0.1, 100]},
+             {'mean': [-4000, 4000], 'std': [0.1, 100]},
+             {'mean': [-5000, 5000], 'std': [0.1, 100]},
+             {'mean': [-7000, 7000], 'std': [0.1, 100]},
+             {'mean': [-9000, 9000], 'std': [0.1, 100]},
              {'mean': [-10000, 10000], 'std': [0.1, 100]},
          ],
          'distrib': 'uniform',
@@ -48,7 +64,7 @@ param = {'n_encoder': 3,
          'warmup': 2}
 
 freq_checkpoint = 1/10
-nb_frames_GIF = 50
+nb_frames_GIF = 100
 nb_frames_window = int(nb_frames_GIF / len(param['training_strategy']))
 n_iter_window = int(param['n_iter'] / len(param['training_strategy']))
 
@@ -78,7 +94,6 @@ DVec = param['d_in']
 NVec = param['len_in']
 Weight = 2 * torch.rand(DVec) - 1
 Weight = Weight / torch.norm(Weight)
-ValidationInput, ValidationOutput = MakeData(NVec=NVec, DVec=DVec, sigma=1, NData=NDataV, Weight=Weight)
 
 mini_batch_size = 5000
 n_minibatch = int(NDataT/mini_batch_size)
@@ -97,89 +112,142 @@ n_updates = int(NDataT / batch_size) * n_iter
 warmup_steps = int(NDataT / batch_size) * param['warmup']
 lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param['max_lr'])
 
-TrainingInput, TrainingOutput = MakeData(NVec=NVec, DVec=DVec, sigma=1, NData=NDataT, Weight=Weight)
+PlottingInput, PlottingOutput = MakeTargetedData(
+    NVec=NVec,
+    DVec=DVec,
+    mean_min=min([window['mean'][0] for window in param['training_strategy']]),
+    mean_max=max([window['mean'][1] for window in param['training_strategy']]),
+    sigma_min=min([window['std'][0] for window in param['training_strategy']]),
+    sigma_max=max([window['std'][1] for window in param['training_strategy']]),
+    distrib=param['distrib'],
+    NData=100,
+    Weight=Weight,
+    plot=True,
+)
 
-for j in tqdm(range(n_iter)):
-    error = 0
-    perf = 0
-    time_to_observe = (int(j * param['FreqGradObs']) == (j * param['FreqGradObs']))
-    for p in range(n_minibatch):
-        InputMiniBatch = TrainingInput[p*mini_batch_size:(p+1)*mini_batch_size].to(device)
-        OutputMiniBatch = TrainingOutput[p*mini_batch_size:(p+1)*mini_batch_size].to(device)
+best_state_dict = N.state_dict().copy()
 
-        for k in range(n_batch):
-            optimizer.zero_grad(set_to_none=True)
+for window in param['training_strategy']:
+    TrainingInput, TrainingOutput = MakeTargetedData(
+        NVec=NVec,
+        DVec=DVec,
+        mean_min=window['mean'][0],
+        mean_max=window['mean'][1],
+        sigma_min=window['std'][0],
+        sigma_max=window['std'][1],
+        distrib=param['distrib'],
+        NData=NDataT,
+        Weight=Weight,
+    )
 
-            InputBatch = InputMiniBatch[k*batch_size:(k+1)*batch_size].to(device)
-            OutputBatch = OutputMiniBatch[k * batch_size:(k + 1) * batch_size].to(device)
-            Prediction = N(InputBatch)
+    ValidationInput, ValidationOutput = MakeTargetedData(
+        NVec=NVec,
+        DVec=DVec,
+        mean_min=window['mean'][0],
+        mean_max=window['mean'][1],
+        sigma_min=window['std'][0],
+        sigma_max=window['std'][1],
+        distrib=param['distrib'],
+        NData=NDataV,
+        Weight=Weight,
+    )
 
-            err = torch.norm(Prediction-OutputBatch, p=2) / sqrt(batch_size * DVec * NVec)
-            (param['mult_grad'] * err).backward()
-            optimizer.step()
-            if lr_scheduler is not None:
-                lr_scheduler.step()
+    base_std = float(torch.std(ValidationOutput.to(torch.float)))
 
-            if k == 0 and time_to_observe:
-                DictGrad.update()
+    for j in tqdm(range(n_iter_window)):
+        error = 0
+        perf = 0
+        time_to_observe = (int(j * param['FreqGradObs']) == (j * param['FreqGradObs']))
+        time_for_checkpoint = (int(j * freq_checkpoint) == (j * freq_checkpoint))
+        time_for_GIF = (j in torch.linspace(0, n_iter_window, nb_frames_window, dtype=int))
 
-            error += float(err) / (n_batch * n_minibatch)
-            perf += float(torch.sum(ChoseOutput(Prediction, InputBatch) == ChoseOutput(OutputBatch, InputBatch)))/(NDataT*NVec)
+        for p in range(n_minibatch):
+            InputMiniBatch = TrainingInput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
+            OutputMiniBatch = TrainingOutput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
 
-    if time_to_observe:
-        DictGrad.next(j)
+            for k in range(n_batch):
+                optimizer.zero_grad(set_to_none=True)
 
-    with torch.no_grad():
-        Input = ValidationInput.to(device)
-        Output = ValidationOutput.to(device)
-        Prediction = N(Input)
+                InputBatch = InputMiniBatch[k * batch_size:(k + 1) * batch_size]
+                OutputBatch = OutputMiniBatch[k * batch_size:(k + 1) * batch_size]
+                Prediction = N(InputBatch)
 
-        err = torch.norm(Prediction - Output, p=2) / sqrt(NDataV*DVec*NVec)
-        ValidationError.append(float(err))
-        ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input)))/(NDataV*NVec))
+                err = torch.norm(Prediction - OutputBatch, p=2) / sqrt(batch_size * DVec * NVec) / base_std
+                (param['mult_grad'] * err).backward()
+                optimizer.step()
+                if lr_scheduler is not None:
+                    lr_scheduler.step()
 
-    TrainingError.append(error)
-    TrainingPerf.append(perf)
+                if k == 0 and time_to_observe:
+                    DictGrad.update()
 
-################################################################################################################################################
-if save:
-    try:
-        os.mkdir(save_path)
-    except:
-        for file in os.listdir(save_path):
-            os.remove(os.path.join(save_path, file))
-        os.rmdir(save_path)
-        os.mkdir(save_path)
+                error += float(err) / (n_batch * n_minibatch)
+                perf += float(torch.sum(ChoseOutput(Prediction, InputBatch) == ChoseOutput(OutputBatch, InputBatch))) / (NDataT * NVec)
 
-    DictGrad.del_module()
-    error = {'TrainingError': TrainingError,
-             'ValidationError': ValidationError,
-             'TrainingPerf': TrainingPerf,
-             'ValidationPerf': ValidationPerf}
-    saveObjAsXml(param, os.path.join(save_path, 'param'))
-    saveObjAsXml(error, os.path.join(save_path, 'error'))
-    with open(os.path.join(save_path, 'DictGrad.pkl'), 'wb') as file:
-        pickle.dump(DictGrad, file)
-    with open(os.path.join(save_path, 'ParamObs.pkl'), 'wb') as file:
-        ParamObs = DictParamObserver(N)
-        pickle.dump(ParamObs, file)
-################################################################################################################################################
+        if time_to_observe:
+            DictGrad.next(j)
+
+        with torch.no_grad():
+            Input = ValidationInput.to(device)
+            Output = ValidationOutput.to(device)
+            Prediction = N(Input)
+
+            err = torch.norm(Prediction - Output, p=2) / sqrt(NDataV * DVec * NVec) / base_std
+            ValidationError.append(float(err))
+            ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input))) / (NDataV * NVec))
+
+        TrainingError.append(error)
+        TrainingPerf.append(perf)
+
+        if error == min(TrainingError):
+            best_state_dict = N.state_dict().copy()
+
+        if time_for_checkpoint:
+            try:
+                os.mkdir(save_path)
+            except:
+                pass
+            error = {'TrainingError': TrainingError,
+                     'ValidationError': ValidationError,
+                     'TrainingPerf': TrainingPerf,
+                     'ValidationPerf': ValidationPerf}
+            saveObjAsXml(param, os.path.join(save_path, 'param'))
+            saveObjAsXml(error, os.path.join(save_path, 'error'))
+            torch.save(best_state_dict, os.path.join(save_path, 'Best_network'))
+            with open(os.path.join(save_path, 'DictGrad.pkl'), 'wb') as file:
+                pickle.dump(DictGrad, file)
+            with open(os.path.join(save_path, 'ParamObs.pkl'), 'wb') as file:
+                ParamObs = DictParamObserver(N)
+                pickle.dump(ParamObs, file)
+
+        if time_for_GIF:
+            with torch.no_grad():
+                Input = PlottingInput.to(device)
+                Output = PlottingOutput.to(device)
+                Prediction = N(Input)
+
+                err = torch.norm(Prediction - Output, p=2, dim=[-1, -2]) / sqrt(NVec) / base_std
+                perf = torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input), dim=[-1]) / NVec
+                PlottingError.append(err)
+                PlottingPerf.append(perf)
+
+MakeGIF([PlottingError, PlottingPerf], 100, param['training_strategy'], param['distrib'], save_path)
 
 if True:
     fig, (ax1, ax2) = plt.subplots(2, 1)
 
     ax1.plot(TrainingError, 'r', label="Ensemble d'entrainement")
     ax1.plot(ValidationError, 'b', label="Ensemble de Validation")
-    ax1.plot([float(torch.std(ValidationOutput))] * len(ValidationError), 'black')
+    ax1.plot([1.] * len(ValidationError), 'black')
     ax1.set_ylim(bottom=0)
     ax1.legend(loc='upper right')
-    ax1.set_title('V0' + '-' + 'Vecteurs' + " : Erreur")
+    ax1.set_title('V0' + '-' + 'Incides' + " : Erreur")
 
     ax2.plot(TrainingPerf, 'r', label="Ensemble d'entrainement")
     ax2.plot(ValidationPerf, 'b', label="Ensemble de Validation")
     ax2.set_ylim(bottom=0)
     ax2.legend(loc='upper right')
-    ax2.set_title('V0' + '-' + 'Vecteurs' + " : Performance")
+    ax2.set_title('V0' + '-' + 'Incides' + " : Performance")
 
     fig.tight_layout(pad=1.0)
 

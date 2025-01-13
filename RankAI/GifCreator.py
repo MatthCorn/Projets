@@ -56,7 +56,7 @@ def MakeGIF(PlottingData, NData, training_strategy, distrib, save_path):
         ax[1].set_title("perf :" + str(frame))
         error_im = PlottingData[0][frame].reshape(NData, NData).tolist()
         perf_im = PlottingData[1][frame].reshape(NData, NData).tolist()
-        im0 = ax[0].imshow(error_im, cmap="cool", vmin=0, vmax=3)
+        im0 = ax[0].imshow(error_im, cmap="cool", vmin=0, vmax=1)
         im1 = ax[1].imshow(perf_im, cmap="cool", vmin=0, vmax=1)
 
         current_strat = training_strategy[int(frame/frames * len(training_strategy))]
