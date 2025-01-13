@@ -241,13 +241,13 @@ if True:
     ax1.plot([1.] * len(ValidationError), 'black')
     ax1.set_ylim(bottom=0)
     ax1.legend(loc='upper right')
-    ax1.set_title('V0' + '-' + 'Incides' + " : Erreur")
+    ax1.set_title('V0' + '-' + 'Vecteurs' + " : Erreur")
 
     ax2.plot(TrainingPerf, 'r', label="Ensemble d'entrainement")
     ax2.plot(ValidationPerf, 'b', label="Ensemble de Validation")
     ax2.set_ylim(bottom=0)
     ax2.legend(loc='upper right')
-    ax2.set_title('V0' + '-' + 'Incides' + " : Performance")
+    ax2.set_title('V0' + '-' + 'Vecteurs' + " : Performance")
 
     fig.tight_layout(pad=1.0)
 

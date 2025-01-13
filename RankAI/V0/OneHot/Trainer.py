@@ -134,10 +134,7 @@ for j in tqdm(range(n_iter)):
         ValidationError.append(float(err))
         ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction) == ChoseOutput(Output)))/(NDataV*NVec))
 
-    if param['type_error'] == 'CE':
-        TrainingError.append(error)
-    else:
-        TrainingError.append(error)
+    TrainingError.append(error)
     TrainingPerf.append(perf)
 
 ################################################################################################################################################
