@@ -86,7 +86,7 @@ if param['path_ini'] is not None:
 
 N.to(device)
 
-optimizer = torch.optim.Adam(N.parameters(), weight_decay=param['weight_decay'], lr=param['lr'])
+optimizer = torch.optim.SGD(N.parameters(), weight_decay=param['weight_decay'], lr=param['lr'])
 
 NDataT = param['NDataT']
 NDataV = param['NDataV']
@@ -95,7 +95,7 @@ NVec = param['len_in']
 Weight = 2 * torch.rand(DVec) - 1
 Weight = Weight / torch.norm(Weight)
 
-mini_batch_size = 5000
+mini_batch_size = 50000
 n_minibatch = int(NDataT/mini_batch_size)
 batch_size = param['batch_size']
 n_batch = int(mini_batch_size/batch_size)
@@ -226,7 +226,7 @@ for window in param['training_strategy']:
                 Output = PlottingOutput.to(device)
                 Prediction = N(Input)
 
-                err = torch.norm(Prediction - Output, p=2, dim=[-1, -2]) / sqrt(NVec) / base_std
+                err = torch.norm(Prediction - Output, p=2, dim=[-1, -2]) / sqrt(DVec * NVec) / base_std
                 perf = torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input), dim=[-1]) / NVec
                 PlottingError.append(err)
                 PlottingPerf.append(perf)

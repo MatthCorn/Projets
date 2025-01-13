@@ -23,26 +23,40 @@ if save:
     save_path = os.path.join(local, 'RankAI', 'Save', 'V0', 'OneHot', folder)
 ################################################################################################################################################
 
-param = {'n_encoder': 1,
+param = {'n_encoder': 5,
          'len_in': 10,
          'path_ini': None,
          # 'path_ini': os.path.join('RankAI', 'Save', 'V0', 'Vecteurs', 'XXXXXXXXXX', 'ParamObs.pkl'),
          'd_in': 10,
-         'd_att': 32,
-         'WidthsEmbedding': [8],
+         'd_att': 128,
+         'WidthsEmbedding': [32],
          'n_heads': 4,
          'norm': 'post',
          'dropout': 0,
          'lr': 3e-4,
          'mult_grad': 10000,
          'weight_decay': 1e-3,
-         'NDataT': 5000,
+         'NDataT': 500000,
          'NDataV': 1000,
          'batch_size': 1000,
          'n_iter': 800,
          'training_strategy': [
              {'mean': [-50, 50], 'std': [0.1, 10]},
              {'mean': [-200, 200], 'std': [0.1, 50]},
+             {'mean': [-500, 500], 'std': [0.1, 50]},
+             {'mean': [-800, 800], 'std': [0.1, 50]},
+             {'mean': [-1000, 1000], 'std': [0.1, 50]},
+             {'mean': [-1000, 1000], 'std': [0.1, 80]},
+             {'mean': [-1000, 1000], 'std': [0.1, 100]},
+             {'mean': [-1500, 1500], 'std': [0.1, 100]},
+             {'mean': [-2000, 2000], 'std': [0.1, 100]},
+             {'mean': [-2500, 2500], 'std': [0.1, 100]},
+             {'mean': [-3000, 3000], 'std': [0.1, 100]},
+             {'mean': [-4000, 4000], 'std': [0.1, 100]},
+             {'mean': [-5000, 5000], 'std': [0.1, 100]},
+             {'mean': [-7000, 7000], 'std': [0.1, 100]},
+             {'mean': [-9000, 9000], 'std': [0.1, 100]},
+             {'mean': [-10000, 10000], 'std': [0.1, 100]},
          ],
          'distrib': 'uniform',
          'max_lr': 5,
@@ -51,7 +65,7 @@ param = {'n_encoder': 1,
          'type_error': 'CE'}
 
 freq_checkpoint = 1/10
-nb_frames_GIF = 100
+nb_frames_GIF = 20
 nb_frames_window = int(nb_frames_GIF / len(param['training_strategy']))
 n_iter_window = int(param['n_iter'] / len(param['training_strategy']))
 
@@ -82,7 +96,7 @@ NVec = param['len_in']
 Weight = 2 * torch.rand(DVec) - 1
 Weight = Weight / torch.norm(Weight)
 
-mini_batch_size = 5000
+mini_batch_size = 50000
 n_minibatch = int(NDataT/mini_batch_size)
 batch_size = param['batch_size']
 n_batch = int(mini_batch_size/batch_size)
@@ -188,9 +202,9 @@ for window in param['training_strategy']:
             Prediction = N(Input)
 
             if param['type_error'] == 'CE':
-                err = torch.nn.functional.cross_entropy(Prediction, Output)
+                err = torch.nn.functional.cross_entropy(Prediction, Output) / base_value
             elif param['type_error'] == 'MSE':
-                err = torch.norm(Prediction - Output, p=2) / sqrt(NDataV*NVec*NVec)
+                err = torch.norm(Prediction - Output, p=2) / sqrt(NDataV*NVec*NVec) / base_value
 
             ValidationError.append(float(err))
             ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction) == ChoseOutput(Output)))/(NDataV*NVec))
@@ -224,6 +238,11 @@ for window in param['training_strategy']:
                 Input = PlottingInput.to(device)
                 Output = PlottingOutput.to(device)
                 Prediction = N(Input)
+
+                if param['type_error'] == 'CE':
+                    err = torch.mean(torch.nn.functional.cross_entropy(Prediction, Output, reduction='none'), dim=-1) / base_value
+                elif param['type_error'] == 'MSE':
+                    err = torch.norm(Prediction - Output, p=2, dim=[-1, -2]) / sqrt(NVec * NVec) / base_value
 
                 err = torch.norm(Prediction - Output, p=2, dim=[-1, -2]) / sqrt(NVec) / base_value
                 perf = torch.sum(ChoseOutput(Prediction,) == ChoseOutput(Output), dim=[-1]) / NVec
