@@ -86,7 +86,7 @@ if param['path_ini'] is not None:
 
 N.to(device)
 
-optimizer = torch.optim.SGD(N.parameters(), weight_decay=param['weight_decay'], lr=param['lr'])
+optimizer = torch.optim.Adam(N.parameters(), weight_decay=param['weight_decay'], lr=param['lr'])
 
 NDataT = param['NDataT']
 NDataV = param['NDataV']
