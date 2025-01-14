@@ -22,13 +22,13 @@ if save:
     save_path = os.path.join(local, 'RankAI', 'Save', 'V1', 'Vecteurs', folder)
 ################################################################################################################################################
 
-param = {'n_encoder': 1,
+param = {'n_encoder': 5,
          'len_in': 10,
          'len_out': 5,
          'path_ini': None,
          # 'path_ini': os.path.join('RankAI', 'Save', 'V1', 'Vecteurs', 'XXXXXXXXXX', 'ParamObs.pkl'),
          'd_in': 10,
-         'd_att': 64,
+         'd_att': 128,
          'WidthsEmbedding': [32],
          'n_heads': 4,
          'norm': 'post',
@@ -36,12 +36,12 @@ param = {'n_encoder': 1,
          'lr': 3e-4,
          'mult_grad': 10000,
          'weight_decay': 1e-3,
-         'NDataT': 50000,
+         'NDataT': 500000,
          'NDataV': 1000,
          'batch_size': 1000,
-         'n_iter': 10,
+         'n_iter': 50,
          'max_lr': 5,
-         'FreqGradObs': 1/3,
+         'FreqGradObs': 1/30,
          'warmup': 2}
 
 if torch.cuda.is_available():
@@ -74,7 +74,7 @@ WeightSort = 2 * torch.rand(DVec) - 1
 WeightSort = WeightSort / torch.norm(WeightSort)
 ValidationInput, ValidationOutput = MakeData(NInput=NInput, NOutput=NOutput, DVec=DVec, sigma=1, NData=NDataV, WeightCut=WeightCut, WeightSort=WeightSort)
 
-mini_batch_size = 5000
+mini_batch_size = 500000
 n_minibatch = int(NDataT/mini_batch_size)
 batch_size = param['batch_size']
 n_batch = int(mini_batch_size/batch_size)
