@@ -1,13 +1,13 @@
 import torch
 import math
 
-def GetSelected(Input, WeightCut, LimCut=0, NOutput=5):
+def GetSelected(Input, WeightCut, NOutput=5):
     if WeightCut is None:
         WeightCut = torch.tensor([1.]*Input.shape[-1])
     Values = torch.matmul(Input, WeightCut)
     Orders = Values.argsort(dim=-1).argsort(dim=-1)
     MaskOrders = Orders > NOutput
-    Mask = Values > LimCut
+    Mask = Values > Values.mean(dim=-1, keepdim=True)
     Mask[MaskOrders] = True
 
     return Mask
@@ -26,7 +26,7 @@ def GetSorted(Input, Mask, WeightSort):
 def MakeData(NInput=5, DVec=10, mean=0, sigma=1, NData=1000, WeightCut=None, WeightSort=None, NOutput=5):
     Input = torch.normal(mean, sigma, (NData, NInput, DVec))
 
-    Mask = GetSelected(Input, WeightCut, LimCut=0, NOutput=NOutput)
+    Mask = GetSelected(Input, WeightCut, NOutput=NOutput)
     Indices = GetSorted(Input, Mask, WeightSort)
     return Input, Indices[:, :NOutput]
 
