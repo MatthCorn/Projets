@@ -147,6 +147,8 @@ for window in param['training_strategy']:
         WeightSort = WeightSort,
     )
 
+    base_std = float(torch.std(ValidationOutput.to(torch.float)))
+
     for j in tqdm(range(n_iter_window)):
         error = 0
         perf = 0
@@ -164,7 +166,7 @@ for window in param['training_strategy']:
                 OutputBatch = OutputMiniBatch[k * batch_size:(k + 1) * batch_size]
                 Prediction = N(InputBatch)
 
-                err = torch.norm(Prediction - OutputBatch, p=2) / sqrt(batch_size * NOutput)
+                err = torch.norm(Prediction - OutputBatch, p=2) / sqrt(batch_size * NOutput) / base_std
                 (param['mult_grad'] * err).backward()
                 optimizer.step()
 
@@ -185,7 +187,7 @@ for window in param['training_strategy']:
             Output = ValidationOutput.to(device)
             Prediction = N(Input)
 
-            err = torch.norm(Prediction - Output, p=2) / sqrt(NDataV * NOutput)
+            err = torch.norm(Prediction - Output, p=2) / sqrt(NDataV * NOutput) / base_std
             ValidationError.append(float(err))
             ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction, NOutput) == Output)) / (NDataV * NOutput))
 
@@ -201,7 +203,7 @@ for window in param['training_strategy']:
                 Output = PlottingOutput.to(device)
                 Prediction = N(Input)
 
-                err = torch.norm(Prediction - Output, p=2, dim=[-1, -2]) / sqrt(NOutput)
+                err = torch.norm(Prediction - Output, p=2, dim=[-1, -2]) / sqrt(NOutput) / base_std
                 perf = torch.sum(ChoseOutput(Prediction, NOutput) == Output, dim=[-1, -2]) / NOutput
                 PlottingError.append(err.reshape(100, 100).tolist())
                 PlottingPerf.append(perf.reshape(100, 100).tolist())
@@ -233,7 +235,7 @@ if True:
 
     ax1.plot(TrainingError, 'r', label="Ensemble d'entrainement")
     ax1.plot(ValidationError, 'b', label="Ensemble de Validation")
-    ax1.plot([float(torch.std(ValidationOutput.to(torch.float)))] * len(ValidationError), 'black')
+    ax1.plot([1.] * len(ValidationError), 'black')
     ax1.set_ylim(bottom=0)
     ax1.legend(loc='upper right')
     ax1.set_title('V1' + '-' + 'Incides' + " : Erreur")
