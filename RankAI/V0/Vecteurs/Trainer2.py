@@ -9,18 +9,16 @@ import torch
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-save = True
 ################################################################################################################################################
-if save:
-    # pour sauvegarder toutes les informations de l'apprentissage
-    import os
-    import datetime
-    from Tools.XMLTools import saveObjAsXml
-    import pickle
+# pour sauvegarder toutes les informations de l'apprentissage
+import os
+import datetime
+from Tools.XMLTools import saveObjAsXml
+import pickle
 
-    local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projets')
-    folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
-    save_path = os.path.join(local, 'RankAI', 'Save', 'V0', 'Vecteurs', folder)
+local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projets')
+folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
+save_path = os.path.join(local, 'RankAI', 'Save', 'V0', 'Vecteurs', folder)
 ################################################################################################################################################
 
 param = {'n_encoder': 5,
@@ -202,24 +200,6 @@ for window in param['training_strategy']:
         if error == min(TrainingError):
             best_state_dict = N.state_dict().copy()
 
-        if time_for_checkpoint:
-            try:
-                os.mkdir(save_path)
-            except:
-                pass
-            error = {'TrainingError': TrainingError,
-                     'ValidationError': ValidationError,
-                     'TrainingPerf': TrainingPerf,
-                     'ValidationPerf': ValidationPerf}
-            saveObjAsXml(param, os.path.join(save_path, 'param'))
-            saveObjAsXml(error, os.path.join(save_path, 'error'))
-            torch.save(best_state_dict, os.path.join(save_path, 'Best_network'))
-            with open(os.path.join(save_path, 'DictGrad.pkl'), 'wb') as file:
-                pickle.dump(DictGrad, file)
-            with open(os.path.join(save_path, 'ParamObs.pkl'), 'wb') as file:
-                ParamObs = DictParamObserver(N)
-                pickle.dump(ParamObs, file)
-
         if time_for_GIF:
             with torch.no_grad():
                 Input = PlottingInput.to(device)
@@ -228,8 +208,28 @@ for window in param['training_strategy']:
 
                 err = torch.norm(Prediction - Output, p=2, dim=[-1, -2]) / sqrt(DVec * NVec) / base_std
                 perf = torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input), dim=[-1]) / NVec
-                PlottingError.append(err)
-                PlottingPerf.append(perf)
+                PlottingError.append(err.reshape(100, 100).tolist())
+                PlottingPerf.append(perf.reshape(100, 100).tolist())
+
+        if time_for_checkpoint:
+            try:
+                os.mkdir(save_path)
+            except:
+                pass
+            error = {'TrainingError': TrainingError,
+                     'ValidationError': ValidationError,
+                     'TrainingPerf': TrainingPerf,
+                     'ValidationPerf': ValidationPerf,
+                     'PlottingPerf': PlottingPerf,
+                     'PlottingError': PlottingError}
+            saveObjAsXml(param, os.path.join(save_path, 'param'))
+            saveObjAsXml(error, os.path.join(save_path, 'error'))
+            torch.save(best_state_dict, os.path.join(save_path, 'Best_network'))
+            with open(os.path.join(save_path, 'DictGrad.pkl'), 'wb') as file:
+                pickle.dump(DictGrad, file)
+            with open(os.path.join(save_path, 'ParamObs.pkl'), 'wb') as file:
+                ParamObs = DictParamObserver(N)
+                pickle.dump(ParamObs, file)
 
 MakeGIF([PlottingError, PlottingPerf], 100, param['training_strategy'], param['distrib'], save_path)
 
