@@ -109,7 +109,7 @@ PlottingInput, PlottingOutput = MakeTargetedData(
     sigma_min=min([window['std'][0] for window in param['training_strategy']]),
     sigma_max=max([window['std'][1] for window in param['training_strategy']]),
     distrib=param['distrib'],
-    NData=100,
+    NData=32,
     WeightCut=WeightCut,
     WeightSort=WeightSort,
     plot=True,
@@ -204,8 +204,8 @@ for window in param['training_strategy']:
 
                 err = torch.norm(Prediction - Output, p=2, dim=[-1, -2]) / sqrt(DVec * NOutput) / base_std
                 perf = torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input), dim=[-1]) / NOutput
-                PlottingError.append(err.reshape(100, 100).tolist())
-                PlottingPerf.append(perf.reshape(100, 100).tolist())
+                PlottingError.append(err.reshape(32, 32).tolist())
+                PlottingPerf.append(perf.reshape(32, 32).tolist())
 
         if time_for_checkpoint:
             try:
@@ -227,7 +227,7 @@ for window in param['training_strategy']:
                 ParamObs = DictParamObserver(N)
                 pickle.dump(ParamObs, file)
 
-MakeGIF([PlottingError, PlottingPerf], 100, param['training_strategy'], param['distrib'], save_path)
+MakeGIF([PlottingError, PlottingPerf], 32, param['training_strategy'], param['distrib'], save_path)
 
 if True:
     fig, (ax1, ax2) = plt.subplots(2, 1)
