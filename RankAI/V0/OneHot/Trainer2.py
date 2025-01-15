@@ -65,6 +65,7 @@ param = {'n_encoder': 5,
 freq_checkpoint = 1/10
 nb_frames_GIF = 20
 nb_frames_window = int(nb_frames_GIF / len(param['training_strategy']))
+res_GIF = 50
 n_iter_window = int(param['n_iter'] / len(param['training_strategy']))
 
 if torch.cuda.is_available():
@@ -119,7 +120,7 @@ PlottingInput, PlottingOutput = MakeTargetedData(
     sigma_min=min([window['std'][0] for window in param['training_strategy']]),
     sigma_max=max([window['std'][1] for window in param['training_strategy']]),
     distrib=param['distrib'],
-    NData=32,
+    NData=res_GIF,
     Weight=Weight,
     plot=True,
 )
@@ -226,8 +227,8 @@ for window in param['training_strategy']:
 
                 err = torch.norm(Prediction - Output, p=2, dim=[-1, -2]) / sqrt(NVec) / base_value
                 perf = torch.sum(ChoseOutput(Prediction,) == ChoseOutput(Output), dim=[-1]) / NVec
-                PlottingError.append(err.reshape(32, 32).tolist())
-                PlottingPerf.append(perf.reshape(32, 32).tolist())
+                PlottingError.append(err.reshape(res_GIF, res_GIF).tolist())
+                PlottingPerf.append(perf.reshape(res_GIF, res_GIF).tolist())
 
         if time_for_checkpoint:
             try:
@@ -249,7 +250,7 @@ for window in param['training_strategy']:
                 ParamObs = DictParamObserver(N)
                 pickle.dump(ParamObs, file)
 
-MakeGIF([PlottingError, PlottingPerf], 32, param['training_strategy'], param['distrib'], save_path)
+MakeGIF([PlottingError, PlottingPerf], res_GIF, param['training_strategy'], param['distrib'], save_path)
 
 if True:
     fig, (ax1, ax2) = plt.subplots(2, 1)
