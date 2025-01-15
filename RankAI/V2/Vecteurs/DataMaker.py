@@ -24,14 +24,14 @@ def GetSorted(Input, Mask, WeightSort):
     return Output[torch.arange(Output.size(0)).unsqueeze(1), Orders]
 
 
-def MakeData(NInput=5, DVec=10, mean=0, sigma=1, NData=1000, WeightCut=None, WeightSort=None, NOutput=5):
-    Input = torch.normal(mean, sigma ,(NData, NInput, DVec))
+def MakeData(NInput=5, DVec=10, mean=0, std=1, NData=1000, WeightCut=None, WeightSort=None, NOutput=5):
+    Input = torch.normal(mean, std ,(NData, NInput, DVec))
 
     Mask = GetSelected(Input, WeightCut, NOutput=NOutput)
     Output = GetSorted(Input, Mask, WeightSort)
     return Input, Output[:, :NOutput]
 
-def MakeTargetedData(NInput=10, NOutput=5, DVec=10, mean_min=1e-1, mean_max=1e1, sigma_min=1e0, sigma_max=1e1,
+def MakeTargetedData(NInput=10, NOutput=5, DVec=10, mean_min=1e-1, mean_max=1e1, std_min=1e0, std_max=1e1,
                      distrib='log', plot=False, NData=1000, WeightCut=None, WeightSort=None, device=torch.device('cpu')):
     if WeightCut is None:
         WeightCut = torch.tensor([1.] * DVec)
@@ -54,13 +54,13 @@ def MakeTargetedData(NInput=10, NOutput=5, DVec=10, mean_min=1e-1, mean_max=1e1,
         f = lambda x: math.exp(x)
         g = lambda x: torch.log(x)
     mean = g((f(mean_max) - f(mean_min)) * spacing(NData) + f(mean_min))
-    sigma = g((f(sigma_max) - f(sigma_min)) * spacing(NData) + f(sigma_min))
+    std = g((f(std_max) - f(std_min)) * spacing(NData) + f(std_min))
 
     if plot:
-        mean, sigma = torch.meshgrid(mean, sigma)
+        mean, std = torch.meshgrid(mean, std)
         NData = NData ** 2
 
-    mean, sigma = mean.reshape(-1, 1), sigma.reshape(-1, 1)
+    mean, std = mean.reshape(-1, 1), std.reshape(-1, 1)
 
     def ortho(x):
         v1 = WeightSort
@@ -70,12 +70,12 @@ def MakeTargetedData(NInput=10, NOutput=5, DVec=10, mean_min=1e-1, mean_max=1e1,
         p2 = p1 - torch.matmul(x, v2.to(x.device)).unsqueeze(-1) * v2.view(1, 1, DVec)
         return p2
 
-    alpha = torch.normal(0, 1, (NData, NInput)) * sigma / (1 + torch.dot(WeightSort, WeightCut) ** 2) + mean / (1 + torch.dot(WeightSort, WeightCut))
-    beta = torch.normal(0, 1, (NData, NInput)) * sigma / (1 + torch.dot(WeightSort, WeightCut) ** 2) + mean / (1 + torch.dot(WeightSort, WeightCut))
+    alpha = torch.normal(0, 1, (NData, NInput)) * std / (1 + torch.dot(WeightSort, WeightCut) ** 2) + mean / (1 + torch.dot(WeightSort, WeightCut))
+    beta = torch.normal(0, 1, (NData, NInput)) * std / (1 + torch.dot(WeightSort, WeightCut) ** 2) + mean / (1 + torch.dot(WeightSort, WeightCut))
 
     Input = torch.normal(0, 1, (NData, NInput, DVec)) * (alpha.unsqueeze(-1) + beta.unsqueeze(-1)) / 2
     Input = ortho(Input) + alpha.unsqueeze(-1) * WeightSort.view(1, 1, DVec) + beta.unsqueeze(-1) * WeightCut.view(1, 1, DVec)
 
-    Mask = GetSelected(Input, WeightCut, LimCut=0, NOutput=NOutput)
+    Mask = GetSelected(Input, WeightCut, NOutput=NOutput)
     Output = GetSorted(Input, Mask, WeightSort)
     return Input, Output[:, :NOutput]

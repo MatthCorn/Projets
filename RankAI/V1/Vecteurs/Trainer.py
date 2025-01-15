@@ -72,7 +72,7 @@ WeightCut = 2 * torch.rand(DVec) - 1
 WeightCut = WeightCut / torch.norm(WeightCut)
 WeightSort = 2 * torch.rand(DVec) - 1
 WeightSort = WeightSort / torch.norm(WeightSort)
-ValidationInput, ValidationOutput = MakeData(NInput=NInput, NOutput=NOutput, DVec=DVec, sigma=1, NData=NDataV, WeightCut=WeightCut, WeightSort=WeightSort)
+ValidationInput, ValidationOutput = MakeData(NInput=NInput, NOutput=NOutput, DVec=DVec, std=1, NData=NDataV, WeightCut=WeightCut, WeightSort=WeightSort)
 
 mini_batch_size = 500000
 n_minibatch = int(NDataT/mini_batch_size)
@@ -89,7 +89,7 @@ n_updates = int(NDataT / batch_size) * n_iter
 warmup_steps = int(NDataT / batch_size) * param['warmup']
 lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param['max_lr'])
 
-TrainingInput, TrainingOutput = MakeData(NInput=NInput, NOutput=NOutput, DVec=DVec, sigma=1, NData=NDataT, WeightCut=WeightCut, WeightSort=WeightSort)
+TrainingInput, TrainingOutput = MakeData(NInput=NInput, NOutput=NOutput, DVec=DVec, std=1, NData=NDataT, WeightCut=WeightCut, WeightSort=WeightSort)
 
 for j in tqdm(range(n_iter)):
     error = 0

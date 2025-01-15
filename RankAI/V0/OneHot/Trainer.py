@@ -69,7 +69,7 @@ DVec = param['d_in']
 NVec = param['len_in']
 Weight = 2 * torch.rand(DVec) - 1
 Weight = Weight / torch.norm(Weight)
-ValidationInput, ValidationOutput = MakeData(NVec=NVec, DVec=DVec, sigma=1, NData=NDataV, Weight=Weight)
+ValidationInput, ValidationOutput = MakeData(NVec=NVec, DVec=DVec, std=1, NData=NDataV, Weight=Weight)
 
 mini_batch_size = 5000
 n_minibatch = int(NDataT/mini_batch_size)
@@ -86,7 +86,7 @@ n_updates = int(NDataT / batch_size) * n_iter
 warmup_steps = int(NDataT / batch_size) * param['warmup']
 lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param['max_lr'])
 
-TrainingInput, TrainingOutput = MakeData(NVec=NVec, DVec=DVec, sigma=1, NData=NDataT, Weight=Weight)
+TrainingInput, TrainingOutput = MakeData(NVec=NVec, DVec=DVec, std=1, NData=NDataT, Weight=Weight)
 
 for j in tqdm(range(n_iter)):
     error = 0
