@@ -21,45 +21,53 @@ folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
 save_path = os.path.join(local, 'RankAI', 'Save', 'V0', 'Vecteurs', folder)
 ################################################################################################################################################
 
-param = {'n_encoder': 5,
-         'len_in': 10,
-         'path_ini': None,
-         # 'path_ini': os.path.join('RankAI', 'Save', 'V0', 'Vecteurs', 'XXXXXXXXXX', 'ParamObs.pkl'),
-         'd_in': 10,
-         'd_att': 128,
-         'WidthsEmbedding': [32],
-         'n_heads': 4,
-         'norm': 'post',
-         'dropout': 0,
-         'lr': 3e-4,
-         'mult_grad': 10000,
-         'weight_decay': 1e-3,
-         'NDataT': 500000,
-         'NDataV': 1000,
-         'batch_size': 1000,
-         'n_iter': 800,
-         'training_strategy': [
-             {'mean': [-50, 50], 'std': [0.1, 10]},
-             {'mean': [-200, 200], 'std': [0.1, 50]},
-             {'mean': [-500, 500], 'std': [0.1, 50]},
-             {'mean': [-800, 800], 'std': [0.1, 50]},
-             {'mean': [-1000, 1000], 'std': [0.1, 50]},
-             {'mean': [-1000, 1000], 'std': [0.1, 80]},
-             {'mean': [-1000, 1000], 'std': [0.1, 100]},
-             {'mean': [-1500, 1500], 'std': [0.1, 100]},
-             {'mean': [-2000, 2000], 'std': [0.1, 100]},
-             {'mean': [-2500, 2500], 'std': [0.1, 100]},
-             {'mean': [-3000, 3000], 'std': [0.1, 100]},
-             {'mean': [-4000, 4000], 'std': [0.1, 100]},
-             {'mean': [-5000, 5000], 'std': [0.1, 100]},
-             {'mean': [-7000, 7000], 'std': [0.1, 100]},
-             {'mean': [-9000, 9000], 'std': [0.1, 100]},
-             {'mean': [-10000, 10000], 'std': [0.1, 100]},
-         ],
-         'distrib': 'uniform',
-         'max_lr': 5,
-         'FreqGradObs': 1/3,
-         'warmup': 2}
+try:
+    import json
+    import sys
+    json_file = sys.argv[1]
+    with open(json_file, 'r') as f:
+        param = json.load(f)
+
+except:
+    param = {'n_encoder': 5,
+             'len_in': 10,
+             'path_ini': None,
+             # 'path_ini': os.path.join('RankAI', 'Save', 'V0', 'Vecteurs', 'XXXXXXXXXX', 'ParamObs.pkl'),
+             'd_in': 10,
+             'd_att': 128,
+             'WidthsEmbedding': [32],
+             'n_heads': 4,
+             'norm': 'post',
+             'dropout': 0,
+             'lr': 3e-4,
+             'mult_grad': 10000,
+             'weight_decay': 1e-3,
+             'NDataT': 500000,
+             'NDataV': 1000,
+             'batch_size': 1000,
+             'n_iter': 800,
+             'training_strategy': [
+                 {'mean': [-50, 50], 'std': [0.1, 10]},
+                 {'mean': [-200, 200], 'std': [0.1, 50]},
+                 {'mean': [-500, 500], 'std': [0.1, 50]},
+                 {'mean': [-800, 800], 'std': [0.1, 50]},
+                 {'mean': [-1000, 1000], 'std': [0.1, 50]},
+                 {'mean': [-1000, 1000], 'std': [0.1, 80]},
+                 {'mean': [-1000, 1000], 'std': [0.1, 100]},
+                 {'mean': [-1500, 1500], 'std': [0.1, 100]},
+                 {'mean': [-2000, 2000], 'std': [0.1, 100]},
+                 {'mean': [-2500, 2500], 'std': [0.1, 100]},
+                 {'mean': [-3000, 3000], 'std': [0.1, 100]},
+                 {'mean': [-4000, 4000], 'std': [0.1, 100]},
+                 {'mean': [-5000, 5000], 'std': [0.1, 100]},
+                 {'mean': [-7000, 7000], 'std': [0.1, 100]},
+                 {'mean': [-9000, 9000], 'std': [0.1, 100]},
+                 {'mean': [-10000, 10000], 'std': [0.1, 100]},
+             ],
+             'distrib': 'uniform',
+             'max_lr': 5,
+             'FreqGradObs': 1/3,
+             'warmup': 2}
 
 freq_checkpoint = 1/10
 nb_frames_GIF = 100
