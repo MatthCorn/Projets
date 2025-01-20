@@ -1,5 +1,4 @@
 from RankAI.V0.Vecteurs.DataMaker import MakeTargetedData
-# from RankAI.GifCreator import MakeGIF
 from RankAI.V0.Vecteurs.Ranker import Network, ChoseOutput
 from Complete.LRScheduler import Scheduler
 from GradObserver.GradObserverClass import DictGradObserver
@@ -7,7 +6,6 @@ from Tools.ParamObs import DictParamObserver, RecInitParam
 from math import sqrt
 import torch
 from tqdm import tqdm
-# import matplotlib.pyplot as plt
 
 ################################################################################################################################################
 # pour sauvegarder toutes les informations de l'apprentissage
@@ -54,8 +52,10 @@ try:
     with open(json_file, 'r') as f:
         temp_param = json.load(f)
     param.update(temp_param)
+    plot = False
 except:
     print('nothing loaded')
+    plot = True
 
 
 
@@ -230,24 +230,29 @@ for window in param['training_strategy']:
                 ParamObs = DictParamObserver(N)
                 pickle.dump(ParamObs, file)
 
-# MakeGIF([PlottingError, PlottingPerf], res_GIF, param['training_strategy'], param['distrib'], save_path)
 
-# if True:
-#     fig, (ax1, ax2) = plt.subplots(2, 1)
-#
-#     ax1.plot(TrainingError, 'r', label="Ensemble d'entrainement")
-#     ax1.plot(ValidationError, 'b', label="Ensemble de Validation")
-#     ax1.plot([1.] * len(ValidationError), 'black')
-#     ax1.set_ylim(bottom=0)
-#     ax1.legend(loc='upper right')
-#     ax1.set_title('V0' + '-' + 'Vecteurs' + " : Erreur")
-#
-#     ax2.plot(TrainingPerf, 'r', label="Ensemble d'entrainement")
-#     ax2.plot(ValidationPerf, 'b', label="Ensemble de Validation")
-#     ax2.set_ylim(bottom=0)
-#     ax2.legend(loc='upper right')
-#     ax2.set_title('V0' + '-' + 'Vecteurs' + " : Performance")
-#
-#     fig.tight_layout(pad=1.0)
-#
-#     plt.show()
+
+if plot:
+    from RankAI.GifCreator import MakeGIF
+    import matplotlib.pyplot as plt
+
+    MakeGIF([PlottingError, PlottingPerf], res_GIF, param['training_strategy'], param['distrib'], save_path)
+
+    fig, (ax1, ax2) = plt.subplots(2, 1)
+
+    ax1.plot(TrainingError, 'r', label="Ensemble d'entrainement")
+    ax1.plot(ValidationError, 'b', label="Ensemble de Validation")
+    ax1.plot([1.] * len(ValidationError), 'black')
+    ax1.set_ylim(bottom=0)
+    ax1.legend(loc='upper right')
+    ax1.set_title('V0' + '-' + 'Vecteurs' + " : Erreur")
+
+    ax2.plot(TrainingPerf, 'r', label="Ensemble d'entrainement")
+    ax2.plot(ValidationPerf, 'b', label="Ensemble de Validation")
+    ax2.set_ylim(bottom=0)
+    ax2.legend(loc='upper right')
+    ax2.set_title('V0' + '-' + 'Vecteurs' + " : Performance")
+
+    fig.tight_layout(pad=1.0)
+
+    plt.show()
