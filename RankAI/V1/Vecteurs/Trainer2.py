@@ -33,10 +33,10 @@ param = {'n_encoder': 5,
          'lr': 3e-4,
          'mult_grad': 10000,
          'weight_decay': 1e-3,
-         'NDataT': 50000,
+         'NDataT': 500000,
          'NDataV': 1000,
          'batch_size': 1000,
-         'n_iter': 20,
+         'n_iter': 80,
          'training_strategy': [
              {'mean': [-50, 50], 'std': [0.1, 10]},
              {'mean': [-200, 200], 'std': [0.1, 50]},
@@ -59,7 +59,7 @@ except:
     plot = True
 
 freq_checkpoint = 1/10
-nb_frames_GIF = 4
+nb_frames_GIF = 20
 nb_frames_window = int(nb_frames_GIF / len(param['training_strategy']))
 res_GIF = 50
 n_iter_window = int(param['n_iter'] / len(param['training_strategy']))
