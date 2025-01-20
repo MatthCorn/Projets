@@ -72,12 +72,16 @@ def MakeTargetedData(NInput=10, NOutput=5, DVec=10, mean_min=1e-1, mean_max=1e1,
         p2 = p1 - torch.matmul(x, v2.to(x.device)).unsqueeze(-1) * v2.view(1, 1, DVec)
         return p2
 
-    alpha = torch.normal(0, 1, (NData, NInput)) * std_alpha / (1 + torch.dot(WeightSort, WeightCut) ** 2) + mean_alpha / (1 + torch.dot(WeightSort, WeightCut))
-    beta = torch.normal(0, 1, (NData, NInput)) * std_beta / (1 + torch.dot(WeightSort, WeightCut) ** 2) + mean_beta / (1 + torch.dot(WeightSort, WeightCut))
+    alpha = (torch.normal(0, 1, (NData, NInput)) *
+             torch.sqrt((std_alpha - torch.dot(WeightSort, WeightCut) ** 2 * std_beta) / (1 - torch.dot(WeightSort, WeightCut) ** 4)) +
+             (mean_alpha - torch.dot(WeightSort, WeightCut) * mean_beta) / (1 - torch.dot(WeightSort, WeightCut) ** 2))
+    beta = (torch.normal(0, 1, (NData, NInput)) *
+            torch.sqrt((std_beta - torch.dot(WeightSort, WeightCut) ** 2 * std_alpha) / (1 - torch.dot(WeightSort, WeightCut) ** 4)) +
+            (mean_beta - torch.dot(WeightSort, WeightCut) * mean_alpha) / (1 - torch.dot(WeightSort, WeightCut) ** 2))
 
-    Input = torch.normal(0, 1, (NData, NInput, DVec)) * (alpha.unsqueeze(-1) + beta.unsqueeze(-1)) / 2
+    Input = (torch.normal(0, 1, (NData, NInput, DVec)) * alpha.unsqueeze(-1) + torch.normal(0, 1, (NData, NInput, DVec)) * beta.unsqueeze(-1)) / 2
     Input = ortho(Input) + alpha.unsqueeze(-1) * WeightSort.view(1, 1, DVec) + beta.unsqueeze(-1) * WeightCut.view(1, 1, DVec)
 
     Selected = GetSelected(Input, WeightCut, NOutput)
     Output = GetSorted(Selected, WeightSort)
-    return Input, Output
+    return Input.to(device), Output.to(device)

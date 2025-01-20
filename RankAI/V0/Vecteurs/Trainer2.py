@@ -57,8 +57,6 @@ except:
     print('nothing loaded')
     plot = True
 
-
-
 freq_checkpoint = 1/10
 nb_frames_GIF = 100
 nb_frames_window = int(nb_frames_GIF / len(param['training_strategy']))
@@ -229,8 +227,6 @@ for window in param['training_strategy']:
             with open(os.path.join(save_path, 'ParamObs.pkl'), 'wb') as file:
                 ParamObs = DictParamObserver(N)
                 pickle.dump(ParamObs, file)
-
-
 
 if plot:
     from RankAI.GifCreator import MakeGIF

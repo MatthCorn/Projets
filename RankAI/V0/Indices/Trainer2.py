@@ -1,13 +1,11 @@
 from RankAI.V0.Indices.Ranker import Network, ChoseOutput
 from RankAI.V0.Indices.DataMaker import MakeTargetedData
-from RankAI.GifCreator import MakeGIF
 from Complete.LRScheduler import Scheduler
 from math import sqrt
 from GradObserver.GradObserverClass import DictGradObserver
 from Tools.ParamObs import DictParamObserver, RecInitParam
 import torch
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 
 ################################################################################################################################################
 # pour sauvegarder toutes les informations de l'apprentissage
@@ -48,6 +46,18 @@ param = {'n_encoder': 3,
          'max_lr': 5,
          'FreqGradObs': 1/3,
          'warmup': 2}
+
+try:
+    import json
+    import sys
+    json_file = sys.argv[1]
+    with open(json_file, 'r') as f:
+        temp_param = json.load(f)
+    param.update(temp_param)
+    plot = False
+except:
+    print('nothing loaded')
+    plot = True
 
 freq_checkpoint = 1/10
 nb_frames_GIF = 50
@@ -220,10 +230,12 @@ for window in param['training_strategy']:
                 ParamObs = DictParamObserver(N)
                 pickle.dump(ParamObs, file)
 
-MakeGIF([PlottingError, PlottingPerf], res_GIF, param['training_strategy'], param['distrib'], save_path)
+if plot:
+    from RankAI.GifCreator import MakeGIF
+    import matplotlib.pyplot as plt
 
+    MakeGIF([PlottingError, PlottingPerf], res_GIF, param['training_strategy'], param['distrib'], save_path)
 
-if True:
     fig, (ax1, ax2) = plt.subplots(2, 1)
 
     ax1.plot(TrainingError, 'r', label="Ensemble d'entrainement")
