@@ -34,6 +34,7 @@ def MakeTargetedData(NInput=10, NOutput=5, DVec=10, mean_min=1e-1, mean_max=1e1,
         WeightSort = torch.tensor([1.] * DVec)
     WeightSort = WeightSort / torch.norm(WeightSort)
     WeightCut = WeightCut / torch.norm(WeightCut)
+    scal = torch.dot(WeightSort, WeightCut)
     if plot:
         spacing = lambda x: torch.linspace(0, 1, x)
     else:
@@ -58,7 +59,7 @@ def MakeTargetedData(NInput=10, NOutput=5, DVec=10, mean_min=1e-1, mean_max=1e1,
     mean, std = mean.reshape(-1, 1), std.reshape(-1, 1)
     gamma_mean = torch.rand(*mean.size())
     eps_mean = torch.randint(0, 2, tuple(mean.shape))
-    gamma_std = torch.rand(tuple(std.shape))
+    gamma_std = torch.rand(tuple(std.shape)) * (1 - abs(scal)) / (1 + abs(scal)) + abs(scal) / (1 + abs(scal))
     mean_alpha = (-1) ** (eps_mean + (mean > 0)) * abs(mean) * gamma_mean
     mean_beta = (-1) ** eps_mean * abs(mean) * (1 - gamma_mean)
     std_alpha = std * gamma_std
@@ -66,18 +67,18 @@ def MakeTargetedData(NInput=10, NOutput=5, DVec=10, mean_min=1e-1, mean_max=1e1,
 
     def ortho(x):
         v1 = WeightSort
-        v2 = WeightCut - torch.dot(WeightSort, WeightCut) * WeightSort
+        v2 = WeightCut - scal * WeightSort
         v2 = v2 / torch.norm(v2)
         p1 = x - torch.matmul(x, v1.to(x.device)).unsqueeze(-1) * v1.view(1, 1, DVec)
         p2 = p1 - torch.matmul(x, v2.to(x.device)).unsqueeze(-1) * v2.view(1, 1, DVec)
         return p2
 
     alpha = (torch.normal(0, 1, (NData, NInput)) *
-             torch.sqrt((std_alpha - torch.dot(WeightSort, WeightCut) ** 2 * std_beta) / (1 - torch.dot(WeightSort, WeightCut) ** 4)) +
-             (mean_alpha - torch.dot(WeightSort, WeightCut) * mean_beta) / (1 - torch.dot(WeightSort, WeightCut) ** 2))
+             torch.sqrt((std_alpha ** 2 - scal ** 2 * std_beta ** 2) / (1 - scal ** 4)) +
+             (mean_alpha - scal * mean_beta) / (1 - scal ** 2))
     beta = (torch.normal(0, 1, (NData, NInput)) *
-            torch.sqrt((std_beta - torch.dot(WeightSort, WeightCut) ** 2 * std_alpha) / (1 - torch.dot(WeightSort, WeightCut) ** 4)) +
-            (mean_beta - torch.dot(WeightSort, WeightCut) * mean_alpha) / (1 - torch.dot(WeightSort, WeightCut) ** 2))
+            torch.sqrt((std_beta - scal ** 2 * std_alpha) / (1 - scal ** 4)) +
+            (mean_beta - scal * mean_alpha) / (1 - scal ** 2))
 
     Input = (torch.normal(0, 1, (NData, NInput, DVec)) * alpha.unsqueeze(-1) + torch.normal(0, 1, (NData, NInput, DVec)) * beta.unsqueeze(-1)) / 2
     Input = ortho(Input) + alpha.unsqueeze(-1) * WeightSort.view(1, 1, DVec) + beta.unsqueeze(-1) * WeightCut.view(1, 1, DVec)
