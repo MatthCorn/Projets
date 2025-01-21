@@ -60,7 +60,7 @@ def MakeGIF(PlottingData, NData, training_strategy, frac, distrib, save_path):
         im0 = ax[0].imshow(error_im, cmap="cool", vmin=0, vmax=1)
         im1 = ax[1].imshow(perf_im, cmap="cool", vmin=0, vmax=1)
 
-        current_strat = training_strategy[int(frame/frames/frac * len(training_strategy))]
+        current_strat = training_strategy[int(frame/frames*frac * len(training_strategy))]
         current_mean_min = current_strat['mean'][0]
         current_mean_max = current_strat['mean'][1]
         current_std_min = current_strat['std'][0]
@@ -141,7 +141,7 @@ def PlotError(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r"C:\Users\Matth\Documents\Projets\RankAI\Save\V1\Vecteurs\2025-01-20__23-31"
+    save_path = r"C:\Users\matth\Documents\Python\Projets\RankAI\Save\V0\Vecteurs\2025-01-21__10-48"
 
     PlotError(save_path)
 

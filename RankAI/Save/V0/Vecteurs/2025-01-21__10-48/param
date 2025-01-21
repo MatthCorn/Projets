@@ -1,0 +1,48 @@
+<?xml version="1.0" ?>
+<Dictionary>
+ <Object Key="n_encoder" Value="10"/>
+ <Object Key="len_in" Value="10"/>
+ <Object Key="path_ini" Value="None"/>
+ <Object Key="d_in" Value="10"/>
+ <Object Key="d_att" Value="128"/>
+ <List Key="WidthsEmbedding">
+  <Object Value="32"/>
+ </List>
+ <Object Key="n_heads" Value="4"/>
+ <String Key="norm" Value="post"/>
+ <Object Key="dropout" Value="0"/>
+ <Object Key="lr" Value="3e-05"/>
+ <Object Key="mult_grad" Value="10000"/>
+ <Object Key="weight_decay" Value="0.001"/>
+ <Object Key="NDataT" Value="5000000"/>
+ <Object Key="NDataV" Value="1000"/>
+ <Object Key="batch_size" Value="1000"/>
+ <Object Key="n_iter" Value="5"/>
+ <List Key="training_strategy">
+  <Dictionary>
+   <List Key="mean">
+    <Object Value="-10000"/>
+    <Object Value="10000"/>
+   </List>
+   <List Key="std">
+    <Object Value="0.1"/>
+    <Object Value="100"/>
+   </List>
+  </Dictionary>
+  <Dictionary>
+   <List Key="mean">
+    <Object Value="-10000"/>
+    <Object Value="10000"/>
+   </List>
+   <List Key="std">
+    <Object Value="0.1"/>
+    <Object Value="100"/>
+   </List>
+  </Dictionary>
+ </List>
+ <String Key="distrib" Value="uniform"/>
+ <Object Key="max_lr" Value="5"/>
+ <Object Key="FreqGradObs" Value="0.333333"/>
+ <Object Key="warmup" Value="2"/>
+ <Object Key="len_out" Value="5"/>
+</Dictionary>
