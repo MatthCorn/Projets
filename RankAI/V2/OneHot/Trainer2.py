@@ -1,5 +1,5 @@
 from RankAI.V2.OneHot.DataMaker import MakeTargetedData
-from RankAI.GifCreator import MakeGIF
+from RankAI.Visualization import MakeGIF
 from RankAI.V2.OneHot.Ranker import Network, ChoseOutput
 from Complete.LRScheduler import Scheduler
 from GradObserver.GradObserverClass import DictGradObserver
@@ -244,7 +244,7 @@ for window in param['training_strategy']:
                 ParamObs = DictParamObserver(N)
                 pickle.dump(ParamObs, file)
 
-MakeGIF([PlottingError, PlottingPerf], res_GIF, param['training_strategy'], param['distrib'], save_path)
+MakeGIF([PlottingError, PlottingPerf], res_GIF, param['training_strategy'], param['n_iter'], param['distrib'], save_path)
 
 if True:
     fig, (ax1, ax2) = plt.subplots(2, 1)

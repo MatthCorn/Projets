@@ -261,10 +261,10 @@ for window in param['training_strategy']:
                 pickle.dump(ParamObs, file)
 
 if plot:
-    from RankAI.GifCreator import MakeGIF
+    from RankAI.Visualization import MakeGIF
     import matplotlib.pyplot as plt
 
-    MakeGIF([PlottingError, PlottingPerf], res_GIF, param['training_strategy'], param['distrib'], save_path)
+    MakeGIF([PlottingError, PlottingPerf], res_GIF, param['training_strategy'], param['n_iter'], param['distrib'], save_path)
 
     fig, (ax1, ax2) = plt.subplots(2, 1)
 
