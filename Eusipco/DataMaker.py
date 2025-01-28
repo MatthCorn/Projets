@@ -44,8 +44,25 @@ def MakeTargetedData(NVec=5, DVec=10, mean_min=1e-1, mean_max=1e1, std_min=1e0, 
     alpha = torch.normal(0, 1, (NData, NVec)) * std + mean
 
     Input = torch.normal(0, 1, (NData, NVec, DVec)) * alpha.unsqueeze(-1)
+
+    # centered = Input - Input.mean(dim=-2, keepdim=True)
+    # dist = torch.sqrt(torch.sum(centered ** 2, dim=-1) / 10)
+    # err = torch.mean(dist, dim=-1, keepdim=True)
+    # l1 = err / abs(alpha).mean(dim=-1, keepdim=True)
+    #
+    # centered = Input - Input.mean(dim=[0, -2], keepdim=True)
+    # dist = torch.sqrt(torch.sum(centered ** 2, dim=-1) / 10)
+    # err = torch.mean(dist, dim=-1, keepdim=True)
+    # l2 = err / torch.std(Input)
+    #
+    # import matplotlib.pyplot as plt
+    # plt.imshow(l1.reshape(50, 50))
+    # plt.show()
+    # plt.imshow(l2.reshape(50, 50))
+    # plt.show()
+
     uncontroled_values = torch.matmul(Input, Weight.to(Input.device))
     Input = Input + (alpha - uncontroled_values).unsqueeze(-1) * Weight.view(1, 1, DVec)
 
     Output = GetSorted(Input, Weight)
-    return Input.to(device), Output.to(device)
+    return Input.to(device), Output.to(device), abs(alpha).mean(dim=-1, keepdim=True).unsqueeze(-1).to(device)

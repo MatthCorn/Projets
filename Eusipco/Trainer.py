@@ -27,11 +27,11 @@ folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
 save_path = os.path.join(local, 'Eusipco', 'Save', folder)
 ################################################################################################################################################
 
-param = {'n_encoder': 5,
-         'len_in': 10,
+param = {'n_encoder': 10,
+         'len_in': 20,
          'd_in': 10,
          'd_att': 128,
-         'network': 'CNN',
+         'network': 'RNN',
          'WidthsEmbedding': [32],
          'dropout': 0,
          'lr': 3e-4,
@@ -40,10 +40,10 @@ param = {'n_encoder': 5,
          'NDataT': 500000,
          'NDataV': 1000,
          'batch_size': 1000,
-         'n_iter': 40,
+         'n_iter': 80,
          'training_strategy': [
-             {"mean": [-10000, 10000], "std": [0.1, 100]},
-             {"mean": [-10000, 10000], "std": [0.1, 100]}
+             {"mean": [-10, 10], "std": [0.1, 10]},
+             {"mean": [-50, 50], "std": [0.1, 50]}
          ],
          'distrib': 'uniform',
          'max_lr': 5,
@@ -108,7 +108,7 @@ n_updates = int(NDataT / batch_size) * n_iter
 warmup_steps = int(NDataT / batch_size) * param['warmup']
 lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param['max_lr'])
 
-PlottingInput, PlottingOutput = MakeTargetedData(
+PlottingInput, PlottingOutput, PlottingStd = MakeTargetedData(
     NVec=NVec,
     DVec=DVec,
     mean_min=min([window['mean'][0] for window in param['training_strategy']]),
@@ -124,7 +124,7 @@ PlottingInput, PlottingOutput = MakeTargetedData(
 best_state_dict = N.state_dict().copy()
 
 for window in param['training_strategy']:
-    TrainingInput, TrainingOutput = MakeTargetedData(
+    TrainingInput, TrainingOutput, TrainingStd = MakeTargetedData(
         NVec=NVec,
         DVec=DVec,
         mean_min=window['mean'][0],
@@ -136,7 +136,7 @@ for window in param['training_strategy']:
         Weight=Weight,
     )
 
-    ValidationInput, ValidationOutput = MakeTargetedData(
+    ValidationInput, ValidationOutput, ValidationStd = MakeTargetedData(
         NVec=NVec,
         DVec=DVec,
         mean_min=window['mean'][0],
@@ -148,8 +148,6 @@ for window in param['training_strategy']:
         Weight=Weight,
     )
 
-    base_std = float(torch.std(ValidationOutput.to(torch.float)))
-
     for j in tqdm(range(n_iter_window)):
         error = 0
         perf = 0
@@ -160,15 +158,17 @@ for window in param['training_strategy']:
         for p in range(n_minibatch):
             InputMiniBatch = TrainingInput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
             OutputMiniBatch = TrainingOutput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
+            StdMiniBatch = TrainingStd[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
 
             for k in range(n_batch):
                 optimizer.zero_grad(set_to_none=True)
 
                 InputBatch = InputMiniBatch[k * batch_size:(k + 1) * batch_size]
                 OutputBatch = OutputMiniBatch[k * batch_size:(k + 1) * batch_size]
+                StdBatch = StdMiniBatch[k * batch_size:(k + 1) * batch_size]
                 Prediction = N(InputBatch)
 
-                err = torch.norm(Prediction - OutputBatch, p=2) / sqrt(batch_size * DVec * NVec) / base_std
+                err = torch.norm((Prediction - OutputBatch) / StdBatch, p=2) / sqrt(batch_size * DVec * NVec)
                 (param['mult_grad'] * err).backward()
                 optimizer.step()
                 if lr_scheduler is not None:
@@ -186,9 +186,10 @@ for window in param['training_strategy']:
         with torch.no_grad():
             Input = ValidationInput.to(device)
             Output = ValidationOutput.to(device)
+            Std = ValidationStd.to(device)
             Prediction = N(Input)
 
-            err = torch.norm(Prediction - Output, p=2) / sqrt(NDataV * DVec * NVec) / base_std
+            err = torch.norm((Prediction - Output) / Std, p=2) / sqrt(NDataV * DVec * NVec)
             ValidationError.append(float(err))
             ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input))) / (NDataV * NVec))
 
@@ -202,9 +203,10 @@ for window in param['training_strategy']:
             with torch.no_grad():
                 Input = PlottingInput.to(device)
                 Output = PlottingOutput.to(device)
+                Std = PlottingStd.to(device)
                 Prediction = N(Input)
 
-                err = torch.norm(Prediction - Output, p=2, dim=[-1, -2]) / sqrt(DVec * NVec) / base_std
+                err = torch.norm((Prediction - Output) / Std, p=2, dim=[-1, -2]) / sqrt(DVec * NVec)
                 perf = torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input), dim=[-1]) / NVec
                 PlottingError.append(err.reshape(res_GIF, res_GIF).tolist())
                 PlottingPerf.append(perf.reshape(res_GIF, res_GIF).tolist())
