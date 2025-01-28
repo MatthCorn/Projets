@@ -28,10 +28,10 @@ save_path = os.path.join(local, 'Eusipco', 'Save', folder)
 ################################################################################################################################################
 
 param = {'n_encoder': 10,
-         'len_in': 20,
+         'len_in': 10,
          'd_in': 10,
          'd_att': 128,
-         'network': 'RNN',
+         'network': 'Transformer',
          'WidthsEmbedding': [32],
          'dropout': 0,
          'lr': 3e-4,
@@ -40,10 +40,24 @@ param = {'n_encoder': 10,
          'NDataT': 500000,
          'NDataV': 1000,
          'batch_size': 1000,
-         'n_iter': 80,
+         'n_iter': 800,
          'training_strategy': [
-             {"mean": [-10, 10], "std": [0.1, 10]},
-             {"mean": [-50, 50], "std": [0.1, 50]}
+             {'mean': [-50, 50], 'std': [0.1, 10]},
+             {'mean': [-200, 200], 'std': [0.1, 50]},
+             {'mean': [-500, 500], 'std': [0.1, 50]},
+             {'mean': [-800, 800], 'std': [0.1, 50]},
+             {'mean': [-1000, 1000], 'std': [0.1, 50]},
+             {'mean': [-1000, 1000], 'std': [0.1, 80]},
+             {'mean': [-1000, 1000], 'std': [0.1, 100]},
+             {'mean': [-1500, 1500], 'std': [0.1, 100]},
+             {'mean': [-2000, 2000], 'std': [0.1, 100]},
+             {'mean': [-2500, 2500], 'std': [0.1, 100]},
+             {'mean': [-3000, 3000], 'std': [0.1, 100]},
+             {'mean': [-4000, 4000], 'std': [0.1, 100]},
+             {'mean': [-5000, 5000], 'std': [0.1, 100]},
+             {'mean': [-7000, 7000], 'std': [0.1, 100]},
+             {'mean': [-9000, 9000], 'std': [0.1, 100]},
+             {'mean': [-10000, 10000], 'std': [0.1, 100]},
          ],
          'distrib': 'uniform',
          'max_lr': 5,
@@ -65,7 +79,7 @@ except:
 Network = {'Transformer': Transformer, 'CNN': CNN, 'RNN': RNN}[param['network']]
 
 freq_checkpoint = 1/10
-nb_frames_GIF = 20
+nb_frames_GIF = 100
 nb_frames_window = int(nb_frames_GIF / len(param['training_strategy']))
 res_GIF = 50
 n_iter_window = int(param['n_iter'] / len(param['training_strategy']))
