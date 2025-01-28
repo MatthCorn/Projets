@@ -141,8 +141,8 @@ def PlotError(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r"C:\Users\Matth\Documents\Projets\RankAI\Save\V1\Vecteurs\2025-01-21__16-01"
+    save_path = r"C:\Users\Matth\Documents\Projets\RankAI\Save\V0\Vecteurs\2025-01-20__19-39"
 
     PlotError(save_path)
 
-    PathToGIF(save_path)
+    # PathToGIF(save_path)

@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QGroupBox, QGridLayout, QPushButton, QFileDialog
+from PyQt5.QtWidgets import QGroupBox, QGridLayout, QPushButton, QFileDialog, QLineEdit, QSizePolicy
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 import pyqtgraph as pg
@@ -26,7 +26,10 @@ class ErrorWindowWidget(QGroupBox):
         self.ValidationButton.setCheckable(True)
         self.ValidationButton.setChecked(True)
         self.ValidationButton.clicked.connect(self.ValButAct)
-        self.VSButton = QPushButton('Comparaison')
+        self.KeywordEdit = QLineEdit('')
+        self.KeywordEdit.editingFinished.connect(self.KeywordChanged)
+        self.KeywordEdit.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.VSButton = QPushButton('VS')
         self.VSButton.clicked.connect(self.CompButAct)
         self.reloadButton = QPushButton(icon=QIcon(os.path.join(local, 'GradObserver', 'updateButton.png')))
         self.reloadButton.clicked.connect(self.redraw)
@@ -35,7 +38,8 @@ class ErrorWindowWidget(QGroupBox):
         layout.addWidget(self.graphWidget, 0, 0, 6, 6)
         layout.addWidget(self.TrainingButton, 6, 0, 1, 2)
         layout.addWidget(self.ValidationButton, 6, 2, 1, 2)
-        layout.addWidget(self.VSButton, 6, 4, 1, 2)
+        layout.addWidget(self.KeywordEdit, 6, 4, 1, 1)
+        layout.addWidget(self.VSButton, 6, 5, 1, 1)
         layout.addWidget(self.reloadButton, 0, 5, 1, 1)
         self.setLayout(layout)
         self.Plot = []
@@ -44,12 +48,18 @@ class ErrorWindowWidget(QGroupBox):
         self.ValShown = True
         self.main_data = None
         self.main_name = ''
+        self.comp_data = []
+        self.comp_name = []
 
 
     def update(self, data, name=''):
         R, G, B = self.color[len(self.Plot)]
-        Training = data['Training']
-        Validation = data['Validation']
+        try :
+            Training = data['Training' + self.KeywordEdit.text()]
+            Validation = data['Validation' + self.KeywordEdit.text()]
+        except:
+            print('wrong keyword')
+            return
         T = pg.PlotCurveItem()
         T.setData(Training, pen={'color': (R, G, B, 255), 'width': 2})
         V = pg.PlotCurveItem()
@@ -57,7 +67,7 @@ class ErrorWindowWidget(QGroupBox):
         self.Plot.append({'train': T, 'val': V, 'name': name})
         if self.TrainShown:
             self.graphWidget.addItem(T)
-            self.legend.addItem(T, 'training ' + name)
+            self.legend.addItem(T, 'Training ' + name)
         if self.ValShown:
             self.graphWidget.addItem(V)
             self.legend.addItem(V, 'validation ' + name)
@@ -67,6 +77,8 @@ class ErrorWindowWidget(QGroupBox):
             self.main_data = data
             self.main_name = name
         self.graphWidget.clear()
+        self.comp_data = []
+        self.comp_name = []
         self.Plot = []
         if type(self.main_data) is dict:
             self.update(self.main_data, name=self.main_name)
@@ -110,3 +122,11 @@ class ErrorWindowWidget(QGroupBox):
             name = os.path.split(os.path.split(file)[0])[-1]
             self.update(data, name=name)
 
+    def KeywordChanged(self):
+        self.graphWidget.clear()
+        self.Plot = []
+        if type(self.main_data) is dict:
+            self.update(self.main_data, name=self.main_name)
+        for i in range(len(self.comp_name)):
+            data, name = self.comp_data[i], self.comp_name[i]
+            self.update(data, name)

@@ -166,7 +166,7 @@ class Histogram3DWidget(QWidget):
         else:
             id = np.arange(self.nb_hist)
             id = id * len(self.GradObserver.time) / self.nb_hist
-            id = id.round().astype(np.int)
+            id = id.round().astype(np.int32)
             self.hist_list = np.array(self.GradObserver.freq_save)[id]
             bins_list = np.array(self.GradObserver.bins_save)
             self.bin_centers_list = ((bins_list[:, 1:] + bins_list[:, :-1]) / 2)[id]
@@ -182,7 +182,7 @@ class Histogram3DWidget(QWidget):
     def Replot_data(self, min, max):
         id = np.arange(self.nb_hist) / self.nb_hist
         id = (id * (max-min) + min) * (len(self.GradObserver.time) / self.GradObserver.time[-1])
-        id = id.round().astype(np.int)
+        id = id.round().astype(np.int32)
         self.hist_list = np.array(self.GradObserver.freq_save)[id]
         bins_list = np.array(self.GradObserver.bins_save)
         self.bin_centers_list = ((bins_list[:, 1:] + bins_list[:, :-1]) / 2)[id]
