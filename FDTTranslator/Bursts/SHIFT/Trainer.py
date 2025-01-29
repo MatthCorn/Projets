@@ -11,7 +11,7 @@ from FDTTranslator.Bursts.Error import ErrorAction, DetailObjectiveError
 import datetime
 import numpy as np
 from math import log10
-from GitPush import git_push
+from Tools.GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 

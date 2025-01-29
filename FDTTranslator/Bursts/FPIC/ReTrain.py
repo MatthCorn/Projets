@@ -7,7 +7,7 @@ from tqdm import tqdm
 from FDTTranslator.PlotError import Plot
 from FDTTranslator.Bursts.Error import ErrorAction
 import datetime
-from GitPush import git_push
+from Tools.GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 

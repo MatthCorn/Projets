@@ -9,7 +9,7 @@ import torch
 from tqdm import tqdm
 import datetime
 from Complete.LRScheduler import Scheduler
-from GitPush import git_push
+from Tools.GitPush import git_push
 
 # Ce script sert à l'apprentissage du réseau Network.TransformerTranslator
 

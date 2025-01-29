@@ -5,6 +5,7 @@ from Eusipco.CNN import Encoder as CNN
 from Complete.LRScheduler import Scheduler
 from GradObserver.GradObserverClass import DictGradObserver
 from Tools.ParamObs import DictParamObserver
+from Tools.GitPush import git_push
 from math import sqrt
 import torch
 from tqdm import tqdm
@@ -16,101 +17,99 @@ def ChoseOutput(Pred, Input):
     return Arg
 
 ################################################################################################################################################
-# pour sauvegarder toutes les informations de l'apprentissage
+# pour sauvegarder toutes les informations de l"apprentissage
 import os
 import datetime
 from Tools.XMLTools import saveObjAsXml
 import pickle
 
-local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index('Projets'))], 'Projets')
+local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
 folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
-save_path = os.path.join(local, 'Eusipco', 'Save', folder)
+save_path = os.path.join(local, "Eusipco", "Save", folder)
 ################################################################################################################################################
 
-param = {'n_encoder': 10,
-         'len_in': 10,
-         'd_in': 10,
-         'd_att': 128,
-         'network': 'Transformer',
-         'WidthsEmbedding': [32],
-         'dropout': 0,
-         'lr': 3e-4,
-         'mult_grad': 10000,
-         'weight_decay': 1e-3,
-         'NDataT': 500000,
-         'NDataV': 1000,
-         'batch_size': 1000,
-         'n_iter': 800,
-         'training_strategy': [
-             {'mean': [-50, 50], 'std': [0.1, 10]},
-             {'mean': [-200, 200], 'std': [0.1, 50]},
-             {'mean': [-500, 500], 'std': [0.1, 50]},
-             {'mean': [-800, 800], 'std': [0.1, 50]},
-             {'mean': [-1000, 1000], 'std': [0.1, 50]},
-             {'mean': [-1000, 1000], 'std': [0.1, 80]},
-             {'mean': [-1000, 1000], 'std': [0.1, 100]},
-             {'mean': [-1500, 1500], 'std': [0.1, 100]},
-             {'mean': [-2000, 2000], 'std': [0.1, 100]},
-             {'mean': [-2500, 2500], 'std': [0.1, 100]},
-             {'mean': [-3000, 3000], 'std': [0.1, 100]},
-             {'mean': [-4000, 4000], 'std': [0.1, 100]},
-             {'mean': [-5000, 5000], 'std': [0.1, 100]},
-             {'mean': [-7000, 7000], 'std': [0.1, 100]},
-             {'mean': [-9000, 9000], 'std': [0.1, 100]},
-             {'mean': [-10000, 10000], 'std': [0.1, 100]},
+param = {"n_encoder": 10,
+         "len_in": 10,
+         "d_in": 10,
+         "d_att": 128,
+         "network": "Transformer",
+         "WidthsEmbedding": [32],
+         "dropout": 0,
+         "lr": 3e-4,
+         "mult_grad": 10000,
+         "weight_decay": 1e-3,
+         "NDataT": 500000,
+         "NDataV": 1000,
+         "batch_size": 1000,
+         "n_iter": 800,
+         "training_strategy": [
+             {"mean": [-50, 50], "std": [0.1, 10]},
+             {"mean": [-200, 200], "std": [0.1, 50]},
+             {"mean": [-500, 500], "std": [0.1, 50]},
+             {"mean": [-800, 800], "std": [0.1, 50]},
+             {"mean": [-1000, 1000], "std": [0.1, 50]},
+             {"mean": [-1000, 1000], "std": [0.1, 80]},
+             {"mean": [-1000, 1000], "std": [0.1, 100]},
+             {"mean": [-1500, 1500], "std": [0.1, 100]},
+             {"mean": [-2000, 2000], "std": [0.1, 100]},
+             {"mean": [-2500, 2500], "std": [0.1, 100]},
+             {"mean": [-3000, 3000], "std": [0.1, 100]},
+             {"mean": [-4000, 4000], "std": [0.1, 100]},
+             {"mean": [-5000, 5000], "std": [0.1, 100]},
+             {"mean": [-7000, 7000], "std": [0.1, 100]},
+             {"mean": [-9000, 9000], "std": [0.1, 100]},
+             {"mean": [-10000, 10000], "std": [0.1, 100]},
          ],
-         'distrib': 'uniform',
-         'max_lr': 5,
-         'FreqGradObs': 1/3,
-         'warmup': 2}
+         "distrib": "uniform",
+         "max_lr": 5,
+         "FreqGradObs": 1/3,
+         "warmup": 2}
 
 try:
     import json
     import sys
     json_file = sys.argv[1]
-    with open(json_file, 'r') as f:
+    with open(json_file, "r") as f:
         temp_param = json.load(f)
     param.update(temp_param)
-    plot = False
 except:
-    print('nothing loaded')
-    plot = True
+    print("nothing loaded")
 
-Network = {'Transformer': Transformer, 'CNN': CNN, 'RNN': RNN}[param['network']]
+Network = {"Transformer": Transformer, "CNN": CNN, "RNN": RNN}[param["network"]]
 
 freq_checkpoint = 1/10
 nb_frames_GIF = 100
-nb_frames_window = int(nb_frames_GIF / len(param['training_strategy']))
+nb_frames_window = int(nb_frames_GIF / len(param["training_strategy"]))
 res_GIF = 50
-n_iter_window = int(param['n_iter'] / len(param['training_strategy']))
+n_iter_window = int(param["n_iter"] / len(param["training_strategy"]))
 
 if torch.cuda.is_available():
     torch.cuda.set_device(0)
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-N = Network(n_encoder=param['n_encoder'], d_in=param['d_in'], d_att=param['d_att'],
-            WidthsEmbedding=param['WidthsEmbedding'], dropout=param['dropout'])
+N = Network(n_encoder=param["n_encoder"], d_in=param["d_in"], d_att=param["d_att"],
+            WidthsEmbedding=param["WidthsEmbedding"], dropout=param["dropout"])
 
 DictGrad = DictGradObserver(N)
 
 N.to(device)
 
-optimizer = torch.optim.Adam(N.parameters(), weight_decay=param['weight_decay'], lr=param['lr'])
+optimizer = torch.optim.Adam(N.parameters(), weight_decay=param["weight_decay"], lr=param["lr"])
 
-NDataT = param['NDataT']
-NDataV = param['NDataV']
-DVec = param['d_in']
-NVec = param['len_in']
+NDataT = param["NDataT"]
+NDataV = param["NDataV"]
+DVec = param["d_in"]
+NVec = param["len_in"]
 Weight = 2 * torch.rand(DVec) - 1
 Weight = Weight / torch.norm(Weight)
 
 mini_batch_size = 50000
 n_minibatch = int(NDataT/mini_batch_size)
-batch_size = param['batch_size']
+batch_size = param["batch_size"]
 n_batch = int(mini_batch_size/batch_size)
 
-n_iter = param['n_iter']
+n_iter = param["n_iter"]
 TrainingError = []
 TrainingPerf = []
 ValidationError = []
@@ -119,17 +118,17 @@ PlottingError = []
 PlottingPerf = []
 
 n_updates = int(NDataT / batch_size) * n_iter
-warmup_steps = int(NDataT / batch_size) * param['warmup']
-lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param['max_lr'])
+warmup_steps = int(NDataT / batch_size) * param["warmup"]
+lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"])
 
 PlottingInput, PlottingOutput, PlottingStd = MakeTargetedData(
     NVec=NVec,
     DVec=DVec,
-    mean_min=min([window['mean'][0] for window in param['training_strategy']]),
-    mean_max=max([window['mean'][1] for window in param['training_strategy']]),
-    std_min=min([window['std'][0] for window in param['training_strategy']]),
-    std_max=max([window['std'][1] for window in param['training_strategy']]),
-    distrib=param['distrib'],
+    mean_min=min([window["mean"][0] for window in param["training_strategy"]]),
+    mean_max=max([window["mean"][1] for window in param["training_strategy"]]),
+    std_min=min([window["std"][0] for window in param["training_strategy"]]),
+    std_max=max([window["std"][1] for window in param["training_strategy"]]),
+    distrib=param["distrib"],
     NData=res_GIF,
     Weight=Weight,
     plot=True,
@@ -137,15 +136,15 @@ PlottingInput, PlottingOutput, PlottingStd = MakeTargetedData(
 
 best_state_dict = N.state_dict().copy()
 
-for window in param['training_strategy']:
+for window in param["training_strategy"]:
     TrainingInput, TrainingOutput, TrainingStd = MakeTargetedData(
         NVec=NVec,
         DVec=DVec,
-        mean_min=window['mean'][0],
-        mean_max=window['mean'][1],
-        std_min=window['std'][0],
-        std_max=window['std'][1],
-        distrib=param['distrib'],
+        mean_min=window["mean"][0],
+        mean_max=window["mean"][1],
+        std_min=window["std"][0],
+        std_max=window["std"][1],
+        distrib=param["distrib"],
         NData=NDataT,
         Weight=Weight,
     )
@@ -153,11 +152,11 @@ for window in param['training_strategy']:
     ValidationInput, ValidationOutput, ValidationStd = MakeTargetedData(
         NVec=NVec,
         DVec=DVec,
-        mean_min=window['mean'][0],
-        mean_max=window['mean'][1],
-        std_min=window['std'][0],
-        std_max=window['std'][1],
-        distrib=param['distrib'],
+        mean_min=window["mean"][0],
+        mean_max=window["mean"][1],
+        std_min=window["std"][0],
+        std_max=window["std"][1],
+        distrib=param["distrib"],
         NData=NDataV,
         Weight=Weight,
     )
@@ -165,7 +164,7 @@ for window in param['training_strategy']:
     for j in tqdm(range(n_iter_window)):
         error = 0
         perf = 0
-        time_to_observe = (int(j * param['FreqGradObs']) == (j * param['FreqGradObs']))
+        time_to_observe = (int(j * param["FreqGradObs"]) == (j * param["FreqGradObs"]))
         time_for_checkpoint = (int(j * freq_checkpoint) == (j * freq_checkpoint))
         time_for_GIF = (j in torch.linspace(0, n_iter_window, nb_frames_window, dtype=int))
 
@@ -183,7 +182,7 @@ for window in param['training_strategy']:
                 Prediction = N(InputBatch)
 
                 err = torch.norm((Prediction - OutputBatch) / StdBatch, p=2) / sqrt(batch_size * DVec * NVec)
-                (param['mult_grad'] * err).backward()
+                (param["mult_grad"] * err).backward()
                 optimizer.step()
                 if lr_scheduler is not None:
                     lr_scheduler.step()
@@ -230,24 +229,19 @@ for window in param['training_strategy']:
                 os.mkdir(save_path)
             except:
                 pass
-            error = {'TrainingError': TrainingError,
-                     'ValidationError': ValidationError,
-                     'TrainingPerf': TrainingPerf,
-                     'ValidationPerf': ValidationPerf,
-                     'PlottingPerf': PlottingPerf,
-                     'PlottingError': PlottingError}
-            saveObjAsXml(param, os.path.join(save_path, 'param'))
-            saveObjAsXml(error, os.path.join(save_path, 'error'))
-            torch.save(best_state_dict, os.path.join(save_path, 'Best_network'))
-            with open(os.path.join(save_path, 'DictGrad.pkl'), 'wb') as file:
+            error = {"TrainingError": TrainingError,
+                     "ValidationError": ValidationError,
+                     "TrainingPerf": TrainingPerf,
+                     "ValidationPerf": ValidationPerf,
+                     "PlottingPerf": PlottingPerf,
+                     "PlottingError": PlottingError}
+            saveObjAsXml(param, os.path.join(save_path, "param"))
+            saveObjAsXml(error, os.path.join(save_path, "error"))
+            torch.save(best_state_dict, os.path.join(save_path, "Best_network"))
+            with open(os.path.join(save_path, "DictGrad.pkl"), "wb") as file:
                 pickle.dump(DictGrad, file)
-            with open(os.path.join(save_path, 'ParamObs.pkl'), 'wb') as file:
+            with open(os.path.join(save_path, "ParamObs.pkl"), "wb") as file:
                 ParamObs = DictParamObserver(N)
                 pickle.dump(ParamObs, file)
 
-if plot:
-    from Eusipco.Visualization import PathToGIF, PlotError
-
-    PlotError(save_path)
-
-    PathToGIF(save_path)
+git_push(local, save_path, CommitMsg='simu ' + folder)
