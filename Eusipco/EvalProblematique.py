@@ -32,7 +32,6 @@ param = {"n_encoder": 10,
          "training_space": {"mean": [-100, 100], "std": [0.01, 50]},
          "distrib": "log",
          "max_lr": 5,
-         "FreqGradObs": 1/3,
          "warmup": 2}
 
 try:
