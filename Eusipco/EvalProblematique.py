@@ -124,7 +124,7 @@ for min_std in min_std_list:
     ValidationError = []
     ValidationPerf = []
 
-    for j in tqdm(range(param['n_iter'])):
+    for j in range(param['n_iter']):
         error = 0
         perf = 0
 
