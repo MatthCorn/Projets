@@ -79,9 +79,9 @@ elif param['distrib'] == 'uniform':
 min_std_list = g(np.flip(np.linspace(f(param['training_space']['std'][0]), f(param['training_space']['std'][1]), param['n_points_reg'], endpoint=False)))
 
 MinTrainingError = []
-MinTrainingPerf = []
+MaxTrainingPerf = []
 MinValidationError = []
-MinValidationPerf = []
+MaxValidationPerf = []
 
 for min_std in min_std_list:
     N = Network(n_encoder=param["n_encoder"], d_in=param["d_in"], d_att=param["d_att"],
@@ -164,16 +164,16 @@ for min_std in min_std_list:
         TrainingPerf.append(perf)
 
     MinTrainingError.append(min(TrainingError))
-    MinTrainingPerf.append(min(TrainingPerf))
+    MaxTrainingPerf.append(max(TrainingPerf))
     MinValidationError.append(min(ValidationError))
-    MinValidationPerf.append(min(ValidationPerf))
+    MaxValidationPerf.append(max(ValidationPerf))
 
     print('############################################################')
     print('intervalle std : [', f"{window['std'][0]:.2e}", ', ', f"{window['std'][1]:.2e}", ']')
     print('min TrainingError : ', [f"{num:.2e}" for num in MinTrainingError])
-    print('min TrainingPerf : ', [f"{num:.2e}" for num in MinTrainingPerf])
+    print('max TrainingPerf : ', [f"{num:.2e}" for num in MaxTrainingPerf])
     print('min ValidationError : ', [f"{num:.2e}" for num in MinValidationError])
-    print('min ValidationPerf : ', [f"{num:.2e}" for num in MinValidationPerf])
+    print('max ValidationPerf : ', [f"{num:.2e}" for num in MaxValidationPerf])
 
 print('############################################################')
 print('############################################################')
