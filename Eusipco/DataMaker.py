@@ -29,10 +29,7 @@ def MakeTargetedData(NVec=5, DVec=10, mean_min=1e-1, mean_max=1e1, std_min=1e0, 
     elif distrib == 'log':
         f = lambda x: math.log(x)
         g = lambda x: torch.exp(x)
-    elif distrib == 'exp':
-        f = lambda x: math.exp(x)
-        g = lambda x: torch.log(x)
-    mean = g((f(mean_max) - f(mean_min)) * spacing(NData) + f(mean_min))
+    mean = (mean_max - mean_min) * spacing(NData) + mean_min
     std = g((f(std_max) - f(std_min)) * spacing(NData) + f(std_min))
 
     if plot:

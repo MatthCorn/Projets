@@ -12,9 +12,6 @@ def MakeGIF(PlottingData, NData, training_strategy, frac, distrib, save_path):
     elif distrib == 'log':
         f = lambda x: np.log(x)
         g = lambda x: np.exp(x)
-    elif distrib == 'exp':
-        f = lambda x: np.exp(x)
-        g = lambda x: np.log(x)
 
     frames = len(PlottingData[0])
 
@@ -24,9 +21,9 @@ def MakeGIF(PlottingData, NData, training_strategy, frac, distrib, save_path):
     std_max = max([window['std'][1] for window in training_strategy])
 
 
-    log_x_ticks = g(np.linspace(f(std_min), f(std_max), 7))
+    plot_x_ticks = g(np.linspace(f(std_min), f(std_max), 7))
     x_ticks = np.linspace(0, NData+1, 7)
-    log_y_ticks = g(np.linspace(f(mean_min), f(mean_max), 7))
+    plot_y_ticks = np.linspace(mean_min, mean_max, 7)
     y_ticks = np.linspace(0, NData+1, 7)
 
     # Prepare the figure
@@ -38,14 +35,14 @@ def MakeGIF(PlottingData, NData, training_strategy, frac, distrib, save_path):
         ax[1].clear()
 
         ax[0].set_xticks(x_ticks)
-        ax[0].set_xticklabels([f"{val:.1f}" for val in log_x_ticks])
+        ax[0].set_xticklabels([f"{val:.1f}" for val in plot_x_ticks] if distrib == 'uniform' else [f"{val:.0e}" for val in plot_x_ticks])
         ax[0].set_yticks(y_ticks)
-        ax[0].set_yticklabels([f"{val:.1f}" for val in log_y_ticks])
+        ax[0].set_yticklabels([f"{val:.1f}" for val in plot_y_ticks])
 
         ax[1].set_xticks(x_ticks)
-        ax[1].set_xticklabels([f"{val:.1f}" for val in log_x_ticks])
+        ax[1].set_xticklabels([f"{val:.1f}" for val in plot_x_ticks] if distrib == 'uniform' else [f"{val:.0e}" for val in plot_x_ticks])
         ax[1].set_yticks(y_ticks)
-        ax[1].set_yticklabels([f"{val:.1f}" for val in log_y_ticks])
+        ax[1].set_yticklabels([f"{val:.1f}" for val in plot_y_ticks])
 
         ax[0].set_xlabel("standard deviation")
         ax[0].set_ylabel("mean")
@@ -65,8 +62,8 @@ def MakeGIF(PlottingData, NData, training_strategy, frac, distrib, save_path):
         current_mean_max = current_strat['mean'][1]
         current_std_min = current_strat['std'][0]
         current_std_max = current_strat['std'][1]
-        alpha_mean_min = (f(current_mean_min) - f(mean_max)) / (f(mean_min) - f(mean_max))
-        alpha_mean_max = (f(current_mean_max) - f(mean_max)) / (f(mean_min) - f(mean_max))
+        alpha_mean_min = (current_mean_min - mean_max) / (mean_min - mean_max)
+        alpha_mean_max = (current_mean_max - mean_max) / (mean_min - mean_max)
         alpha_std_min = (f(current_std_min) - f(std_max)) / (f(std_min) - f(std_max))
         alpha_std_max = (f(current_std_max) - f(std_max)) / (f(std_min) - f(std_max))
         square_y = [
@@ -106,7 +103,7 @@ def MakeGIF(PlottingData, NData, training_strategy, frac, distrib, save_path):
 def PathToGIF(save_path):
     error = loadXmlAsObj(os.path.join(save_path, 'error'))
     param = loadXmlAsObj(os.path.join(save_path, 'param'))
-    distrib = param['distrib']
+    distrib = param['plot_distrib'] if 'plot_distrib' in param.keys() else param['distrib']
     training_strategy = param['training_strategy']
     PlottingData = [error['PlottingError'], error['PlottingPerf']]
     NData = len(PlottingData[0][0])
@@ -141,7 +138,7 @@ def PlotError(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r"C:\Users\matth\Documents\Python\Projets\Eusipco\Save\2025-01-28__19-20"
+    save_path = r"C:\Users\Matth\Documents\Projets\Eusipco\Save\2025-02-10__14-58"
 
     PlotError(save_path)
 
