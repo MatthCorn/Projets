@@ -6,7 +6,6 @@ from Complete.LRScheduler import Scheduler
 from math import sqrt
 import torch
 import numpy as np
-from tqdm import tqdm
 
 def ChoseOutput(Pred, Input):
     Diff = Pred.unsqueeze(dim=1) - Input.unsqueeze(dim=2)
@@ -76,14 +75,16 @@ if param['distrib'] == 'log':
 elif param['distrib'] == 'uniform':
     f = lambda x: x
     g = lambda x: x
-min_std_list = g(np.flip(np.linspace(f(param['training_space']['std'][0]), f(param['training_space']['std'][1]), param['n_points_reg'], endpoint=False)))
+
+max_std_list = g(np.linspace(0, f(param['training_space']['std'][1]), param['n_points_reg'], endpoint=True))
+max_mean_list = np.linspace(10, param['training_space']['std'][1], param['n_points_reg'], endpoint=True)
 
 MinTrainingError = []
 MaxTrainingPerf = []
 MinValidationError = []
 MaxValidationPerf = []
 
-for min_std in min_std_list:
+for i in range(param['n_points_reg']):
     N = Network(n_encoder=param["n_encoder"], d_in=param["d_in"], d_att=param["d_att"],
                 WidthsEmbedding=param["WidthsEmbedding"], dropout=param["dropout"])
     N.to(device)
@@ -93,7 +94,8 @@ for min_std in min_std_list:
     lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"])
 
     window = param['training_space']
-    window['std'][0] = min_std
+    window['std'][1] = max_std_list[i]
+    window['mean'] = [-max_mean_list[i], max_mean_list[i]]
 
     TrainingInput, TrainingOutput, TrainingStd = MakeTargetedData(
         NVec=NVec,
@@ -124,7 +126,7 @@ for min_std in min_std_list:
     ValidationError = []
     ValidationPerf = []
 
-    for j in tqdm(range(param['n_iter'])):
+    for j in range(param['n_iter']):
         error = 0
         perf = 0
 
