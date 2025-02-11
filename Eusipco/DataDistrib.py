@@ -1,20 +1,22 @@
 import torch
 import numpy as np
 
+torch.set_default_dtype(torch.float32)
+
 control = True
-n_input = 100000
+n_input = 1000000
 len_seq = 30
 d_vec = 15
-distrib = 'uniform'
+distrib = 'log'
 plot = 'log'
 
 weight = torch.normal(0, 1, (d_vec,))
 weight = weight / torch.norm(weight)
 
-grid_size_abs = 80
-grid_size_ord = 80
-x_min, x_max = 1e-3, 3
-y_min, y_max = -3, 3
+grid_size_abs = 200
+grid_size_ord = 200
+x_min, x_max = 1e-6, 50
+y_min, y_max = -100, 100
 
 if control:
     if distrib == 'uniform':
@@ -36,7 +38,7 @@ if control:
     sequences = sequences + (alpha - uncontroled_scores).unsqueeze(-1) * weight.view(1, 1, d_vec)
 
 else:
-    sequences = torch.normal(0, 1, (n_input, len_seq, d_vec,))
+    sequences = torch.normal(0, 1, (n_input, len_seq, d_vec,)) * x_max / 1.5
 
 scores = torch.matmul(sequences, weight)
 
@@ -50,7 +52,7 @@ elif plot == 'uniform':
     f = lambda x: x
     g = lambda x: x
 
-y_min_plot, y_max_plot = y_min - 1, y_max + 1
+y_min_plot, y_max_plot = y_min - 10, y_max + 10
 x_max_plot, x_min_plot = x_max + 1, x_min
 
 x_indices = ((f(std_scores) - f(x_min_plot)) / (f(x_max_plot) - f(x_min_plot)) * grid_size_abs).long()
@@ -74,7 +76,7 @@ plot_y_ticks = torch.linspace(y_min_plot, y_max_plot, 7)
 y_ticks = torch.linspace(0, grid_size_ord, 7) - 0.5
 
 plt.gca().set_xticks(x_ticks)
-plt.gca().set_xticklabels([f"{val:.0e}" for val in plot_x_ticks])
+plt.gca().set_xticklabels([f"{val:.0e}" for val in plot_x_ticks] if plot == 'log' else [f"{val:.1f}" for val in plot_x_ticks])
 plt.gca().set_yticks(y_ticks)
 plt.gca().set_yticklabels([f"{val:.1f}" for val in plot_y_ticks])
 plt.gca().set_xlabel("standard deviation")
@@ -98,6 +100,6 @@ square_x = [
     grid_size_abs * (1 - alpha_std_max) - 0.5,
     grid_size_abs * (1 - alpha_std_min) - 0.5
 ]
-# plt.plot(square_x, square_y, 'red', linewidth=1)
+plt.plot(square_x, square_y, 'red', linewidth=1)
 
 plt.show()
