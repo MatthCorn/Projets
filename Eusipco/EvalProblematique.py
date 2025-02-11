@@ -29,7 +29,7 @@ param = {"n_encoder": 10,
          "batch_size": 1000,
          "n_points_reg": 10,
          "n_iter": 80,
-         "training_space": {"mean": [-100, 100], "std": [0.01, 50]},
+         "training_space": {"mean": [-100, 100], "std": [0.001, 50]},
          "distrib": "log",
          "max_lr": 5,
          "warmup": 2}
@@ -180,6 +180,6 @@ print('############################################################')
 print('############################################################')
 print('############################################################')
 print('min TrainingError : ', [f"{num:.2e}" for num in MinTrainingError])
-print('min TrainingPerf : ', [f"{num:.2e}" for num in MinTrainingPerf])
+print('min TrainingPerf : ', [f"{num:.2e}" for num in MaxTrainingPerf])
 print('min ValidationError : ', [f"{num:.2e}" for num in MinValidationError])
-print('min ValidationPerf : ', [f"{num:.2e}" for num in MinValidationPerf])
+print('min ValidationPerf : ', [f"{num:.2e}" for num in MaxValidationPerf])

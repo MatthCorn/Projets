@@ -43,8 +43,7 @@ param = {"n_encoder": 10,
          "batch_size": 1000,
          "n_iter": 80,
          "training_strategy": [
-             {"mean": [-100, 100], "std": [1, 50]},
-             {"mean": [-100, 100], "std": [0.01, 50]}
+             {"mean": [-100, 100], "std": [0.0001, 50]}
          ],
          "distrib": "log",
          "plot_distrib": "log",
