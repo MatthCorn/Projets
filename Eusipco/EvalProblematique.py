@@ -29,7 +29,7 @@ param = {"n_encoder": 10,
          "batch_size": 1000,
          "n_points_reg": 10,
          "n_iter": 200,
-         "training_space": {"mean": [-100, 100], "std": [0.000001, 50]},
+         "training_space": {"mean": [-10000, 10000], "std": [0.001, 5000]},
          "distrib": "log",
          "max_lr": 5,
          "warmup": 2}
@@ -124,7 +124,7 @@ for min_std in min_std_list:
     ValidationError = []
     ValidationPerf = []
 
-    for j in range(param['n_iter']):
+    for j in tqdm(range(param['n_iter'])):
         error = 0
         perf = 0
 
