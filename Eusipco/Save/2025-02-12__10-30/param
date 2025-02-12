@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<Dictionary>
+ <Object Key="n_encoder" Value="10"/>
+ <Object Key="len_in" Value="10"/>
+ <Object Key="d_in" Value="10"/>
+ <Object Key="d_att" Value="128"/>
+ <String Key="network" Value="Transformer"/>
+ <List Key="WidthsEmbedding">
+  <Object Value="32"/>
+ </List>
+ <Object Key="dropout" Value="0"/>
+ <Object Key="lr" Value="0.0003"/>
+ <Object Key="mult_grad" Value="10000"/>
+ <Object Key="weight_decay" Value="0.001"/>
+ <Object Key="NDataT" Value="500000"/>
+ <Object Key="NDataV" Value="1000"/>
+ <Object Key="batch_size" Value="1000"/>
+ <Object Key="n_iter" Value="200"/>
+ <List Key="training_strategy">
+  <Dictionary>
+   <List Key="mean">
+    <Object Value="-100"/>
+    <Object Value="100"/>
+   </List>
+   <List Key="std">
+    <Object Value="0.0001"/>
+    <Object Value="50"/>
+   </List>
+  </Dictionary>
+ </List>
+ <String Key="distrib" Value="log"/>
+ <String Key="plot_distrib" Value="log"/>
+ <Object Key="max_lr" Value="5"/>
+ <Object Key="FreqGradObs" Value="0.3333333333333333"/>
+ <Object Key="warmup" Value="0.8"/>
+</Dictionary>

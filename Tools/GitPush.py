@@ -11,6 +11,7 @@ def git_push(local, save_path, CommitMsg=COMMIT_MESSAGE):
         repo.git.add([save_path])
         repo.index.commit(CommitMsg)
         origin = repo.remote(name='origin')
+        origin.pull()
         origin.push()
     except Exception as e:
         print(f"Une erreur est survenue: {e}")

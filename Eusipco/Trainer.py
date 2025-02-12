@@ -49,7 +49,7 @@ param = {"n_encoder": 10,
          "plot_distrib": "log",
          "max_lr": 5,
          "FreqGradObs": 1/3,
-         "warmup": 2}
+         "warmup": 0.8}
 
 try:
     import json
