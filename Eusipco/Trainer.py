@@ -35,6 +35,7 @@ param = {"n_encoder": 10,
          "network": "Transformer",
          "WidthsEmbedding": [32],
          "dropout": 0,
+         "optim": "AdamW",
          "lr": 3e-4,
          "mult_grad": 10000,
          "weight_decay": 1e-3,
@@ -49,7 +50,7 @@ param = {"n_encoder": 10,
          "plot_distrib": "log",
          "max_lr": 5,
          "FreqGradObs": 1/3,
-         "warmup": 0.8}
+         "warmup": 2}
 
 try:
     import json
@@ -81,7 +82,12 @@ DictGrad = DictGradObserver(N)
 
 N.to(device)
 
-optimizer = torch.optim.Adam(N.parameters(), weight_decay=param["weight_decay"], lr=param["lr"])
+optimizers = {
+    "AdamW": torch.optim.AdamW,
+    "Adam": torch.optim.Adam,
+}
+
+optimizer = optimizers[param['optim']](N.parameters(), weight_decay=param["weight_decay"], lr=param["lr"])
 
 NDataT = param["NDataT"]
 NDataV = param["NDataV"]

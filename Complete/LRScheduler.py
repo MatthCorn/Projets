@@ -60,6 +60,7 @@ class Scheduler(LambdaLR):
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
     import torch
+    from tqdm import tqdm
 
     class model(torch.nn.Module):
         def __init__(self):
@@ -82,9 +83,11 @@ if __name__ == '__main__':
     # model = torch.nn.Sequential(torch.nn.Linear(1, 4, bias=False), torch.nn.Linear(4, 3, bias=False))
     model = modeltest()
     opt = torch.optim.Adam(model.parameters())
-    sch = Scheduler(opt, 1, warmup_steps=10, max=5, max_steps=100, ramp_steps=15, dropping_step_list=[100, 150], type='ramp')
+    sch = Scheduler(opt, 256, warmup_steps = int(500000 / 1000 * 0.8), max=5)
+    n_updates = int(500000 / 1000) * 200
+    # sch = Scheduler(opt, 1, warmup_steps=10, max=5, max_steps=100, ramp_steps=15, dropping_step_list=[100, 150], type='ramp')
     lr_list = []
-    for i in range(100):
+    for i in tqdm(range(n_updates)):
         opt.zero_grad()
         o = model(torch.normal(torch.zeros(30, 1)))
         o.norm().backward()
@@ -92,9 +95,9 @@ if __name__ == '__main__':
         lr_list.append(sch.last_lr)
         sch.step()
 
-        if i % 100 == 0:
-            print(i)
-            print(opt.state)
+        # if i % 100 == 0:
+        #     print(i)
+        #     print(opt.state)
 
 
     plt.plot(lr_list)
