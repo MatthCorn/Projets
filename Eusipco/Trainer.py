@@ -35,16 +35,16 @@ param = {"n_encoder": 10,
          "network": "Transformer",
          "WidthsEmbedding": [32],
          "dropout": 0,
-         "optim": "AdamW",
+         "optim": "Adam",
          "lr": 3e-4,
          "mult_grad": 10000,
          "weight_decay": 1e-3,
          "NDataT": 500000,
          "NDataV": 1000,
          "batch_size": 1000,
-         "n_iter": 200,
+         "n_iter": 130,
          "training_strategy": [
-             {"mean": [-100, 100], "std": [0.0001, 50]}
+             {"mean": [-10, 10], "std": [0.001, 1]}
          ],
          "distrib": "log",
          "plot_distrib": "log",
@@ -85,6 +85,7 @@ N.to(device)
 optimizers = {
     "AdamW": torch.optim.AdamW,
     "Adam": torch.optim.Adam,
+    "SGD": torch.optim.SGD,
 }
 
 optimizer = optimizers[param['optim']](N.parameters(), weight_decay=param["weight_decay"], lr=param["lr"])
@@ -110,7 +111,7 @@ PlottingError = []
 PlottingPerf = []
 
 n_updates = int(NDataT / batch_size) * n_iter
-warmup_steps = int(NDataT / batch_size) * param["warmup"]
+warmup_steps = int(NDataT / batch_size * param["warmup"])
 lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"])
 
 PlottingInput, PlottingOutput, PlottingStd = MakeTargetedData(

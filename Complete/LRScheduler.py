@@ -51,7 +51,7 @@ class Scheduler(LambdaLR):
         if step in self.dropping_step_list:
             self.mult_fact /= self.dropping_factor
         self.target_lr = self.mult_fact * self.target_lr
-        new_lr = 0.9 * self.last_lr + 0.1 * self.target_lr
+        new_lr = 0.95 * self.last_lr + 0.05 * self.target_lr
         self.last_lr = new_lr
         return new_lr
 
@@ -83,7 +83,7 @@ if __name__ == '__main__':
     # model = torch.nn.Sequential(torch.nn.Linear(1, 4, bias=False), torch.nn.Linear(4, 3, bias=False))
     model = modeltest()
     opt = torch.optim.Adam(model.parameters())
-    sch = Scheduler(opt, 256, warmup_steps = int(500000 / 1000 * 0.8), max=5)
+    sch = Scheduler(opt, 256, warmup_steps = int(500000 / 1000 * 2), max=5)
     n_updates = int(500000 / 1000) * 200
     # sch = Scheduler(opt, 1, warmup_steps=10, max=5, max_steps=100, ramp_steps=15, dropping_step_list=[100, 150], type='ramp')
     lr_list = []
