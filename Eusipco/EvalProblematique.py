@@ -28,7 +28,7 @@ param = {"n_encoder": 10,
          "batch_size": 1000,
          "n_points_reg": 10,
          "n_iter": 200,
-         "training_space": {"mean": [-10000, 10000], "std": [0.001, 5000]},
+         "training_space": {"mean": [-10000, 10000], "std": [0.01, 5000]},
          "distrib": "log",
          "max_lr": 5,
          "warmup": 2}
@@ -77,7 +77,7 @@ elif param['distrib'] == 'uniform':
     g = lambda x: x
 
 max_std_list = g(np.linspace(0, f(param['training_space']['std'][1]), param['n_points_reg'], endpoint=True))
-max_mean_list = np.linspace(10, param['training_space']['std'][1], param['n_points_reg'], endpoint=True)
+max_mean_list = 2 * max_std_list
 
 MinTrainingError = []
 MaxTrainingPerf = []
@@ -172,6 +172,7 @@ for i in range(param['n_points_reg']):
 
     print('############################################################')
     print('intervalle std : [', f"{window['std'][0]:.2e}", ', ', f"{window['std'][1]:.2e}", ']')
+    print('intervalle mean : [', f"{window['mean'][0]:.1f}", ', ', f"{window['mean'][1]:.1f}", ']')
     print('min TrainingError : ', [f"{num:.2e}" for num in MinTrainingError])
     print('max TrainingPerf : ', [f"{num:.2e}" for num in MaxTrainingPerf])
     print('min ValidationError : ', [f"{num:.2e}" for num in MinValidationError])
