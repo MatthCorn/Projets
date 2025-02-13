@@ -33,13 +33,9 @@ save_path = os.path.join(local, "Eusipco", "Save", folder)
 import psutil, sys
 
 p = psutil.Process(os.getpid())
-current_priority = p.nice()
-print(f"Priorité actuelle : {current_priority}")
 
 if sys.platform == "win32":
     p.nice(psutil.HIGH_PRIORITY_CLASS)
-else:
-    p.nice(-15)
 ################################################################################################################################################
 
 param = {"n_encoder": 10,
