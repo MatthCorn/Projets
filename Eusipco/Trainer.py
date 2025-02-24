@@ -52,7 +52,7 @@ param = {"n_encoder": 10,
          "NDataT": 500000,
          "NDataV": 1000,
          "batch_size": 1000,
-         "n_iter": 130,
+         "n_iter": 800,
          "training_strategy": [
              {"mean": [-1000, 1000], "std": [0.1, 500]}
          ],

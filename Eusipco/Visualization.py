@@ -51,7 +51,7 @@ def MakeGIF(PlottingData, NData, training_strategy, frac, distrib, save_path):
         ax[1].set_ylabel("mean")
 
         ax[0].set_title("error :" + str(frame))
-        ax[1].set_title("perf :" + str(frame))
+        ax[1].set_title("accuracy :" + str(frame))
         error_im = PlottingData[0][frame]
         perf_im = PlottingData[1][frame]
         im0 = ax[0].imshow(error_im, cmap="cool", vmin=0, vmax=1)
@@ -120,25 +120,25 @@ def PlotError(save_path):
 
     fig, (ax1, ax2) = plt.subplots(2, 1)
 
-    ax1.plot(TrainingError, 'r', label="Ensemble d'entrainement")
-    ax1.plot(ValidationError, 'b', label="Ensemble de Validation")
+    ax1.plot(TrainingError, 'r', label="Training")
+    ax1.plot(ValidationError, 'b', label="Validation")
     ax1.plot([1.] * len(ValidationError), 'black')
     ax1.set_ylim(bottom=0)
     ax1.legend(loc='upper right')
-    ax1.set_title('V0' + '-' + 'Vecteurs' + " : Erreur")
+    ax1.set_title("Erreur")
 
-    ax2.plot(TrainingPerf, 'r', label="Ensemble d'entrainement")
-    ax2.plot(ValidationPerf, 'b', label="Ensemble de Validation")
+    ax2.plot(TrainingPerf, 'r', label="Training")
+    ax2.plot(ValidationPerf, 'b', label="Validation")
     ax2.set_ylim(bottom=0)
     ax2.legend(loc='upper right')
-    ax2.set_title('V0' + '-' + 'Vecteurs' + " : Performance")
+    ax2.set_title("Accuracy")
 
     fig.tight_layout(pad=1.0)
 
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r"C:\Users\Matth\Documents\Projets\Eusipco\Save\2025-02-24__14-55"
+    save_path = r"C:\Users\Matth\Documents\Projets\Eusipco\Save\2025-02-24__15-30"
 
     PlotError(save_path)
 
