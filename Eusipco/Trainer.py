@@ -52,12 +52,13 @@ param = {"n_encoder": 10,
          "NDataT": 500000,
          "NDataV": 1000,
          "batch_size": 1000,
-         "n_iter": 800,
+         "n_iter": 50,
          "training_strategy": [
              {"mean": [-1000, 1000], "std": [0.01, 500]}
          ],
          "distrib": "log",
          "plot_distrib": "log",
+         "error_weighting": "y",
          "max_lr": 5,
          "FreqGradObs": 1/3,
          "warmup": 2}
@@ -182,6 +183,10 @@ for window in param["training_strategy"]:
                 InputBatch = InputMiniBatch[k * batch_size:(k + 1) * batch_size]
                 OutputBatch = OutputMiniBatch[k * batch_size:(k + 1) * batch_size]
                 StdBatch = StdMiniBatch[k * batch_size:(k + 1) * batch_size]
+
+                if param['error_weighting'] == 'n':
+                    StdBatch = torch.mean(StdBatch)
+
                 Prediction = N(InputBatch)
 
                 err = torch.norm((Prediction - OutputBatch) / StdBatch, p=2) / sqrt(batch_size * DVec * NVec)
@@ -203,6 +208,10 @@ for window in param["training_strategy"]:
             Input = ValidationInput.to(device)
             Output = ValidationOutput.to(device)
             Std = ValidationStd.to(device)
+
+            if param['error_weighting'] == 'n':
+                Std = torch.mean(Std)
+
             Prediction = N(Input)
 
             err = torch.norm((Prediction - Output) / Std, p=2) / sqrt(NDataV * DVec * NVec)
@@ -220,6 +229,10 @@ for window in param["training_strategy"]:
                 Input = PlottingInput.to(device)
                 Output = PlottingOutput.to(device)
                 Std = PlottingStd.to(device)
+
+                if param['error_weighting'] == 'n':
+                    Std = torch.mean(Std)
+
                 Prediction = N(Input)
 
                 err = torch.norm((Prediction - Output) / Std, p=2, dim=[-1, -2]) / sqrt(DVec * NVec)

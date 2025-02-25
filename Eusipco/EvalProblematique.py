@@ -6,6 +6,7 @@ from Complete.LRScheduler import Scheduler
 from math import sqrt
 import torch
 import numpy as np
+from copy import deepcopy
 
 def ChoseOutput(Pred, Input):
     Diff = Pred.unsqueeze(dim=1) - Input.unsqueeze(dim=2)
@@ -27,11 +28,23 @@ param = {"n_encoder": 10,
          "NDataV": 1000,
          "batch_size": 1000,
          "n_points_reg": 10,
-         "n_iter": 200,
-         "training_space": {"mean": [-10000, 10000], "std": [0.01, 5000]},
+         "n_iter": 50,
+         "training_space": {"mean": [-1000, 1000], "std": [100, 500]},
          "distrib": "log",
+         "error_weighting": "y",
          "max_lr": 5,
          "warmup": 2}
+
+################################################################################################################################################
+# pour les performances
+import psutil, sys, os
+
+p = psutil.Process(os.getpid())
+
+if sys.platform == "win32":
+    p.nice(psutil.HIGH_PRIORITY_CLASS)
+################################################################################################################################################
+
 
 try:
     import json
@@ -76,8 +89,9 @@ elif param['distrib'] == 'uniform':
     f = lambda x: x
     g = lambda x: x
 
-max_std_list = g(np.linspace(0, f(param['training_space']['std'][1]), param['n_points_reg'], endpoint=True))
-max_mean_list = 2 * max_std_list
+# max_std_list = g(np.linspace(0, f(param['training_space']['std'][1]), param['n_points_reg'], endpoint=True))
+# max_mean_list = 2 * max_std_list
+lbd = np.flip(g(np.linspace(f(1e-4), f(1), param['n_points_reg'], endpoint=True)))
 
 MinTrainingError = []
 MaxTrainingPerf = []
@@ -93,9 +107,12 @@ for i in range(param['n_points_reg']):
 
     lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"])
 
-    window = param['training_space']
-    window['std'][1] = max_std_list[i]
-    window['mean'] = [-max_mean_list[i], max_mean_list[i]]
+    window = deepcopy(param['training_space'])
+
+    window['std'][0] *= lbd[i]
+    # window['std'][1] = max_std_list[i]
+    # window['mean'] = [-max_mean_list[i], max_mean_list[i]]
+
 
     TrainingInput, TrainingOutput, TrainingStd = MakeTargetedData(
         NVec=NVec,
@@ -141,6 +158,10 @@ for i in range(param['n_points_reg']):
                 InputBatch = InputMiniBatch[k * batch_size:(k + 1) * batch_size]
                 OutputBatch = OutputMiniBatch[k * batch_size:(k + 1) * batch_size]
                 StdBatch = StdMiniBatch[k * batch_size:(k + 1) * batch_size]
+
+                if param['error_weighting'] == 'n':
+                    StdBatch = torch.mean(StdBatch)
+
                 Prediction = N(InputBatch)
 
                 err = torch.norm((Prediction - OutputBatch) / StdBatch, p=2) / sqrt(batch_size * DVec * NVec)
@@ -156,6 +177,10 @@ for i in range(param['n_points_reg']):
             Input = ValidationInput.to(device)
             Output = ValidationOutput.to(device)
             Std = ValidationStd.to(device)
+
+            if param['error_weighting'] == 'n':
+                Std = torch.mean(Std)
+
             Prediction = N(Input)
 
             err = torch.norm((Prediction - Output) / Std, p=2) / sqrt(NDataV * DVec * NVec)
