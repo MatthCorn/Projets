@@ -8,6 +8,7 @@ import torch
 import numpy as np
 from copy import deepcopy
 from Tools.GitPush import git_push
+from tqdm import tqdm
 
 ################################################################################################################################################
 # pour sauvegarder toutes les informations de l"apprentissage
@@ -120,7 +121,7 @@ MaxPerf = []
 LeftStdMaxPerf = []
 RightStdMaxPerf = []
 
-for i in range(param['n_points_reg']):
+for i in tqdm(range(param['n_points_reg'])):
     N = Network(n_encoder=param["n_encoder"], d_in=param["d_in"], d_att=param["d_att"],
                 WidthsEmbedding=param["WidthsEmbedding"], dropout=param["dropout"])
     N.to(device)
