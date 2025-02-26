@@ -1,0 +1,63 @@
+<?xml version="1.0" ?>
+<Dictionary>
+ <List Key="MinError">
+  <Object Value="1.0720258951187134"/>
+  <Object Value="1.0402438640594482"/>
+  <Object Value="1.0217690467834473"/>
+  <Object Value="1.0018165111541748"/>
+  <Object Value="0.9925965070724487"/>
+  <Object Value="1.009559154510498"/>
+  <Object Value="0.9818871021270752"/>
+  <Object Value="1.0181951522827148"/>
+  <Object Value="0.9798331260681152"/>
+  <Object Value="0.9747174382209778"/>
+ </List>
+ <List Key="LeftStdMinError">
+  <Object Value="0.11924726372704461"/>
+  <Object Value="0.10872042577871427"/>
+  <Object Value="0.09946921716568974"/>
+  <Object Value="0.09272329079412112"/>
+  <Object Value="0.08797568602600031"/>
+  <Object Value="0.08386339300746011"/>
+  <Object Value="0.08176763217222167"/>
+  <Object Value="0.07851269310843369"/>
+  <Object Value="0.07626182795659758"/>
+  <Object Value="0.07811365045123632"/>
+ </List>
+ <List Key="RightStdMinError">
+  <Object Value="0.16898571479467286"/>
+  <Object Value="0.18573170541093298"/>
+  <Object Value="0.1722175857703254"/>
+  <Object Value="0.15778210035560736"/>
+  <Object Value="0.1527250360233766"/>
+  <Object Value="0.16192805824485276"/>
+  <Object Value="0.1372688262904851"/>
+  <Object Value="0.1250475182217022"/>
+  <Object Value="0.11614584502261435"/>
+  <Object Value="0.11571858394877702"/>
+ </List>
+ <List Key="MaxPerf">
+  <Object Value="1.1132563352584839"/>
+  <Object Value="1.0817770957946777"/>
+  <Object Value="1.0633594989776611"/>
+  <Object Value="1.0454587936401367"/>
+  <Object Value="1.0366714000701904"/>
+  <Object Value="1.0312644243240356"/>
+  <Object Value="1.0223066806793213"/>
+  <Object Value="1.025847315788269"/>
+  <Object Value="1.0184268951416016"/>
+  <Object Value="1.0156896114349365"/>
+ </List>
+ <List Key="LeftStdMaxPerf">
+  <Object Value="1.0567928142301617"/>
+  <Object Value="1.0265896287353735"/>
+  <Object Value="1.0089903489481404"/>
+  <Object Value="0.991913469245913"/>
+  <Object Value="0.9835412099701012"/>
+  <Object Value="0.9784475871994587"/>
+  <Object Value="0.969870926064756"/>
+  <Object Value="0.9732385381561618"/>
+  <Object Value="0.9661821576283856"/>
+  <Object Value="0.9635805438518696"/>
+ </List>
+</Dictionary>
