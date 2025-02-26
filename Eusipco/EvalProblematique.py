@@ -16,8 +16,15 @@ import datetime
 from Tools.XMLTools import saveObjAsXml
 
 local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
-folder = datetime.datetime.now().strftime("EvalProblem_%Y-%m-%d__%H-%M")
-save_path = os.path.join(local, "Eusipco", "Save", folder)
+folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
+save_dir = os.path.join(local, "Eusipco", "Save")
+existing_folders = [d for d in os.listdir(save_dir) if d.startswith(folder) and os.path.isdir(os.path.join(save_dir, d))]
+
+count = len(existing_folders)
+if count > 0:
+    folder = f"{folder}({count})"
+
+save_path = os.path.join(save_dir, folder)
 ################################################################################################################################################
 
 
@@ -37,11 +44,11 @@ param = {"n_encoder": 10,
          "lr": 3e-4,
          "mult_grad": 10000,
          "weight_decay": 1e-3,
-         "NDataT": 50000,
+         "NDataT": 500000,
          "NDataV": 1000,
          "batch_size": 1000,
          "n_points_reg": 10,
-         "n_iter": 10,
+         "n_iter": 50,
          "training_space": {"mean": [-1000, 1000], "std": [100, 500]},
          "distrib": "log",
          "error_weighting": "y",
@@ -198,16 +205,16 @@ for i in range(param['n_points_reg']):
 
             err = torch.norm((Prediction - Output) / Std, p=2, dim=[1, 2]) / sqrt(DVec * NVec)
             mean_err = float(torch.mean(err))
-            left_std_error = sqrt(float(torch.mean((err[err < mean_err] - mean_err)**2)))
-            right_std_error = sqrt(float(torch.mean((err[err > mean_err] - mean_err)**2)))
+            left_std_error = sqrt(float(torch.mean((err[err <= mean_err] - mean_err)**2)))
+            right_std_error = sqrt(float(torch.mean((err[err >= mean_err] - mean_err)**2)))
             Error.append(mean_err)
             LeftStdError.append(left_std_error)
             RightStdError.append(right_std_error)
 
-            perf = (ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input)).to(float)
-            mean_perf = float(torch.mean(err))
-            left_std_perf = sqrt(float(torch.mean((perf[perf < mean_perf] - mean_perf)**2)))
-            right_std_perf = sqrt(float(torch.mean((perf[perf > mean_perf] - mean_perf)**2)))
+            perf = torch.mean((ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input)).to(float), dim=-1)
+            mean_perf = float(torch.mean(perf))
+            left_std_perf = sqrt(float(torch.mean((perf[perf <= mean_perf] - mean_perf)**2)))
+            right_std_perf = sqrt(float(torch.mean((perf[perf >= mean_perf] - mean_perf)**2)))
             Perf.append(mean_perf)
             LeftStdPerf.append(left_std_perf)
             RightStdPerf.append(right_std_perf)

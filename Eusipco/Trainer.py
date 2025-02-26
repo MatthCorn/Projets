@@ -25,7 +25,14 @@ import pickle
 
 local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
 folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
-save_path = os.path.join(local, "Eusipco", "Save", folder)
+save_dir = os.path.join(local, "Eusipco", "Save")
+existing_folders = [d for d in os.listdir(save_dir) if d.startswith(folder) and os.path.isdir(os.path.join(save_dir, d))]
+
+count = len(existing_folders)
+if count > 0:
+    folder = f"{folder}({count})"
+
+save_path = os.path.join(save_dir, folder)
 ################################################################################################################################################
 
 ################################################################################################################################################
@@ -49,10 +56,10 @@ param = {"n_encoder": 10,
          "lr": 3e-4,
          "mult_grad": 10000,
          "weight_decay": 1e-3,
-         "NDataT": 5000000,
+         "NDataT": 5000,
          "NDataV": 1000,
          "batch_size": 1000,
-         "n_iter": 30,
+         "n_iter": 3,
          "training_strategy": [
              {"mean": [-100000, 100000], "std": [1, 50000]}
          ],
