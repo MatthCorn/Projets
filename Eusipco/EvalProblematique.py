@@ -254,22 +254,22 @@ error = {"MinError": MinError,
          "RightStdMinError": RightStdMinError,
          "MaxPerf": MaxPerf,
          "LeftStdMaxPerf": LeftStdMaxPerf,
-         "RightStdMinError": RightStdMinError,}
+         "RightStdMaxPerf": RightStdMaxPerf,}
 
 saveObjAsXml(error, os.path.join(save_path, "error"))
 git_push(local, save_path, CommitMsg='simu ' + folder)
 
 try:
     import matplotlib.pyplot as plt
-    upper_error = np.array(MinError) + np.array(RightStdMinError)
-    middle_error = np.array(MinError)
-    lower_error = np.array(MinError) - np.array(LeftStdMinError)
+    upper_error = np.array(error['MinError']) + np.array(error['RightStdMinError'])
+    middle_error = np.array(error['MinError'])
+    lower_error = np.array(error['MinError']) - np.array(error['LeftStdMinError'])
 
-    upper_perf = np.array(MaxPerf) + np.array(RightStdMaxPerf)
-    middle_perf = np.array(MaxPerf)
-    lower_perf = np.array(MaxPerf) - np.array(LeftStdMaxPerf)
+    upper_perf = np.array(error['MaxPerf']) + np.array(error['RightStdMaxPerf'])
+    middle_perf = np.array(error['MaxPerf'])
+    lower_perf = np.array(error['MaxPerf']) - np.array(error['LeftStdMaxPerf'])
 
-    fig, (ax1, ax2) = plt.subplots(2, 1)
+    fig, (ax1, ax2) = plt.subplots(1, 2)
 
     ax1.plot(middle_error, 'r')
     ax1.plot(upper_error, 'lightcoral')
