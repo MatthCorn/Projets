@@ -7,6 +7,19 @@ from math import sqrt
 import torch
 import numpy as np
 from copy import deepcopy
+from Tools.GitPush import git_push
+
+################################################################################################################################################
+# pour sauvegarder toutes les informations de l"apprentissage
+import os
+import datetime
+from Tools.XMLTools import saveObjAsXml
+
+local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
+folder = datetime.datetime.now().strftime("EvalProblem_%Y-%m-%d__%H-%M")
+save_path = os.path.join(local, "Eusipco", "Save", folder)
+################################################################################################################################################
+
 
 def ChoseOutput(Pred, Input):
     Diff = Pred.unsqueeze(dim=1) - Input.unsqueeze(dim=2)
@@ -24,11 +37,11 @@ param = {"n_encoder": 10,
          "lr": 3e-4,
          "mult_grad": 10000,
          "weight_decay": 1e-3,
-         "NDataT": 500000,
+         "NDataT": 50000,
          "NDataV": 1000,
          "batch_size": 1000,
          "n_points_reg": 10,
-         "n_iter": 50,
+         "n_iter": 10,
          "training_space": {"mean": [-1000, 1000], "std": [100, 500]},
          "distrib": "log",
          "error_weighting": "y",
@@ -93,10 +106,12 @@ elif param['distrib'] == 'uniform':
 # max_mean_list = 2 * max_std_list
 lbd = np.flip(g(np.linspace(f(1e-4), f(1), param['n_points_reg'], endpoint=True)))
 
-MinTrainingError = []
-MaxTrainingPerf = []
-MinValidationError = []
-MaxValidationPerf = []
+MinError = []
+LeftStdMinError = []
+RightStdMinError = []
+MaxPerf = []
+LeftStdMaxPerf = []
+RightStdMaxPerf = []
 
 for i in range(param['n_points_reg']):
     N = Network(n_encoder=param["n_encoder"], d_in=param["d_in"], d_att=param["d_att"],
@@ -113,6 +128,12 @@ for i in range(param['n_points_reg']):
     # window['std'][1] = max_std_list[i]
     # window['mean'] = [-max_mean_list[i], max_mean_list[i]]
 
+    Error = []
+    LeftStdError = []
+    RightStdError = []
+    Perf = []
+    LeftStdPerf = []
+    RightStdPerf = []
 
     TrainingInput, TrainingOutput, TrainingStd = MakeTargetedData(
         NVec=NVec,
@@ -137,11 +158,6 @@ for i in range(param['n_points_reg']):
         NData=NDataV,
         Weight=Weight,
     )
-
-    TrainingError = []
-    TrainingPerf = []
-    ValidationError = []
-    ValidationPerf = []
 
     for j in range(param['n_iter']):
         error = 0
@@ -170,9 +186,6 @@ for i in range(param['n_points_reg']):
                 if lr_scheduler is not None:
                     lr_scheduler.step()
 
-                error += float(err) / (n_batch * n_minibatch)
-                perf += float(torch.sum(ChoseOutput(Prediction, InputBatch) == ChoseOutput(OutputBatch, InputBatch))) / (NDataT * NVec)
-
         with torch.no_grad():
             Input = ValidationInput.to(device)
             Output = ValidationOutput.to(device)
@@ -183,31 +196,87 @@ for i in range(param['n_points_reg']):
 
             Prediction = N(Input)
 
-            err = torch.norm((Prediction - Output) / Std, p=2) / sqrt(NDataV * DVec * NVec)
-            ValidationError.append(float(err))
-            ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input))) / (NDataV * NVec))
+            err = torch.norm((Prediction - Output) / Std, p=2, dim=[1, 2]) / sqrt(DVec * NVec)
+            mean_err = float(torch.mean(err))
+            left_std_error = sqrt(float(torch.mean((err[err < mean_err] - mean_err)**2)))
+            right_std_error = sqrt(float(torch.mean((err[err > mean_err] - mean_err)**2)))
+            Error.append(mean_err)
+            LeftStdError.append(left_std_error)
+            RightStdError.append(right_std_error)
 
-        TrainingError.append(error)
-        TrainingPerf.append(perf)
+            perf = (ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input)).to(float)
+            mean_perf = float(torch.mean(err))
+            left_std_perf = sqrt(float(torch.mean((perf[perf < mean_perf] - mean_perf)**2)))
+            right_std_perf = sqrt(float(torch.mean((perf[perf > mean_perf] - mean_perf)**2)))
+            Perf.append(mean_perf)
+            LeftStdPerf.append(left_std_perf)
+            RightStdPerf.append(right_std_perf)
 
-    MinTrainingError.append(min(TrainingError))
-    MaxTrainingPerf.append(max(TrainingPerf))
-    MinValidationError.append(min(ValidationError))
-    MaxValidationPerf.append(max(ValidationPerf))
+    min_error = min(Error)
+    left_std_error = LeftStdError[Error.index(min_error)]
+    right_std_error = RightStdError[Error.index(min_error)]
+    max_perf = max(Perf)
+    left_std_perf = LeftStdPerf[Perf.index(max_perf)]
+    right_std_perf = RightStdPerf[Perf.index(max_perf)]
+    MinError.append(min_error)
+    LeftStdMinError.append(left_std_error)
+    RightStdMinError.append(right_std_error)
+    MaxPerf.append(max_perf)
+    LeftStdMaxPerf.append(left_std_perf)
+    RightStdMaxPerf.append(right_std_perf)
 
     print('############################################################')
     print('intervalle std : [', f"{window['std'][0]:.2e}", ', ', f"{window['std'][1]:.2e}", ']')
     print('intervalle mean : [', f"{window['mean'][0]:.1f}", ', ', f"{window['mean'][1]:.1f}", ']')
-    print('min TrainingError : ', [f"{num:.2e}" for num in MinTrainingError])
-    print('max TrainingPerf : ', [f"{num:.2e}" for num in MaxTrainingPerf])
-    print('min ValidationError : ', [f"{num:.2e}" for num in MinValidationError])
-    print('max ValidationPerf : ', [f"{num:.2e}" for num in MaxValidationPerf])
+    print('min Error : ', [f"{num:.2e}" for num in MinError])
+    print('max Perf : ', [f"{num:.2e}" for num in MaxPerf])
 
 print('############################################################')
 print('############################################################')
 print('############################################################')
 print('############################################################')
-print('min TrainingError : ', [f"{num:.2e}" for num in MinTrainingError])
-print('min TrainingPerf : ', [f"{num:.2e}" for num in MaxTrainingPerf])
-print('min ValidationError : ', [f"{num:.2e}" for num in MinValidationError])
-print('min ValidationPerf : ', [f"{num:.2e}" for num in MaxValidationPerf])
+print('min Error : ', [f"{num:.2e}" for num in MinError])
+print('min Perf : ', [f"{num:.2e}" for num in MaxPerf])
+
+
+os.mkdir(save_path)
+
+error = {"MinError": MinError,
+         "LeftStdMinError": LeftStdMinError,
+         "RightStdMinError": RightStdMinError,
+         "MaxPerf": MaxPerf,
+         "LeftStdMaxPerf": LeftStdMaxPerf,
+         "RightStdMinError": RightStdMinError,}
+
+saveObjAsXml(error, os.path.join(save_path, "error"))
+git_push(local, save_path, CommitMsg='simu ' + folder)
+
+try:
+    import matplotlib.pyplot as plt
+    upper_error = np.array(MinError) + np.array(RightStdMinError)
+    middle_error = np.array(MinError)
+    lower_error = np.array(MinError) - np.array(LeftStdMinError)
+
+    upper_perf = np.array(MaxPerf) + np.array(RightStdMaxPerf)
+    middle_perf = np.array(MaxPerf)
+    lower_perf = np.array(MaxPerf) - np.array(LeftStdMaxPerf)
+
+    fig, (ax1, ax2) = plt.subplots(2, 1)
+
+    ax1.plot(middle_error, 'r')
+    ax1.plot(upper_error, 'lightcoral')
+    ax1.plot(lower_error, 'lightcoral')
+    ax1.set_ylim(bottom=0)
+    ax1.set_title("Erreur")
+
+    ax2.plot(middle_perf, 'b')
+    ax2.plot(upper_perf, 'skyblue')
+    ax2.plot(lower_perf, 'skyblue')
+    ax2.set_ylim(bottom=0)
+    ax2.set_title("Accuracy")
+
+    fig.tight_layout(pad=1.0)
+
+    plt.show()
+except:
+    pass

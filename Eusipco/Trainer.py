@@ -49,12 +49,12 @@ param = {"n_encoder": 10,
          "lr": 3e-4,
          "mult_grad": 10000,
          "weight_decay": 1e-3,
-         "NDataT": 500000,
+         "NDataT": 5000000,
          "NDataV": 1000,
          "batch_size": 1000,
-         "n_iter": 50,
+         "n_iter": 30,
          "training_strategy": [
-             {"mean": [-1000, 1000], "std": [0.01, 500]}
+             {"mean": [-100000, 100000], "std": [1, 50000]}
          ],
          "distrib": "log",
          "plot_distrib": "log",
