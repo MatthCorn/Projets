@@ -17,7 +17,7 @@ import datetime
 from Tools.XMLTools import saveObjAsXml
 
 local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
-folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
+folder = datetime.datetime.now().strftime("eval_problem_%Y-%m-%d__%H-%M")
 save_dir = os.path.join(local, "Eusipco", "Save")
 existing_folders = [d for d in os.listdir(save_dir) if d.startswith(folder) and os.path.isdir(os.path.join(save_dir, d))]
 
