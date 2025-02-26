@@ -1,0 +1,63 @@
+<?xml version="1.0" ?>
+<Dictionary>
+ <List Key="MinError">
+  <Object Value="0.217007115483284"/>
+  <Object Value="0.22996999323368073"/>
+  <Object Value="0.23084403574466705"/>
+  <Object Value="0.38008925318717957"/>
+  <Object Value="0.355205774307251"/>
+  <Object Value="0.3917376399040222"/>
+  <Object Value="0.9723950028419495"/>
+  <Object Value="0.9685401320457458"/>
+  <Object Value="0.9721662998199463"/>
+  <Object Value="0.9921572208404541"/>
+ </List>
+ <List Key="LeftStdMinError">
+  <Object Value="0.08985477877387091"/>
+  <Object Value="0.08314123930360923"/>
+  <Object Value="0.09033148481873896"/>
+  <Object Value="0.1913382058936112"/>
+  <Object Value="0.1581455349592931"/>
+  <Object Value="0.18140180330962596"/>
+  <Object Value="0.08173288284212969"/>
+  <Object Value="0.0771744388512423"/>
+  <Object Value="0.07965249246300266"/>
+  <Object Value="0.0816938580353158"/>
+ </List>
+ <List Key="RightStdMinError">
+  <Object Value="0.2911722926409863"/>
+  <Object Value="0.22768689539062326"/>
+  <Object Value="0.2539842192439033"/>
+  <Object Value="0.3093904881501857"/>
+  <Object Value="0.2747449271720428"/>
+  <Object Value="0.2958219448212304"/>
+  <Object Value="0.1243971540677959"/>
+  <Object Value="0.13236266981627884"/>
+  <Object Value="0.13316590608600212"/>
+  <Object Value="0.12193470097872701"/>
+ </List>
+ <List Key="MaxPerf">
+  <Object Value="0.9548"/>
+  <Object Value="0.9551999999999999"/>
+  <Object Value="0.9530000000000001"/>
+  <Object Value="0.8459"/>
+  <Object Value="0.8663000000000001"/>
+  <Object Value="0.8270000000000001"/>
+  <Object Value="0.10250000000000001"/>
+  <Object Value="0.1005"/>
+  <Object Value="0.10020000000000003"/>
+  <Object Value="0.10010000000000001"/>
+ </List>
+ <List Key="LeftStdMaxPerf">
+  <Object Value="0.17282695305559062"/>
+  <Object Value="0.15603364848474008"/>
+  <Object Value="0.18339574695177643"/>
+  <Object Value="0.2208480064738423"/>
+  <Object Value="0.27019692754576696"/>
+  <Object Value="0.3171172392575709"/>
+  <Object Value="0.0025000000000000022"/>
+  <Object Value="0.0005000000000000004"/>
+  <Object Value="0.0002000000000000196"/>
+  <Object Value="0.00010000000000000286"/>
+ </List>
+</Dictionary>
