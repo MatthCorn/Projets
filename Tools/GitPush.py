@@ -11,7 +11,7 @@ def git_push(local, save_path, CommitMsg=COMMIT_MESSAGE):
         repo.git.add([save_path])
         repo.index.commit(CommitMsg)
         origin = repo.remote(name='origin')
-        repo.git.stash('push')
+        repo.git.stash('push', '--keep-index')
         origin.pull(rebase=True)
         repo.git.stash('pop')
         try:
