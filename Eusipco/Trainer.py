@@ -56,10 +56,10 @@ param = {"n_encoder": 10,
          "lr": 3e-4,
          "mult_grad": 10000,
          "weight_decay": 1e-3,
-         "NDataT": 5000,
+         "NDataT": 500000,
          "NDataV": 1000,
          "batch_size": 1000,
-         "n_iter": 3,
+         "n_iter": 50,
          "training_strategy": [
              {"mean": [-100000, 100000], "std": [1, 50000]}
          ],
