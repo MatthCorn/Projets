@@ -257,6 +257,7 @@ error = {"MinError": MinError,
          "RightStdMaxPerf": RightStdMaxPerf,}
 
 saveObjAsXml(error, os.path.join(save_path, "error"))
+saveObjAsXml(param, os.path.join(save_path, "param"))
 git_push(local, save_path, CommitMsg='simu ' + folder)
 
 try:
