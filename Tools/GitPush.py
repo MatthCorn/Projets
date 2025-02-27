@@ -11,9 +11,12 @@ def git_push(local, save_path, CommitMsg=COMMIT_MESSAGE):
         repo.git.add([save_path])
         repo.index.commit(CommitMsg)
         origin = repo.remote(name='origin')
-        repo.git.stash('push', '--keep-index')
-        origin.pull(rebase=True)
-        repo.git.stash('pop')
+        if repo.git.status('--porcelain'):
+            repo.git.stash('push', '--keep-index')
+            origin.pull(rebase=True)
+            repo.git.stash('pop')
+        else:
+            origin.pull(rebase=True)
         try:
             origin.push()
         except:
