@@ -260,7 +260,14 @@ saveObjAsXml(error, os.path.join(save_path, "error"))
 git_push(local, save_path, CommitMsg='simu ' + folder)
 
 try:
+    error_path = os.path.join(save_path, 'error')
     import matplotlib.pyplot as plt
+    import matplotlib
+    import numpy as np
+    from Tools.XMLTools import loadXmlAsObj
+    error = loadXmlAsObj(error_path)
+    matplotlib.use('Qt5Agg')
+
     upper_error = np.array(error['MinError']) + np.array(error['RightStdMinError'])
     middle_error = np.array(error['MinError'])
     lower_error = np.array(error['MinError']) - np.array(error['LeftStdMinError'])
@@ -276,12 +283,14 @@ try:
     ax1.plot(lower_error, 'lightcoral')
     ax1.set_ylim(bottom=0)
     ax1.set_title("Erreur")
+    ax1.set_box_aspect(1)
 
     ax2.plot(middle_perf, 'b')
     ax2.plot(upper_perf, 'skyblue')
     ax2.plot(lower_perf, 'skyblue')
     ax2.set_ylim(bottom=0)
     ax2.set_title("Accuracy")
+    ax2.set_box_aspect(1)
 
     fig.tight_layout(pad=1.0)
 
