@@ -167,7 +167,7 @@ for i in tqdm(range(param['n_points_reg'])):
         Weight=Weight,
     )
 
-    for j in range(param['n_iter']):
+    for j in tqdm(range(param['n_iter'])):
         error = 0
         perf = 0
 
