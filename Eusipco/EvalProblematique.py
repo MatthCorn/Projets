@@ -15,6 +15,7 @@ from tqdm import tqdm
 import os
 import datetime
 from Tools.XMLTools import saveObjAsXml
+import time
 
 local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
 base_folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
