@@ -22,17 +22,25 @@ import os
 import datetime
 from Tools.XMLTools import saveObjAsXml
 import pickle
+import time
 
 local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
-folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
+base_folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
 save_dir = os.path.join(local, "Eusipco", "Save")
-existing_folders = [d for d in os.listdir(save_dir) if d.startswith(folder) and os.path.isdir(os.path.join(save_dir, d))]
 
-count = len(existing_folders)
-if count > 0:
-    folder = f"{folder}({count})"
+attempt = 0
+while True:
+    folder = f"{base_folder}({attempt})" if attempt > 0 else base_folder
+    save_path = os.path.join(save_dir, folder)
 
-save_path = os.path.join(save_dir, folder)
+    try:
+        os.makedirs(save_path, exist_ok=False)
+        break
+    except FileExistsError:
+        attempt += 1
+        time.sleep(0.1)
+
+print(f"Dossier créé : {save_path}")
 ################################################################################################################################################
 
 ################################################################################################################################################
