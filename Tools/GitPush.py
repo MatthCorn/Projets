@@ -11,19 +11,37 @@ def git_push(local, save_path, CommitMsg=COMMIT_MESSAGE):
         repo.git.add([save_path])
         repo.index.commit(CommitMsg)
         origin = repo.remote(name='origin')
-        if repo.git.status('--porcelain'):
+
+        # Si des fichiers sont modifiés, on stash avant de récupérer les mises à jour
+        try:
             repo.git.stash('push', '--keep-index')
-            origin.pull(rebase=True)
+        except Exception as e:
+            print(f"Une erreur est survenue lors du stash push: {e}")
+
+        # Récupérer les mises à jour sans modifier la copie de travail
+        origin.fetch()
+
+        try:
+            repo.git.rebase('origin/main')  # Rebase sécurisé
+        except Exception as e:
+            print(f"Une erreur est survenue lors du rebase: {e}")
+            repo.git.reset('--hard', 'origin/main')
+
+        # Tenter de récupérer le stash (si existant)
+        try:
             repo.git.stash('pop')
-        else:
-            origin.pull(rebase=True)
+        except Exception as e:
+            print(f"Une erreur est survenue lors du stash pop: {e}")
+
         try:
             origin.push()
-        except:
-            print("Push refusé, tentative avec force...")
+        except Exception as e:
+            print(f"Une erreur est survenue lors du push: {e}")
             origin.push(force=True)
+
     except Exception as e:
         print(f"Une erreur est survenue: {e}")
+
 
 
 if __name__ == '__main__':
