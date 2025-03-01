@@ -138,7 +138,7 @@ def PlotError(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r"C:\Users\Matth\Documents\Projets\Eusipco\Save\2025-02-27__14-23"
+    save_path = r"C:\Users\matth\Documents\Python\Projets\Eusipco\Save\2025-02-28__22-09(2)"
 
     PlotError(save_path)
 
