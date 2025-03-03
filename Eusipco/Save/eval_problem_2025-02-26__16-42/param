@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<Dictionary>
+ <Object Key="n_encoder" Value="10"/>
+ <Object Key="len_in" Value="10"/>
+ <Object Key="d_in" Value="10"/>
+ <Object Key="d_att" Value="128"/>
+ <String Key="network" Value="Transformer"/>
+ <List Key="WidthsEmbedding">
+  <Object Value="32"/>
+ </List>
+ <Object Key="dropout" Value="0"/>
+ <Object Key="lr" Value="3e-05"/>
+ <Object Key="mult_grad" Value="10000"/>
+ <Object Key="weight_decay" Value="0.001"/>
+ <Object Key="NDataT" Value="500000"/>
+ <Object Key="NDataV" Value="1000"/>
+ <Object Key="batch_size" Value="1000"/>
+ <Object Key="n_points_reg" Value="10"/>
+ <Object Key="n_iter" Value="50"/>
+ <Dictionary Key="training_space">
+  <List Key="mean">
+   <Object Value="-1000"/>
+   <Object Value="1000"/>
+  </List>
+  <List Key="std">
+   <Object Value="100"/>
+   <Object Value="500"/>
+  </List>
+ </Dictionary>
+ <String Key="distrib" Value="log"/>
+ <String Key="error_weighting" Value="y"/>
+ <Object Key="max_lr" Value="5"/>
+ <Object Key="warmup" Value="0.8"/>
+ <String Key="optim" Value="Adam"/>
+ <Dictionary Key="trainingspace">
+  <List Key="mean">
+   <Object Value="-1000"/>
+   <Object Value="1000"/>
+  </List>
+  <List Key="std">
+   <Object Value="100"/>
+   <Object Value="500"/>
+  </List>
+ </Dictionary>
+</Dictionary>
