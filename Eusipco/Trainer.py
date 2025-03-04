@@ -275,4 +275,4 @@ for window in param["training_strategy"]:
                 ParamObs = DictParamObserver(N)
                 pickle.dump(ParamObs, file)
 
-git_push(local, save_path, CommitMsg='simu ' + folder)
+# git_push(local, save_path, CommitMsg='simu ' + folder)
