@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<Dictionary>
+ <List Key="FinalPerfValidation">
+  <Object Value="0.10784000000000002"/>
+  <Object Value="0.8093600000000001"/>
+  <Object Value="0.9927"/>
+  <Object Value="0.9938"/>
+  <Object Value="0.1"/>
+ </List>
+ <List Key="NoisePerfValidation">
+  <Object Value="0.00024389102188716763"/>
+  <Object Value="0.00208751039266076"/>
+  <Object Value="0.013397266739949242"/>
+  <Object Value="0.010269731504059989"/>
+  <Object Value="0.008191318710399607"/>
+ </List>
+ <List Key="FinalErrorValidation">
+  <Object Value="1.0425598382949828"/>
+  <Object Value="0.48201144933700557"/>
+  <Object Value="0.10288237482309343"/>
+  <Object Value="0.0963795930147171"/>
+  <Object Value="1.125825572013855"/>
+ </List>
+ <List Key="NoiseErrorValidation">
+  <Object Value="0.0003806951130753797"/>
+  <Object Value="0.0012314500086339718"/>
+  <Object Value="0.011432355638831866"/>
+  <Object Value="0.016717806868922186"/>
+  <Object Value="0.00814939947802428"/>
+ </List>
+</Dictionary>
