@@ -22,9 +22,9 @@ def MakeGIF(PlottingData, NData, training_strategy, frac, distrib, save_path):
 
 
     plot_x_ticks = g(np.linspace(f(std_min), f(std_max), 5))
-    x_ticks = np.linspace(0, NData+1, 5)
+    x_ticks = np.linspace(0, NData, 5)
     plot_y_ticks = np.linspace(mean_min, mean_max, 7)
-    y_ticks = np.linspace(0, NData+1, 7)
+    y_ticks = np.linspace(0, NData, 7)
 
     # Prepare the figure
     fig, ax = plt.subplots(1, 2, figsize=(8, 4))
@@ -91,7 +91,6 @@ def MakeGIF(PlottingData, NData, training_strategy, frac, distrib, save_path):
             update.cbar1.update_normal(im1)
 
         plt.tight_layout()
-
         return ax0, ax1
 
     # Create animation
@@ -138,7 +137,7 @@ def PlotError(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r"C:\Users\matth\Documents\Python\Projets\Eusipco\Save\2025-03-03__16-48"
+    save_path = r"C:\Users\Matth\Documents\Projets\Eusipco\Save\2025-03-04__11-45"
 
     PlotError(save_path)
 
