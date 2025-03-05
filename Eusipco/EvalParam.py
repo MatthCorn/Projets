@@ -57,7 +57,7 @@ def ChoseOutput(Pred, Input):
     Arg = torch.argmin(Dist, dim=1)
     return Arg
 
-param = {"n_encoder": 10,
+global_param = {"n_encoder": 10,
          "len_in": 10,
          "d_in": 10,
          "d_att": 128,
@@ -78,7 +78,7 @@ param = {"n_encoder": 10,
          "warmup": 2,
          "eval": {"param": "lr",
                   "n_points_reg": 5,
-                  "multiplier": [1e-1, 1e1],
+                  "multiplier": [1, 1e2],
                   "spacing": "log"}
          }
 
@@ -99,63 +99,63 @@ try:
     json_file = sys.argv[1]
     with open(json_file, "r") as f:
         temp_param = json.load(f)
-    param.update(temp_param)
+    global_param.update(temp_param)
 except:
     print("nothing loaded")
 
-Network = {"Transformer": Transformer, "CNN": CNN, "RNN": RNN}[param["network"]]
+Network = {"Transformer": Transformer, "CNN": CNN, "RNN": RNN}[global_param["network"]]
 
 if torch.cuda.is_available():
     torch.cuda.set_device(0)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-if param['eval']['spacing'] == 'log':
+if global_param['eval']['spacing'] == 'log':
     f = np.log
     g = np.exp
-elif param['eval']['spacing'] == 'uniform':
+elif global_param['eval']['spacing'] == 'uniform':
     f = lambda x: x
     g = lambda x: x
 
-lbd = np.flip(g(np.linspace(f(param['eval']['multiplier'][0]), f(param['eval']['multiplier'][1]), param['eval']['n_points_reg'], endpoint=True)))
+lbd = g(np.linspace(f(global_param['eval']['multiplier'][0]), f(global_param['eval']['multiplier'][1]), global_param['eval']['n_points_reg'], endpoint=True))
 
 FinalPerfValidation = []
 NoisePerfValidation = []
 FinalErrorValidation = []
 NoiseErrorValidation = []
 
-for i in tqdm(range(param['eval']['n_points_reg'])):
+for i in tqdm(range(global_param['eval']['n_points_reg'])):
     ValidationError = []
     ValidationPerf = []
 
-    local_param = deepcopy(param)
-    local_param[param['eval']['param']] = local_param[param['eval']['param']] * lbd[i]
+    param = deepcopy(global_param)
+    param[param['eval']['param']] = param[param['eval']['param']] * lbd[i]
 
-    NDataT = local_param["NDataT"]
-    NDataV = local_param["NDataV"]
-    DVec = local_param["d_in"]
-    NVec = local_param["len_in"]
+    NDataT = param["NDataT"]
+    NDataV = param["NDataV"]
+    DVec = param["d_in"]
+    NVec = param["len_in"]
     Weight = 2 * torch.rand(DVec) - 1
     Weight = Weight / torch.norm(Weight)
 
     mini_batch_size = 50000
     n_minibatch = int(NDataT / mini_batch_size)
-    batch_size = local_param["batch_size"]
+    batch_size = param["batch_size"]
     n_batch = int(mini_batch_size / batch_size)
 
-    n_iter = local_param["n_iter"]
+    n_iter = param["n_iter"]
 
     n_updates = int(NDataT / batch_size) * n_iter
-    warmup_steps = int(NDataT / batch_size) * local_param["warmup"]
+    warmup_steps = int(NDataT / batch_size) * param["warmup"]
 
     TrainingInput, TrainingOutput, TrainingStd = MakeTargetedData(
         NVec=NVec,
         DVec=DVec,
-        mean_min=local_param['training_space']["mean"][0],
-        mean_max=local_param['training_space']["mean"][1],
-        std_min=local_param['training_space']["std"][0],
-        std_max=local_param['training_space']["std"][1],
-        distrib=local_param["distrib"],
+        mean_min=param['training_space']["mean"][0],
+        mean_max=param['training_space']["mean"][1],
+        std_min=param['training_space']["std"][0],
+        std_max=param['training_space']["std"][1],
+        distrib=param["distrib"],
         NData=NDataT,
         Weight=Weight,
     )
@@ -163,24 +163,24 @@ for i in tqdm(range(param['eval']['n_points_reg'])):
     ValidationInput, ValidationOutput, ValidationStd = MakeTargetedData(
         NVec=NVec,
         DVec=DVec,
-        mean_min=local_param['training_space']["mean"][0],
-        mean_max=local_param['training_space']["mean"][1],
-        std_min=local_param['training_space']["std"][0],
-        std_max=local_param['training_space']["std"][1],
-        distrib=local_param["distrib"],
+        mean_min=param['training_space']["mean"][0],
+        mean_max=param['training_space']["mean"][1],
+        std_min=param['training_space']["std"][0],
+        std_max=param['training_space']["std"][1],
+        distrib=param["distrib"],
         NData=NDataV,
         Weight=Weight,
     )
 
-    N = Network(n_encoder=local_param["n_encoder"], d_in=local_param["d_in"], d_att=local_param["d_att"],
-                WidthsEmbedding=local_param["WidthsEmbedding"], dropout=local_param["dropout"])
+    N = Network(n_encoder=param["n_encoder"], d_in=param["d_in"], d_att=param["d_att"],
+                WidthsEmbedding=param["WidthsEmbedding"], dropout=param["dropout"])
     N.to(device)
 
-    optimizer = torch.optim.Adam(N.parameters(), weight_decay=local_param["weight_decay"], lr=local_param["lr"])
+    optimizer = torch.optim.Adam(N.parameters(), weight_decay=param["weight_decay"], lr=param["lr"])
 
-    lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=local_param["max_lr"])
+    lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"])
 
-    for j in tqdm(range(local_param['n_iter'])):
+    for j in tqdm(range(param['n_iter'])):
 
         for p in range(n_minibatch):
             InputMiniBatch = TrainingInput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
@@ -194,13 +194,13 @@ for i in tqdm(range(param['eval']['n_points_reg'])):
                 OutputBatch = OutputMiniBatch[k * batch_size:(k + 1) * batch_size]
                 StdBatch = StdMiniBatch[k * batch_size:(k + 1) * batch_size]
 
-                if local_param['error_weighting'] == 'n':
+                if param['error_weighting'] == 'n':
                     StdBatch = torch.mean(StdBatch)
 
                 Prediction = N(InputBatch)
 
                 err = torch.norm((Prediction - OutputBatch) / StdBatch, p=2) / sqrt(batch_size * DVec * NVec)
-                (local_param["mult_grad"] * err).backward()
+                (param["mult_grad"] * err).backward()
                 optimizer.step()
                 if lr_scheduler is not None:
                     lr_scheduler.step()
@@ -210,7 +210,7 @@ for i in tqdm(range(param['eval']['n_points_reg'])):
             Output = ValidationOutput.to(device)
             Std = ValidationStd.to(device)
 
-            if local_param['error_weighting'] == 'n':
+            if param['error_weighting'] == 'n':
                 Std = torch.mean(Std)
 
             Prediction = N(Input)
@@ -220,11 +220,10 @@ for i in tqdm(range(param['eval']['n_points_reg'])):
             ValidationError.append(float(err))
             ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input))) / (NDataV * NVec))
 
-
-    n, e = eval_curve(ValidationPerf)
+    e, n = eval_curve(ValidationPerf)
     FinalPerfValidation.append(e)
     NoisePerfValidation.append(n)
-    n, e = eval_curve(ValidationError)
+    e, n = eval_curve(ValidationError)
     FinalErrorValidation.append(e)
     NoiseErrorValidation.append(n)
 
@@ -234,9 +233,10 @@ error = {"FinalPerfValidation": FinalPerfValidation,
          "NoiseErrorValidation": NoiseErrorValidation}
 
 saveObjAsXml(error, os.path.join(save_path, "error"))
-saveObjAsXml(param, os.path.join(save_path, "param"))
+saveObjAsXml(global_param, os.path.join(save_path, "param"))
 
 try:
+    import os
     error_path = os.path.join(save_path, 'error')
     param_path = os.path.join(save_path, 'param')
     import matplotlib.pyplot as plt
