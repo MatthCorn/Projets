@@ -254,7 +254,7 @@ try:
         f = lambda x: x
         g = lambda x: x
 
-    lbd = np.flip(g(np.linspace(f(param['eval']['multiplier'][0]), f(param['eval']['multiplier'][1]),param['eval']['n_points_reg'], endpoint=True)))
+    lbd = g(np.linspace(f(param['eval']['multiplier'][0]), f(param['eval']['multiplier'][1]),param['eval']['n_points_reg'], endpoint=True))
     x = param[param['eval']['param']] * lbd
 
     upper_error = np.array(error['FinalErrorValidation']) + np.array(error['NoiseErrorValidation'])
@@ -272,7 +272,7 @@ try:
     ax1.plot(lower_error, 'r')
     ax1.fill_between([i for i in range(len(middle_error))], lower_error, upper_error, color='r', alpha=0.5)
     ax1.set_xticklabels([f"{val:.0e}" for val in x])
-    ax1.set_ylim(top=1, bottom=-1)
+    ax1.set_ylim(top=1, bottom=0)
     ax1.set_xlabel(param['eval']['param'])
     ax1.set_title("Erreur")
     ax1.set_box_aspect(1)
@@ -281,7 +281,7 @@ try:
     ax2.plot(upper_perf, 'b')
     ax2.plot(lower_perf, 'b')
     ax2.fill_between([i for i in range(len(middle_perf))], upper_perf, lower_perf, color='b', alpha=0.5)
-    ax2.set_ylim(top=1, bottom=-1)
+    ax2.set_ylim(top=1, bottom=0)
     ax2.set_xticklabels([f"{val:.0e}" for val in x])
     ax2.set_xlabel(param['eval']['param'])
     ax2.set_title("Accuracy")
