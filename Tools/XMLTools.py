@@ -137,6 +137,8 @@ def fromXmlToObjRec(Base):
         for El in Base.findall("./"):
             (El != Base) and dic.update({El.get('Key'): fromXmlToObjRec(El)})
         return dic
+    elif Base.get('Value') == "nan":
+        return float("nan")
     else:
         return ast.literal_eval(Base.get('Value'))
 def loadXmlAsObj(file):

@@ -136,9 +136,59 @@ def PlotError(save_path):
 
     plt.show()
 
+def PlotEvalParam(save_path):
+    error_path = os.path.join(save_path, 'error')
+    param_path = os.path.join(save_path, 'param')
+    error = loadXmlAsObj(error_path)
+    param = loadXmlAsObj(param_path)
+
+    if param['eval']['spacing'] == 'log':
+        f = np.log
+        g = np.exp
+    elif param['eval']['spacing'] == 'uniform':
+        f = lambda x: x
+        g = lambda x: x
+
+    lbd = g(np.linspace(f(param['eval']['multiplier'][0]), f(param['eval']['multiplier'][1]),param['eval']['n_points_reg'], endpoint=True))
+    x = param[param['eval']['param']] * lbd
+
+    upper_error = np.array(error['FinalErrorValidation']) + np.array(error['NoiseErrorValidation'])
+    middle_error = np.array(error['FinalErrorValidation'])
+    lower_error = np.array(error['FinalErrorValidation']) - np.array(error['NoiseErrorValidation'])
+
+    upper_perf = np.array(error['FinalPerfValidation']) + np.array(error['NoisePerfValidation'])
+    middle_perf = np.array(error['FinalPerfValidation'])
+    lower_perf = np.array(error['FinalPerfValidation']) - np.array(error['NoisePerfValidation'])
+
+    fig, (ax1, ax2) = plt.subplots(1, 2)
+
+    ax1.plot(middle_error, 'r')
+    ax1.plot(upper_error, 'r')
+    ax1.plot(lower_error, 'r')
+    ax1.fill_between([i for i in range(len(middle_error))], lower_error, upper_error, color='r', alpha=0.5)
+    ax1.set_xticks([i for i in range(len(x))])
+    ax1.set_xticklabels([f"{val:.0e}" for val in x])
+    ax1.set_ylim(bottom=0)
+    ax1.set_xlabel(param['eval']['param'])
+    ax1.set_title("Erreur")
+    ax1.set_box_aspect(1)
+
+    ax2.plot(middle_perf, 'b')
+    ax2.plot(upper_perf, 'b')
+    ax2.plot(lower_perf, 'b')
+    ax2.set_xticks([i for i in range(len(x))])
+    ax2.fill_between([i for i in range(len(middle_perf))], upper_perf, lower_perf, color='b', alpha=0.5)
+    ax2.set_ylim(bottom=0)
+    ax2.set_xticklabels([f"{val:.0e}" for val in x])
+    ax2.set_xlabel(param['eval']['param'])
+    ax2.set_title("Accuracy")
+    ax2.set_box_aspect(1)
+
+    fig.tight_layout(pad=1.0)
+
+    plt.show()
+
 if __name__ == '__main__':
-    save_path = r"C:\Users\Matth\Documents\Projets\Eusipco\Save\2025-03-04__11-45"
+    save_path = r'C:\Users\Matth\Documents\Projets\Eusipco\Save\eval_param_2025-03-05__17-22'
 
-    PlotError(save_path)
-
-    PathToGIF(save_path)
+    PlotEvalParam(save_path)
