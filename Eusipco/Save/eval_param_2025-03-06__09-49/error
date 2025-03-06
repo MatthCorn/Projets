@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+<Dictionary>
+ <List Key="FinalPerfValidation">
+  <Object Value="0.67604"/>
+  <Object Value="0.87846"/>
+  <Object Value="0.9054800000000001"/>
+  <Object Value="0.91644"/>
+  <Object Value="0.9198199999999999"/>
+  <Object Value="0.90082"/>
+  <Object Value="0.8989400000000001"/>
+  <Object Value="0.8848799999999999"/>
+  <Object Value="0.1"/>
+  <Object Value="0.1"/>
+ </List>
+ <List Key="NoisePerfValidation">
+  <Object Value="0.00333168059659881"/>
+  <Object Value="0.0038545535886943725"/>
+  <Object Value="0.00634930896659353"/>
+  <Object Value="0.007788946286064913"/>
+  <Object Value="0.00958115582608305"/>
+  <Object Value="0.00808690247578877"/>
+  <Object Value="0.005825348257789041"/>
+  <Object Value="0.006093237479004286"/>
+  <Object Value="0.0024265665082464512"/>
+  <Object Value="0.0034510092458822266"/>
+ </List>
+ <List Key="FinalErrorValidation">
+  <Object Value="0.48121539354324344"/>
+  <Object Value="0.32223749756813047"/>
+  <Object Value="0.2996876657009125"/>
+  <Object Value="0.2886131465435028"/>
+  <Object Value="0.2801548957824707"/>
+  <Object Value="0.3072761833667755"/>
+  <Object Value="0.3160218358039856"/>
+  <Object Value="0.34074299335479735"/>
+  <Object Value="nan"/>
+  <Object Value="nan"/>
+ </List>
+ <List Key="NoiseErrorValidation">
+  <Object Value="0.003791955459106677"/>
+  <Object Value="0.004865448881870135"/>
+  <Object Value="0.006936571805338809"/>
+  <Object Value="0.008758156812860842"/>
+  <Object Value="0.009894020418587649"/>
+  <Object Value="0.008830086818737842"/>
+  <Object Value="0.00783226442937574"/>
+  <Object Value="0.007629865082600951"/>
+  <Object Value="nan"/>
+  <Object Value="nan"/>
+ </List>
+</Dictionary>
