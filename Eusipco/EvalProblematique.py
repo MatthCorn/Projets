@@ -50,15 +50,16 @@ param = {"n_encoder": 10,
          "network": "Transformer",
          "WidthsEmbedding": [32],
          "dropout": 0,
-         "lr": 3e-4,
+         "lr": 3e-3,
          "mult_grad": 10000,
          "weight_decay": 1e-3,
-         "NDataT": 500000,
+         "NDataT": 5000000,
          "NDataV": 1000,
          "batch_size": 1000,
          "n_points_reg": 10,
-         "n_iter": 50,
-         "training_space": {"mean": [-1000, 1000], "std": [100, 500]},
+         "n_iter": 30,
+         "training_space": {"mean": [-10, 10], "std": [1, 5]},
+         "lbd": {"min": 1e-4, "max": 1},
          "distrib": "log",
          "error_weighting": "y",
          "max_lr": 5,
@@ -118,9 +119,7 @@ elif param['distrib'] == 'uniform':
     f = lambda x: x
     g = lambda x: x
 
-# max_std_list = g(np.linspace(0, f(param['training_space']['std'][1]), param['n_points_reg'], endpoint=True))
-# max_mean_list = 2 * max_std_list
-lbd = np.flip(g(np.linspace(f(1e-4), f(1), param['n_points_reg'], endpoint=True)))
+lbd = np.flip(g(np.linspace(f(param['lbd']['min']), f(param['lbd']['max']), param['n_points_reg'], endpoint=True)))
 
 MinError = []
 LeftStdMinError = []
@@ -141,8 +140,6 @@ for i in tqdm(range(param['n_points_reg'])):
     window = deepcopy(param['training_space'])
 
     window['std'][0] *= lbd[i]
-    # window['std'][1] = max_std_list[i]
-    # window['mean'] = [-max_mean_list[i], max_mean_list[i]]
 
     Error = []
     LeftStdError = []
@@ -266,7 +263,6 @@ error = {"MinError": MinError,
 
 saveObjAsXml(error, os.path.join(save_path, "error"))
 saveObjAsXml(param, os.path.join(save_path, "param"))
-# git_push(local, save_path, CommitMsg='simu ' + folder)
 
 try:
     error_path = os.path.join(save_path, 'error')
