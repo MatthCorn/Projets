@@ -251,9 +251,6 @@ print('############################################################')
 print('min Error : ', [f"{num:.2e}" for num in MinError])
 print('min Perf : ', [f"{num:.2e}" for num in MaxPerf])
 
-
-os.mkdir(save_path)
-
 error = {"MinError": MinError,
          "LeftStdMinError": LeftStdMinError,
          "RightStdMinError": RightStdMinError,
