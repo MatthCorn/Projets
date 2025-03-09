@@ -7,7 +7,6 @@ from math import sqrt
 import torch
 import numpy as np
 from copy import deepcopy
-from Tools.GitPush import git_push
 from tqdm import tqdm
 
 ################################################################################################################################################
@@ -18,7 +17,7 @@ from Tools.XMLTools import saveObjAsXml
 import time
 
 local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
-base_folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
+base_folder = datetime.datetime.now().strftime("eval_problem_%Y-%m-%d__%H-%M")
 save_dir = os.path.join(local, "Eusipco", "Save")
 
 attempt = 0
@@ -262,6 +261,7 @@ saveObjAsXml(error, os.path.join(save_path, "error"))
 saveObjAsXml(param, os.path.join(save_path, "param"))
 
 try:
+    import os
     error_path = os.path.join(save_path, 'error')
     import matplotlib.pyplot as plt
     import matplotlib
