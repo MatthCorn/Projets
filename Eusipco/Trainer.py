@@ -67,9 +67,11 @@ param = {"n_encoder": 10,
          "NDataT": 500000,
          "NDataV": 1000,
          "batch_size": 1000,
-         "n_iter": 80,
+         "n_iter": 150,
          "training_strategy": [
-             {"mean": [-10, 10], "std": [1, 5]}
+             {"mean": [-1, 1], "std": [0.1, 0.5]},
+             {"mean": [-0.1, 0.1], "std": [0.01, 0.05]},
+             {"mean": [-0.01, 0.01], "std": [0.001, 0.005]}
          ],
          "distrib": "log",
          "plot_distrib": "log",
@@ -156,6 +158,12 @@ PlottingInput, PlottingOutput, PlottingStd = MakeTargetedData(
 best_state_dict = N.state_dict().copy()
 
 for window in param["training_strategy"]:
+    optimizer = optimizers[param['optim']](N.parameters(), weight_decay=param["weight_decay"], lr=param["lr"])
+
+    n_updates = int(NDataT / batch_size) * n_iter_window
+    warmup_steps = int(NDataT / batch_size * param["warmup"])
+    lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"], max_steps=n_updates, type='cos')
+
     TrainingInput, TrainingOutput, TrainingStd = MakeTargetedData(
         NVec=NVec,
         DVec=DVec,
