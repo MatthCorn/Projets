@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, PillowWriter
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
 from Tools.XMLTools import loadXmlAsObj
 
@@ -54,7 +55,7 @@ def MakeGIF(PlottingData, NData, training_strategy, frac, distrib, save_path):
         ax[1].set_title("accuracy :" + str(frame))
         error_im = PlottingData[0][frame]
         perf_im = PlottingData[1][frame]
-        im0 = ax[0].imshow(error_im, cmap="cool", vmin=0, vmax=1)
+        im0 = ax[0].imshow(error_im, cmap="cool_r", vmin=0, vmax=1)
         im1 = ax[1].imshow(perf_im, cmap="cool", vmin=0, vmax=1)
 
         current_strat = training_strategy[int(frame/frames*frac * len(training_strategy))]
@@ -83,12 +84,26 @@ def MakeGIF(PlottingData, NData, training_strategy, frac, distrib, save_path):
         ax0 = ax[0].plot(square_x, square_y, 'black', linewidth=1)
         ax1 = ax[1].plot(square_x, square_y, 'black', linewidth=1)
 
-        if not hasattr(update, "cbar0"):
-            update.cbar0 = plt.colorbar(im0, ax=ax[0])
-            update.cbar1 = plt.colorbar(im1, ax=ax[1])
-        else:
-            update.cbar0.update_normal(im0)
-            update.cbar1.update_normal(im1)
+        try:
+            update.cbar0.remove()
+        except:
+            pass
+        try:
+            update.cbar1.remove()
+        except:
+            pass
+
+        divider0 = make_axes_locatable(ax[0])
+        cax0 = divider0.append_axes("right", size="5%", pad=0.05)
+
+        divider1 = make_axes_locatable(ax[1])
+        cax1 = divider1.append_axes("right", size="5%", pad=0.05)
+
+        cax0.yaxis.set_ticks_position('right')
+        cax1.yaxis.set_ticks_position('right')
+
+        update.cbar0 = plt.colorbar(im0, cax=cax0)
+        update.cbar1 = plt.colorbar(im1, cax=cax1)
 
         plt.tight_layout()
         return ax0, ax1
@@ -189,8 +204,79 @@ def PlotEvalParam(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\Matth\Documents\Projets\Eusipco\Save\2025-03-10__16-30'
+    # save_path = r'C:\Users\Matth\Documents\Projets\Eusipco\Save\2025-03-11__15-53'
+    #
+    # PlotError(save_path)
+    #
+    # PathToGIF(save_path)
 
-    PlotError(save_path)
+    Tr_path = r'C:\Users\Matth\Documents\Projets\Eusipco\Save\eval_problem_2025-03-08__10-51\error'
+    Cnn_path = r'C:\Users\Matth\Documents\Projets\Eusipco\Save\eval_problem_2025-03-07__21-08\error'
+    Rnn_path = r'C:\Users\Matth\Documents\Projets\Eusipco\Save\eval_problem_2025-03-07__21-08(1)\error'
+    param_path = r'C:\Users\Matth\Documents\Projets\Eusipco\Save\eval_problem_2025-03-08__10-51\param'
 
-    PathToGIF(save_path)
+    import matplotlib.pyplot as plt
+    import matplotlib
+    import numpy as np
+    from Tools.XMLTools import loadXmlAsObj
+    error_Tr = loadXmlAsObj(Tr_path)
+    error_Cnn = loadXmlAsObj(Cnn_path)
+    error_Rnn = loadXmlAsObj(Rnn_path)
+    param = loadXmlAsObj(param_path)
+
+    if param['distrib'] == 'log':
+        f = np.log
+        g = np.exp
+    elif param['distrib'] == 'uniform':
+        f = lambda x: x
+        g = lambda x: x
+
+    lbd = np.flip(g(np.linspace(f(param['lbd']['min']), f(param['lbd']['max']), param['n_points_reg'], endpoint=True)))
+
+    matplotlib.use('Qt5Agg')
+
+    upper_error_Tr = np.array(error_Tr['MinError']) + np.array(error_Tr['RightStdMinError'])
+    middle_error_Tr = np.array(error_Tr['MinError'])
+    lower_error_Tr = np.array(error_Tr['MinError']) - np.array(error_Tr['LeftStdMinError'])
+
+    upper_perf_Tr = np.array(error_Tr['MaxPerf']) + np.array(error_Tr['RightStdMaxPerf'])
+    middle_perf_Tr = np.array(error_Tr['MaxPerf'])
+    lower_perf_Tr = np.array(error_Tr['MaxPerf']) - np.array(error_Tr['LeftStdMaxPerf'])
+
+    middle_error_Cnn = np.array(error_Cnn['MinError'])
+    middle_perf_Cnn = np.array(error_Cnn['MaxPerf'])
+
+    middle_error_Rnn = np.array(error_Rnn['MinError'])
+    middle_perf_Rnn = np.array(error_Rnn['MaxPerf'])
+
+    fig, (ax1, ax2) = plt.subplots(1, 2)
+
+    ax1.plot(middle_error_Tr, 'r', label="Transformer")
+    ax1.plot(upper_error_Tr, '+r')
+    ax1.plot(lower_error_Tr, '+r')
+    ax1.fill_between([i for i in range(len(middle_error_Tr))], lower_error_Tr, upper_error_Tr, color='r', alpha=0.2)
+    ax1.plot(middle_error_Cnn, 'b', label="CNN")
+    ax1.plot(middle_error_Rnn, 'g', label="RNN")
+    ax1.set_ylim(bottom=0)
+    ax1.legend(loc='upper left', framealpha=0.3)
+    ax1.set_title("Erreur")
+    ax1.set_xticks([i for i in range(len(middle_error_Tr)) if not i%3])
+    ax1.set_xticklabels([f"{lbd[i]:.0e}" for i in range(len(middle_error_Tr)) if not i%3])
+    ax1.set_box_aspect(1)
+
+    ax2.plot(middle_perf_Tr, 'r', label="Transformer")
+    ax2.plot(upper_perf_Tr, '+r')
+    ax2.plot(lower_perf_Tr, '+r')
+    ax2.fill_between([i for i in range(len(middle_perf_Tr))], upper_perf_Tr, lower_perf_Tr, color='r', alpha=0.2)
+    ax2.plot(middle_perf_Cnn, 'b', label="CNN")
+    ax2.plot(middle_perf_Rnn, 'g', label="RNN")
+    ax2.set_ylim(bottom=0)
+    ax2.legend(loc='lower left', framealpha=0.3)
+    ax2.set_title("Accuracy")
+    ax2.set_xticks([i for i in range(len(middle_error_Tr)) if not i%3])
+    ax2.set_xticklabels([f"{lbd[i]:.0e}" for i in range(len(middle_error_Tr)) if not i%3])
+    ax2.set_box_aspect(1)
+
+    fig.tight_layout(pad=1.0)
+
+    plt.show()
