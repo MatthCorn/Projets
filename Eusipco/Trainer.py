@@ -61,7 +61,11 @@ param = {"n_encoder": 10,
          "WidthsEmbedding": [32],
          "dropout": 0,
          "optim": "Adam",
-         "lr": 3e-4,
+         "lr_option": {
+             "value": 3e-4,
+             "reset": "n",
+             "type": "classic"
+         },
          "mult_grad": 10000,
          "weight_decay": 1e-3,
          "NDataT": 500000,
@@ -115,7 +119,7 @@ optimizers = {
     "SGD": torch.optim.SGD,
 }
 
-optimizer = optimizers[param['optim']](N.parameters(), weight_decay=param["weight_decay"], lr=param["lr"])
+optimizer = optimizers[param['optim']](N.parameters(), weight_decay=param["weight_decay"], lr=param["lr_option"]["value"])
 
 NDataT = param["NDataT"]
 NDataV = param["NDataV"]
@@ -139,7 +143,7 @@ PlottingPerf = []
 
 n_updates = int(NDataT / batch_size) * n_iter
 warmup_steps = int(NDataT / batch_size * param["warmup"])
-lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"])
+lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"], max_steps=n_updates, type=param["lr_option"]["type"])
 
 PlottingInput, PlottingOutput, PlottingStd = MakeTargetedData(
     NVec=NVec,
@@ -157,11 +161,12 @@ PlottingInput, PlottingOutput, PlottingStd = MakeTargetedData(
 best_state_dict = N.state_dict().copy()
 
 for window in param["training_strategy"]:
-    optimizer = optimizers[param['optim']](N.parameters(), weight_decay=param["weight_decay"], lr=param["lr"])
+    if param["lr_option"]["reset"] == "y":
+        optimizer = optimizers[param['optim']](N.parameters(), weight_decay=param["weight_decay"], lr=param["lr"])
 
-    n_updates = int(NDataT / batch_size) * n_iter_window
-    warmup_steps = int(NDataT / batch_size * param["warmup"])
-    lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"], max_steps=n_updates, type='cos')
+        n_updates = int(NDataT / batch_size) * n_iter_window
+        warmup_steps = int(NDataT / batch_size * param["warmup"])
+        lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"], max_steps=n_updates)
 
     TrainingInput, TrainingOutput, TrainingStd = MakeTargetedData(
         NVec=NVec,

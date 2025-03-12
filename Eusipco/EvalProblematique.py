@@ -52,11 +52,11 @@ param = {"n_encoder": 10,
          "lr": 3e-3,
          "mult_grad": 10000,
          "weight_decay": 1e-3,
-         "NDataT": 5000000,
+         "NDataT": 50000,
          "NDataV": 1000,
          "batch_size": 1000,
          "n_points_reg": 10,
-         "n_iter": 30,
+         "n_iter": 5,
          "training_space": {"mean": [-10, 10], "std": [1, 5]},
          "lbd": {"min": 1e-4, "max": 1},
          "distrib": "log",
@@ -120,12 +120,19 @@ elif param['distrib'] == 'uniform':
 
 lbd = np.flip(g(np.linspace(f(param['lbd']['min']), f(param['lbd']['max']), param['n_points_reg'], endpoint=True)))
 
-MinError = []
-LeftStdMinError = []
-RightStdMinError = []
-MaxPerf = []
-LeftStdMaxPerf = []
-RightStdMaxPerf = []
+ErrorQ1List = []
+ErrorQ2List = []
+ErrorQ3List = []
+Error_lower_whiskerList = []
+Error_upper_whiskerList = []
+ErrorOutliersList = []
+
+PerfQ1List = []
+PerfQ2List = []
+PerfQ3List = []
+Perf_lower_whiskerList = []
+Perf_upper_whiskerList = []
+PerfOutliersList = []
 
 for i in tqdm(range(param['n_points_reg'])):
     N = Network(n_encoder=param["n_encoder"], d_in=param["d_in"], d_att=param["d_att"],
@@ -141,11 +148,19 @@ for i in tqdm(range(param['n_points_reg'])):
     window['std'][0] *= lbd[i]
 
     Error = []
-    LeftStdError = []
-    RightStdError = []
-    Perf = []
-    LeftStdPerf = []
-    RightStdPerf = []
+    ErrorQ1 = []
+    ErrorQ2 = []
+    ErrorQ3 = []
+    Error_lower_whisker = []
+    Error_upper_whisker = []
+    ErrorOutliers = []
+
+    PerfQ1 = []
+    PerfQ2 = []
+    PerfQ3 = []
+    Perf_lower_whisker = []
+    Perf_upper_whisker = []
+    PerfOutliers = []
 
     TrainingInput, TrainingOutput, TrainingStd = MakeTargetedData(
         NVec=NVec,
@@ -172,8 +187,6 @@ for i in tqdm(range(param['n_points_reg'])):
     )
 
     for j in tqdm(range(param['n_iter'])):
-        error = 0
-        perf = 0
 
         for p in range(n_minibatch):
             InputMiniBatch = TrainingInput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
@@ -209,53 +222,65 @@ for i in tqdm(range(param['n_points_reg'])):
             Prediction = N(Input)
 
             err = torch.norm((Prediction - Output) / Std, p=2, dim=[1, 2]) / sqrt(DVec * NVec)
-            mean_err = float(torch.mean(err))
-            left_std_error = sqrt(float(torch.mean((err[err <= mean_err] - mean_err)**2)))
-            right_std_error = sqrt(float(torch.mean((err[err >= mean_err] - mean_err)**2)))
-            Error.append(mean_err)
-            LeftStdError.append(left_std_error)
-            RightStdError.append(right_std_error)
+            Error.append(torch.mean(err))
+
+            data = err.cpu().numpy()
+            ErrorQ1.append(np.percentile(data, 25))
+            ErrorQ2.append(np.median(data))
+            ErrorQ3.append(np.percentile(data, 75))
+            IQR = ErrorQ3[-1] - ErrorQ1[-1]
+
+            Error_lower_whisker.append(max(ErrorQ1[-1] - 1.5 * IQR, min(data)))
+            Error_upper_whisker.append(min(ErrorQ3[-1] + 1.5 * IQR, max(data)))
+
+            ErrorOutliers.append(data[(data < Error_lower_whisker[-1]) | (data > Error_upper_whisker[-1])])
 
             perf = torch.mean((ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input)).to(float), dim=-1)
-            mean_perf = float(torch.mean(perf))
-            left_std_perf = sqrt(float(torch.mean((perf[perf <= mean_perf] - mean_perf)**2)))
-            right_std_perf = sqrt(float(torch.mean((perf[perf >= mean_perf] - mean_perf)**2)))
-            Perf.append(mean_perf)
-            LeftStdPerf.append(left_std_perf)
-            RightStdPerf.append(right_std_perf)
 
-    min_error = min(Error)
-    left_std_error = LeftStdError[Error.index(min_error)]
-    right_std_error = RightStdError[Error.index(min_error)]
-    max_perf = max(Perf)
-    left_std_perf = LeftStdPerf[Perf.index(max_perf)]
-    right_std_perf = RightStdPerf[Perf.index(max_perf)]
-    MinError.append(min_error)
-    LeftStdMinError.append(left_std_error)
-    RightStdMinError.append(right_std_error)
-    MaxPerf.append(max_perf)
-    LeftStdMaxPerf.append(left_std_perf)
-    RightStdMaxPerf.append(right_std_perf)
+            data = perf.cpu().numpy()
+            PerfQ1.append(np.percentile(data, 25))
+            PerfQ2.append(np.median(data))
+            PerfQ3.append(np.percentile(data, 75))
+            IQR = PerfQ3[-1] - PerfQ1[-1]
 
-    print('############################################################')
-    print('intervalle std : [', f"{window['std'][0]:.2e}", ', ', f"{window['std'][1]:.2e}", ']')
-    print('intervalle mean : [', f"{window['mean'][0]:.1f}", ', ', f"{window['mean'][1]:.1f}", ']')
-    print('min Error : ', [f"{num:.2e}" for num in MinError])
-    print('max Perf : ', [f"{num:.2e}" for num in MaxPerf])
+            Perf_lower_whisker.append(max(PerfQ1[-1] - 1.5 * IQR, min(data)))
+            Perf_upper_whisker.append(min(PerfQ3[-1] + 1.5 * IQR, max(data)))
 
-print('############################################################')
-print('############################################################')
-print('############################################################')
-print('############################################################')
-print('min Error : ', [f"{num:.2e}" for num in MinError])
-print('min Perf : ', [f"{num:.2e}" for num in MaxPerf])
+            PerfOutliers.append(data[(data < Perf_lower_whisker[-1]) | (data > Perf_upper_whisker[-1])])
 
-error = {"MinError": MinError,
-         "LeftStdMinError": LeftStdMinError,
-         "RightStdMinError": RightStdMinError,
-         "MaxPerf": MaxPerf,
-         "LeftStdMaxPerf": LeftStdMaxPerf,
-         "RightStdMaxPerf": RightStdMaxPerf,}
+
+    argmin = Error.index(min(Error))
+    ErrorQ1List.append(ErrorQ1[argmin])
+    ErrorQ2List.append(ErrorQ2[argmin])
+    ErrorQ3List.append(ErrorQ3[argmin])
+
+    Error_lower_whiskerList.append(Error_lower_whisker[argmin])
+    Error_upper_whiskerList.append(Error_upper_whisker[argmin])
+
+    ErrorOutliersList.append(ErrorOutliers[argmin])
+
+    PerfQ1List.append(PerfQ1[argmin])
+    PerfQ2List.append(PerfQ2[argmin])
+    PerfQ3List.append(PerfQ3[argmin])
+
+    Perf_lower_whiskerList.append(Perf_lower_whisker[argmin])
+    Perf_upper_whiskerList.append(Perf_upper_whisker[argmin])
+
+    PerfOutliersList.append(PerfOutliers[argmin])
+
+
+error = {"ErrorQ1List": ErrorQ1List,
+         "ErrorQ2List": ErrorQ2List,
+         "ErrorQ3List": ErrorQ3List,
+         "Error_lower_whiskerList": Error_lower_whiskerList,
+         "Error_upper_whiskerList": Error_upper_whiskerList,
+         "ErrorOutliersList": ErrorOutliersList,
+         "PerfQ1List": PerfQ1List,
+         "PerfQ2List": PerfQ2List,
+         "PerfQ3List": PerfQ3List,
+         "Perf_lower_whiskerList": Perf_lower_whiskerList,
+         "Perf_upper_whiskerList": Perf_upper_whiskerList,
+         "PerfOutliersList": PerfOutliersList,}
 
 saveObjAsXml(error, os.path.join(save_path, "error"))
 saveObjAsXml(param, os.path.join(save_path, "param"))
