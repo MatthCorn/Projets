@@ -162,11 +162,11 @@ best_state_dict = N.state_dict().copy()
 
 for window in param["training_strategy"]:
     if param["lr_option"]["reset"] == "y":
-        optimizer = optimizers[param['optim']](N.parameters(), weight_decay=param["weight_decay"], lr=param["lr"])
+        optimizer = optimizers[param['optim']](N.parameters(), weight_decay=param["weight_decay"], lr=param["lr_option"]["value"])
 
         n_updates = int(NDataT / batch_size) * n_iter_window
         warmup_steps = int(NDataT / batch_size * param["warmup"])
-        lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"], max_steps=n_updates)
+        lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"], max_steps=n_updates, type=param["lr_option"]["type"])
 
     TrainingInput, TrainingOutput, TrainingStd = MakeTargetedData(
         NVec=NVec,
