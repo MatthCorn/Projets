@@ -5,7 +5,6 @@ from Eusipco.CNN import Encoder as CNN
 from Complete.LRScheduler import Scheduler
 from GradObserver.GradObserverClass import DictGradObserver
 from Tools.ParamObs import DictParamObserver
-from Tools.GitPush import git_push
 from math import sqrt
 import torch
 from tqdm import tqdm
@@ -63,8 +62,8 @@ param = {"n_encoder": 10,
          "optim": "Adam",
          "lr_option": {
              "value": 3e-4,
-             "reset": "n",
-             "type": "classic"
+             "reset": "y",
+             "type": "cos"
          },
          "mult_grad": 10000,
          "weight_decay": 1e-3,
@@ -73,12 +72,12 @@ param = {"n_encoder": 10,
          "batch_size": 1000,
          "n_iter": 300,
          "training_strategy": [
-             {"mean": [-10, 10], "std": [0.001, 5]},
-             {"mean": [-10, 10], "std": [0.001, 5]},
+             {"mean": [-10, 10], "std": [0.0001, 5]},
+             {"mean": [-10, 10], "std": [0.0001, 5]},
          ],
          "distrib": "log",
          "plot_distrib": "log",
-         "error_weighting": "n",
+         "error_weighting": "y",
          "max_lr": 5,
          "FreqGradObs": 1/3,
          "warmup": 2}
@@ -281,10 +280,10 @@ for window in param["training_strategy"]:
             saveObjAsXml(param, os.path.join(save_path, "param"))
             saveObjAsXml(error, os.path.join(save_path, "error"))
             torch.save(best_state_dict, os.path.join(save_path, "Best_network"))
+            torch.save(Weight, os.path.join(save_path, "Weight"))
             with open(os.path.join(save_path, "DictGrad.pkl"), "wb") as file:
                 pickle.dump(DictGrad, file)
             with open(os.path.join(save_path, "ParamObs.pkl"), "wb") as file:
                 ParamObs = DictParamObserver(N)
                 pickle.dump(ParamObs, file)
 
-# git_push(local, save_path, CommitMsg='simu ' + folder)
