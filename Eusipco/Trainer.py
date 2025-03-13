@@ -67,10 +67,10 @@ param = {"n_encoder": 10,
          },
          "mult_grad": 10000,
          "weight_decay": 1e-3,
-         "NDataT": 500000,
+         "NDataT": 50000,
          "NDataV": 1000,
          "batch_size": 1000,
-         "n_iter": 300,
+         "n_iter": 30,
          "training_strategy": [
              {"mean": [-10, 10], "std": [0.0001, 5]},
              {"mean": [-10, 10], "std": [0.0001, 5]},
@@ -280,6 +280,7 @@ for window in param["training_strategy"]:
             saveObjAsXml(param, os.path.join(save_path, "param"))
             saveObjAsXml(error, os.path.join(save_path, "error"))
             torch.save(best_state_dict, os.path.join(save_path, "Best_network"))
+            torch.save(N.state_dict().copy(), os.path.join(save_path, "Last_network"))
             torch.save(Weight, os.path.join(save_path, "Weight"))
             with open(os.path.join(save_path, "DictGrad.pkl"), "wb") as file:
                 pickle.dump(DictGrad, file)
@@ -287,3 +288,19 @@ for window in param["training_strategy"]:
                 ParamObs = DictParamObserver(N)
                 pickle.dump(ParamObs, file)
 
+error = {"TrainingError": TrainingError,
+         "ValidationError": ValidationError,
+         "TrainingPerf": TrainingPerf,
+         "ValidationPerf": ValidationPerf,
+         "PlottingPerf": PlottingPerf,
+         "PlottingError": PlottingError}
+saveObjAsXml(param, os.path.join(save_path, "param"))
+saveObjAsXml(error, os.path.join(save_path, "error"))
+torch.save(best_state_dict, os.path.join(save_path, "Best_network"))
+torch.save(N.state_dict().copy(), os.path.join(save_path, "Last_network"))
+torch.save(Weight, os.path.join(save_path, "Weight"))
+with open(os.path.join(save_path, "DictGrad.pkl"), "wb") as file:
+    pickle.dump(DictGrad, file)
+with open(os.path.join(save_path, "ParamObs.pkl"), "wb") as file:
+    ParamObs = DictParamObserver(N)
+    pickle.dump(ParamObs, file)
