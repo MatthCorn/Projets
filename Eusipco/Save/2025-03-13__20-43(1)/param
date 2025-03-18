@@ -1,0 +1,125 @@
+<?xml version="1.0" ?>
+<Dictionary>
+ <Object Key="n_encoder" Value="10"/>
+ <Object Key="len_in" Value="10"/>
+ <Object Key="d_in" Value="10"/>
+ <Object Key="d_att" Value="128"/>
+ <String Key="network" Value="CNN"/>
+ <List Key="WidthsEmbedding">
+  <Object Value="32"/>
+ </List>
+ <Object Key="dropout" Value="0"/>
+ <String Key="optim" Value="Adam"/>
+ <Dictionary Key="lr_option">
+  <Object Key="value" Value="0.0003"/>
+  <String Key="reset" Value="y"/>
+  <String Key="type" Value="cos"/>
+ </Dictionary>
+ <Object Key="mult_grad" Value="10000"/>
+ <Object Key="weight_decay" Value="0.001"/>
+ <Object Key="NDataT" Value="500000"/>
+ <Object Key="NDataV" Value="1000"/>
+ <Object Key="batch_size" Value="1000"/>
+ <Object Key="n_iter" Value="1000"/>
+ <List Key="training_strategy">
+  <Dictionary>
+   <List Key="mean">
+    <Object Value="-10"/>
+    <Object Value="10"/>
+   </List>
+   <List Key="std">
+    <Object Value="1"/>
+    <Object Value="5"/>
+   </List>
+  </Dictionary>
+  <Dictionary>
+   <List Key="mean">
+    <Object Value="-10"/>
+    <Object Value="10"/>
+   </List>
+   <List Key="std">
+    <Object Value="0.3"/>
+    <Object Value="5"/>
+   </List>
+  </Dictionary>
+  <Dictionary>
+   <List Key="mean">
+    <Object Value="-10"/>
+    <Object Value="10"/>
+   </List>
+   <List Key="std">
+    <Object Value="0.1"/>
+    <Object Value="5"/>
+   </List>
+  </Dictionary>
+  <Dictionary>
+   <List Key="mean">
+    <Object Value="-10"/>
+    <Object Value="10"/>
+   </List>
+   <List Key="std">
+    <Object Value="0.03"/>
+    <Object Value="5"/>
+   </List>
+  </Dictionary>
+  <Dictionary>
+   <List Key="mean">
+    <Object Value="-10"/>
+    <Object Value="10"/>
+   </List>
+   <List Key="std">
+    <Object Value="0.01"/>
+    <Object Value="5"/>
+   </List>
+  </Dictionary>
+  <Dictionary>
+   <List Key="mean">
+    <Object Value="-10"/>
+    <Object Value="10"/>
+   </List>
+   <List Key="std">
+    <Object Value="0.003"/>
+    <Object Value="5"/>
+   </List>
+  </Dictionary>
+  <Dictionary>
+   <List Key="mean">
+    <Object Value="-10"/>
+    <Object Value="10"/>
+   </List>
+   <List Key="std">
+    <Object Value="0.001"/>
+    <Object Value="5"/>
+   </List>
+  </Dictionary>
+  <Dictionary>
+   <List Key="mean">
+    <Object Value="-10"/>
+    <Object Value="10"/>
+   </List>
+   <List Key="std">
+    <Object Value="0.0003"/>
+    <Object Value="5"/>
+   </List>
+  </Dictionary>
+  <Dictionary>
+   <List Key="mean">
+    <Object Value="-10"/>
+    <Object Value="10"/>
+   </List>
+   <List Key="std">
+    <Object Value="0.0001"/>
+    <Object Value="5"/>
+   </List>
+  </Dictionary>
+ </List>
+ <String Key="distrib" Value="log"/>
+ <String Key="plot_distrib" Value="log"/>
+ <String Key="error_weighting" Value="y"/>
+ <Object Key="max_lr" Value="5"/>
+ <Object Key="FreqGradObs" Value="0.333333"/>
+ <Object Key="warmup" Value="1"/>
+ <Object Key="len_out" Value="5"/>
+ <Object Key="n_heads" Value="4"/>
+ <String Key="norm" Value="post"/>
+</Dictionary>
