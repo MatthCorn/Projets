@@ -35,7 +35,7 @@ def MakeData(NInput=10, DVec=10, mean=0, std=1, NData=1000, WeightF=None, Weight
     return Input, Output[:, :NOutput]
 
 def MakeTargetedData(NInput=10, DVec=10, NData=1000, WeightF=None, WeightN=None, Threshold=0.14, NOutput=5,
-                     mean_min=-10, mean_max=10, std_min=1, std_max=5, distrib='log', plot=False, device=torch.device('cpu')):
+                     mean_min=-10, mean_max=10, std_min=1, std_max=5, distrib='log', plot=False):
     if WeightF is None:
         WeightF = torch.tensor([1.] * DVec)
     if WeightN is None:
@@ -59,7 +59,7 @@ def MakeTargetedData(NInput=10, DVec=10, NData=1000, WeightF=None, WeightN=None,
     mean = (mean_max - mean_min) * spacing(NData) + mean_min
     std = g((f(std_max) - f(std_min)) * spacing(NData) + f(std_min))
     lbd_mean = torch.rand(NData)
-    lbd_std = torch.rand(NData) * (1 - gamma) / (1 + gamma) + 1 / (1 + gamma)
+    lbd_std = torch.rand(NData) * (1 - abs(gamma)) / (1 + abs(gamma)) + (abs(gamma) / (1 + abs(gamma)))
     eps_mean = torch.randint(0, 2, (NData,))
 
     std_F = std * lbd_std
@@ -79,7 +79,9 @@ def MakeTargetedData(NInput=10, DVec=10, NData=1000, WeightF=None, WeightN=None,
     alpha = (
             torch.normal(0, 1, (NData, NInput))
             * torch.sqrt((std_F ** 2 - gamma ** 2 * std_N ** 2) / (1 - gamma ** 4))
-            + ((mean_F - gamma * mean_N) / (1 - gamma ** 2)))
+            + ((mean_F - gamma * mean_N) / (1 - gamma ** 2))
+    )
+
     beta = (
             torch.normal(0, 1, (NData, NInput))
             * torch.sqrt((std_N ** 2 - gamma ** 2 * std_F ** 2) / (1 - gamma ** 4))
@@ -99,11 +101,9 @@ def MakeTargetedData(NInput=10, DVec=10, NData=1000, WeightF=None, WeightN=None,
 
     Input = Ortho_Input + alpha.unsqueeze(-1) * WeightF.view(1, 1, DVec) + beta.unsqueeze(-1) * WeightN.view(1, 1, DVec)
 
-    ValuesF = torch.matmul(Input, WeightF)
-    ValuesN = torch.matmul(Input, WeightN)
-
-    Output = GetSorted(Input, Weight)
-    return Input.to(device), Output.to(device), abs(alpha).mean(dim=-1, keepdim=True).unsqueeze(-1).to(device)
+    Mask = GetSelected(Input, WeightF, WeightN, Threshold=Threshold)
+    Output = GetSorted(Input, Mask, WeightN)
+    return Input, Output[:, :NOutput], torch.stack((alpha, beta), dim=-1).norm(dim=[-2, -1], keepdim=True)
 
 if __name__ == '__main__':
     DVec = 10
