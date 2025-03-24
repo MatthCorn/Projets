@@ -1,16 +1,17 @@
 import torch
 
 class Simulator:
-    def __init__(self, dim, sensitivity_fourier, sensitivity_sensor, WeightF=None, WeightL=None):
+    def __init__(self, dim, sensitivity, WeightF=None, WeightL=None):
         self.dim = dim
-        self.sensitivity_fourier = sensitivity_fourier
-        self.sensitivity_sensor = sensitivity_sensor
-        self.weight_f = WeightF if WeightF is not None else [1., 0.] + [0.] * (self.dim - 2)
-        self.weight_l = WeightL if WeightL is not None else [0., 1.] + [0.] * (self.dim - 2)
-        self.P = []
-        self.TM = []
-        self.TI = []
-        self.R = []
+        self.sensitivity = sensitivity
+        self.weight_f = WeightF if WeightF is not None else torch.tensor([1., 0.] + [0.] * (self.dim - 2))
+        self.weight_f = self.weight_f / torch.norm(self.weight_f)
+        self.weight_l = WeightL if WeightL is not None else torch.tensor([0., 1.] + [0.] * (self.dim - 2))
+        self.weight_l = self.weight_l / torch.norm(self.weight_l)
+        self.P = []     # contient les vecteurs de suivis, qui enregistrent itérativement les informations des vecteurs présents
+        self.TM = []    # contient le temps de dernière mise-à-jour de chaque vecteurs de suivis
+        self.TI = []    # contient le temps d'apparition de chaque vecteurs de suivis
+        self.R = []     # contient tous les vecteurs interceptés, ajoutés à la fin de leurs interceptions
         self.T = 0
         self.running = True
 
@@ -19,7 +20,7 @@ class Simulator:
         Frequencies = torch.matmul(Input, torch.tensor(self.weight_f))
         Levels = torch.matmul(Input, torch.tensor(self.weight_l))
 
-        BF = torch.abs(Frequencies.unsqueeze(-1) - Frequencies.unsqueeze(-2)) < self.sensitivity_fourier
+        BF = torch.abs(Frequencies.unsqueeze(-1) - Frequencies.unsqueeze(-2)) < self.sensitivity
         BN = (Levels.unsqueeze(-1) > Levels.unsqueeze(-2))
         BM = torch.sum(BF * BN, dim=-2) == 0
 
@@ -40,16 +41,21 @@ class Simulator:
 
             j = 0
             while j < len(self.TM):
+                # le vecteur de suivis n° j n'est plus mise-à-jour : l'information interceptée est complète
                 if self.T - self.TM[j] == 2:
                     TI, TM, P = self.TI.pop(j), self.TM.pop(j), self.P.pop(j)
+                    # on ajoute deux informations : le temps d'intercepté et la date de début d'interception
                     P += [TM - TI, len(self.R) - TI]
+                    # le vecteur intercepté est ajouté à self.R
                     self.R.append(P)
                 else:
                     j += 1
             return
 
+        # on sélectionne les vecteurs contenus dans les informations interceptées à l'instant présent
         V = self.SelectPulses(torch.tensor(Input, dtype=torch.float))
 
+        # si aucun vecteur de suivi n'existe, chaque information interceptée est envoyée dans un nouveau vecteur de suivi
         if self.P == []:
             self.running = True
             for i in range(len(V)):
@@ -58,31 +64,40 @@ class Simulator:
                 self.TM.append(self.T)
             return
 
+        # sinon, on compare les informations interceptées aux vecteurs de suivis pour traitement
         self.running = True
-        fV = torch.matmul(V, torch.tensor(self.weight_f))
-        fP = torch.matmul(torch.tensor(self.P), torch.tensor(self.weight_f))
-        lP = torch.matmul(torch.tensor(self.P), torch.tensor(self.weight_l))
-        correlation = torch.abs(fV.unsqueeze(-1) - fP.unsqueeze(-2)) < self.sensitivity_sensor
+        fV = torch.matmul(V, self.weight_f)
+        fP = torch.matmul(torch.tensor(self.P), self.weight_f)
+        lP = torch.matmul(torch.tensor(self.P), self.weight_l)
+        correlation = torch.abs(fV.unsqueeze(-1) - fP.unsqueeze(-2)) < self.sensitivity
         m = len(self.P)
         for i in range(len(V)):
             selected_instance = []
             for j in range(m):
                 if correlation[i, j] and (self.TM[j] < self.T):
                     selected_instance.append(j)
+            # traitement 1 : pas de corrélation entre V[i] et P : création d'un nouveau vecteur de suivi
             if selected_instance == []:
                 self.P.append(V[i].tolist())
                 self.TM.append(self.T)
                 self.TI.append(self.T - 1)
+            # traitement 2 : corrélation entre V[i] et plusieurs vecteurs de suivi P[j1], P[j2] ...
             else:
+                # on détermine le vecteur de suivi avec corrélation de niveau le plus haut
                 Levels = lP[selected_instance]
-                j = torch.argmax(Levels)
-                self.TM[selected_instance[j]] = self.T
+                k = selected_instance[torch.argmax(Levels)]
+                # on met à jour le vecteur de suivi P[k] correspondant
+                self.TM[k] = self.T
+                self.P[k] = (torch.tensor(self.P)[k] + (fV[i] - fP[k]) * self.weight_f).tolist()
 
         j = 0
         while j < len(self.TM):
+            # le vecteur de suivis n° j n'est plus mise-à-jour : l'information interceptée est complète
             if self.T - self.TM[j] == 2:
                 TI, TM, P = self.TI.pop(j), self.TM.pop(j), self.P.pop(j)
+                # on ajoute deux informations : le temps d'intercepté et la date de début d'interception
                 P += [TM - TI, len(self.R) - TI]
+                # le vecteur intercepté est ajouté à self.R
                 self.R.append(P)
             else:
                 j += 1

@@ -204,7 +204,7 @@ def PlotEvalParam(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\Matth\Documents\Projets\RankAI\Save\V4\Vecteurs\2025-03-24__13-26'
+    save_path = r'C:\Users\Matth\Documents\Projets\RankAI\Save\V4\Vecteurs\2025-03-24__17-12(1)'
 
     PlotError(save_path)
 

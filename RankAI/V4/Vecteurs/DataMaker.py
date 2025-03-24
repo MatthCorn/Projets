@@ -103,7 +103,7 @@ def MakeTargetedData(NInput=10, DVec=10, NData=1000, WeightF=None, WeightN=None,
 
     Mask = GetSelected(Input, WeightF, WeightN, Threshold=Threshold)
     Output = GetSorted(Input, Mask, WeightN)
-    return Input, Output[:, :NOutput], torch.stack((alpha, beta), dim=-1).norm(dim=[-2, -1], keepdim=True)
+    return Input, Output[:, :NOutput], Output[:, :NOutput].std(dim=[-1, -2], keepdim=True)
 
 if __name__ == '__main__':
     DVec = 10
