@@ -56,26 +56,25 @@ param = {"n_encoder": 10,
          'norm': 'post',
          "optim": "Adam",
          "lr_option": {
-             "value": 3e-5,
+             "value": 3e-4,
              "reset": "y",
              "type": "cos"
          },
          "mult_grad": 10000,
          "weight_decay": 1e-3,
-         "NDataT": 500000,
+         "NDataT": 5000000,
          "NDataV": 1000,
          "batch_size": 1000,
-         "n_iter": 16,
+         "n_iter": 100,
          "training_strategy": [
-             {"mean": [-2, 2], "std": [0.05, 1]},
-             {"mean": [-10, 10], "std": [0.05, 5]},
+             {"mean": [-5, 5], "std": [1, 2]},
          ],
          "distrib": "log",
          "plot_distrib": "log",
          "error_weighting": "y",
          "max_lr": 5,
          "FreqGradObs": 1/3,
-         "warmup": 2}
+         "warmup": 10}
 
 try:
     import json

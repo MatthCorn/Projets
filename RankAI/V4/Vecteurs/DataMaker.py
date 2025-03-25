@@ -110,4 +110,4 @@ if __name__ == '__main__':
     WeightN = 2 * torch.rand(DVec) - 1
     WeightF = 2 * torch.rand(DVec) - 1
 
-    MakeTargetedData(DVec=DVec, WeightF=WeightF, WeightN=WeightN)
+    MakeTargetedData(DVec=DVec, WeightF=WeightF, WeightN=WeightN, std_min=0.1, std_max=0.2)

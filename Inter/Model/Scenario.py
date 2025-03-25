@@ -8,7 +8,7 @@ class Simulator:
         self.dim = dim
         self.T = 0
         self.V = [] # contient tous les vecteurs présents simultanément à un instant donné
-        self.A = [] # contient l'age de chaque vecteur présent à un instant donné
+        self.A = [] # contient l'âge de chaque vecteur présent à un instant donné
         self.L = [] # contient chaque vecteur du scénario ainsi que leurs ages à leurs disparitions
 
         self.sensor_simulator = SensorSimulator(dim=dim, sensitivity=sensitivity)
@@ -24,15 +24,15 @@ class Simulator:
             p = [(1+a)/(m+sum(np.array(self.A))) for a in self.A]
             k = np.random.choice(range(m), p=p)
 
-            # on supprime le vecteur disparu de self.V, et on retient son age depuis self.A
+            # on supprime le vecteur disparu de self.V, et on retient son âge depuis self.A
             a_out, v_out = self.A.pop(k), self.V.pop(k)
 
-            # on inscrit l'age du vecteur juste disparu dans son instance présente dans self.L
+            # on inscrit l'âge du vecteur juste disparu dans son instance présente dans self.L
             i = self.L.index(v_out)
             self.L[i] += [a_out]
 
         if self.T < self.N:
-            # on ajoute le nouveau vecteur dans self.L et self.V, ainsi que son age actuel dans self.A
+            # on ajoute le nouveau vecteur dans self.L et self.V, ainsi que son âge actuel dans self.A
             self.L.append(v)
             self.V.append(v)
             self.A.append(0)
@@ -42,11 +42,11 @@ class Simulator:
             self.A[i] += 1
 
     def Run(self):
-        while self.T == 0 or len(self.V) > 0:
-            self.Step()
-            self.sensor_simulator.Process(self.V)
         while self.sensor_simulator.running:
+            if (self.T == 0) or (len(self.V) > 0):
+                self.Step()
             self.sensor_simulator.Process(self.V)
+
 
 
 if __name__ == '__main__':

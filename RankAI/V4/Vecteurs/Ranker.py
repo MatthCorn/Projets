@@ -4,6 +4,7 @@ from Complete.Transformer.EasyFeedForward import FeedForward
 from Complete.Transformer.LearnableModule import LearnableParameters
 import torch.nn as nn
 import torch
+from torch.nn.functional import pad
 
 class Network(nn.Module):
     def __init__(self, n_encoder, len_in, len_latent, d_in=10, d_att=64, n_heads=4, WidthsEmbedding=[32], norm='post', dropout=0):
@@ -31,7 +32,7 @@ class Network(nn.Module):
 
 
 def ChoseOutput(Pred, Input):
-    Diff = Pred.unsqueeze(dim=1) - Input.unsqueeze(dim=2)
+    Diff = Pred.unsqueeze(dim=1) - pad(Input, [0, 0, 0, 1]).unsqueeze(dim=2)
     Dist = torch.norm(Diff, dim=-1)
     Arg = torch.argmin(Dist, dim=1)
     return Arg
