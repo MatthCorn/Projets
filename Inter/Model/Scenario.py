@@ -10,13 +10,14 @@ class Simulator:
         self.V = [] # contient tous les vecteurs présents simultanément à un instant donné
         self.A = [] # contient l'âge de chaque vecteur présent à un instant donné
         self.L = [] # contient chaque vecteur du scénario ainsi que leurs ages à leurs disparitions
+        self.D = [] # contient un encodage des vecteurs sélectionnés à chaque itération par le simulateur
 
         self.sensor_simulator = SensorSimulator(dim=dim, sensitivity=sensitivity)
         if seed is not None:
             np.random.seed(seed)
 
     def Step(self):
-        v = list(np.random.normal(0, 1, self.dim))
+        v = np.random.normal(0, 1, self.dim).tolist()
 
         if self.T >= self.n:
             # sélection d'un indice dans les vecteurs du palier, correspondant au vecteur disparaissant
@@ -47,6 +48,16 @@ class Simulator:
                 self.Step()
             self.sensor_simulator.Process(self.V)
 
+            Selected = self.sensor_simulator.V.numpy()
+            Match = np.array([[0, -1]] * self.n)
+            if len(Selected) != 0:
+                History = np.array([x[:self.dim] for x in self.L])
+                Dist = np.linalg.norm(np.expand_dims(Selected, 1) - np.expand_dims(History, 0), axis=-1)
+                Match = Dist.argmin(axis=1) - self.T + 1
+                Match = np.pad(np.expand_dims(Match, axis=1), ((0, 0), (0, 1)), 'constant')
+            if len(Match) != self.n:
+                Match = np.concatenate((Match, np.array([[0, -1]] * (self.n - len(Match)))))
+            self.D.append(Match.tolist())
 
 
 if __name__ == '__main__':

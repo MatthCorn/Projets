@@ -35,7 +35,7 @@ class Scheduler(LambdaLR):
 
         if self.type == 'cos':
             self.last_lr = self.max * min(step / self.warmup_steps,
-                                  math.cos(math.pi / 2 * ((step - self.warmup_steps) / (self.max_steps - self.warmup_steps))) ** 2)
+                                  math.cos(math.pi / 2 * ((step - self.warmup_steps) / (1e-10 + self.max_steps - self.warmup_steps))) ** 2)
             return self.last_lr
 
         if self.type == 'ramp':

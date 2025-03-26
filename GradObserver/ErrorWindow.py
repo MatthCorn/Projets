@@ -70,7 +70,7 @@ class ErrorWindowWidget(QGroupBox):
             self.legend.addItem(T, 'Training ' + name)
         if self.ValShown:
             self.graphWidget.addItem(V)
-            self.legend.addItem(V, 'validation ' + name)
+            self.legend.addItem(V, 'Validation ' + name)
 
     def redraw(self, data=None, name=''):
         if type(data) is dict:
@@ -96,7 +96,7 @@ class ErrorWindowWidget(QGroupBox):
             for P in self.Plot:
                 T = P['train']
                 self.graphWidget.addItem(T)
-                self.legend.addItem(T, 'training ' + P['name'])
+                self.legend.addItem(T, 'Training ' + P['name'])
 
     def ValButAct(self):
         if self.ValShown:
@@ -111,7 +111,7 @@ class ErrorWindowWidget(QGroupBox):
             for P in self.Plot:
                 V = P['val']
                 self.graphWidget.addItem(V)
-                self.legend.addItem(V, 'validation ' + P['name'])
+                self.legend.addItem(V, 'Validation ' + P['name'])
 
     def CompButAct(self):
         file, check = QFileDialog.getOpenFileName(None, "Load error", "")
