@@ -4,9 +4,9 @@ class Simulator:
     def __init__(self, dim, sensitivity, WeightF=None, WeightL=None):
         self.dim = dim
         self.sensitivity = sensitivity
-        self.weight_f = WeightF if WeightF is not None else torch.tensor([1., 0.] + [0.] * (self.dim - 2))
+        self.weight_f = torch.tensor(WeightF, dtype=torch.float) if WeightF is not None else torch.tensor([1., 0.] + [0.] * (self.dim - 2))
         self.weight_f = self.weight_f / torch.norm(self.weight_f)
-        self.weight_l = WeightL if WeightL is not None else torch.tensor([0., 1.] + [0.] * (self.dim - 2))
+        self.weight_l = torch.tensor(WeightL, dtype=torch.float) if WeightL is not None else torch.tensor([0., 1.] + [0.] * (self.dim - 2))
         self.weight_l = self.weight_l / torch.norm(self.weight_l)
         self.P = []     # contient les vecteurs de suivis, qui enregistrent itérativement les informations des vecteurs présents
         self.TM = []    # contient le temps de dernière mise-à-jour de chaque vecteur de suivi
@@ -22,8 +22,8 @@ class Simulator:
 
         else:
             # We make a mask, BM, that is 0 only if the pulse is selected
-            Frequencies = torch.matmul(Input, torch.tensor(self.weight_f))
-            Levels = torch.matmul(Input, torch.tensor(self.weight_l))
+            Frequencies = torch.matmul(Input, self.weight_f)
+            Levels = torch.matmul(Input, self.weight_l)
 
             BF = torch.abs(Frequencies.unsqueeze(-1) - Frequencies.unsqueeze(-2)) < self.sensitivity
             BN = (Levels.unsqueeze(-1) > Levels.unsqueeze(-2))
@@ -31,7 +31,7 @@ class Simulator:
 
             # The selected pulses are then sorted by decreasing level
             Selected = Input[BM]
-            Levels = torch.matmul(Selected, torch.tensor(self.weight_l))
+            Levels = torch.matmul(Selected, self.weight_l)
             Orders = Levels.argsort(dim=-1, descending=True)
             self.V = Selected[Orders]
 

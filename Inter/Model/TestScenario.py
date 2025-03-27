@@ -1,4 +1,4 @@
-from Inter.Model.Scenario import Simulator
+from Inter.Model.Scenario import Simulator, BiasedSimulator
 import numpy as np
 
 if __name__ == '__main__':
@@ -22,8 +22,10 @@ if __name__ == '__main__':
     import random
     import math
     df = 0.2
-    S = Simulator(5, 30, 4, sensitivity=df, seed=None)
-    S.Run()
+    # S = Simulator(5, 30, 4, sensitivity=df, seed=None)
+    S = BiasedSimulator(1, 3, 5, 30, 4, sensitivity=df, seed=None)
+    S.run()
+
 
     fig, (ax1, ax2) = plt.subplots(2)
 

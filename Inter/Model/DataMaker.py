@@ -1,5 +1,5 @@
 import torch
-from Inter.Model.Scenario import Simulator
+from Inter.Model.Scenario import Simulator, BiasedSimulator
 from Tools.XMLTools import loadXmlAsObj, saveObjAsXml
 import os
 from tqdm import tqdm
@@ -9,10 +9,14 @@ def generate_sample(args):
     warnings.filterwarnings("ignore")  # Désactive les warnings
 
     """ Génère un échantillon unique basé sur les paramètres. """
-    d_in, n_pulse_plateau, len_in, len_out, sensitivity = args
+    if len(args) == 5:
+        d_in, n_pulse_plateau, len_in, len_out, sensitivity = args
+        S = Simulator(n_pulse_plateau, len_in, d_in - 1, sensitivity=sensitivity)
+    else:
+        std, mean, d_in, n_pulse_plateau, len_in, len_out, sensitivity = args
+        S = BiasedSimulator(std, mean, n_pulse_plateau, len_in, d_in - 1, sensitivity=sensitivity)
 
-    S = Simulator(n_pulse_plateau, len_in, d_in - 1, sensitivity=sensitivity)
-    S.Run()
+    S.run()
 
     input_data = S.L
     output = S.sensor_simulator.R
@@ -23,10 +27,7 @@ def generate_sample(args):
 
     return input_data, output[:len_out], len_element_output
 
-def MakeData1(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity):
-    import warnings
-    warnings.filterwarnings("ignore")   # Désactive les warnings
-
+def MakeData(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity):
     input_data = []
     output_data = []
     len_element_output = []
@@ -46,7 +47,7 @@ def MakeData1(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity):
 
 from concurrent.futures import ProcessPoolExecutor
 
-def MakeData2(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity):
+def MakeDataParallel(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity):
     """ Génère n_data échantillons en parallèle avec ProcessPoolExecutor. """
     args = [(d_in, n_pulse_plateau, len_in, len_out, sensitivity) for _ in range(n_data)]
 
@@ -71,11 +72,11 @@ def MakeData2(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity):
 
 
 def GetData(d_in, n_pulse_plateau, len_in, len_out, n_data_training, n_data_validation, sensitivity, save_path=None, parallel=False):
-    MakeData = MakeData2 if parallel else MakeData1
+    make_data = MakeDataParallel if parallel else MakeData
 
     if save_path is None:
-        return [MakeData(d_in, n_pulse_plateau, len_in, len_out, n_data_validation, sensitivity),
-                MakeData(d_in, n_pulse_plateau, len_in, len_out, n_data_training, sensitivity)]
+        return [make_data(d_in, n_pulse_plateau, len_in, len_out, n_data_validation, sensitivity),
+                make_data(d_in, n_pulse_plateau, len_in, len_out, n_data_training, sensitivity)]
 
     else:
         arg = {'d_in': d_in,
@@ -93,7 +94,7 @@ def GetData(d_in, n_pulse_plateau, len_in, len_out, n_data_training, n_data_vali
                 MultMaskTraining = torch.load(os.path.join(save_path, file, 'MultMaskTraining'))
 
                 if len(InputTraining) < n_data_training:
-                    Input, Output, Mask = MakeData(d_in, n_pulse_plateau, len_in, len_out, n_data_training - len(InputTraining), sensitivity)
+                    Input, Output, Mask = make_data(d_in, n_pulse_plateau, len_in, len_out, n_data_training - len(InputTraining), sensitivity)
                     InputTraining = torch.cat((InputTraining, Input), dim=0)
                     OutputTraining = torch.cat((OutputTraining, Output), dim=0)
                     AddMaskTraining = torch.cat((AddMaskTraining, Mask[0]), dim=0)
@@ -109,7 +110,7 @@ def GetData(d_in, n_pulse_plateau, len_in, len_out, n_data_training, n_data_vali
                 MultMaskValidation = torch.load(os.path.join(save_path, file, 'MultMaskValidation'))
 
                 if len(InputValidation) < n_data_validation:
-                    Input, Output, Mask = MakeData(d_in, n_pulse_plateau, len_in, len_out, n_data_validation - len(InputValidation), sensitivity)
+                    Input, Output, Mask = make_data(d_in, n_pulse_plateau, len_in, len_out, n_data_validation - len(InputValidation), sensitivity)
                     InputValidation = torch.cat((InputValidation, Input), dim=0)
                     OutputValidation = torch.cat((OutputValidation, Output), dim=0)
                     AddMaskValidation = torch.cat((AddMaskValidation, Mask[0]), dim=0)
@@ -127,13 +128,13 @@ def GetData(d_in, n_pulse_plateau, len_in, len_out, n_data_training, n_data_vali
         file = 'config' + str(len(os.listdir(save_path)))
         os.mkdir(os.path.join(save_path, file))
         saveObjAsXml(arg, os.path.join(save_path, file, 'arg.xml'))
-        InputValidation, OutputValidation, MaskValidation = MakeData(d_in, n_pulse_plateau, len_in, len_out, n_data_validation, sensitivity)
+        InputValidation, OutputValidation, MaskValidation = make_data(d_in, n_pulse_plateau, len_in, len_out, n_data_validation, sensitivity)
         AddMaskValidation, MultMaskValidation = MaskValidation
         torch.save(InputValidation, os.path.join(save_path, file, 'InputValidation'))
         torch.save(OutputValidation, os.path.join(save_path, file, 'OutputValidation'))
         torch.save(AddMaskValidation, os.path.join(save_path, file, 'AddMaskValidation'))
         torch.save(MultMaskValidation, os.path.join(save_path, file, 'MultMaskValidation'))
-        InputTraining, OutputTraining, MaskTraining = MakeData(d_in, n_pulse_plateau, len_in, len_out, n_data_training, sensitivity)
+        InputTraining, OutputTraining, MaskTraining = make_data(d_in, n_pulse_plateau, len_in, len_out, n_data_training, sensitivity)
         AddMaskTraining, MultMaskTraining = MaskTraining
         torch.save(InputTraining, os.path.join(save_path, file, 'InputTraining'))
         torch.save(OutputTraining, os.path.join(save_path, file, 'OutputTraining'))
@@ -153,5 +154,5 @@ if __name__ == '__main__':
     print(time.time() - t)
 
     t = time.time()
-    I, O, len_el_O = MakeData2(10, 5, 300, 400, 100, 0.1)
+    I, O, len_el_O = MakeDataParallel(10, 5, 300, 400, 100, 0.1)
     print(time.time() - t)
