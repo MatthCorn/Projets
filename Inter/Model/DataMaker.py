@@ -1,20 +1,27 @@
 import torch
-from Inter.Model.Scenario import Simulator, BiasedSimulator
+from Inter.Model.Scenario import Simulator, BiasedSimulator, FreqBiasedSimulator
 from Tools.XMLTools import loadXmlAsObj, saveObjAsXml
 import os
 from tqdm import tqdm
+import numpy as np
 
-def generate_sample(args):
+def generate_sample(bias, *args):
     import warnings
     warnings.filterwarnings("ignore")  # Désactive les warnings
 
+    print(bias)
     """ Génère un échantillon unique basé sur les paramètres. """
-    if len(args) == 5:
+    if bias == 'none':
         d_in, n_pulse_plateau, len_in, len_out, sensitivity = args
         S = Simulator(n_pulse_plateau, len_in, d_in - 1, sensitivity=sensitivity)
-    else:
+    elif bias == 'freq':
+        std, mean, d_in, n_pulse_plateau, len_in, len_out, sensitivity = args
+        S = FreqBiasedSimulator(std, mean, n_pulse_plateau, len_in, d_in - 1, sensitivity=sensitivity)
+    elif bias == 'all':
         std, mean, d_in, n_pulse_plateau, len_in, len_out, sensitivity = args
         S = BiasedSimulator(std, mean, n_pulse_plateau, len_in, d_in - 1, sensitivity=sensitivity)
+    else:
+        raise ValueError
 
     S.run()
 
@@ -27,13 +34,34 @@ def generate_sample(args):
 
     return input_data, output[:len_out], len_element_output
 
-def MakeData(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity):
+def MakeData(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity, bias='none',
+             std_min=1, std_max=5, mean_min=-10, mean_max=10, distrib='log', plot=False):
     input_data = []
     output_data = []
     len_element_output = []
 
-    for _ in tqdm(range(n_data)):
-        input, output, len_output = generate_sample((d_in, n_pulse_plateau, len_in, len_out, sensitivity))
+    if bias != 'none':
+        if plot:
+            spacing = lambda x: np.linspace(0, 1, x)
+        else:
+            spacing = lambda x: np.random.rand(x)
+
+        if distrib == 'uniform':
+            f = lambda x: x
+            g = lambda x: x
+        elif distrib == 'log':
+            f = lambda x: np.log(x)
+            g = lambda x: np.exp(x)
+        mean_list = (mean_max - mean_min) * spacing(n_data) + mean_min
+        std_list = g((f(std_max) - f(std_min)) * spacing(n_data) + f(std_min))
+
+    for i in tqdm(range(n_data)):
+        if bias != 'none':
+            mean = mean_list[i]
+            std = std_list[i]
+            input, output, len_output = generate_sample(bias, std, mean, d_in, n_pulse_plateau, len_in, len_out, sensitivity)
+        else:
+            input, output, len_output = generate_sample(bias, d_in, n_pulse_plateau, len_in, len_out, sensitivity)
         input_data.append(input)
         output_data.append(output)
         len_element_output.append(len_output)
@@ -47,9 +75,29 @@ def MakeData(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity):
 
 from concurrent.futures import ProcessPoolExecutor
 
-def MakeDataParallel(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity):
-    """ Génère n_data échantillons en parallèle avec ProcessPoolExecutor. """
-    args = [(d_in, n_pulse_plateau, len_in, len_out, sensitivity) for _ in range(n_data)]
+def MakeDataParallel(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity, bias='none',
+                     std_min=1, std_max=5, mean_min=-10, mean_max=10, distrib='log', plot=False):
+
+    if bias != 'none':
+        if plot:
+            spacing = lambda x: np.linspace(0, 1, x)
+        else:
+            spacing = lambda x: np.random.rand(x)
+
+        if distrib == 'uniform':
+            f = lambda x: x
+            g = lambda x: x
+        elif distrib == 'log':
+            f = lambda x: np.log(x)
+            g = lambda x: np.exp(x)
+        mean_list = (mean_max - mean_min) * spacing(n_data) + mean_min
+        std_list = g((f(std_max) - f(std_min)) * spacing(n_data) + f(std_min))
+
+        """ Génère n_data échantillons en parallèle avec ProcessPoolExecutor. """
+        args = [(bias, std_list[i], mean_list[i], d_in, n_pulse_plateau, len_in, len_out, sensitivity) for i in range(n_data)]
+
+    else:
+        args = [(bias, d_in, n_pulse_plateau, len_in, len_out, sensitivity) for _ in range(n_data)]
 
     with ProcessPoolExecutor() as executor:
         results = list(executor.map(generate_sample, args))  # On passe une fonction globale et une liste d'args
@@ -68,7 +116,6 @@ def MakeDataParallel(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity
     mult_mask = torch.tensor((len_element_output + 1) >= arange, dtype=torch.float).unsqueeze(-1)
 
     return input_data, output_data, [add_mask, mult_mask]
-
 
 
 def GetData(d_in, n_pulse_plateau, len_in, len_out, n_data_training, n_data_validation, sensitivity, save_path=None, parallel=False):
@@ -149,10 +196,10 @@ def GetData(d_in, n_pulse_plateau, len_in, len_out, n_data_training, n_data_vali
 if __name__ == '__main__':
     import time
 
-    t = time.time()
-    I, O, len_el_O = MakeData(10, 5, 300, 400, 100, 0.1)
-    print(time.time() - t)
+    # t = time.time()
+    # I, O, len_el_O = MakeData(10, 5, 300, 400, 100, 0.1, bias='freq')
+    # print(time.time() - t)
 
     t = time.time()
-    I, O, len_el_O = MakeDataParallel(10, 5, 300, 400, 100, 0.1)
+    I, O, len_el_O = MakeDataParallel(10, 5, 300, 400, 100, 0.1, bias='freq')
     print(time.time() - t)

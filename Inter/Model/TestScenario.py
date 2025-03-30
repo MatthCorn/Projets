@@ -1,4 +1,4 @@
-from Inter.Model.Scenario import Simulator, BiasedSimulator
+from Inter.Model.Scenario import Simulator, BiasedSimulator, FreqBiasedSimulator
 import numpy as np
 
 if __name__ == '__main__':
@@ -23,7 +23,8 @@ if __name__ == '__main__':
     import math
     df = 0.2
     # S = Simulator(5, 30, 4, sensitivity=df, seed=None)
-    S = BiasedSimulator(1, 3, 5, 30, 4, sensitivity=df, seed=None)
+    # S = BiasedSimulator(1, 3, 5, 30, 4, sensitivity=df, seed=None)
+    S = FreqBiasedSimulator(3, 0, 5, 30, 4, sensitivity=df, seed=None)
     S.run()
 
 

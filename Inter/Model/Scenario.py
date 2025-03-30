@@ -127,3 +127,29 @@ class BiasedSimulator(Simulator):
         vector = ortho_vector + alpha * self.weight_f + beta * self.weight_l
 
         return vector.tolist()
+
+class FreqBiasedSimulator(Simulator):
+    def __init__(self, std, mean, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.std = std
+        self.mean = mean
+
+    def run(self):
+        while self.sensor_simulator.running:
+            if (self.T == 0) or (len(self.V) > 0):
+                v = self.make_constrained_vector()
+                self.step(v)
+
+            self.sensor_simulator.Process(self.V)
+            self.add_D()
+
+    def make_constrained_vector(self):
+        f = np.random.randn() * self.std + self.mean
+
+        raw_vector = np.random.randn(self.dim) * abs(f)
+
+        raw_f = np.matmul(raw_vector, self.weight_f)
+
+        vector = raw_vector + (f - raw_f) * self.weight_f
+
+        return vector.tolist()
