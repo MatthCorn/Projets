@@ -1,5 +1,5 @@
-from RankAI.V4.Vecteurs.DataMaker import MakeTargetedData
-from RankAI.V4.Vecteurs.Ranker import Network, ChoseOutput
+from Inter.Model.DataMaker import GetData, MakeData
+from Inter.Network.Network import TransformerTranslator
 from Complete.LRScheduler import Scheduler
 from GradObserver.GradObserverClass import DictGradObserver
 from Tools.ParamObs import DictParamObserver
@@ -17,7 +17,8 @@ import time
 
 local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
 base_folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
-save_dir = os.path.join(local, 'RankAI', 'Save', 'V4', 'Vecteurs')
+save_dir = os.path.join(local, 'Inter', 'Network', 'Save')
+data_dir = os.path.join(local, 'Inter', 'Data')
 
 attempt = 0
 while True:
@@ -45,8 +46,11 @@ if sys.platform == "win32":
 ################################################################################################################################################
 
 param = {"n_encoder": 10,
+         "n_decoder": 10,
          "len_in": 10,
-         'len_out': 5,
+         "len_out": 20,
+         "n_pulse_plateau": 5,
+         "sensibility": 0.1,
          "d_in": 10,
          "d_att": 128,
          "WidthsEmbedding": [32],
@@ -84,6 +88,7 @@ try:
     param.update(temp_param)
 except:
     print("nothing loaded")
+d_out = param['d_in'] + 1
 
 freq_checkpoint = 1/10
 nb_frames_GIF = 100
@@ -96,9 +101,9 @@ if torch.cuda.is_available():
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-N = Network(n_encoder=param['n_encoder'], len_in=param['len_in'], len_latent=param['len_out'], d_in=param['d_in'], d_att=param['d_att'],
-            WidthsEmbedding=param['WidthsEmbedding'], n_heads=param['n_heads'], norm=param['norm'], dropout=param['dropout'])
-
+N = TransformerTranslator(param['d_in'], d_out, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
+                          n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], len_in=param['len_in'],
+                          len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'])
 DictGrad = DictGradObserver(N)
 
 N.to(device)
@@ -138,18 +143,20 @@ n_updates = int(NDataT / batch_size) * n_iter
 warmup_steps = int(NDataT / batch_size * param["warmup"])
 lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"], max_steps=n_updates, type=param["lr_option"]["type"])
 
-PlottingInput, PlottingOutput, PlottingStd = MakeTargetedData(
-    NInput=NInput,
-    NOutput=NOutput,
-    DVec=DVec,
+PlottingInput, PlottingOutput, PlottingStd = MakeData(
+    d_in=param['d_in'],
+    n_pulse_plateau=param["n_pulse_plateau"],
+    len_in=param['len_in'],
+    len_out=param['len_out'],
+    bias='freq',
     mean_min=min([window["mean"][0] for window in param["training_strategy"]]),
     mean_max=max([window["mean"][1] for window in param["training_strategy"]]),
     std_min=min([window["std"][0] for window in param["training_strategy"]]),
     std_max=max([window["std"][1] for window in param["training_strategy"]]),
     distrib=param["plot_distrib"],
-    NData=res_GIF,
-    WeightF=WeightF,
-    WeightN=WeightN,
+    n_data=res_GIF,
+    weight_f=WeightF,
+    weight_l=WeightN,
     plot=True,
 )
 

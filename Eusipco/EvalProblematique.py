@@ -10,7 +10,7 @@ from copy import deepcopy
 from tqdm import tqdm
 
 ################################################################################################################################################
-# pour sauvegarder toutes les informations de l"apprentissage
+# pour sauvegarder toutes les informations de l'apprentissage
 import os
 import datetime
 from Tools.XMLTools import saveObjAsXml
