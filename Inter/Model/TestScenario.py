@@ -24,7 +24,7 @@ if __name__ == '__main__':
     df = 0.2
     # S = Simulator(5, 30, 4, sensitivity=df, seed=None)
     # S = BiasedSimulator(1, 3, 5, 30, 4, sensitivity=df, seed=None)
-    S = FreqBiasedSimulator(3, 0, 5, 30, 4, sensitivity=df, seed=None)
+    S = FreqBiasedSimulator(0.2, 1, 5, 30, 4, sensitivity=df, seed=None)
     S.run()
 
 

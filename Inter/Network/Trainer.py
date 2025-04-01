@@ -77,7 +77,6 @@ NVec = param['len_out']
     param['d_in'], param['n_pulse_plateau'], param['len_in'], param['len_out'], param['NDataT'], param['NDataV'],
     param['sensibility_fourier'], param['sensibility_sensor'], save_path=os.path.join(local, 'Inter', 'Model', 'Data'))
 
-
 mini_batch_size = 5000
 n_minibatch = int(NDataT/mini_batch_size)
 batch_size = param['batch_size']

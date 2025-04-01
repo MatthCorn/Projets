@@ -65,6 +65,11 @@ def MakeData(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity, weight
         mean_list = (mean_max - mean_min) * spacing(n_data) + mean_min
         std_list = g((f(std_max) - f(std_min)) * spacing(n_data) + f(std_min))
 
+        if plot:
+            n_data = n_data ** 2
+            mean_list, std_list = np.meshgrid(mean_list, std_list)
+            mean_list, std_list = mean_list.flatten(), std_list.flatten()
+
     for i in tqdm(range(n_data)):
         if bias != 'none':
             mean = mean_list[i]
@@ -81,7 +86,10 @@ def MakeData(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity, weight
     add_mask = torch.tensor((len_element_output + 1) == arange, dtype=torch.float).unsqueeze(-1)
     mult_mask = torch.tensor((len_element_output + 1) >= arange, dtype=torch.float).unsqueeze(-1)
 
-    return torch.tensor(input_data, dtype=torch.float), torch.tensor(output_data, dtype=torch.float), [add_mask, mult_mask]
+    return (torch.tensor(input_data, dtype=torch.float),
+            torch.tensor(output_data, dtype=torch.float),
+            [add_mask, mult_mask],
+            torch.tensor(output_data, dtype=torch.float).std(dim=[-1, -2], keepdim=True))
 
 from concurrent.futures import ProcessPoolExecutor
 
@@ -102,6 +110,10 @@ def MakeDataParallel(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity
             g = lambda x: np.exp(x)
         mean_list = (mean_max - mean_min) * spacing(n_data) + mean_min
         std_list = g((f(std_max) - f(std_min)) * spacing(n_data) + f(std_min))
+
+        if plot:
+            n_data = n_data ** 2
+            mean_list, std_list = np.meshgrid(mean_list, std_list)
 
         """ Génère n_data échantillons en parallèle avec ProcessPoolExecutor. """
         args = [(bias, std_list[i], mean_list[i], d_in, n_pulse_plateau, len_in, len_out, sensitivity, weight_f, weight_l) for i in range(n_data)]
@@ -125,7 +137,10 @@ def MakeDataParallel(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity
     add_mask = torch.tensor((len_element_output + 1) == arange, dtype=torch.float).unsqueeze(-1)
     mult_mask = torch.tensor((len_element_output + 1) >= arange, dtype=torch.float).unsqueeze(-1)
 
-    return input_data, output_data, [add_mask, mult_mask]
+    return (input_data,
+            output_data,
+            [add_mask, mult_mask],
+            output_data.std(dim=[-1, -2], keepdim=True))
 
 
 def GetData(d_in, n_pulse_plateau, len_in, len_out, n_data_training, n_data_validation, sensitivity,
@@ -140,23 +155,23 @@ def GetData(d_in, n_pulse_plateau, len_in, len_out, n_data_training, n_data_vali
     else:
         if bias == 'none':
             kwargs = {'d_in': d_in,
-                   'n_pulse_plateau': n_pulse_plateau,
-                   'len_in': len_in,
-                   'len_out': len_out,
-                   'sensitivity': sensitivity}
+                      'n_pulse_plateau': n_pulse_plateau,
+                      'len_in': len_in,
+                      'len_out': len_out,
+                      'sensitivity': sensitivity}
         else:
             kwargs = {'d_in': d_in,
-                   'n_pulse_plateau': n_pulse_plateau,
-                   'len_in': len_in,
-                   'len_out': len_out,
-                   'sensitivity': sensitivity,
-                   'bias': bias,
-                   'std_min': std_min,
-                   'std_max': std_max,
-                   'mean_min': mean_min,
-                   'mean_max': mean_max,
-                   'distrib': distrib,
-                   'plot': plot}
+                      'n_pulse_plateau': n_pulse_plateau,
+                      'len_in': len_in,
+                      'len_out': len_out,
+                      'sensitivity': sensitivity,
+                      'bias': bias,
+                      'std_min': std_min,
+                      'std_max': std_max,
+                      'mean_min': mean_min,
+                      'mean_max': mean_max,
+                      'distrib': distrib,
+                      'plot': plot}
 
         for file in os.listdir(save_path):
             kwargs_file = loadXmlAsObj(os.path.join(save_path, file, 'kwargs.xml'))
@@ -167,38 +182,47 @@ def GetData(d_in, n_pulse_plateau, len_in, len_out, n_data_training, n_data_vali
                 OutputTraining = torch.load(os.path.join(save_path, file, 'OutputTraining'))
                 AddMaskTraining = torch.load(os.path.join(save_path, file, 'AddMaskTraining'))
                 MultMaskTraining = torch.load(os.path.join(save_path, file, 'MultMaskTraining'))
+                StdTraining = torch.load(os.path.join(save_path, file, 'StdTraining'))
 
                 if len(InputTraining) < n_data_training:
-                    Input, Output, Mask = make_data(n_data=n_data_training - len(InputTraining), weight_f=weight_f, weight_l=weight_l, **kwargs)
+                    Input, Output, Mask, Std = make_data(n_data=n_data_training - len(InputTraining), weight_f=weight_f, weight_l=weight_l, **kwargs)
                     InputTraining = torch.cat((InputTraining, Input), dim=0)
                     OutputTraining = torch.cat((OutputTraining, Output), dim=0)
                     AddMaskTraining = torch.cat((AddMaskTraining, Mask[0]), dim=0)
                     MultMaskTraining = torch.cat((MultMaskTraining, Mask[1]), dim=0)
+                    StdTraining = torch.cat((StdTraining, Std), dim=0)
+
                     torch.save(InputTraining, os.path.join(save_path, file, 'InputTraining'))
                     torch.save(OutputTraining, os.path.join(save_path, file, 'OutputTraining'))
                     torch.save(AddMaskTraining, os.path.join(save_path, file, 'AddMaskTraining'))
                     torch.save(MultMaskTraining, os.path.join(save_path, file, 'MultMaskTraining'))
+                    torch.save(StdTraining, os.path.join(save_path, file, 'StdTraining'))
 
                 InputValidation = torch.load(os.path.join(save_path, file, 'InputValidation'))
                 OutputValidation = torch.load(os.path.join(save_path, file, 'OutputValidation'))
                 AddMaskValidation = torch.load(os.path.join(save_path, file, 'AddMaskValidation'))
                 MultMaskValidation = torch.load(os.path.join(save_path, file, 'MultMaskValidation'))
+                StdValidation = torch.load(os.path.join(save_path, file, 'StdValidation'))
 
                 if len(InputValidation) < n_data_validation:
-                    Input, Output, Mask = make_data(n_data=n_data_validation - len(InputValidation), weight_f=weight_f, weight_l=weight_l, **kwargs)
+                    Input, Output, Mask, Std = make_data(n_data=n_data_validation - len(InputValidation), weight_f=weight_f, weight_l=weight_l, **kwargs)
                     InputValidation = torch.cat((InputValidation, Input), dim=0)
                     OutputValidation = torch.cat((OutputValidation, Output), dim=0)
                     AddMaskValidation = torch.cat((AddMaskValidation, Mask[0]), dim=0)
                     MultMaskValidation = torch.cat((MultMaskValidation, Mask[1]), dim=0)
+                    StdValidation = torch.cat((StdValidation, Std), dim=0)
                     torch.save(InputValidation, os.path.join(save_path, file, 'InputValidation'))
                     torch.save(OutputValidation, os.path.join(save_path, file, 'OutputValidation'))
                     torch.save(AddMaskValidation, os.path.join(save_path, file, 'AddMaskValidation'))
                     torch.save(MultMaskValidation, os.path.join(save_path, file, 'MultMaskValidation'))
+                    torch.save(StdValidation, os.path.join(save_path, file, 'StdValidation'))
 
                 return [[InputValidation[:n_data_validation], OutputValidation[:n_data_validation],
-                         [AddMaskValidation[:n_data_validation], MultMaskValidation[:n_data_validation]]],
+                         [AddMaskValidation[:n_data_validation], MultMaskValidation[:n_data_validation]],
+                          StdValidation],
                         [InputTraining[:n_data_training], OutputTraining[:n_data_training],
-                         [AddMaskTraining[:n_data_training], MultMaskTraining[:n_data_training]]]]
+                         [AddMaskTraining[:n_data_training], MultMaskTraining[:n_data_training]],
+                         StdTraining]]
 
         file = 'config' + str(len(os.listdir(save_path)))
         os.mkdir(os.path.join(save_path, file))
@@ -209,21 +233,25 @@ def GetData(d_in, n_pulse_plateau, len_in, len_out, n_data_training, n_data_vali
         np.save(os.path.join(save_path, file, 'weight_f'), weight_f)
         np.save(os.path.join(save_path, file, 'weight_l'), weight_l)
         saveObjAsXml(kwargs, os.path.join(save_path, file, 'kwargs.xml'))
-        InputValidation, OutputValidation, MaskValidation = make_data(n_data=n_data_validation, weight_f=weight_f, weight_l=weight_l, **kwargs)
+
+        InputValidation, OutputValidation, MaskValidation, StdValidation = make_data(n_data=n_data_validation, weight_f=weight_f, weight_l=weight_l, **kwargs)
         AddMaskValidation, MultMaskValidation = MaskValidation
         torch.save(InputValidation, os.path.join(save_path, file, 'InputValidation'))
         torch.save(OutputValidation, os.path.join(save_path, file, 'OutputValidation'))
         torch.save(AddMaskValidation, os.path.join(save_path, file, 'AddMaskValidation'))
         torch.save(MultMaskValidation, os.path.join(save_path, file, 'MultMaskValidation'))
-        InputTraining, OutputTraining, MaskTraining = make_data(n_data=n_data_training, weight_f=weight_f, weight_l=weight_l, **kwargs)
+        torch.save(StdValidation, os.path.join(save_path, file, 'StdValidation'))
+
+        InputTraining, OutputTraining, MaskTraining, StdTraining = make_data(n_data=n_data_training, weight_f=weight_f, weight_l=weight_l, **kwargs)
         AddMaskTraining, MultMaskTraining = MaskTraining
         torch.save(InputTraining, os.path.join(save_path, file, 'InputTraining'))
         torch.save(OutputTraining, os.path.join(save_path, file, 'OutputTraining'))
         torch.save(AddMaskTraining, os.path.join(save_path, file, 'AddMaskTraining'))
         torch.save(MultMaskTraining, os.path.join(save_path, file, 'MultMaskTraining'))
+        torch.save(StdTraining, os.path.join(save_path, file, 'StdTraining'))
 
-        return [[InputValidation, OutputValidation, MaskValidation],
-                [InputTraining, OutputTraining, MaskTraining]]
+        return [[InputValidation, OutputValidation, MaskValidation, StdValidation],
+                [InputTraining, OutputTraining, MaskTraining, StdTraining]]
 
 
 
