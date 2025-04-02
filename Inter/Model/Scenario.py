@@ -50,11 +50,15 @@ class Simulator:
     def run(self):
         while self.sensor_simulator.running:
             if (self.T == 0) or (len(self.V) > 0):
-                v = np.random.normal(0, 1, self.dim).tolist()
+                v = self.make_vector()
                 self.step(v)
 
             self.sensor_simulator.Process(self.V)
             self.add_D()
+
+    def make_vector(self):
+        return np.random.normal(0, 1, self.dim).tolist()
+
 
     def add_D(self):
             Selected = self.sensor_simulator.V.numpy()
@@ -74,22 +78,14 @@ class BiasedSimulator(Simulator):
         self.std = std
         self.mean = mean
 
-
         self.mean_f = None
         self.std_f = None
         self.mean_l = None
         self.std_l = None
 
-    def run(self):
+        self.alpha = None
+        self.beta = None
         self.constrain_sequence()
-
-        while self.sensor_simulator.running:
-            if (self.T == 0) or (len(self.V) > 0):
-                v = self.make_constrained_vector()
-                self.step(v)
-
-            self.sensor_simulator.Process(self.V)
-            self.add_D()
 
     def constrain_sequence(self):
         lbd_mean = np.random.rand()
@@ -109,7 +105,7 @@ class BiasedSimulator(Simulator):
                             (mean_N - self.gamma * mean_F) / (1 - self.gamma ** 2),
                             np.sqrt((std_N ** 2 - self.gamma ** 2 * std_F ** 2) / (1 - self.gamma ** 4)))
 
-    def make_constrained_vector(self):
+    def make_vector(self):
         alpha = self.alpha()
         beta = self.beta()
 
@@ -134,16 +130,7 @@ class FreqBiasedSimulator(Simulator):
         self.std = std
         self.mean = mean
 
-    def run(self):
-        while self.sensor_simulator.running:
-            if (self.T == 0) or (len(self.V) > 0):
-                v = self.make_constrained_vector()
-                self.step(v)
-
-            self.sensor_simulator.Process(self.V)
-            self.add_D()
-
-    def make_constrained_vector(self):
+    def make_vector(self):
         f = np.random.randn() * self.std + self.mean
 
         raw_vector = np.random.randn(self.dim) * abs(f)

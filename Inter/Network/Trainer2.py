@@ -65,12 +65,12 @@ param = {"n_encoder": 10,
          },
          "mult_grad": 10000,
          "weight_decay": 1e-3,
-         "NDataT": 10000,
+         "NDataT": 500000,
          "NDataV": 1000,
          "batch_size": 1000,
-         "n_iter": 10,
+         "n_iter": 80,
          "training_strategy": [
-             {"mean": [-5, 5], "std": [1, 2]},
+             {"mean": [-10, 10], "std": [0.2, 5]},
          ],
          "distrib": "log",
          "plot_distrib": "log",
@@ -197,8 +197,8 @@ for window in param["training_strategy"]:
         for p in range(n_minibatch):
             InputMiniBatch = TrainingInput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
             OutputMiniBatch = TrainingOutput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
-            TargetMaskMiniBatch = [TrainingMasks[0][p * batch_size:(p + 1) * batch_size].to(device),
-                                   TrainingMasks[1][p * batch_size:(p + 1) * batch_size].to(device)]
+            TargetMaskMiniBatch = [TrainingMasks[0][p * mini_batch_size:(p + 1) * mini_batch_size].to(device),
+                                   TrainingMasks[1][p * mini_batch_size:(p + 1) * mini_batch_size].to(device)]
             StdMiniBatch = TrainingStd[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
 
             for k in range(n_batch):
