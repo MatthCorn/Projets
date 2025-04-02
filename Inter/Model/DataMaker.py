@@ -87,7 +87,7 @@ def MakeData(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity, type='
 
         if plot:
             n_data = n_data ** 2
-            mean_list, std_list = np.meshgrid(mean_list, std_list)
+            std_list, mean_list = np.meshgrid(std_list, mean_list)
             mean_list, std_list = mean_list.flatten(), std_list.flatten()
 
     for i in tqdm(range(n_data)):
@@ -143,7 +143,8 @@ def MakeDataParallel(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity
 
         if plot:
             n_data = n_data ** 2
-            mean_list, std_list = np.meshgrid(mean_list, std_list)
+            std_list, mean_list = np.meshgrid(std_list, mean_list)
+            mean_list, std_list = mean_list.flatten(), std_list.flatten()
 
         """ Génère n_data échantillons en parallèle avec ProcessPoolExecutor. """
         args = [(bias, type, std_list[i], mean_list[i], d_in, n_pulse_plateau, len_in, len_out, sensitivity, weight_f, weight_l) for i in range(n_data)]
