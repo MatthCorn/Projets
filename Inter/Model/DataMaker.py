@@ -19,15 +19,15 @@ def generate_sample(args):
 
     """ Génère un échantillon unique basé sur les paramètres. """
     if args[0] == 'none':
-        d_in, n_pulse_plateau, len_in, len_out, sensitivity, weight_f, weight_l = args[1:]
+        d_in, n_pulse_plateau, len_in, len_out, sensitivity, weight_f, weight_l = args[2:]
         S = Simulator(n_pulse_plateau, len_in, d_in - 1,
                       sensitivity=sensitivity, WeightF=weight_f, WeightL=weight_l)
     elif args[0] == 'freq':
-        std, mean, d_in, n_pulse_plateau, len_in, len_out, sensitivity, weight_f, weight_l = args[1:]
+        std, mean, d_in, n_pulse_plateau, len_in, len_out, sensitivity, weight_f, weight_l = args[2:]
         S = FreqBiasedSimulator(std, mean, n_pulse_plateau, len_in, d_in - 1,
                                 sensitivity=sensitivity, WeightF=weight_f, WeightL=weight_l)
     elif args[0] == 'all':
-        std, mean, d_in, n_pulse_plateau, len_in, len_out, sensitivity, weight_f, weight_l = args[1:]
+        std, mean, d_in, n_pulse_plateau, len_in, len_out, sensitivity, weight_f, weight_l = args[2:]
         S = BiasedSimulator(std, mean, n_pulse_plateau, len_in, d_in - 1,
                             sensitivity=sensitivity, WeightF=weight_f, WeightL=weight_l)
     else:
@@ -35,17 +35,36 @@ def generate_sample(args):
 
     S.run()
 
-    input_data = S.L
-    output = S.sensor_simulator.R
-    len_element_output = len(output)
+    if args[1] == 'complete':
+        input = S.L
+        output = S.sensor_simulator.R
+        len_element_output = len(output)
 
-    # Remplissage pour correspondre à len_out
-    output += [[0.] * (d_in + 1)] * (len_out - len(output))
+        # Remplissage pour correspondre à len_out
+        output += [[0.] * (d_in + 1)] * (len_out - len(output))
 
-    return input_data, output[:len_out], len_element_output
+        return input, output[:len_out], len_element_output
+    elif args[1] == 'NDA':
+        input = S.L
+        output = S.D
 
-def MakeData(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity, weight_f=None, weight_l=None, bias='none',
-             std_min=1, std_max=5, mean_min=-10, mean_max=10, distrib='log', plot=False):
+        return input, output
+
+    elif args[1] == 'tracking':
+        input = S.D
+        output = S.sensor_simulator.R
+        len_element_output = len(output)
+
+        # Remplissage pour correspondre à len_out
+        output += [[0.] * (d_in + 1)] * (len_out - len(output))
+
+        return input, output[:len_out], len_element_output
+
+    else:
+        raise ValueError('invalid type')
+
+def MakeData(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity, type='complete', weight_f=None, weight_l=None,
+             bias='none', std_min=1, std_max=5, mean_min=-10, mean_max=10, distrib='log', plot=False):
     input_data = []
     output_data = []
     len_element_output = []
@@ -74,27 +93,37 @@ def MakeData(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity, weight
         if bias != 'none':
             mean = mean_list[i]
             std = std_list[i]
-            input, output, len_output = generate_sample((bias, std, mean, d_in, n_pulse_plateau, len_in, len_out, sensitivity, weight_f, weight_l))
+            input, output, *len_output = generate_sample((bias, type, std, mean, d_in, n_pulse_plateau, len_in, len_out, sensitivity, weight_f, weight_l))
         else:
-            input, output, len_output = generate_sample((bias, d_in, n_pulse_plateau, len_in, len_out, sensitivity, weight_f, weight_l))
+            input, output, *len_output = generate_sample((bias, type, d_in, n_pulse_plateau, len_in, len_out, sensitivity, weight_f, weight_l))
         input_data.append(input)
         output_data.append(output)
         len_element_output.append(len_output)
 
-    len_element_output = torch.tensor(len_element_output).unsqueeze(-1)
-    arange = torch.arange(len_out + 1).unsqueeze(0).expand(n_data, -1)
-    add_mask = torch.tensor((len_element_output + 1) == arange, dtype=torch.float).unsqueeze(-1)
-    mult_mask = torch.tensor((len_element_output + 1) >= arange, dtype=torch.float).unsqueeze(-1)
+    input_data = torch.tensor(input_data, dtype=torch.float)
+    output_data = torch.tensor(output_data, dtype=torch.float)
+    if type == 'complete' or type == 'tracking':
+        len_element_output = torch.tensor(len_element_output)
+        arange = torch.arange(len_out + 1).unsqueeze(0).expand(n_data, -1)
+        add_mask = torch.tensor((len_element_output + 1) == arange, dtype=torch.float).unsqueeze(-1)
+        mult_mask = torch.tensor((len_element_output + 1) >= arange, dtype=torch.float).unsqueeze(-1)
 
-    return (torch.tensor(input_data, dtype=torch.float),
-            torch.tensor(output_data, dtype=torch.float),
-            [add_mask, mult_mask],
-            torch.tensor(output_data, dtype=torch.float).std(dim=[-1, -2], keepdim=True))
+        return (input_data,
+                output_data,
+                output_data.std(dim=[-1, -2], keepdim=True),
+                [add_mask, mult_mask])
+
+    elif type == 'NDA':
+        return input_data, output_data, output_data.std(dim=[-1, -2], keepdim=True)
+
+    else:
+        raise ValueError('invalid type')
+
 
 from concurrent.futures import ProcessPoolExecutor
 
-def MakeDataParallel(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity, weight_f=None, weight_l=None, bias='none',
-                     std_min=1, std_max=5, mean_min=-10, mean_max=10, distrib='log', plot=False):
+def MakeDataParallel(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity, type='complete', weight_f=None, weight_l=None,
+                     bias='none', std_min=1, std_max=5, mean_min=-10, mean_max=10, distrib='log', plot=False):
 
     if bias != 'none':
         if plot:
@@ -116,41 +145,44 @@ def MakeDataParallel(d_in, n_pulse_plateau, len_in, len_out, n_data, sensitivity
             mean_list, std_list = np.meshgrid(mean_list, std_list)
 
         """ Génère n_data échantillons en parallèle avec ProcessPoolExecutor. """
-        args = [(bias, std_list[i], mean_list[i], d_in, n_pulse_plateau, len_in, len_out, sensitivity, weight_f, weight_l) for i in range(n_data)]
+        args = [(bias, type, std_list[i], mean_list[i], d_in, n_pulse_plateau, len_in, len_out, sensitivity, weight_f, weight_l) for i in range(n_data)]
 
     else:
-        args = [(bias, d_in, n_pulse_plateau, len_in, len_out, sensitivity, weight_f, weight_l) for _ in range(n_data)]
+        args = [(bias, type, d_in, n_pulse_plateau, len_in, len_out, sensitivity, weight_f, weight_l) for _ in range(n_data)]
 
     with ProcessPoolExecutor() as executor:
         results = list(executor.map(generate_sample, args))  # On passe une fonction globale et une liste d'args
 
     # Extraction des résultats
-    input_data, output_data, len_element_output = zip(*results)
+    input_data, output_data, *len_element_output = zip(*results)
 
-    # Conversion en tensors
     input_data = torch.tensor(input_data, dtype=torch.float)
     output_data = torch.tensor(output_data, dtype=torch.float)
-    len_element_output = torch.tensor(len_element_output).unsqueeze(-1)
+    if type == 'complete' or type == 'tracking':
+        len_element_output = torch.tensor(len_element_output[0]).unsqueeze(-1)
+        arange = torch.arange(len_out + 1).unsqueeze(0).expand(n_data, -1)
+        add_mask = torch.tensor((len_element_output + 1) == arange, dtype=torch.float).unsqueeze(-1)
+        mult_mask = torch.tensor((len_element_output + 1) >= arange, dtype=torch.float).unsqueeze(-1)
 
-    # Masques
-    arange = torch.arange(len_out + 1).unsqueeze(0).expand(n_data, -1)
-    add_mask = torch.tensor((len_element_output + 1) == arange, dtype=torch.float).unsqueeze(-1)
-    mult_mask = torch.tensor((len_element_output + 1) >= arange, dtype=torch.float).unsqueeze(-1)
+        return (input_data,
+                output_data,
+                output_data.std(dim=[-1, -2], keepdim=True),
+                [add_mask, mult_mask])
 
-    return (input_data,
-            output_data,
-            [add_mask, mult_mask],
-            output_data.std(dim=[-1, -2], keepdim=True))
+    elif type == 'NDA':
+        return input_data, output_data, output_data.std(dim=[-1, -2], keepdim=True)
 
+    else:
+        raise ValueError('invalid type')
 
 def GetData(d_in, n_pulse_plateau, len_in, len_out, n_data_training, n_data_validation, sensitivity,
             weight_f=None, weight_l=None, bias='none', std_min=1, std_max=5, mean_min=-10, mean_max=10,
-            distrib='log', plot=False, save_path=None, parallel=False):
+            distrib='log', plot=False, save_path=None, parallel=False, type='complete'):
     make_data = MakeDataParallel if parallel else MakeData
 
     if save_path is None:
-        return [make_data(d_in, n_pulse_plateau, len_in, len_out, n_data_validation, sensitivity, weight_f, weight_l),
-                make_data(d_in, n_pulse_plateau, len_in, len_out, n_data_training, sensitivity, weight_f, weight_l)]
+        return [make_data(d_in, n_pulse_plateau, len_in, len_out, n_data_validation, sensitivity, weight_f, weight_l, type=type),
+                make_data(d_in, n_pulse_plateau, len_in, len_out, n_data_training, sensitivity, weight_f, weight_l, type=type)]
 
     else:
         if bias == 'none':
@@ -158,13 +190,15 @@ def GetData(d_in, n_pulse_plateau, len_in, len_out, n_data_training, n_data_vali
                       'n_pulse_plateau': n_pulse_plateau,
                       'len_in': len_in,
                       'len_out': len_out,
-                      'sensitivity': sensitivity}
+                      'sensitivity': sensitivity,
+                      'type': type}
         else:
             kwargs = {'d_in': d_in,
                       'n_pulse_plateau': n_pulse_plateau,
                       'len_in': len_in,
                       'len_out': len_out,
                       'sensitivity': sensitivity,
+                      'type': type,
                       'bias': bias,
                       'std_min': std_min,
                       'std_max': std_max,
@@ -180,49 +214,68 @@ def GetData(d_in, n_pulse_plateau, len_in, len_out, n_data_training, n_data_vali
                 weight_f = np.load(os.path.join(save_path, file, 'weight_f.npy'))
                 InputTraining = torch.load(os.path.join(save_path, file, 'InputTraining'))
                 OutputTraining = torch.load(os.path.join(save_path, file, 'OutputTraining'))
-                AddMaskTraining = torch.load(os.path.join(save_path, file, 'AddMaskTraining'))
-                MultMaskTraining = torch.load(os.path.join(save_path, file, 'MultMaskTraining'))
                 StdTraining = torch.load(os.path.join(save_path, file, 'StdTraining'))
 
+                if type == 'complete' or type == 'tracking':
+                    AddMaskTraining = torch.load(os.path.join(save_path, file, 'AddMaskTraining'))
+                    MultMaskTraining = torch.load(os.path.join(save_path, file, 'MultMaskTraining'))
+
                 if len(InputTraining) < n_data_training:
-                    Input, Output, Mask, Std = make_data(n_data=n_data_training - len(InputTraining), weight_f=weight_f, weight_l=weight_l, **kwargs)
+                    Input, Output, Std, *Mask  = make_data(n_data=n_data_training - len(InputTraining), weight_f=weight_f, weight_l=weight_l, **kwargs)
                     InputTraining = torch.cat((InputTraining, Input), dim=0)
                     OutputTraining = torch.cat((OutputTraining, Output), dim=0)
-                    AddMaskTraining = torch.cat((AddMaskTraining, Mask[0]), dim=0)
-                    MultMaskTraining = torch.cat((MultMaskTraining, Mask[1]), dim=0)
                     StdTraining = torch.cat((StdTraining, Std), dim=0)
-
                     torch.save(InputTraining, os.path.join(save_path, file, 'InputTraining'))
                     torch.save(OutputTraining, os.path.join(save_path, file, 'OutputTraining'))
-                    torch.save(AddMaskTraining, os.path.join(save_path, file, 'AddMaskTraining'))
-                    torch.save(MultMaskTraining, os.path.join(save_path, file, 'MultMaskTraining'))
                     torch.save(StdTraining, os.path.join(save_path, file, 'StdTraining'))
+
+                    if type == 'complete' or type == 'tracking':
+                        Mask = Mask[0]
+                        AddMaskTraining = torch.cat((AddMaskTraining, Mask[0]), dim=0)
+                        MultMaskTraining = torch.cat((MultMaskTraining, Mask[1]), dim=0)
+                        torch.save(AddMaskTraining, os.path.join(save_path, file, 'AddMaskTraining'))
+                        torch.save(MultMaskTraining, os.path.join(save_path, file, 'MultMaskTraining'))
 
                 InputValidation = torch.load(os.path.join(save_path, file, 'InputValidation'))
                 OutputValidation = torch.load(os.path.join(save_path, file, 'OutputValidation'))
-                AddMaskValidation = torch.load(os.path.join(save_path, file, 'AddMaskValidation'))
-                MultMaskValidation = torch.load(os.path.join(save_path, file, 'MultMaskValidation'))
                 StdValidation = torch.load(os.path.join(save_path, file, 'StdValidation'))
 
+                if type == 'complete' or type == 'tracking':
+                    AddMaskValidation = torch.load(os.path.join(save_path, file, 'AddMaskValidation'))
+                    MultMaskValidation = torch.load(os.path.join(save_path, file, 'MultMaskValidation'))
+
                 if len(InputValidation) < n_data_validation:
-                    Input, Output, Mask, Std = make_data(n_data=n_data_validation - len(InputValidation), weight_f=weight_f, weight_l=weight_l, **kwargs)
+                    Input, Output, Std, *Mask = make_data(n_data=n_data_validation - len(InputValidation), weight_f=weight_f, weight_l=weight_l, **kwargs)
                     InputValidation = torch.cat((InputValidation, Input), dim=0)
                     OutputValidation = torch.cat((OutputValidation, Output), dim=0)
-                    AddMaskValidation = torch.cat((AddMaskValidation, Mask[0]), dim=0)
-                    MultMaskValidation = torch.cat((MultMaskValidation, Mask[1]), dim=0)
                     StdValidation = torch.cat((StdValidation, Std), dim=0)
                     torch.save(InputValidation, os.path.join(save_path, file, 'InputValidation'))
                     torch.save(OutputValidation, os.path.join(save_path, file, 'OutputValidation'))
-                    torch.save(AddMaskValidation, os.path.join(save_path, file, 'AddMaskValidation'))
-                    torch.save(MultMaskValidation, os.path.join(save_path, file, 'MultMaskValidation'))
                     torch.save(StdValidation, os.path.join(save_path, file, 'StdValidation'))
 
-                return [[InputValidation[:n_data_validation], OutputValidation[:n_data_validation],
-                         [AddMaskValidation[:n_data_validation], MultMaskValidation[:n_data_validation]],
-                          StdValidation],
-                        [InputTraining[:n_data_training], OutputTraining[:n_data_training],
-                         [AddMaskTraining[:n_data_training], MultMaskTraining[:n_data_training]],
-                         StdTraining]]
+                    if type == 'complete' or type == 'tracking':
+                        Mask = Mask[0]
+                        AddMaskValidation = torch.cat((AddMaskValidation, Mask[0]), dim=0)
+                        MultMaskValidation = torch.cat((MultMaskValidation, Mask[1]), dim=0)
+                        torch.save(AddMaskValidation, os.path.join(save_path, file, 'AddMaskValidation'))
+                        torch.save(MultMaskValidation, os.path.join(save_path, file, 'MultMaskValidation'))
+
+                if type == 'complete' or type == 'tracking':
+                    return [[InputValidation[:n_data_validation], OutputValidation[:n_data_validation],
+                             [AddMaskValidation[:n_data_validation], MultMaskValidation[:n_data_validation]],
+                             StdValidation],
+                            [InputTraining[:n_data_training], OutputTraining[:n_data_training],
+                             [AddMaskTraining[:n_data_training], MultMaskTraining[:n_data_training]],
+                             StdTraining]]
+
+                elif type == 'NDA':
+                    return [[InputValidation[:n_data_validation], OutputValidation[:n_data_validation],
+                             StdValidation],
+                            [InputTraining[:n_data_training], OutputTraining[:n_data_training],
+                             StdTraining]]
+
+                else:
+                    raise ValueError('invalid type')
 
         file = 'config' + str(len(os.listdir(save_path)))
         os.mkdir(os.path.join(save_path, file))
@@ -234,48 +287,58 @@ def GetData(d_in, n_pulse_plateau, len_in, len_out, n_data_training, n_data_vali
         np.save(os.path.join(save_path, file, 'weight_l'), weight_l)
         saveObjAsXml(kwargs, os.path.join(save_path, file, 'kwargs.xml'))
 
-        InputValidation, OutputValidation, MaskValidation, StdValidation = make_data(n_data=n_data_validation, weight_f=weight_f, weight_l=weight_l, **kwargs)
-        AddMaskValidation, MultMaskValidation = MaskValidation
+        InputValidation, OutputValidation, StdValidation, *MaskValidation = make_data(n_data=n_data_validation, weight_f=weight_f, weight_l=weight_l, **kwargs)
         torch.save(InputValidation, os.path.join(save_path, file, 'InputValidation'))
         torch.save(OutputValidation, os.path.join(save_path, file, 'OutputValidation'))
-        torch.save(AddMaskValidation, os.path.join(save_path, file, 'AddMaskValidation'))
-        torch.save(MultMaskValidation, os.path.join(save_path, file, 'MultMaskValidation'))
         torch.save(StdValidation, os.path.join(save_path, file, 'StdValidation'))
 
-        InputTraining, OutputTraining, MaskTraining, StdTraining = make_data(n_data=n_data_training, weight_f=weight_f, weight_l=weight_l, **kwargs)
-        AddMaskTraining, MultMaskTraining = MaskTraining
+        InputTraining, OutputTraining, StdTraining, *MaskTraining = make_data(n_data=n_data_training, weight_f=weight_f, weight_l=weight_l, **kwargs)
         torch.save(InputTraining, os.path.join(save_path, file, 'InputTraining'))
         torch.save(OutputTraining, os.path.join(save_path, file, 'OutputTraining'))
-        torch.save(AddMaskTraining, os.path.join(save_path, file, 'AddMaskTraining'))
-        torch.save(MultMaskTraining, os.path.join(save_path, file, 'MultMaskTraining'))
         torch.save(StdTraining, os.path.join(save_path, file, 'StdTraining'))
 
-        return [[InputValidation, OutputValidation, MaskValidation, StdValidation],
-                [InputTraining, OutputTraining, MaskTraining, StdTraining]]
+        if type == 'complete' or type == 'tracking':
+            AddMaskValidation, MultMaskValidation = MaskValidation[0]
+            torch.save(AddMaskValidation, os.path.join(save_path, file, 'AddMaskValidation'))
+            torch.save(MultMaskValidation, os.path.join(save_path, file, 'MultMaskValidation'))
+
+            AddMaskTraining, MultMaskTraining = MaskTraining[0]
+            torch.save(AddMaskTraining, os.path.join(save_path, file, 'AddMaskTraining'))
+            torch.save(MultMaskTraining, os.path.join(save_path, file, 'MultMaskTraining'))
+
+            return [[InputValidation, OutputValidation, MaskValidation, StdValidation],
+                    [InputTraining, OutputTraining, MaskTraining, StdTraining]]
+
+        elif type == 'NDA':
+            return [[InputValidation, OutputValidation, StdValidation],
+                    [InputTraining, OutputTraining, StdTraining]]
+
+        else:
+            raise ValueError('invalid type')
 
 
 
 if __name__ == '__main__':
     import time
 
-    # t = time.time()
-    # I, O, len_el_O = MakeData(10, 5, 300, 400, 100, 0.1, bias='freq')
-    # print(time.time() - t)
-    #
-    # print('next')
-    #
-    # t = time.time()
-    # I, O, len_el_O = MakeDataParallel(10, 5, 300, 400, 100, 0.1, bias='freq')
-    # print(time.time() - t)
-
     t = time.time()
-    GetData(10, 5, 30, 40, 2000, 500, 0.1,
-            bias='none', std_min=1, std_max=5, mean_min=-10, mean_max=10, distrib='log', plot=False,
-            save_path=r'C:\Users\Matth\Documents\Projets\Inter\Data', parallel=False)
+    I, O, Std, *masks = MakeData(10, 5, 30, 40, 100, 0.1, bias='freq', type='NDA')
     print(time.time() - t)
 
+    print('next')
+
     t = time.time()
-    GetData(10, 5, 31, 40, 2000, 500, 0.1,
-            bias='none', std_min=1, std_max=5, mean_min=-10, mean_max=10, distrib='log', plot=False,
-            save_path=r'C:\Users\Matth\Documents\Projets\Inter\Data', parallel=True)
+    I, O, Std, *masks = MakeDataParallel(10, 5, 30, 40, 100, 0.1, bias='freq', type='complete')
     print(time.time() - t)
+    #
+    # t = time.time()
+    # GetData(10, 5, 30, 40, 20, 10, 0.1,
+    #         bias='none', std_min=1, std_max=5, mean_min=-10, mean_max=10, distrib='log', plot=False,
+    #         save_path=r'C:\Users\Matth\Documents\Projets\Inter\Data', parallel=False)
+    # print(time.time() - t)
+    #
+    # t = time.time()
+    # GetData(10, 5, 31, 40, 2000, 500, 0.1,
+    #         bias='none', std_min=1, std_max=5, mean_min=-10, mean_max=10, distrib='log', plot=False,
+    #         save_path=r'C:\Users\Matth\Documents\Projets\Inter\Data', parallel=True)
+    # print(time.time() - t)
