@@ -4,6 +4,7 @@ from Tools.XMLTools import loadXmlAsObj, saveObjAsXml
 import os
 from tqdm import tqdm
 import numpy as np
+import time
 
 def generate_sample(args):
     # pour les performances
@@ -180,6 +181,11 @@ def GetData(d_in, n_pulse_plateau, len_in, len_out, n_data_training, n_data_vali
             distrib='log', plot=False, save_path=None, parallel=False, type='complete'):
     make_data = MakeDataParallel if parallel else MakeData
 
+    try:
+        os.mkdir(save_path)
+    except:
+        pass
+
     if save_path is None:
         return [make_data(d_in, n_pulse_plateau, len_in, len_out, n_data_validation, sensitivity, weight_f, weight_l, type=type),
                 make_data(d_in, n_pulse_plateau, len_in, len_out, n_data_training, sensitivity, weight_f, weight_l, type=type)]
@@ -208,7 +214,11 @@ def GetData(d_in, n_pulse_plateau, len_in, len_out, n_data_training, n_data_vali
                       'plot': plot}
 
         for file in os.listdir(save_path):
-            kwargs_file = loadXmlAsObj(os.path.join(save_path, file, 'kwargs.xml'))
+            try:
+                kwargs_file = loadXmlAsObj(os.path.join(save_path, file, 'kwargs.xml'))
+            except:
+                continue
+
             if kwargs_file == kwargs:
                 weight_l = np.load(os.path.join(save_path, file, 'weight_l.npy'))
                 weight_f = np.load(os.path.join(save_path, file, 'weight_f.npy'))
@@ -277,8 +287,17 @@ def GetData(d_in, n_pulse_plateau, len_in, len_out, n_data_training, n_data_vali
                 else:
                     raise ValueError('invalid type')
 
-        file = 'config' + str(len(os.listdir(save_path)))
-        os.mkdir(os.path.join(save_path, file))
+        attempt = 0
+        while True:
+            file = f"config({attempt})"
+
+            try:
+                os.makedirs(os.path.join(save_path, file), exist_ok=False)
+                break
+            except FileExistsError:
+                attempt += 1
+                time.sleep(0.1)
+
         weight_f = weight_f if weight_f is not None else np.array([1., 0.] + [0.] * (d_in - 3))
         weight_f = weight_f / np.linalg.norm(weight_f)
         weight_l = weight_f if weight_f is not None else np.array([0., 1.] + [0.] * (d_in - 3))
@@ -306,8 +325,8 @@ def GetData(d_in, n_pulse_plateau, len_in, len_out, n_data_training, n_data_vali
             torch.save(AddMaskTraining, os.path.join(save_path, file, 'AddMaskTraining'))
             torch.save(MultMaskTraining, os.path.join(save_path, file, 'MultMaskTraining'))
 
-            return [[InputValidation, OutputValidation, MaskValidation, StdValidation],
-                    [InputTraining, OutputTraining, MaskTraining, StdTraining]]
+            return [[InputValidation, OutputValidation, [AddMaskValidation, MultMaskValidation], StdValidation],
+                    [InputTraining, OutputTraining, [AddMaskTraining, MultMaskTraining], StdTraining]]
 
         elif type == 'NDA':
             return [[InputValidation, OutputValidation, StdValidation],

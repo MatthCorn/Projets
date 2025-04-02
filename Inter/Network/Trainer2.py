@@ -68,9 +68,10 @@ param = {"n_encoder": 10,
          "NDataT": 500000,
          "NDataV": 1000,
          "batch_size": 1000,
-         "n_iter": 80,
+         "n_iter": 30,
          "training_strategy": [
-             {"mean": [-10, 10], "std": [0.2, 5]},
+             {"mean": [-5, 5], "std": [0.2, 1]},
+             {"mean": [-50, 50], "std": [0.2, 20]},
          ],
          "distrib": "log",
          "plot_distrib": "log",
@@ -138,7 +139,7 @@ n_updates = int(NDataT / batch_size) * n_iter
 warmup_steps = int(NDataT / batch_size * param["warmup"])
 lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"], max_steps=n_updates, type=param["lr_option"]["type"])
 
-PlottingInput, PlottingOutput, PlottingMasks, PlottingStd = MakeData(
+PlottingInput, PlottingOutput, PlottingStd, PlottingMasks = MakeData(
     d_in=param['d_in'],
     n_pulse_plateau=param["n_pulse_plateau"],
     len_in=param['len_in'],
