@@ -86,7 +86,7 @@ global_param = {"n_encoder": 10,
          "error_weighting": "y",
          "max_lr": 5,
          "warmup": 2,
-         "eval": {"param": "mult_grad",
+         "eval": {"param_path": ["mult_grad"],
                   "n_points_reg": 5,
                   "multiplier": [1, 1e1],
                   "spacing": "log",
@@ -135,7 +135,7 @@ for i in tqdm(range(global_param['eval']['n_points_reg'])):
 
     param = deepcopy(global_param)
     param_type = {'str': str, 'int': int, 'float': float}[param['eval']['type']]
-    param_path = param['eval']['param'].split('/')
+    param_path = param['eval']['param_path']
     reduce(operator.getitem, param_path[:-1], param)[param_path[-1]] = (
         param_type(reduce(operator.getitem, param_path[:-1], param)[param_path[-1]] * lbd[i]))
 
@@ -271,7 +271,7 @@ try:
         g = lambda x: x
 
     lbd = g(np.linspace(f(param['eval']['multiplier'][0]), f(param['eval']['multiplier'][1]),param['eval']['n_points_reg'], endpoint=True))
-    param_path = param['eval']['param'].split('/')
+    param_path = param['eval']['param_path']
     x = reduce(operator.getitem, param_path[:-1], param)[param_path[-1]] * lbd
 
     upper_error = np.array(error['FinalErrorValidation']) + np.array(error['NoiseErrorValidation'])
