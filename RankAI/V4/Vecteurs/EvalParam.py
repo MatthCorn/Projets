@@ -241,13 +241,13 @@ for i in tqdm(range(global_param['eval']['n_points_reg'])):
     FinalErrorValidation.append(e)
     NoiseErrorValidation.append(n)
 
-error = {"FinalPerfValidation": FinalPerfValidation,
-         "NoisePerfValidation": NoisePerfValidation,
-         "FinalErrorValidation": FinalErrorValidation,
-         "NoiseErrorValidation": NoiseErrorValidation}
+    error = {"FinalPerfValidation": FinalPerfValidation,
+             "NoisePerfValidation": NoisePerfValidation,
+             "FinalErrorValidation": FinalErrorValidation,
+             "NoiseErrorValidation": NoiseErrorValidation}
 
-saveObjAsXml(error, os.path.join(save_path, "error"))
-saveObjAsXml(global_param, os.path.join(save_path, "param"))
+    saveObjAsXml(error, os.path.join(save_path, "error"))
+    saveObjAsXml(global_param, os.path.join(save_path, "param"))
 
 try:
     import os
@@ -271,6 +271,7 @@ try:
         g = lambda x: x
 
     lbd = g(np.linspace(f(param['eval']['multiplier'][0]), f(param['eval']['multiplier'][1]),param['eval']['n_points_reg'], endpoint=True))
+    lbd = lbd[:len(error['FinalErrorValidation'])]
     param_path = param['eval']['param_path']
     x = reduce(operator.getitem, param_path[:-1], param)[param_path[-1]] * lbd
 
@@ -289,9 +290,9 @@ try:
     ax1.plot(lower_error, 'r')
     ax1.fill_between([i for i in range(len(middle_error))], lower_error, upper_error, color='r', alpha=0.5)
     ax1.set_xticks([i for i in range(len(x))])
-    ax1.set_xticklabels([f"{val:.0e}" for val in x])
+    ax1.set_xticklabels([f"{val:.1e}" for val in x])
     ax1.set_ylim(bottom=0)
-    ax1.set_xlabel(param['eval']['param'])
+    ax1.set_xlabel(''.join([x + ' - ' for x in param['eval']["param_path"]]))
     ax1.set_title("Erreur")
     ax1.set_box_aspect(1)
 
@@ -301,8 +302,8 @@ try:
     ax2.set_xticks([i for i in range(len(x))])
     ax2.fill_between([i for i in range(len(middle_perf))], upper_perf, lower_perf, color='b', alpha=0.5)
     ax2.set_ylim(bottom=0)
-    ax2.set_xticklabels([f"{val:.0e}" for val in x])
-    ax2.set_xlabel(param['eval']['param'])
+    ax2.set_xticklabels([f"{val:.1e}" for val in x])
+    ax2.set_xlabel(''.join([x + ' - ' for x in param['eval']["param_path"]]))
     ax2.set_title("Accuracy")
     ax2.set_box_aspect(1)
 

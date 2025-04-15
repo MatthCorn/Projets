@@ -19,18 +19,18 @@
  </Dictionary>
  <Object Key="mult_grad" Value="10000"/>
  <Object Key="weight_decay" Value="0.001"/>
- <Object Key="NDataT" Value="50000"/>
+ <Object Key="NDataT" Value="5000000"/>
  <Object Key="NDataV" Value="1000"/>
  <Object Key="batch_size" Value="1000"/>
- <Object Key="n_iter" Value="80"/>
+ <Object Key="n_iter" Value="40"/>
  <Dictionary Key="training_space">
   <List Key="mean">
-   <Object Value="-10"/>
-   <Object Value="10"/>
+   <Object Value="-5"/>
+   <Object Value="5"/>
   </List>
   <List Key="std">
    <Object Value="1"/>
-   <Object Value="5"/>
+   <Object Value="2"/>
   </List>
  </Dictionary>
  <String Key="distrib" Value="log"/>
@@ -38,13 +38,15 @@
  <Object Key="max_lr" Value="5"/>
  <Object Key="warmup" Value="2"/>
  <Dictionary Key="eval">
-  <String Key="param" Value="lr_option/value"/>
-  <Object Key="n_points_reg" Value="5"/>
-  <List Key="multiplier">
-   <Object Value="1"/>
-   <Object Value="100.0"/>
+  <List Key="param_path">
+   <String Value="n_encoder"/>
   </List>
-  <String Key="spacing" Value="log"/>
-  <String Key="type" Value="float"/>
+  <Object Key="n_points_reg" Value="6"/>
+  <List Key="multiplier">
+   <Object Value="0.5"/>
+   <Object Value="1"/>
+  </List>
+  <String Key="spacing" Value="uniform"/>
+  <String Key="type" Value="int"/>
  </Dictionary>
 </Dictionary>
