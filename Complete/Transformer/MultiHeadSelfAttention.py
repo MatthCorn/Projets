@@ -17,6 +17,7 @@ class MHSA(nn.Module):
         self.key = nn.Linear(d_att, d_att, bias=False)
         self.value = nn.Linear(d_att, d_att, bias=False)
         self.query = nn.Linear(d_att, d_att, bias=False)
+        self.linear = nn.Linear(d_att, d_att)
         self.dropout = nn.Dropout(dropout)
 
         self.ResetParam()
@@ -42,7 +43,7 @@ class MHSA(nn.Module):
         concat = SA.transpose(1, 2).reshape(batch_size, len_seq, self.d_att)
         # concat.shape = (batch_size, len_seq, d_att)
 
-        return self.dropout(concat)
+        return self.dropout(self.linear(concat))
 
     def SelfAttention(self, Q, Kt, V, mask):
         d_head = self.d_head

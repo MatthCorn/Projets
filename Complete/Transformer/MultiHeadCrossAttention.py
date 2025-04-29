@@ -17,6 +17,7 @@ class MHCA(nn.Module):
         self.key = nn.Linear(d_att, d_att, bias=False)
         self.value = nn.Linear(d_att, d_att, bias=False)
         self.query = nn.Linear(d_att, d_att, bias=False)
+        self.linear = nn.Linear(d_att, d_att)
         self.dropout = nn.Dropout(dropout)
 
         self.ResetParam()
@@ -43,7 +44,7 @@ class MHCA(nn.Module):
         concat = CA.transpose(1, 2).reshape(batch_size, len_target, -1)
         # Concat.shape = (batch_size, len_target, d_att)
 
-        return self.dropout(concat)
+        return self.dropout(self.linear(concat))
 
     def CrossAttention(self, Q, Kt, V):
         d_head = self.d_head

@@ -72,7 +72,7 @@ param = {"n_encoder": 10,
          "plot_distrib": "log",
          "error_weighting": "y",
          "max_lr": 5,
-         "FreqGradObs": 1/3,
+         "FreqGradObs": 1/100,
          "warmup": 5}
 
 try:
