@@ -52,7 +52,7 @@ param = {"n_encoder": 10,
          "WidthsEmbedding": [32],
          'n_heads': 4,
          "dropout": 0,
-         'norm': 'pre',
+         'norm': 'post',
          "optim": "Adam",
          "lr_option": {
              "value": 1e-4,
