@@ -20,7 +20,7 @@ class MHSA(nn.Module):
         self.linear = nn.Linear(d_att, d_att)
         self.dropout = nn.Dropout(dropout)
 
-        self.ResetParam()
+        # self.ResetParam()
 
     def forward(self, x, mask=None, RoPE=lambda u: u):
         # x.shape = (batch_size, len_seq, d_model)

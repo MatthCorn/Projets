@@ -20,7 +20,7 @@ class MHCA(nn.Module):
         self.linear = nn.Linear(d_att, d_att)
         self.dropout = nn.Dropout(dropout)
 
-        self.ResetParam()
+        # self.ResetParam()
 
     def forward(self, x_target, x_source, RoPE_Q=lambda u: u, RoPE_K=lambda u: u):
         # x_source.shape = (batch_size, len_source, d_input)
