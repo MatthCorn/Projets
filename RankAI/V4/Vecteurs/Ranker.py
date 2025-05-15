@@ -7,7 +7,7 @@ import torch
 from torch.nn.functional import pad
 
 class Network(nn.Module):
-    def __init__(self, n_encoder, len_in, len_latent, d_in=10, d_att=64, n_heads=4, WidthsEmbedding=[32], norm='post', dropout=0):
+    def __init__(self, n_encoder, len_in, len_latent, d_in=10, d_att=64, n_heads=4, width_FF=[32], WidthsEmbedding=[32], norm='post', dropout=0):
         super().__init__()
         self.PEIn = PositionalEncoding(d_att=d_att, dropout=dropout, max_len=len_in)
 
@@ -15,7 +15,7 @@ class Network(nn.Module):
 
         self.Encoders = nn.ModuleList()
         for i in range(n_encoder):
-            self.Encoders.append(EncoderLayer(d_att=d_att, n_heads=n_heads, norm=norm, dropout_FF=dropout, dropout_A=dropout))
+            self.Encoders.append(EncoderLayer(d_att=d_att, n_heads=n_heads, width_FF=width_FF, norm=norm, dropout_FF=dropout, dropout_A=dropout))
 
         self.Embedding = FeedForward(d_in=d_in, d_out=d_att, widths=WidthsEmbedding, dropout=dropout)
 

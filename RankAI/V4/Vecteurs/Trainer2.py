@@ -44,18 +44,19 @@ if sys.platform == "win32":
     p.nice(psutil.HIGH_PRIORITY_CLASS)
 ################################################################################################################################################
 
-param = {"n_encoder": 10,
+param = {"n_encoder": 6,
          "len_in": 10,
          'len_out': 5,
          "d_in": 10,
-         "d_att": 128,
-         "WidthsEmbedding": [32],
-         'n_heads': 4,
+         "d_att": 512,
+         "WidthsEmbedding": [64],
+         "width_FF": [2048],
+         'n_heads': 8,
          "dropout": 0,
          'norm': 'post',
          "optim": "Adam",
          "lr_option": {
-             "value": 1e-4,
+             "value": 1e-5,
              "reset": "y",
              "type": "cos"
          },
@@ -63,7 +64,7 @@ param = {"n_encoder": 10,
          "weight_decay": 1e-3,
          "NDataT": 5000000,
          "NDataV": 1000,
-         "batch_size": 1000,
+         "batch_size": 200,
          "n_iter": 40,
          "training_strategy": [
              {"mean": [-5, 5], "std": [1, 2]},
@@ -85,7 +86,7 @@ try:
 except:
     print("nothing loaded")
 
-freq_checkpoint = 1/10
+freq_checkpoint = 1/3
 nb_frames_GIF = 100
 nb_frames_window = int(nb_frames_GIF / len(param["training_strategy"]))
 res_GIF = 50
@@ -96,8 +97,9 @@ if torch.cuda.is_available():
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-N = Network(n_encoder=param['n_encoder'], len_in=param['len_in'], len_latent=param['len_out'], d_in=param['d_in'], d_att=param['d_att'],
-            WidthsEmbedding=param['WidthsEmbedding'], n_heads=param['n_heads'], norm=param['norm'], dropout=param['dropout'])
+N = Network(n_encoder=param['n_encoder'], len_in=param['len_in'], len_latent=param['len_out'], d_in=param['d_in'],
+            d_att=param['d_att'], WidthsEmbedding=param['WidthsEmbedding'], width_FF=param['width_FF'],
+            n_heads=param['n_heads'], norm=param['norm'], dropout=param['dropout'])
 
 DictGrad = DictGradObserver(N)
 
@@ -198,7 +200,7 @@ for window in param["training_strategy"]:
         time_for_checkpoint = (int(j * freq_checkpoint) == (j * freq_checkpoint))
         time_for_GIF = (j in torch.linspace(0, n_iter_window, nb_frames_window, dtype=int))
 
-        for p in range(n_minibatch):
+        for p in tqdm(range(n_minibatch)):
             InputMiniBatch = TrainingInput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
             OutputMiniBatch = TrainingOutput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
             StdMiniBatch = TrainingStd[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
@@ -224,6 +226,9 @@ for window in param["training_strategy"]:
                 if k == 0 and time_to_observe:
                     DictGrad.update()
 
+                TrainingError.append(float(err))
+                TrainingPerf.append(float(torch.sum(ChoseOutput(Prediction, InputBatch) == ChoseOutput(OutputBatch, InputBatch))) / (batch_size * NOutput))
+
                 error += float(err) / (n_batch * n_minibatch)
                 perf += float(torch.sum(ChoseOutput(Prediction, InputBatch) == ChoseOutput(OutputBatch, InputBatch))) / (NDataT * NOutput)
 
@@ -244,8 +249,8 @@ for window in param["training_strategy"]:
             ValidationError.append(float(err))
             ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input))) / (NDataV * NOutput))
 
-        TrainingError.append(error)
-        TrainingPerf.append(perf)
+        # TrainingError.append(error)
+        # TrainingPerf.append(perf)
 
         if error == min(TrainingError):
             best_state_dict = N.state_dict().copy()
