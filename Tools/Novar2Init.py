@@ -1,6 +1,7 @@
 import torch
 from torch.func import functional_call
 from tqdm import tqdm
+from math import sqrt
 
 def forward_with_alphas(model, x, alphas):
     named_params = [(name, p) for name, p in model.named_parameters()]
@@ -17,7 +18,7 @@ def gradient_variance(loss, params_model, alphas):
     return torch.var(torch.stack([(g**2).sum() for g in grad]))
 
 
-def novar2_init(model, criterion, x_size, y_size, generator=None, lr=0.1, steps=500, device=torch.device('cpu')):
+def novar2_init(model, criterion, x_size, y_size, data_generator=None, lr=0.1, steps=500, device=torch.device('cpu')):
     alphas_hist = []
     factor_hist = []
     grad_hist = []
@@ -28,8 +29,8 @@ def novar2_init(model, criterion, x_size, y_size, generator=None, lr=0.1, steps=
     alphas = torch.tensor([1.] * len(list(model.parameters())), requires_grad=True, device=device)
 
     for i in tqdm(range(steps)):
-        if generator is not None:
-            input, target = generator(x_size[0], device)
+        if data_generator is not None:
+            input, target = data_generator(x_size[0], device)
         else:
             input = torch.normal(0, 1, x_size, device=device)
             target = torch.normal(0, 1, y_size, device=device)
@@ -37,7 +38,7 @@ def novar2_init(model, criterion, x_size, y_size, generator=None, lr=0.1, steps=
         loss = criterion(forward_with_alphas(model, input, alphas), target)
         g_params = torch.autograd.grad(loss, model.parameters(), create_graph=True)
         grad = [g_p / a for g_p, a in zip(g_params, alphas)]
-        grad_amp = torch.stack([g.norm() for g in grad])
+        grad_amp = torch.stack([g.norm() / sqrt(g.numel()) for g in grad])
         factor = torch.var(grad_amp) / torch.mean(grad_amp) ** 2
         g = torch.autograd.grad(factor, alphas)
 
@@ -67,5 +68,5 @@ if __name__ == '__main__':
     y_size = (1000, 10, 10)
 
     from Eusipco.DataMaker import MakeData
-    generator = lambda x, d: (vec.to(device=d) for vec in MakeData(NVec=10, DVec=10, NData=x))
-    novar2_init(model, criterion, x_size, y_size, generator=generator, lr=0.0001, steps=60000, device=torch.device('cuda'))
+    data_generator = lambda x, d: (vec.to(device=d) for vec in MakeData(NVec=10, DVec=10, NData=x))
+    novar2_init(model, criterion, x_size, y_size, data_generator=data_generator, lr=0.0001, steps=60000, device=torch.device('cuda'))

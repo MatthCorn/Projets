@@ -44,14 +44,14 @@ if sys.platform == "win32":
     p.nice(psutil.HIGH_PRIORITY_CLASS)
 ################################################################################################################################################
 
-param = {"n_encoder": 6,
+param = {"n_encoder": 10,
          "len_in": 10,
          'len_out': 5,
          "d_in": 10,
-         "d_att": 512,
-         "WidthsEmbedding": [64],
-         "width_FF": [2048],
-         'n_heads': 8,
+         "d_att": 128,
+         "WidthsEmbedding": [32],
+         "width_FF": [256],
+         'n_heads': 4,
          "dropout": 0,
          'norm': 'post',
          "optim": "Adam",
@@ -64,7 +64,7 @@ param = {"n_encoder": 6,
          "weight_decay": 1e-3,
          "NDataT": 5000000,
          "NDataV": 1000,
-         "batch_size": 200,
+         "batch_size": 1000,
          "n_iter": 40,
          "training_strategy": [
              {"mean": [-5, 5], "std": [1, 2]},
@@ -122,6 +122,21 @@ WeightN = 2 * torch.rand(DVec) - 1
 WeightN = WeightN / torch.norm(WeightN)
 WeightF = 2 * torch.rand(DVec) - 1
 WeightF = WeightF / torch.norm(WeightF)
+
+
+
+criterion = torch.nn.MSELoss()
+x_size = (1000, 10, 10)
+y_size = (1000, 10, 5)
+
+from RankAI.V4.Vecteurs.DataMaker import MakeData
+from Tools.NovarInit import novar_init
+
+data_generator = lambda x, d: (vec.to(device=d) for vec in MakeData(NInput=10, DVec=10, mean=0, std=1, NData=x,
+                                                                    WeightF=WeightF, WeightN=WeightN, NOutput=5))
+novar_init(N, criterion, x_size, y_size, data_generator=data_generator, lr=0.0001, steps=10000,
+           device=device)
+N.train()
 
 mini_batch_size = 50000
 n_minibatch = int(NDataT/mini_batch_size)
