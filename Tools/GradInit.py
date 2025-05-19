@@ -60,8 +60,8 @@ def scaled_grad(loss, params_model, alphas):
     g_params = torch.autograd.grad(loss, params_model, create_graph=True)
     return [g_p / a for g_p, a in zip(g_params, alphas)]
 
-def grad_init(model, criterion, x_size, y_size, data_generator=None, gamma=0.1, lr=0.1, steps=500,
-              device=torch.device('cpu'), additional_eval=[], freq_eval=50):
+def grad_init(model, criterion, x_size, y_size, data_generator=None, gamma=5, lr=0.1, steps=500,
+              device=torch.device('cpu'), additional_eval=[], freq_eval=50, plot=False):
     alphas_hist = []
     loss_hist = []
     additional_hist = [[] for _ in additional_eval]
@@ -79,17 +79,28 @@ def grad_init(model, criterion, x_size, y_size, data_generator=None, gamma=0.1, 
 
         if not i % freq_eval:
             for j in range(len(additional_eval)):
-                additional_hist[j].append(additional_eval[j](model, criterion, x_size, y_size, data_generator=data_generator, device=device))
+                named_params = [(name, p) for name, p in model.named_parameters()]
 
-    import matplotlib.pyplot as plt
-    for i in range(len(alphas)):
-        plt.plot([alphas[i] for alphas in alphas_hist])
-    plt.show()
-    plt.plot(loss_hist)
-    plt.show()
-    for hist in additional_hist:
-        plt.plot(hist)
+                patched_params = {
+                    name: p * a for (name, p), a in zip(named_params, alphas)
+                }
+
+                additional_hist[j].append(additional_eval[j](model, criterion, x_size, y_size, parameters=patched_params,
+                                                             data_generator=data_generator, device=device))
+
+    for i, layer in enumerate(model.parameters()):
+        layer.data.mul_(alphas[i])
+
+    if plot:
+        import matplotlib.pyplot as plt
+        for i in range(len(alphas)):
+            plt.plot([alphas[i] for alphas in alphas_hist])
         plt.show()
+        plt.plot(loss_hist)
+        plt.show()
+        for hist in additional_hist:
+            plt.plot(hist)
+            plt.show()
 
 def grad_init_step(model, criterion, x_size, y_size, alphas, data_generator=None, gamma=0.1, lr=0.1, device=torch.device('cpu')):
         if data_generator is not None:
@@ -114,7 +125,7 @@ def grad_init_step(model, criterion, x_size, y_size, alphas, data_generator=None
             g = torch.autograd.grad(loss, alphas)
             alphas = alphas - lr * g[0]
 
-        alphas = torch.maximum(alphas, 0.01 * torch.ones(alphas.shape, device=device))
+        alphas = torch.maximum(alphas, 0.1 * torch.ones(alphas.shape, device=device))
 
         return alphas, loss.item()
         alphas_hist.append(alphas.cpu().tolist())
@@ -130,5 +141,7 @@ if __name__ == '__main__':
 
     from Eusipco.DataMaker import MakeData
     data_generator = lambda x, d: (vec.to(device=d) for vec in MakeData(NVec=10, DVec=10, NData=x))
-
-    grad_init(model, criterion, x_size, y_size, data_generator=None, gamma=5, lr=0.0001, steps=5000, device=torch.device('cuda'))
+    from Tools.MetaInit import eval_method as eval_metainit
+    from Tools.NovarInit import eval_method as eval_novarinit
+    grad_init(model, criterion, x_size, y_size, data_generator=None, gamma=5, lr=0.0001, steps=5000,
+              device=torch.device('cuda'), additional_eval=[eval_metainit, eval_novarinit], plot=True)

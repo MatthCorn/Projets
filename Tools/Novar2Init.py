@@ -73,6 +73,9 @@ def novar2_init(model, criterion, x_size, y_size, data_generator=None, lr=0.1, g
                 additional_hist[j].append(additional_eval[j](model, criterion, x_size, y_size, parameters=patched_params,
                                                              data_generator=data_generator, device=device))
 
+    for i, layer in enumerate(model.parameters()):
+        layer.data.mul_(alphas[i])
+
     if plot:
         import matplotlib.pyplot as plt
         for i in range(len(alphas)):

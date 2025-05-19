@@ -45,7 +45,7 @@ def meta_init_step(model, criterion, params, memory, x_size, y_size, data_genera
     return gq.item(), layerwise_norm
 
 def meta_init(model, criterion, x_size, y_size, data_generator=None, lr=0.1, momentum=0.9, steps=500, eps=1e-5,
-              device=torch.device('cpu'), additional_eval=[], freq_eval=50):
+              device=torch.device('cpu'), additional_eval=[], freq_eval=50, plot=False):
     hist_gq = []
     hist_norm = []
     additional_hist = [[] for _ in additional_eval]
@@ -65,15 +65,16 @@ def meta_init(model, criterion, x_size, y_size, data_generator=None, lr=0.1, mom
             for j in range(len(additional_eval)):
                 additional_hist[j].append(additional_eval[j](model, criterion, x_size, y_size, data_generator=data_generator, device=device))
 
-    import matplotlib.pyplot as plt
-    plt.plot(hist_gq)
-    plt.show()
-    for i in range(len(params)):
-        plt.plot([norm[i] for norm in hist_norm])
-    plt.show()
-    for hist in additional_hist:
-        plt.plot(hist)
+    if plot:
+        import matplotlib.pyplot as plt
+        plt.plot(hist_gq)
         plt.show()
+        for i in range(len(params)):
+            plt.plot([norm[i] for norm in hist_norm])
+        plt.show()
+        for hist in additional_hist:
+            plt.plot(hist)
+            plt.show()
 
 if __name__ == '__main__':
     from Eusipco.Transformer import Network
@@ -89,4 +90,4 @@ if __name__ == '__main__':
     from Tools.NovarInit import eval_method as eval_novarinit
     from Tools.GradInit import eval_method as eval_gradinit
     meta_init(model, criterion, x_size, y_size, data_generator=data_generator, lr=0.0001, steps=2000,
-              device=torch.device('cuda'), additional_eval=[eval_gradinit, eval_novarinit])
+              device=torch.device('cuda'), additional_eval=[eval_gradinit, eval_novarinit], plot=True)

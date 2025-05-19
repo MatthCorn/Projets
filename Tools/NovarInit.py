@@ -70,7 +70,7 @@ def novar_init(model, criterion, x_size, y_size, data_generator=None, lr=0.1, mo
                 additional_hist[j].append(additional_eval[j](model, criterion, x_size, y_size, data_generator=data_generator, device=device))
 
         if not i % freq_redraw:
-            redraw_param(model, p=0.1)
+            redraw_param(model, p=0.05)
 
     if plot:
         import matplotlib.pyplot as plt

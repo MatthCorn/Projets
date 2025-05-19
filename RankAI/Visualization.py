@@ -141,7 +141,7 @@ def PlotError(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r"C:\Users\matth\Documents\Python\Projets\RankAI\Save\V4\Vecteurs\2025-05-17__14-29"
+    save_path = r"C:\Users\Matth\Documents\Projets\Test\Save\Test_init_2025-05-19__14-29"
 
     PlotError(save_path)
 

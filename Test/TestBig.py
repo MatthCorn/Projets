@@ -17,7 +17,7 @@ import time
 
 local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
 base_folder = datetime.datetime.now().strftime("Test_big_%Y-%m-%d__%H-%M")
-save_dir = os.path.join(local, 'RankAI', 'Save', 'V4', 'Vecteurs')
+save_dir = os.path.join(local, 'Test', 'Save')
 
 attempt = 0
 while True:

@@ -17,7 +17,7 @@ import time
 
 local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
 base_folder = datetime.datetime.now().strftime("Test_init_%Y-%m-%d__%H-%M")
-save_dir = os.path.join(local, 'RankAI', 'Save', 'V4', 'Vecteurs')
+save_dir = os.path.join(local, 'Test', 'Save')
 
 attempt = 0
 while True:
@@ -50,13 +50,13 @@ param = {"n_encoder": 10,
          "d_in": 10,
          "d_att": 128,
          "WidthsEmbedding": [32],
-         "width_FF": [256],
+         "width_FF": [128],
          'n_heads': 4,
          "dropout": 0,
          'norm': 'post',
          "optim": "Adam",
          "lr_option": {
-             "value": 1e-5,
+             "value": 1e-4,
              "reset": "y",
              "type": "cos"
          },
@@ -74,7 +74,8 @@ param = {"n_encoder": 10,
          "error_weighting": "y",
          "max_lr": 5,
          "FreqGradObs": 1/100,
-         "warmup": 5}
+         "warmup": 5,
+         "net_init": "grad_init"}
 
 try:
     import json
@@ -123,19 +124,28 @@ WeightN = WeightN / torch.norm(WeightN)
 WeightF = 2 * torch.rand(DVec) - 1
 WeightF = WeightF / torch.norm(WeightF)
 
-
-
 criterion = torch.nn.MSELoss()
 x_size = (1000, 10, 10)
-y_size = (1000, 10, 5)
+y_size = (1000, 5, 10)
 
 from RankAI.V4.Vecteurs.DataMaker import MakeData
-from Tools.NovarInit import novar_init
+data_generator = lambda x, d: (vec.to(device=d) for vec in MakeData(NInput=10, DVec=10, mean=0, std=1, NData=x, WeightF=WeightF, WeightN=WeightN, NOutput=5))
 
-data_generator = lambda x, d: (vec.to(device=d) for vec in MakeData(NInput=10, DVec=10, mean=0, std=1, NData=x,
-                                                                    WeightF=WeightF, WeightN=WeightN, NOutput=5))
-novar_init(N, criterion, x_size, y_size, data_generator=data_generator, lr=0.0001, steps=10000,
-           device=device)
+if param['net_init'] == 'novar_init':
+    from Tools.NovarInit import novar_init
+    novar_init(N, criterion, x_size, y_size, data_generator=data_generator, lr=0.0001, steps=10000,device=device)
+if param['net_init'] == 'meta_init':
+    from Tools.MetaInit import meta_init
+    meta_init(N, criterion, x_size, y_size, data_generator=data_generator, lr=0.0001, steps=10000,device=device)
+if param['net_init'] == 'grad_init':
+    from Tools.GradInit import grad_init
+    grad_init(N, criterion, x_size, y_size, data_generator=data_generator, lr=0.0001, steps=10000,device=device)
+if param['net_init'] == 'novar2_init':
+    from Tools.Novar2Init import novar2_init
+    novar2_init(N, criterion, x_size, y_size, data_generator=data_generator, lr=0.0001, steps=10000,device=device)
+if param['net_init'] == 'novar2_init':
+    from Tools.FixLNInit import fix_ln_init
+    fix_ln_init(N, criterion, x_size, y_size, data_generator=data_generator, lr=0.0001, steps=10000, device=device)
 N.train()
 
 mini_batch_size = 50000
@@ -215,7 +225,7 @@ for window in param["training_strategy"]:
         time_for_checkpoint = (int(j * freq_checkpoint) == (j * freq_checkpoint))
         time_for_GIF = (j in torch.linspace(0, n_iter_window, nb_frames_window, dtype=int))
 
-        for p in tqdm(range(n_minibatch)):
+        for p in range(n_minibatch):
             InputMiniBatch = TrainingInput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
             OutputMiniBatch = TrainingOutput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
             StdMiniBatch = TrainingStd[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
@@ -241,9 +251,6 @@ for window in param["training_strategy"]:
                 if k == 0 and time_to_observe:
                     DictGrad.update()
 
-                TrainingError.append(float(err))
-                TrainingPerf.append(float(torch.sum(ChoseOutput(Prediction, InputBatch) == ChoseOutput(OutputBatch, InputBatch))) / (batch_size * NOutput))
-
                 error += float(err) / (n_batch * n_minibatch)
                 perf += float(torch.sum(ChoseOutput(Prediction, InputBatch) == ChoseOutput(OutputBatch, InputBatch))) / (NDataT * NOutput)
 
@@ -264,8 +271,8 @@ for window in param["training_strategy"]:
             ValidationError.append(float(err))
             ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input))) / (NDataV * NOutput))
 
-        # TrainingError.append(error)
-        # TrainingPerf.append(perf)
+        TrainingError.append(error)
+        TrainingPerf.append(perf)
 
         if error == min(TrainingError):
             best_state_dict = N.state_dict().copy()
