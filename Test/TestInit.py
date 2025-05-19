@@ -143,7 +143,7 @@ if param['net_init'] == 'grad_init':
 if param['net_init'] == 'novar2_init':
     from Tools.Novar2Init import novar2_init
     novar2_init(N, criterion, x_size, y_size, data_generator=data_generator, lr=0.0001, steps=10000,device=device)
-if param['net_init'] == 'novar2_init':
+if param['net_init'] == 'fix_ln_init':
     from Tools.FixLNInit import fix_ln_init
     fix_ln_init(N, criterion, x_size, y_size, data_generator=data_generator, lr=0.0001, steps=10000, device=device)
 N.train()
