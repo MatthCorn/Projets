@@ -35,8 +35,16 @@ def novar_init_step(model, criterion, params, memory, x_size, y_size, data_gener
         p.data = p.data - lr * memory[j]
     return factor.item(), grad_amp.cpu().tolist(), [p.data.norm().item() for p in model.parameters()]
 
+def redraw_param(model, p=0.1):
+    for layer in model.parameters():
+        mu = layer.data.mean()
+        sigma = layer.data.std() + 1e-3
+        dist = torch.distributions.Normal(mu, sigma)
+        mask = torch.bernoulli(p * torch.ones(layer.data.size())).to(layer.device)
+        layer.data = (1 - mask) * layer.data + mask * dist.sample((layer.data.size())).to(layer.device)
+
 def novar_init(model, criterion, x_size, y_size, data_generator=None, lr=0.1, momentum=0.9, steps=500,
-               device=torch.device('cpu'), additional_eval=[], freq_eval=50, plot=False):
+               device=torch.device('cpu'), additional_eval=[], freq_eval=50, freq_redraw=10, plot=False):
     hist_var = []
     hist_grad = []
     hist_norm_param = []
@@ -61,6 +69,8 @@ def novar_init(model, criterion, x_size, y_size, data_generator=None, lr=0.1, mo
             for j in range(len(additional_eval)):
                 additional_hist[j].append(additional_eval[j](model, criterion, x_size, y_size, data_generator=data_generator, device=device))
 
+        if not i % freq_redraw:
+            redraw_param(model, p=0.1)
 
     if plot:
         import matplotlib.pyplot as plt
@@ -88,5 +98,5 @@ if __name__ == '__main__':
     from Tools.MetaInit import eval_method as eval_metainit
     from Tools.GradInit import eval_method as eval_gradinit
     data_generator = lambda x, d: (vec.to(device=d) for vec in MakeData(NVec=10, DVec=10, NData=x))
-    novar_init(model, criterion, x_size, y_size, data_generator=None, lr=0.0001, steps=10000,
+    novar_init(model, criterion, x_size, y_size, data_generator=None, lr=0.001, steps=20000,
                device=torch.device('cuda'), additional_eval=[eval_gradinit, eval_metainit], plot=True)

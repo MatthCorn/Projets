@@ -30,16 +30,16 @@ def eval_method(model, criterion, x_size, y_size, data_generator=None, lr=0.1, g
     if parameters is not None:
         first_loss = criterion(functional_call(model, parameters, (first_set[0],)), first_set[1])
         grad = torch.autograd.grad(first_loss, list(parameters.values()))
-        norm_grad = sum([g.norm().index() for g in grad])
+        norm_grad = sum([float(g.norm()) for g in grad])
         if norm_grad > gamma:
-            grad = grad * gamma / norm_grad
+            grad = [g * gamma / norm_grad for g in grad]
 
         patched_params = {
             name: p - lr * g for (name, p), g in zip(parameters.items(), grad)
         }
 
-        second_loss = criterion(functional_call(model, patched_params, (second_set[0],)), second_set[1]).index()
-        return first_loss.index() - second_loss
+        second_loss = criterion(functional_call(model, patched_params, (second_set[0],)), second_set[1])
+        return float(first_loss - second_loss)
     else:
         first_loss = criterion(model(first_set[0]), first_set[1])
         grad = torch.autograd.grad(first_loss, model.parameters())
