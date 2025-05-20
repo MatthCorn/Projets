@@ -1,9 +1,11 @@
 import torch
+from torch.nn.functional import pad
 
 class Simulator:
-    def __init__(self, dim, sensitivity, WeightF=None, WeightL=None):
+    def __init__(self, dim, sensitivity, n_sat, WeightF=None, WeightL=None, model_path=None):
         self.dim = dim
         self.sensitivity = sensitivity
+        self.n_sat = n_sat
         self.weight_f = torch.tensor(WeightF, dtype=torch.float) if WeightF is not None else torch.tensor([1., 0.] + [0.] * (self.dim - 2))
         self.weight_f = self.weight_f / torch.norm(self.weight_f)
         self.weight_l = torch.tensor(WeightL, dtype=torch.float) if WeightL is not None else torch.tensor([0., 1.] + [0.] * (self.dim - 2))
@@ -13,6 +15,12 @@ class Simulator:
         self.TI = []    # contient le temps d'apparition de chaque vecteur de suivi
         self.R = []     # contient tous les vecteurs interceptés, ajoutés à la fin de leurs interceptions
         self.V = None   # contient les vecteurs sélectionnés à l'itération présente
+
+        self.model = None # contient un model qui fait la sélection des impulsions
+        self.model_param = None
+        if model_path is not None:
+            self.load_model(model_path)
+
         self.T = 0
         self.running = True
 
@@ -21,19 +29,39 @@ class Simulator:
             self.V = Input
 
         else:
-            # We make a mask, BM, that is 0 only if the pulse is selected
-            Frequencies = torch.matmul(Input, self.weight_f)
-            Levels = torch.matmul(Input, self.weight_l)
+            if self.model is None:
 
-            BF = torch.abs(Frequencies.unsqueeze(-1) - Frequencies.unsqueeze(-2)) < self.sensitivity
-            BN = (Levels.unsqueeze(-1) > Levels.unsqueeze(-2))
-            BM = torch.sum(BF * BN, dim=-2) == 0
+                # We make a mask, BM, that is 0 only if the pulse is selected
+                Frequencies = torch.matmul(Input, self.weight_f)
+                Levels = torch.matmul(Input, self.weight_l)
 
-            # The selected pulses are then sorted by decreasing level
-            Selected = Input[BM]
-            Levels = torch.matmul(Selected, self.weight_l)
-            Orders = Levels.argsort(dim=-1, descending=True)
-            self.V = Selected[Orders]
+                BF = torch.abs(Frequencies.unsqueeze(-1) - Frequencies.unsqueeze(-2)) < self.sensitivity
+                BN = (Levels.unsqueeze(-1) > Levels.unsqueeze(-2))
+                BM = torch.sum(BF * BN, dim=-2) == 0
+
+                # The selected pulses are then sorted by decreasing level
+                Selected = Input[BM]
+                Levels = torch.matmul(Selected, self.weight_l)
+                Orders = Levels.argsort(dim=-1, descending=True)#[:self.n_sat]
+                self.V = Selected[Orders]
+
+            else:
+                len_in = self.model_param['len_in']
+
+                inp = pad(Input, (0, 0, 0, len_in - len(Input))).unsqueeze(0)
+
+                Output = self.model(inp)
+
+                inp = torch.nn.functional.pad(inp, [0, 0, 0, 1])
+
+                Diff = Output.unsqueeze(dim=1) - inp.unsqueeze(dim=2)
+                Dist = torch.norm(Diff, dim=-1)
+                Arg = torch.argmin(Dist, dim=1)
+                Selected = []
+                for arg in Arg[0]:
+                    if sum(inp[0][arg]) != 0:
+                        Selected.append(inp[0][arg].tolist())
+                self.V = torch.tensor(Selected)
 
     def Process(self, Input):
         self.T += 1
@@ -105,3 +133,20 @@ class Simulator:
                 self.R.append(P)
             else:
                 j += 1
+
+    def load_model(self, model_path):
+        import os
+        from RankAI.V4.Vecteurs.Ranker import Network
+        from Tools.XMLTools import loadXmlAsObj
+        param = loadXmlAsObj(os.path.join(model_path, 'param'))
+
+        model = Network(
+            n_encoder=param['n_encoder'], len_in=param['len_in'], len_latent=param['len_out'], d_in=param['d_in'],
+            d_att=param['d_att'], WidthsEmbedding=param['WidthsEmbedding'],
+            n_heads=param['n_heads'], norm=param['norm'], dropout=param['dropout']
+        )
+
+        model.load_state_dict(torch.load(os.path.join(model_path, 'Best_network')))
+        model.eval()
+        self.model = model
+        self.model_param = param

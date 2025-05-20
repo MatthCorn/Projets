@@ -22,9 +22,13 @@ if __name__ == '__main__':
     import random
     import math
     df = 0.2
-    # S = Simulator(5, 30, 4, sensitivity=df, seed=None)
-    # S = BiasedSimulator(1, 3, 5, 30, 4, sensitivity=df, seed=None)
-    S = FreqBiasedSimulator(0.8, 1, 5, 30, 4, sensitivity=df, seed=None)
+    N = 30
+    n = 10
+    range_plot = N + n
+    dim = 10
+    # S = Simulator(n, N, dim, sensitivity=df, seed=None, model_path=r'C:\Users\Matth\Documents\Projets\RankAI\Save\V4\Vecteurs\2025-04-29__09-58')
+    # S = BiasedSimulator(1, 3, n, N, dim, sensitivity=df, seed=None)
+    S = FreqBiasedSimulator(1.2, 1, n, N, dim, sensitivity=df, seed=None)
     S.run()
 
 
@@ -48,9 +52,9 @@ if __name__ == '__main__':
         Rectangle = Polygon(((T1, 0), (T1, N), (T2, N), (T2, 0)), fc=(r, g, b, 0.1), ec=(0, 0, 0, 1), lw=2)
         ax2.add_artist(Rectangle)
 
-    ax1.set_xlim(-2, 35)
+    ax1.set_xlim(-2, range_plot)
     ax1.set_ylim(0, 2)
-    ax2.set_xlim(-2, 35)
+    ax2.set_xlim(-2, range_plot)
     ax2.set_ylim(0, 2)
     plt.show()
 
@@ -120,7 +124,7 @@ if __name__ == '__main__':
     fig.colorbar(sm, ax=ax2, shrink=0.4)
     fig.colorbar(sm, ax=ax1, shrink=0.4)
 
-    ax1.set_xlim(-2, 35)
+    ax1.set_xlim(-2, range_plot)
     ax1.set_ylim(-3, 3)
     ax1.set_zlim(0, 2)
     ax1.set_box_aspect([2, 2, 0.5])
@@ -133,7 +137,7 @@ if __name__ == '__main__':
     ax1.set_title("Impulsions d'entrée")
     ax1.set_proj_type('ortho')
     ax1.view_init(elev=90, azim=-90)
-    ax2.set_xlim(-2, 35)
+    ax2.set_xlim(-2, range_plot)
     ax2.set_ylim(-3, 3)
     ax2.set_zlim(0, 2)
     ax2.set_box_aspect([2, 2, 0.5])

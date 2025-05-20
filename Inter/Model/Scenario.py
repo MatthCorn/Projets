@@ -3,9 +3,10 @@ from Inter.Model.Sensor import Simulator as SensorSimulator
 from functools import partial
 
 class Simulator:
-    def __init__(self, n, N, dim, sensitivity=0.2, seed=None, WeightF=None, WeightL=None):
+    def __init__(self, n, N, dim, n_sat=5, sensitivity=0.2, seed=None, WeightF=None, WeightL=None, model_path=None):
         self.n = n  # Nombre de vecteurs présents simultanément
         self.N = N  # Nombre total de vecteurs dans le scénario
+        self.n_sat = n_sat # Nombre max de vecteurs pouvant être détectés simultanément
         self.dim = dim
         self.T = 0
         self.V = [] # contient tous les vecteurs présents simultanément à un instant donné
@@ -18,9 +19,11 @@ class Simulator:
         self.weight_l = WeightL if WeightL is not None else np.array([0., 1.] + [0.] * (self.dim - 2))
         self.weight_l = self.weight_l / np.linalg.norm(self.weight_l)
         self.gamma = np.matmul(self.weight_f, self.weight_l)
-        self.sensor_simulator = SensorSimulator(dim=dim, sensitivity=sensitivity, WeightF=self.weight_f, WeightL=self.weight_l)
+        self.sensor_simulator = SensorSimulator(dim=dim, sensitivity=sensitivity, n_sat=n_sat, WeightF=self.weight_f, WeightL=self.weight_l)
         if seed is not None:
             np.random.seed(seed)
+        if model_path is not None:
+            self.sensor_simulator.load_model(model_path)
 
     def step(self, v):
 

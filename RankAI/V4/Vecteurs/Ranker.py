@@ -10,7 +10,8 @@ class Network(nn.Module):
     def __init__(self, n_encoder, len_in, len_latent, d_in=10, d_att=64, n_heads=4, width_FF=[32], WidthsEmbedding=[32], norm='post', dropout=0):
         super().__init__()
         self.PEIn = PositionalEncoding(d_att=d_att, dropout=dropout, max_len=len_in)
-
+        self.len_in = len_in
+        self.len_latent = len_latent
         self.Latent = LearnableParameters(torch.normal(0, 1, (1, len_latent, d_att)))
 
         self.Encoders = nn.ModuleList()
