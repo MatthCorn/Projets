@@ -86,6 +86,9 @@ def fix_ln_init(model, criterion, x_size, y_size, data_generator=None, lr=0.1, s
                     if isinstance(module, torch.nn.LayerNorm):
                         hooks.append(module.register_forward_hook(save_input_hook))
 
+    for hook in hooks:
+        hook.remove()
+
     for i, layer in enumerate(model.parameters()):
         layer.data.mul_(alphas[i])
 
