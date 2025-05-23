@@ -12,6 +12,7 @@ class Simulator:
         self.V = [] # contient tous les vecteurs présents simultanément à un instant donné
         self.A = [] # contient l'âge de chaque vecteur présent à un instant donné
         self.L = [] # contient chaque vecteur du scénario ainsi que leurs ages à leurs disparitions
+        self.P = [] # contient un encodage des vecteurs sélectionnables à chaque itération par le simulateur
         self.D = [] # contient un encodage des vecteurs sélectionnés à chaque itération par le simulateur
 
         self.weight_f = WeightF if WeightF is not None else np.array([1., 0.] + [0.] * (self.dim - 2))
@@ -53,27 +54,31 @@ class Simulator:
     def run(self):
         while self.sensor_simulator.running:
             if (self.T == 0) or (len(self.V) > 0):
+                add = True
                 v = self.make_vector()
                 self.step(v)
-
+                self.add(np.array(self.V), self.P)
+            else:
+                add = False
             self.sensor_simulator.Process(self.V)
-            self.add_D()
+            if add:
+                self.add(self.sensor_simulator.V.numpy(), self.D)
 
     def make_vector(self):
         return np.random.normal(0, 1, self.dim).tolist()
 
 
-    def add_D(self):
-            Selected = self.sensor_simulator.V.numpy()
-            Match = np.array([[0, -1]] * self.n)
-            if len(Selected) != 0:
-                History = np.array([x[:self.dim] for x in self.L])
-                Dist = np.linalg.norm(np.expand_dims(Selected, 1) - np.expand_dims(History, 0), axis=-1)
-                Match = Dist.argmin(axis=1) - self.T + 1
-                Match = np.pad(np.expand_dims(Match, axis=1), ((0, 0), (0, 1)), 'constant')
-            if len(Match) != self.n:
-                Match = np.concatenate((Match, np.array([[0, -1]] * (self.n - len(Match)))))
-            self.D.append(Match.tolist())
+    def add(self, Selected, location):
+        n = self.n if location is self.P else self.n_sat
+        Match = np.array([[0, -1]] * n)
+        if len(Selected) != 0:
+            History = np.array([x[:self.dim] for x in self.L])
+            Dist = np.linalg.norm(np.expand_dims(Selected, 1) - np.expand_dims(History, 0), axis=-1)
+            Match = Dist.argmin(axis=1) - self.T + 1
+            Match = np.pad(np.expand_dims(Match, axis=1), ((0, 0), (0, 1)), 'constant')
+        if len(Match) != n:
+            Match = np.concatenate((Match, np.array([[0, -1]] * (n - len(Match)))))
+        location.append(Match.tolist())
 
 class BiasedSimulator(Simulator):
     def __init__(self, std, mean, *args, **kwargs):

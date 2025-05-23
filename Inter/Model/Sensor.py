@@ -42,7 +42,7 @@ class Simulator:
                 # The selected pulses are then sorted by decreasing level
                 Selected = Input[BM]
                 Levels = torch.matmul(Selected, self.weight_l)
-                Orders = Levels.argsort(dim=-1, descending=True)#[:self.n_sat]
+                Orders = Levels.argsort(dim=-1, descending=True)[:self.n_sat]
                 self.V = Selected[Orders]
 
             else:
@@ -146,7 +146,12 @@ class Simulator:
             n_heads=param['n_heads'], norm=param['norm'], dropout=param['dropout']
         )
 
+        weight_l = torch.load(os.path.join(model_path, 'WeightN'))
+        weight_f = torch.load(os.path.join(model_path, 'WeightF'))
+
+        if (sum(weight_l - self.weight_l) != 0) or (sum(weight_f - self.weight_f) != 0):
+            raise ValueError('weight of the simulation do not match weight using for training the model')
+
         model.load_state_dict(torch.load(os.path.join(model_path, 'Best_network')))
-        model.eval()
         self.model = model
         self.model_param = param

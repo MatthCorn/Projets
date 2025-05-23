@@ -21,14 +21,14 @@ if __name__ == '__main__':
     from matplotlib.patches import Polygon
     import random
     import math
-    df = 0.2
+    df = 0.1
     N = 30
     n = 10
     range_plot = N + n
     dim = 10
-    # S = Simulator(n, N, dim, sensitivity=df, seed=None, model_path=r'C:\Users\Matth\Documents\Projets\RankAI\Save\V4\Vecteurs\2025-04-29__09-58')
+    S = Simulator(n, N, dim, sensitivity=df, seed=None)
     # S = BiasedSimulator(1, 3, n, N, dim, sensitivity=df, seed=None)
-    S = FreqBiasedSimulator(1.2, 1, n, N, dim, sensitivity=df, seed=None)
+    # S = FreqBiasedSimulator(1.2, 1, n, N, dim, sensitivity=df, seed=None)
     S.run()
 
 
