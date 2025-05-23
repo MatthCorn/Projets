@@ -92,7 +92,7 @@ if __name__ == '__main__':
     freq_checkpoint = 1/10
     nb_frames_GIF = 100
     nb_frames_window = int(nb_frames_GIF / len(param["training_strategy"]))
-    res_GIF = 50
+    res_GIF = 10
     n_iter_window = int(param["n_iter"] / len(param["training_strategy"]))
 
     if torch.cuda.is_available():
@@ -191,7 +191,7 @@ if __name__ == '__main__':
             weight_l=WeightN,
             type='NDA_simple',
             save_path=os.path.join(local, 'Inter', 'NetworkDetection', 'Data'),
-            parallel=False
+            parallel=True
         )
 
 
@@ -254,7 +254,7 @@ if __name__ == '__main__':
             if error == min(TrainingError):
                 best_state_dict = N.state_dict().copy()
 
-            if time_for_GIF:
+            if False: #time_for_GIF:
                 with torch.no_grad():
                     Input = PlottingInput.to(device)
                     Output = PlottingOutput.to(device)

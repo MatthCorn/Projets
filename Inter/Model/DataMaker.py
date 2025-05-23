@@ -95,7 +95,8 @@ def MakeData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data, sensitivity=
 
     return input_data, plateau_data, selected_plateau_data, add_mask, mult_mask, output_data
 
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from collections import deque
 
 def MakeDataParallel(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data, sensitivity=0.1, weight_f=None, weight_l=None,
                      bias='none', std_min=1, std_max=5, mean_min=-10, mean_max=10, distrib='log', plot=False):
@@ -126,8 +127,28 @@ def MakeDataParallel(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data, sens
     else:
         args = [(bias, d_in, n_pulse_plateau, n_sat, len_in, len_out, sensitivity, weight_f, weight_l) for _ in range(n_data)]
 
-    with ProcessPoolExecutor() as executor:
-        results = list(executor.map(generate_sample, args))  # On passe une fonction globale et une liste d'args
+    results = []
+    max_inflight = 10000  # Limite de tâches simultanées
+    inflight = deque()
+
+    with ProcessPoolExecutor() as executor, tqdm(total=n_data, desc="Génération") as pbar:
+        it = iter(args)
+
+        # Pré-remplissage
+        for _ in range(min(max_inflight, n_data)):
+            inflight.append(executor.submit(generate_sample, next(it)))
+
+        while inflight:
+            # Attendre qu'une tâche se termine
+            done = inflight.popleft()
+            results.append(done.result())
+            pbar.update(1)
+
+            # En soumettre une nouvelle si dispo
+            try:
+                inflight.append(executor.submit(generate_sample, next(it)))
+            except StopIteration:
+                continue
 
     # Extraction des résultats
     input_data, plateau_data, selected_plateau_data, len_output_data, output_data = zip(*results)
@@ -189,100 +210,99 @@ def GetData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_da
     except:
         pass
 
-    else:
-        for file in os.listdir(save_path):
-            try:
-                kwargs_file = loadXmlAsObj(os.path.join(save_path, file, 'kwargs.xml'))
-            except:
-                continue
+    for file in os.listdir(save_path):
+        try:
+            kwargs_file = loadXmlAsObj(os.path.join(save_path, file, 'kwargs.xml'))
+        except:
+            continue
 
-            if kwargs_file == kwargs:
-                weight_l = np.load(os.path.join(save_path, file, 'weight_l.npy'))
-                weight_f = np.load(os.path.join(save_path, file, 'weight_f.npy'))
+        if kwargs_file == kwargs:
+            weight_l = np.load(os.path.join(save_path, file, 'weight_l.npy'))
+            weight_f = np.load(os.path.join(save_path, file, 'weight_f.npy'))
 
-                n_data = {'training': n_data_training, 'validation': n_data_validation}
-                output = []
-                for phase in  n_data.keys():
+            n_data = {'training': n_data_training, 'validation': n_data_validation}
+            output = []
+            for phase in  n_data.keys():
 
-                    input_data_ = torch.load(os.path.join(save_path, file, phase + '_input_data'))
-                    plateau_data_ = torch.load(os.path.join(save_path, file, phase + '_plateau_data'))
-                    selected_plateau_data_ = torch.load(os.path.join(save_path, file, phase + '_selected_plateau_data'))
-                    add_mask_ = torch.load(os.path.join(save_path, file, phase + '_add_mask'))
-                    mult_mask_ = torch.load(os.path.join(save_path, file, phase + '_mult_mask'))
-                    output_data_ = torch.load(os.path.join(save_path, file, phase + '_output_data'))
+                input_data_ = torch.load(os.path.join(save_path, file, phase + '_input_data'))
+                plateau_data_ = torch.load(os.path.join(save_path, file, phase + '_plateau_data'))
+                selected_plateau_data_ = torch.load(os.path.join(save_path, file, phase + '_selected_plateau_data'))
+                add_mask_ = torch.load(os.path.join(save_path, file, phase + '_add_mask'))
+                mult_mask_ = torch.load(os.path.join(save_path, file, phase + '_mult_mask'))
+                output_data_ = torch.load(os.path.join(save_path, file, phase + '_output_data'))
 
-                    if len(input_data_) < n_data[phase]:
-                        input_data, plateau_data, selected_plateau_data, add_mask, mult_mask, output_data  = (
-                            make_data(n_data=n_data[phase] - len(input_data_), weight_f=weight_f, weight_l=weight_l, **kwargs))
+                if len(input_data_) < n_data[phase]:
+                    input_data, plateau_data, selected_plateau_data, add_mask, mult_mask, output_data  = (
+                        make_data(n_data=n_data[phase] - len(input_data_), weight_f=weight_f, weight_l=weight_l, **kwargs))
 
-                        input_data_ = torch.cat((input_data_, input_data), dim=0)
-                        plateau_data_ = torch.cat((plateau_data_, plateau_data), dim=0)
-                        selected_plateau_data_ = torch.cat((selected_plateau_data_, selected_plateau_data), dim=0)
-                        add_mask_ = torch.cat((add_mask_, add_mask), dim=0)
-                        mult_mask_ = torch.cat((mult_mask_, mult_mask), dim=0)
-                        output_data_ = torch.cat((output_data_, output_data), dim=0)
+                    input_data_ = torch.cat((input_data_, input_data), dim=0)
+                    plateau_data_ = torch.cat((plateau_data_, plateau_data), dim=0)
+                    selected_plateau_data_ = torch.cat((selected_plateau_data_, selected_plateau_data), dim=0)
+                    add_mask_ = torch.cat((add_mask_, add_mask), dim=0)
+                    mult_mask_ = torch.cat((mult_mask_, mult_mask), dim=0)
+                    output_data_ = torch.cat((output_data_, output_data), dim=0)
 
-                        torch.save(input_data_, os.path.join(save_path, file, phase + '_input_data'))
-                        torch.save(plateau_data_, os.path.join(save_path, file, phase + '_plateau_data'))
-                        torch.save(selected_plateau_data_, os.path.join(save_path, file, phase + '_selected_plateau_data'))
-                        torch.save(add_mask_, os.path.join(save_path, file, phase + '_add_mask'))
-                        torch.save(mult_mask_, os.path.join(save_path, file, phase + '_mult_mask'))
-                        torch.save(output_data_, os.path.join(save_path, file, phase + '_output_data'))
+                    torch.save(input_data_, os.path.join(save_path, file, phase + '_input_data'))
+                    torch.save(plateau_data_, os.path.join(save_path, file, phase + '_plateau_data'))
+                    torch.save(selected_plateau_data_, os.path.join(save_path, file, phase + '_selected_plateau_data'))
+                    torch.save(add_mask_, os.path.join(save_path, file, phase + '_add_mask'))
+                    torch.save(mult_mask_, os.path.join(save_path, file, phase + '_mult_mask'))
+                    torch.save(output_data_, os.path.join(save_path, file, phase + '_output_data'))
 
-                    output.append(list(return_data((input_data_[:n_data[phase]],
-                                                    plateau_data_[:n_data[phase]],
-                                                    selected_plateau_data_[:n_data[phase]],
-                                                    add_mask_[:n_data[phase]],
-                                                    mult_mask_[:n_data[phase]],
-                                                    output_data_[:n_data[phase]]
-                                                    ), type)))
+                output.append(list(return_data((input_data_[:n_data[phase]],
+                                                plateau_data_[:n_data[phase]],
+                                                selected_plateau_data_[:n_data[phase]],
+                                                add_mask_[:n_data[phase]],
+                                                mult_mask_[:n_data[phase]],
+                                                output_data_[:n_data[phase]]
+                                                ), type)))
 
-                return output
+            return output
 
-        attempt = 0
-        while True:
-            file = f"config({attempt})"
+    attempt = 0
+    while True:
+        file = f"config({attempt})"
 
-            try:
-                os.makedirs(os.path.join(save_path, file), exist_ok=False)
-                break
-            except FileExistsError:
-                attempt += 1
-                time.sleep(0.1)
+        try:
+            os.makedirs(os.path.join(save_path, file), exist_ok=False)
+            break
+        except FileExistsError:
+            attempt += 1
+            time.sleep(0.1)
 
-        weight_f = weight_f if weight_f is not None else np.array([1., 0.] + [0.] * (d_in - 3))
-        weight_f = weight_f / np.linalg.norm(weight_f)
-        weight_l = weight_l if weight_l is not None else np.array([0., 1.] + [0.] * (d_in - 3))
-        weight_l = weight_l / np.linalg.norm(weight_l)
-        np.save(os.path.join(save_path, file, 'weight_f'), weight_f)
-        np.save(os.path.join(save_path, file, 'weight_l'), weight_l)
-        saveObjAsXml(kwargs, os.path.join(save_path, file, 'kwargs.xml'))
+    weight_f = weight_f if weight_f is not None else np.array([1., 0.] + [0.] * (d_in - 3))
+    weight_f = weight_f / np.linalg.norm(weight_f)
+    weight_l = weight_l if weight_l is not None else np.array([0., 1.] + [0.] * (d_in - 3))
+    weight_l = weight_l / np.linalg.norm(weight_l)
+    np.save(os.path.join(save_path, file, 'weight_f'), weight_f)
+    np.save(os.path.join(save_path, file, 'weight_l'), weight_l)
+    saveObjAsXml(kwargs, os.path.join(save_path, file, 'kwargs.xml'))
 
-        n_data = {'training': n_data_training, 'validation': n_data_validation}
-        output = []
-        for phase in n_data.keys():
+    n_data = {'training': n_data_training, 'validation': n_data_validation}
+    output = []
+    for phase in n_data.keys():
 
-            input_data, plateau_data, selected_plateau_data, add_mask, mult_mask, output_data = (
-                make_data(n_data=n_data[phase], weight_f=weight_f, weight_l=weight_l, **kwargs))
-
+        input_data, plateau_data, selected_plateau_data, add_mask, mult_mask, output_data = (
+            make_data(n_data=n_data[phase], weight_f=weight_f, weight_l=weight_l, **kwargs))
 
 
-            torch.save(input_data, os.path.join(save_path, file, phase + '_input_data'))
-            torch.save(plateau_data, os.path.join(save_path, file, phase + '_plateau_data'))
-            torch.save(selected_plateau_data, os.path.join(save_path, file, phase + '_selected_plateau_data'))
-            torch.save(add_mask, os.path.join(save_path, file, phase + '_add_mask'))
-            torch.save(mult_mask, os.path.join(save_path, file, phase + '_mult_mask'))
-            torch.save(output_data, os.path.join(save_path, file, phase + '_output_data'))
 
-            output.append(list(return_data((input_data,
-                                            plateau_data,
-                                            selected_plateau_data,
-                                            add_mask,
-                                            mult_mask,
-                                            output_data
-                                            ), type)))
+        torch.save(input_data, os.path.join(save_path, file, phase + '_input_data'))
+        torch.save(plateau_data, os.path.join(save_path, file, phase + '_plateau_data'))
+        torch.save(selected_plateau_data, os.path.join(save_path, file, phase + '_selected_plateau_data'))
+        torch.save(add_mask, os.path.join(save_path, file, phase + '_add_mask'))
+        torch.save(mult_mask, os.path.join(save_path, file, phase + '_mult_mask'))
+        torch.save(output_data, os.path.join(save_path, file, phase + '_output_data'))
 
-        return output
+        output.append(list(return_data((input_data,
+                                        plateau_data,
+                                        selected_plateau_data,
+                                        add_mask,
+                                        mult_mask,
+                                        output_data
+                                        ), type)))
+
+    return output
 
 def return_data(data, type):
     input_data, plateau_data, selected_plateau_data, add_mask, mult_mask, output_data = data
