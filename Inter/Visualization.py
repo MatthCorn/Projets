@@ -159,11 +159,11 @@ def PlotEvalParam(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\Matth\Documents\Projets\Inter\Network\Save\2025-04-03__09-53'
+    save_path = r'C:\Users\matth\Documents\Python\Projets\Inter\NetworkDetection\Save\2025-05-24__18-25'
 
     PlotError(save_path)
 
-    PathToGIF(save_path)
+    # PathToGIF(save_path)
 
 
     # Tr_path = r'C:\Users\Matth\Documents\Projets\Eusipco\Save\eval_problem_2025-03-08__10-51\error'
