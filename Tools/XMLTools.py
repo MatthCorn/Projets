@@ -139,8 +139,11 @@ def fromXmlToObjRec(Base):
         return dic
     elif Base.get('Value') == "nan":
         return float("nan")
+    elif 'inf' in Base.get('Value'):
+        return float(Base.get('Value'))
     else:
         return ast.literal_eval(Base.get('Value'))
+
 def loadXmlAsObj(file):
     tree = ET.parse(file)
     dic = fromXmlToObj(tree)

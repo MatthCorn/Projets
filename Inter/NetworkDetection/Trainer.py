@@ -49,6 +49,8 @@ if __name__ == '__main__':
     param = {"n_encoder": 10,
              "len_in": 10,
              'len_out': 5,
+             'len_seq_in': 20,
+             'len_seq_out': 30,
              "d_in": 10,
              "d_att": 128,
              "WidthsEmbedding": [32],
@@ -58,17 +60,17 @@ if __name__ == '__main__':
              'norm': 'post',
              "optim": "Adam",
              "lr_option": {
-                 "value": 1e-4,
+                 "value": 3e-5,
                  "reset": "y",
                  "type": "cos"
              },
              "mult_grad": 10000,
              "weight_decay": 1e-3,
-             "NDataT": 100000,
+             "NDataT": 50000,
              "NDataV": 1000,
              "sensitivity": 0.1,
              "batch_size": 1000,
-             "n_iter": 40,
+             "n_iter": 5,
              "training_strategy": [
                  {"mean": [-5, 5], "std": [1, 2]},
              ],
@@ -77,7 +79,7 @@ if __name__ == '__main__':
              "error_weighting": "y",
              "max_lr": 5,
              "FreqGradObs": 1/100,
-             "warmup": 5}
+             "warmup": 1}
 
     try:
         import json
@@ -125,7 +127,7 @@ if __name__ == '__main__':
     WeightF = torch.tensor([0., 1.] + [0.] * (DVec - 3)).numpy()
 
     mini_batch_size = 50000
-    n_minibatch = int(NDataT/mini_batch_size)
+    n_minibatch = int(NDataT * param['len_seq_out'] / mini_batch_size)
     batch_size = param["batch_size"]
     n_batch = int(mini_batch_size/batch_size)
 
@@ -137,16 +139,16 @@ if __name__ == '__main__':
     PlottingError = []
     PlottingPerf = []
 
-    n_updates = int(NDataT / batch_size) * n_iter
-    warmup_steps = int(NDataT / batch_size * param["warmup"])
+    n_updates = int(NDataT  * param['len_seq_out'] / batch_size) * n_iter
+    warmup_steps = int(NDataT  * param['len_seq_out']  / batch_size * param["warmup"])
     lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"], max_steps=n_updates, type=param["lr_option"]["type"])
 
     PlottingInput, PlottingOutput, PlottingStd = GetData(
         d_in=DVec,
         n_pulse_plateau=NInput,
         n_sat=NOutput,
-        len_in=30,
-        len_out=40,
+        len_in=param["len_seq_in"],
+        len_out=param["len_seq_out"],
         n_data_training=res_GIF,
         sensitivity=param["sensitivity"],
         bias='freq',
@@ -176,8 +178,8 @@ if __name__ == '__main__':
             d_in=DVec,
             n_pulse_plateau=NInput,
             n_sat=NOutput,
-            len_in=20,
-            len_out=30,
+            len_in=param["len_seq_in"],
+            len_out=param["len_seq_out"],
             n_data_training=param['NDataT'],
             n_data_validation=param['NDataV'],
             sensitivity=param["sensitivity"],
@@ -202,7 +204,7 @@ if __name__ == '__main__':
             time_for_checkpoint = (int(j * freq_checkpoint) == (j * freq_checkpoint))
             time_for_GIF = (j in torch.linspace(0, n_iter_window, nb_frames_window, dtype=int))
 
-            for p in range(n_minibatch):
+            for p in tqdm(range(n_minibatch)):
                 InputMiniBatch = TrainingInput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
                 OutputMiniBatch = TrainingOutput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
                 StdMiniBatch = TrainingStd[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
@@ -219,7 +221,7 @@ if __name__ == '__main__':
 
                     Prediction = N(InputBatch)
 
-                    err = torch.norm((Prediction - OutputBatch) / StdBatch, p=2) / sqrt(batch_size * DVec * NOutput)
+                    err = torch.norm((Prediction - OutputBatch) / (StdBatch + 1e-2), p=2) / sqrt(batch_size * DVec * NOutput)
                     (param["mult_grad"] * err).backward()
                     optimizer.step()
                     if lr_scheduler is not None:
@@ -229,7 +231,7 @@ if __name__ == '__main__':
                         DictGrad.update()
 
                     error += float(err) / (n_batch * n_minibatch)
-                    perf += float(torch.sum(ChoseOutput(Prediction, InputBatch) == ChoseOutput(OutputBatch, InputBatch))) / (NDataT * NOutput)
+                    perf += float(torch.sum(ChoseOutput(Prediction, InputBatch) == ChoseOutput(OutputBatch, InputBatch))) / (NDataT * NOutput * param['len_seq_out'])
 
             if time_to_observe:
                 DictGrad.next(j)
@@ -244,9 +246,9 @@ if __name__ == '__main__':
 
                 Prediction = N(Input)
 
-                err = torch.norm((Prediction - Output) / Std, p=2) / sqrt(NDataV * DVec * NOutput)
+                err = torch.norm((Prediction - Output) / (Std + 1e-2), p=2) / sqrt(NDataV * DVec * NOutput * param['len_seq_out'])
                 ValidationError.append(float(err))
-                ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input))) / (NDataV * NOutput))
+                ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input))) / (NDataV * NOutput * param['len_seq_out']))
 
             TrainingError.append(error)
             TrainingPerf.append(perf)
@@ -254,7 +256,7 @@ if __name__ == '__main__':
             if error == min(TrainingError):
                 best_state_dict = N.state_dict().copy()
 
-            if False: #time_for_GIF:
+            if time_for_GIF:
                 with torch.no_grad():
                     Input = PlottingInput.to(device)
                     Output = PlottingOutput.to(device)
@@ -265,8 +267,10 @@ if __name__ == '__main__':
 
                     Prediction = N(Input)
 
-                    err = torch.norm((Prediction - Output) / Std, p=2, dim=[-1, -2]) / sqrt(DVec * NOutput)
-                    perf = torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input), dim=[-1]) / NOutput
+                    err = torch.norm(((Prediction - Output) / (Std + 1e-2)).reshape(res_GIF * res_GIF, param['len_seq_out'], NOutput, -1), p=2, dim=[1, 2, 3]) / sqrt(DVec * NOutput * param['len_seq_out'])
+
+                    perf = torch.sum(torch.mean((ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input)).reshape(res_GIF * res_GIF, param['len_seq_out'], -1).to(torch.float32), dim=[1]), dim=[-1]) / NOutput
+
                     PlottingError.append(err.reshape(res_GIF, res_GIF).tolist())
                     PlottingPerf.append(perf.reshape(res_GIF, res_GIF).tolist())
 
