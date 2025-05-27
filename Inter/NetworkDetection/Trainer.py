@@ -60,7 +60,7 @@ if __name__ == '__main__':
              'norm': 'post',
              "optim": "Adam",
              "lr_option": {
-                 "value": 3e-5,
+                 "value": 1e-4,
                  "reset": "y",
                  "type": "cos"
              },
@@ -70,7 +70,7 @@ if __name__ == '__main__':
              "NDataV": 1000,
              "sensitivity": 0.1,
              "batch_size": 1000,
-             "n_iter": 5,
+             "n_iter": 3,
              "training_strategy": [
                  {"mean": [-5, 5], "std": [1, 2]},
              ],
@@ -219,6 +219,7 @@ if __name__ == '__main__':
                     if param['error_weighting'] == 'n':
                         StdBatch = torch.mean(StdBatch)
 
+                    InputBatch = torch.normal(0, 1, InputBatch.shape, device=InputBatch.device)
                     Prediction = N(InputBatch)
 
                     err = torch.norm((Prediction - OutputBatch) / (StdBatch + 1e-2), p=2) / sqrt(batch_size * DVec * NOutput)

@@ -308,7 +308,11 @@ def return_data(data, type):
     input_data, plateau_data, selected_plateau_data, add_mask, mult_mask, output_data = data
     if type == 'NDA_simple':
         I, O = decode(input_data, plateau_data), decode(input_data, selected_plateau_data)
-        return I, O, O.std(dim=[-1, -2], keepdim=True)
+        batch_size, seq_len, _ = output_data.shape
+        _, n_sat, dim = O.shape
+        Std = O.reshape(batch_size, seq_len, n_sat, dim).std(dim=[1, 2, 3], keepdim=True)
+        Std = Std.expand(batch_size, seq_len, 1, 1).reshape(batch_size * seq_len, 1, 1)
+        return I, O, Std
     elif type == 'NDA':
         return input_data, selected_plateau_data
     elif type == 'tracking':
