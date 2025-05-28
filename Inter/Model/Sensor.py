@@ -56,7 +56,7 @@ class Simulator:
 
                 Diff = Output.unsqueeze(dim=1) - inp.unsqueeze(dim=2)
                 Dist = torch.norm(Diff, dim=-1)
-                Arg = torch.argmin(Dist, dim=1)
+                Arg = (inp.shape[1] - 1) - torch.argmin(Dist.flip(dims=[1]), dim=1)
                 Selected = []
                 for arg in Arg[0]:
                     if sum(inp[0][arg]) != 0:

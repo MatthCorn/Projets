@@ -35,5 +35,5 @@ class Network(nn.Module):
 def ChoseOutput(Pred, Input):
     Diff = Pred.unsqueeze(dim=1) - pad(Input, [0, 0, 0, 1]).unsqueeze(dim=2)
     Dist = torch.norm(Diff, dim=-1)
-    Arg = torch.argmin(Dist, dim=1)
+    Arg = Input.shape[1] - torch.argmin(Dist.flip(dims=[1]), dim=1)
     return Arg

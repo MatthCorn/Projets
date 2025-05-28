@@ -7,19 +7,21 @@ from math import sqrt
 import torch
 from tqdm import tqdm
 
-################################################################################################################################################
-# pour sauvegarder toutes les informations de l'apprentissage
-import os
-import datetime
-from Tools.XMLTools import saveObjAsXml
-import pickle
-import time
+
 
 if __name__ == '__main__':
+    ################################################################################################################################################
+    # pour sauvegarder toutes les informations de l'apprentissage
+    import os
+    import datetime
+    from Tools.XMLTools import saveObjAsXml
+    import pickle
+    import time
 
     local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
     base_folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
     save_dir = os.path.join(local, 'Inter', 'NetworkDetection', 'Save')
+    data_dir = os.path.join(local, 'Inter', 'NetworkDetection', 'Data')
 
     attempt = 0
     while True:
@@ -70,7 +72,7 @@ if __name__ == '__main__':
              "NDataV": 1000,
              "sensitivity": 0.1,
              "batch_size": 1000,
-             "n_iter": 3,
+             "n_iter": 10,
              "training_strategy": [
                  {"mean": [-5, 5], "std": [1, 2]},
              ],
@@ -184,15 +186,15 @@ if __name__ == '__main__':
             n_data_validation=param['NDataV'],
             sensitivity=param["sensitivity"],
             bias='freq',
-            mean_min=min([window["mean"][0] for window in param["training_strategy"]]),
-            mean_max=max([window["mean"][1] for window in param["training_strategy"]]),
-            std_min=min([window["std"][0] for window in param["training_strategy"]]),
-            std_max=max([window["std"][1] for window in param["training_strategy"]]),
+            mean_min=window["mean"][0],
+            mean_max=window["mean"][1],
+            std_min=window["std"][0],
+            std_max=window["std"][1],
             distrib=param["plot_distrib"],
             weight_f=WeightF,
             weight_l=WeightN,
             type='NDA_simple',
-            save_path=os.path.join(local, 'Inter', 'NetworkDetection', 'Data'),
+            save_path=data_dir,
             parallel=True
         )
 
@@ -219,10 +221,9 @@ if __name__ == '__main__':
                     if param['error_weighting'] == 'n':
                         StdBatch = torch.mean(StdBatch)
 
-                    InputBatch = torch.normal(0, 1, InputBatch.shape, device=InputBatch.device)
                     Prediction = N(InputBatch)
 
-                    err = torch.norm((Prediction - OutputBatch) / (StdBatch + 1e-2), p=2) / sqrt(batch_size * DVec * NOutput)
+                    err = torch.norm((Prediction - OutputBatch) / StdBatch, p=2) / sqrt(batch_size * DVec * NOutput)
                     (param["mult_grad"] * err).backward()
                     optimizer.step()
                     if lr_scheduler is not None:
@@ -232,7 +233,7 @@ if __name__ == '__main__':
                         DictGrad.update()
 
                     error += float(err) / (n_batch * n_minibatch)
-                    perf += float(torch.sum(ChoseOutput(Prediction, InputBatch) == ChoseOutput(OutputBatch, InputBatch))) / (NDataT * NOutput * param['len_seq_out'])
+                    perf += float(torch.sum(ChoseOutput(Prediction, InputBatch) == ChoseOutput(OutputBatch, InputBatch))) / (NDataT * (NOutput + 1) * param['len_seq_out'])
 
             if time_to_observe:
                 DictGrad.next(j)
@@ -247,9 +248,9 @@ if __name__ == '__main__':
 
                 Prediction = N(Input)
 
-                err = torch.norm((Prediction - Output) / (Std + 1e-2), p=2) / sqrt(NDataV * DVec * NOutput * param['len_seq_out'])
+                err = torch.norm((Prediction - Output) / Std, p=2) / sqrt(NDataV * DVec * NOutput * param['len_seq_out'])
                 ValidationError.append(float(err))
-                ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input))) / (NDataV * NOutput * param['len_seq_out']))
+                ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input))) / (NDataV * (NOutput + 1) * param['len_seq_out']))
 
             TrainingError.append(error)
             TrainingPerf.append(perf)
@@ -268,9 +269,9 @@ if __name__ == '__main__':
 
                     Prediction = N(Input)
 
-                    err = torch.norm(((Prediction - Output) / (Std + 1e-2)).reshape(res_GIF * res_GIF, param['len_seq_out'], NOutput, -1), p=2, dim=[1, 2, 3]) / sqrt(DVec * NOutput * param['len_seq_out'])
+                    err = torch.norm(((Prediction - Output) / Std).reshape(res_GIF * res_GIF, param['len_seq_out'], NOutput, -1), p=2, dim=[1, 2, 3]) / sqrt(DVec * NOutput * param['len_seq_out'])
 
-                    perf = torch.sum(torch.mean((ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input)).reshape(res_GIF * res_GIF, param['len_seq_out'], -1).to(torch.float32), dim=[1]), dim=[-1]) / NOutput
+                    perf = torch.sum(torch.mean((ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input)).reshape(res_GIF * res_GIF, param['len_seq_out'], -1).to(torch.float32), dim=[1]), dim=[-1]) / (NOutput + 1)
 
                     PlottingError.append(err.reshape(res_GIF, res_GIF).tolist())
                     PlottingPerf.append(perf.reshape(res_GIF, res_GIF).tolist())

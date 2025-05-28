@@ -310,8 +310,14 @@ def return_data(data, type):
         I, O = decode(input_data, plateau_data), decode(input_data, selected_plateau_data)
         batch_size, seq_len, _ = output_data.shape
         _, n_sat, dim = O.shape
-        Std = O.reshape(batch_size, seq_len, n_sat, dim).std(dim=[1, 2, 3], keepdim=True)
+
+        O_reshaped = O.reshape(batch_size, seq_len, n_sat, dim)
+        M = O_reshaped.mean(dim=1, keepdim=True)
+        Std = torch.norm(O_reshaped - M, dim=[1, 2, 3], p=2, keepdim=True) / np.sqrt((seq_len - 1) * n_sat * dim)
         Std = Std.expand(batch_size, seq_len, 1, 1).reshape(batch_size * seq_len, 1, 1)
+
+        # M = O.mean(dim=0)
+        # Std = torch.norm(O - M, keepdim=True, p=2).expand(batch_size * seq_len, 1, 1) / np.sqrt((seq_len * batch_size - 1) * n_sat * dim)
         return I, O, Std
     elif type == 'NDA':
         return input_data, selected_plateau_data
