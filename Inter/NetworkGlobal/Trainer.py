@@ -19,7 +19,7 @@ if __name__ == '__main__':
     local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
     base_folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
     save_dir = os.path.join(local, 'Inter', 'NetworkGlobal', 'Save')
-    data_dir = os.path.join(local, 'Inter', 'NetworkGlobal', 'Data')
+    data_dir = os.path.join(local, 'Inter', 'Data')
 
     attempt = 0
     while True:
@@ -67,7 +67,7 @@ if __name__ == '__main__':
              },
              "mult_grad": 10000,
              "weight_decay": 1e-3,
-             "NDataT": 50000,
+             "NDataT": 500000,
              "NDataV": 1000,
              "batch_size": 1000,
              "n_iter": 40,

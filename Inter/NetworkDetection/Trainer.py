@@ -21,7 +21,7 @@ if __name__ == '__main__':
     local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
     base_folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
     save_dir = os.path.join(local, 'Inter', 'NetworkDetection', 'Save')
-    data_dir = os.path.join(local, 'Inter', 'NetworkDetection', 'Data')
+    data_dir = os.path.join(local, 'Inter', 'Data')
 
     attempt = 0
     while True:
