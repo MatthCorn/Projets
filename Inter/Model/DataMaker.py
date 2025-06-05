@@ -90,12 +90,12 @@ def MakeData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data, sensitivity=
 
     len_element_output = torch.tensor(len_output_data).unsqueeze(-1)
     arrange = torch.arange(len_out + 1).unsqueeze(0).expand(n_data, -1)
-    add_mask = torch.tensor((len_element_output + 1) == arrange, dtype=torch.float).unsqueeze(-1)
-    mult_mask = torch.tensor((len_element_output + 1) >= arrange, dtype=torch.float).unsqueeze(-1)
+    add_mask = torch.tensor(len_element_output == arrange, dtype=torch.float).unsqueeze(-1)
+    mult_mask = torch.tensor(len_element_output >= arrange, dtype=torch.float).unsqueeze(-1)
 
     return input_data, plateau_data, selected_plateau_data, add_mask, mult_mask, output_data
 
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor
 from collections import deque
 
 def MakeDataParallel(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data, sensitivity=0.1, weight_f=None, weight_l=None,
@@ -160,8 +160,8 @@ def MakeDataParallel(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data, sens
 
     len_element_output = torch.tensor(len_output_data).unsqueeze(-1)
     arrange = torch.arange(len_out + 1).unsqueeze(0).expand(n_data, -1)
-    add_mask = torch.tensor((len_element_output + 1) == arrange, dtype=torch.float).unsqueeze(-1)
-    mult_mask = torch.tensor((len_element_output + 1) >= arrange, dtype=torch.float).unsqueeze(-1)
+    add_mask = torch.tensor(len_element_output == arrange, dtype=torch.float).unsqueeze(-1)
+    mult_mask = torch.tensor(len_element_output >= arrange, dtype=torch.float).unsqueeze(-1)
 
     return input_data, plateau_data, selected_plateau_data, add_mask, mult_mask, output_data
 
