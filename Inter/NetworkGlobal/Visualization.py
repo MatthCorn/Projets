@@ -264,10 +264,14 @@ def VisualizeScenario(save_path):
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])  # Optional, required in some cases to avoid warnings
 
-    # Add the colorbar to the figure without any plot
-    fig.colorbar(sm, ax=ax2, shrink=0.4)
-    fig.colorbar(sm, ax=ax1, shrink=0.4)
-    fig.colorbar(sm, ax=ax3, shrink=0.4)
+    from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+
+    cax1 = inset_axes(ax1, width="5%", height="72%", loc='right', borderpad=0.05)
+    fig.colorbar(sm, cax=cax1)
+    cax2 = inset_axes(ax2, width="5%", height="72%", loc='right', borderpad=0.05)
+    fig.colorbar(sm, cax=cax2)
+    cax3 = inset_axes(ax3, width="5%", height="72%", loc='right', borderpad=0.05)
+    fig.colorbar(sm, cax=cax3)
     plt.tight_layout()
 
     ax1.set_xlim(-2, range_plot)
