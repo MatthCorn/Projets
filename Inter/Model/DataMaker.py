@@ -166,7 +166,7 @@ def MakeDataParallel(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data, sens
     return input_data, plateau_data, selected_plateau_data, add_mask, mult_mask, output_data
 
 def GetData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_data_validation=1000, sensitivity=0.1,
-            weight_f=None, weight_l=None, bias='none', std_min=1, std_max=5, mean_min=-10, mean_max=10,
+            weight_f=None, weight_l=None, bias='none', std_min=1., std_max=5., mean_min=-10., mean_max=10.,
             distrib='log', plot=False, save_path=None, parallel=False, type='complete'):
     make_data = MakeDataParallel if parallel else MakeData
 
@@ -304,7 +304,7 @@ def GetData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_da
 
     return output
 
-def return_data(data, type):
+def return_data(data, type, param=None):
     input_data, plateau_data, selected_plateau_data, add_mask, mult_mask, output_data = data
     if type == 'NDA_simple':
         I, O = decode(input_data, plateau_data), decode(input_data, selected_plateau_data)
@@ -316,8 +316,6 @@ def return_data(data, type):
         Std = torch.norm(O_reshaped - M, dim=[1, 2, 3], p=2, keepdim=True) / np.sqrt((seq_len - 1) * n_sat * dim)
         Std = Std.expand(batch_size, seq_len, 1, 1).reshape(batch_size * seq_len, 1, 1)
 
-        # M = O.mean(dim=0)
-        # Std = torch.norm(O - M, keepdim=True, p=2).expand(batch_size * seq_len, 1, 1) / np.sqrt((seq_len * batch_size - 1) * n_sat * dim)
         return I, O, Std
     elif type == 'NDA':
         return input_data, selected_plateau_data
@@ -325,6 +323,8 @@ def return_data(data, type):
         return input_data, selected_plateau_data, output_data, [add_mask, mult_mask], output_data.std(dim=[-1, -2], keepdim=True)
     elif type == 'complete':
         return input_data, output_data, [add_mask, mult_mask], output_data.std(dim=[-1, -2], keepdim=True)
+    elif type == 'complete_windowed':
+        return window(input_data, output_data, mult_mask, add_mask, param)
     else:
         return ValueError('invalid type argument')
 
@@ -341,7 +341,48 @@ def decode(input_data, encode_data):
 
     return decoded_data
 
+def window(input_data, output_data, mult_mask, add_mask, param):
+    param = {
+        'size_tampon': 10,
+        'size_focus_window': 20,
+        'size_target_window': 30,
+    }
+    size_tampon = param['size_tampon']
+    size_focus_window = param['size_focus_window']
+    size_target_window = param['size_target_window']
+    if size_focus_window > input_data.shape[1]:
+        raise ValueError('size_focus_window cannot be greater than len_in')
+    if size_focus_window <= size_tampon:
+        raise ValueError('size_focus_window must be greater than size_tampon')
+    if size_target_window > output_data.shape[1]:
+        raise ValueError('size_target_window cannot be greater than len_out')
+    new_input_data = torch.nn.functional.pad(input_data, (0, 0, size_tampon, size_focus_window))
+    new_output_data = torch.nn.functional.pad(output_data, (0, 0, size_target_window, 0))
+
+    windowed_input_data = new_input_data.unfold(1, size_tampon + size_focus_window, size_focus_window)
+
+    time_of_arrival_window = size_focus_window * torch.arange(1, windowed_input_data.shape[1] + 1)
+    time_of_emission = torch.arange(output_data.shape[1]) - output_data[:, :, -1] + output_data[:, :, -2]
+    time_of_emission = time_of_emission * mult_mask[:, 1:, 0] + (1 - mult_mask[:, 1:, 0]) * (windowed_input_data.shape[1] * size_focus_window - 1)
+    time_of_emission += (1 - mult_mask[:, :-1, 0])
+    time_of_emission = torch.nn.functional.pad(time_of_emission, (size_target_window, 0), value=-1.)
+    time_of_emission[:, size_target_window - 1] = 0.
+
+    # Exemple de séquence
+    S = torch.randn(500, 100, 5)
+
+    # Paramètres de découpage
+    window_size = 20
+    stride = 10
+
+    # Utilisation de unfold
+    # unfold retourne un tenseur de taille (num_windows, window_size, features)
+    windows = S.unfold(1, window_size, stride)  # shape: (9, 20, 5)
+
+    # unfold donne (9, 20, 5) directement dans ce cas
+    print(windows.shape)
+
 if __name__ == '__main__':
 
-    T= GetData(5, 10, 4, 30, 40, 16, 8,
-                   bias='all', std_min=0.1, std_max=1, mean_min=-1, mean_max=1, type='complete', parallel=False, plot=True)
+    T= GetData(5, 10, 4, 100, 120, 16, 8,
+                   bias='all', std_min=0.1, std_max=1, mean_min=-1, mean_max=1, type='complete_windowed', parallel=False, plot=False)
