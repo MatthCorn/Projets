@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
     base_folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
-    save_dir = os.path.join(local, 'Inter', 'NetworkGlobal', 'Save')
+    save_dir = os.path.join(local, 'Inter', 'NetworkGlobalWindowed', 'Save')
     data_dir = os.path.join(local, 'Inter', 'Data')
 
     attempt = 0

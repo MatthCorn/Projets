@@ -167,7 +167,8 @@ def MakeDataParallel(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data, sens
 
 def GetData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_data_validation=1000, sensitivity=0.1,
             weight_f=None, weight_l=None, bias='none', std_min=1., std_max=5., mean_min=-10., mean_max=10.,
-            distrib='log', plot=False, save_path=None, parallel=False, type='complete'):
+            distrib='log', plot=False, save_path=None, parallel=False, type='complete', size_tampon_source=10,
+            size_focus_source=20, size_tampon_target=15, size_focus_target=30):
     make_data = MakeDataParallel if parallel else MakeData
 
     if bias == 'none':
@@ -191,6 +192,13 @@ def GetData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_da
                   'mean_max': mean_max,
                   'distrib': distrib}
 
+    return_param = {
+        'size_tampon_source': size_tampon_source,
+        'size_focus_source': size_focus_source,
+        'size_tampon_target': size_tampon_target,
+        'size_focus_target': size_focus_target,
+    }
+
     if plot or (save_path is None):
         weight_f = weight_f if weight_f is not None else np.array([1., 0.] + [0.] * (d_in - 3))
         weight_f = weight_f / np.linalg.norm(weight_f)
@@ -199,11 +207,11 @@ def GetData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_da
 
         if plot:
             data = make_data(n_data=n_data_training, weight_f=weight_f, weight_l=weight_l, plot=True, **kwargs)
-            return return_data(data, type)
+            return return_data(data, type, param=return_param)
 
         data_training = make_data(n_data=n_data_training, weight_f=weight_f, weight_l=weight_l, **kwargs)
         data_validation = make_data(n_data=n_data_validation, weight_f=weight_f, weight_l=weight_l, **kwargs)
-        return [return_data(data_training, type), return_data(data_validation, type)]
+        return [return_data(data_training, type, param=return_param), return_data(data_validation, type, param=return_param)]
 
     try:
         os.mkdir(save_path)
@@ -255,7 +263,7 @@ def GetData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_da
                                                 add_mask_[:n_data[phase]],
                                                 mult_mask_[:n_data[phase]],
                                                 output_data_[:n_data[phase]]
-                                                ), type)))
+                                                ), type, param=return_param)))
 
             return output
 
@@ -300,7 +308,7 @@ def GetData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_da
                                         add_mask,
                                         mult_mask,
                                         output_data
-                                        ), type)))
+                                        ), type, param=return_param)))
 
     return output
 
@@ -324,7 +332,7 @@ def return_data(data, type, param=None):
     elif type == 'complete':
         return input_data, output_data, [add_mask, mult_mask], output_data.std(dim=[-1, -2], keepdim=True)
     elif type == 'complete_windowed':
-        return window(input_data, output_data, mult_mask, add_mask, param)
+        return window(input_data, output_data, mult_mask, param)
     else:
         return ValueError('invalid type argument')
 
@@ -341,48 +349,59 @@ def decode(input_data, encode_data):
 
     return decoded_data
 
-def window(input_data, output_data, mult_mask, add_mask, param):
-    param = {
-        'size_tampon': 10,
-        'size_focus_window': 20,
-        'size_target_window': 30,
-    }
-    size_tampon = param['size_tampon']
-    size_focus_window = param['size_focus_window']
-    size_target_window = param['size_target_window']
-    if size_focus_window > input_data.shape[1]:
+def window(input_data, output_data, mult_mask, param):
+    size_tampon_source = param['size_tampon_source']
+    size_focus_source = param['size_focus_source']
+    size_tampon_target = param['size_tampon_target']
+    size_focus_target = param['size_focus_target']
+    if size_focus_source > input_data.shape[1]:
         raise ValueError('size_focus_window cannot be greater than len_in')
-    if size_focus_window <= size_tampon:
+    if size_focus_source <= size_tampon_source:
         raise ValueError('size_focus_window must be greater than size_tampon')
-    if size_target_window > output_data.shape[1]:
+    if size_focus_target > output_data.shape[1]:
         raise ValueError('size_target_window cannot be greater than len_out')
-    new_input_data = torch.nn.functional.pad(input_data, (0, 0, size_tampon, size_focus_window))
-    new_output_data = torch.nn.functional.pad(output_data, (0, 0, size_target_window, 0))
+    new_input_data = torch.nn.functional.pad(input_data, (0, 0, size_tampon_source, size_focus_source))
+    new_output_data = torch.nn.functional.pad(output_data, (0, 0, size_tampon_target, size_focus_target))
 
-    windowed_input_data = new_input_data.unfold(1, size_tampon + size_focus_window, size_focus_window)
+    windowed_input_data = new_input_data.unfold(1, size_tampon_source + size_focus_source, size_focus_source)
 
-    time_of_arrival_window = size_focus_window * torch.arange(1, windowed_input_data.shape[1] + 1)
+    time_of_arrival_window = size_focus_source * torch.arange(1, windowed_input_data.shape[1] + 1)
     time_of_emission = torch.arange(output_data.shape[1]) - output_data[:, :, -1] + output_data[:, :, -2]
-    time_of_emission = time_of_emission * mult_mask[:, 1:, 0] + (1 - mult_mask[:, 1:, 0]) * (windowed_input_data.shape[1] * size_focus_window - 1)
+    time_of_emission = time_of_emission * mult_mask[:, 1:, 0] + (1 - mult_mask[:, 1:, 0]) * windowed_input_data.shape[1] * size_focus_source
     time_of_emission += (1 - mult_mask[:, :-1, 0])
-    time_of_emission = torch.nn.functional.pad(time_of_emission, (size_target_window, 0), value=-1.)
-    time_of_emission[:, size_target_window - 1] = 0.
+    time_of_emission = torch.nn.functional.pad(time_of_emission, (0, size_focus_target), value=windowed_input_data.shape[1] * size_focus_source + 1)
+    time_of_emission = torch.nn.functional.pad(time_of_emission, (size_tampon_target, 0), value=-1.)
+    time_of_emission[:, size_tampon_target - 1] = 0.
 
-    # Exemple de séquence
-    S = torch.randn(500, 100, 5)
+    comp = torch.gt(time_of_emission.unsqueeze(-1), time_of_arrival_window.unsqueeze(0).unsqueeze(0))
+    arg = torch.nn.functional.pad(comp.to(torch.int).argmax(dim=1), (1, 0), value=size_tampon_target)
 
-    # Paramètres de découpage
-    window_size = 20
-    stride = 10
+    idx = torch.arange(size_tampon_target + size_focus_target).view(1, 1, size_tampon_target + size_focus_target)
+    starts = arg[:, :-1].unsqueeze(-1) - size_tampon_target
+    window_indices = starts + idx
 
-    # Utilisation de unfold
-    # unfold retourne un tenseur de taille (num_windows, window_size, features)
-    windows = S.unfold(1, window_size, stride)  # shape: (9, 20, 5)
+    batch_size = len(new_output_data)
+    batch_idx = torch.arange(batch_size).view(batch_size, 1, 1).expand(-1, windowed_input_data.shape[1], size_tampon_target + size_focus_target)
+    windowed_output_data = new_output_data[batch_idx, window_indices]
 
-    # unfold donne (9, 20, 5) directement dans ce cas
-    print(windows.shape)
+    target_mult_mask = torch.lt(
+        torch.arange(-size_tampon_target, size_focus_target).view(1, 1, size_tampon_target + size_focus_target),
+        (arg[:, 1:] - arg[:, :-1]).unsqueeze(-1)
+    ).unsqueeze(-1)
+
+    target_add_mask = torch.eq(
+        torch.arange(-size_tampon_target, size_focus_target).view(1, 1, size_tampon_target + size_focus_target),
+        (arg[:, 1:] - arg[:, :-1]).unsqueeze(-1)
+    ).unsqueeze(-1)
+
+    target_mult_mask = target_mult_mask.reshape(-1, *target_mult_mask.shape[2:])
+    target_add_mask = target_add_mask.reshape(-1, *target_add_mask.shape[2:])
+    windowed_output_data = windowed_output_data.reshape(-1, *windowed_output_data.shape[2:])
+    windowed_input_data = windowed_input_data.reshape(-1, *windowed_input_data.shape[2:]).transpose(1, 2)
+
+    return windowed_input_data, windowed_output_data, [target_add_mask, target_mult_mask]
 
 if __name__ == '__main__':
 
-    T= GetData(5, 10, 4, 100, 120, 16, 8,
+    T= GetData(7, 10, 4, 100, 120, 16, 8,
                    bias='all', std_min=0.1, std_max=1, mean_min=-1, mean_max=1, type='complete_windowed', parallel=False, plot=False)
