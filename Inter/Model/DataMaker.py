@@ -383,23 +383,36 @@ def window(input_data, output_data, mult_mask, param):
     batch_size = len(new_output_data)
     batch_idx = torch.arange(batch_size).view(batch_size, 1, 1).expand(-1, windowed_input_data.shape[1], size_tampon_target + size_focus_target)
     windowed_output_data = new_output_data[batch_idx, window_indices]
+    mask = torch.zeros(*new_output_data.shape[:-1], 1)
+    mask[0, :size_tampon_target] = 1
+    mask = mask[batch_idx, window_indices]
+    target_start_mask = mask.reshape(-1, *mask.shape[2:])
 
-    target_mult_mask = torch.lt(
+    target_end_mult_mask = torch.lt(
+        torch.arange(-size_tampon_target, size_focus_target).view(1, 1, size_tampon_target + size_focus_target),
+        (arg[:, 1:] - arg[:, :-1]).unsqueeze(-1)
+    ).unsqueeze(-1).logical_not()
+
+    target_end_add_mask = torch.eq(
         torch.arange(-size_tampon_target, size_focus_target).view(1, 1, size_tampon_target + size_focus_target),
         (arg[:, 1:] - arg[:, :-1]).unsqueeze(-1)
     ).unsqueeze(-1)
 
-    target_add_mask = torch.eq(
-        torch.arange(-size_tampon_target, size_focus_target).view(1, 1, size_tampon_target + size_focus_target),
-        (arg[:, 1:] - arg[:, :-1]).unsqueeze(-1)
-    ).unsqueeze(-1)
+    target_end_mult_mask = target_end_mult_mask.reshape(-1, *target_end_mult_mask.shape[2:])
+    target_end_add_mask = target_end_add_mask.reshape(-1, *target_end_add_mask.shape[2:])
 
-    target_mult_mask = target_mult_mask.reshape(-1, *target_mult_mask.shape[2:])
-    target_add_mask = target_add_mask.reshape(-1, *target_add_mask.shape[2:])
+    mask = torch.zeros(*new_input_data.shape[:-1], 1)
+    mask[:, :size_tampon_source] = 1
+    mask[:, -size_focus_source:] = -1
+    mask = mask.unfold(1, size_tampon_source + size_focus_source, size_focus_source).transpose(2, 3)
+    mask = mask.reshape(-1, *mask.shape[2:])
+    source_start_mask = (mask + mask ** 2) / 2
+    source_end_mask = (mask - mask ** 2) / 2
+
     windowed_output_data = windowed_output_data.reshape(-1, *windowed_output_data.shape[2:])
     windowed_input_data = windowed_input_data.reshape(-1, *windowed_input_data.shape[2:]).transpose(1, 2)
 
-    return windowed_input_data, windowed_output_data, [target_add_mask, target_mult_mask]
+    return windowed_input_data, windowed_output_data, [source_start_mask, source_end_mask, target_start_mask, target_end_add_mask, target_end_mult_mask]
 
 if __name__ == '__main__':
 

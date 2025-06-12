@@ -168,7 +168,7 @@ def VisualizeScenario(save_path):
 
     from Inter.NetworkGlobal.Network import TransformerTranslator
     N = TransformerTranslator(param['d_in'], param['d_in'] + 1, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
-                              n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], len_in=param['len_in'],
+                              n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], width_FF=param['width_FF'], len_in=param['len_in'],
                               len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'])
     N.load_state_dict(torch.load(os.path.join(save_path, 'Last_network')))
     Prediction = N(Input, Output, Masks)[:, :-1, :]
@@ -318,10 +318,10 @@ def VisualizeScenario(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobal\Save\2025-06-04__09-59'
+    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobal\Save\2025-06-12__11-33'
+
+    PlotError(save_path)
 
     VisualizeScenario(save_path)
-
-    # PlotError(save_path)
 
     # PathToGIF(save_path)

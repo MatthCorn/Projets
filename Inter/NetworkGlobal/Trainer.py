@@ -68,10 +68,10 @@ if __name__ == '__main__':
              },
              "mult_grad": 10000,
              "weight_decay": 1e-3,
-             "NDataT": 500000,
+             "NDataT": 1000000,
              "NDataV": 1000,
              "batch_size": 1000,
-             "n_iter": 40,
+             "n_iter": 100,
              "training_strategy": [
                  {"mean": [-5, 5], "std": [0.2, 1]},
              ],
