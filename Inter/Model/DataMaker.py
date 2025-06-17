@@ -99,7 +99,7 @@ from concurrent.futures import ProcessPoolExecutor
 from collections import deque
 
 def MakeDataParallel(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data, sensitivity=0.1, weight_f=None, weight_l=None,
-                     bias='none', std_min=1, std_max=5, mean_min=-10, mean_max=10, distrib='log', plot=False):
+                     bias='none', std_min=1, std_max=5, mean_min=-10, mean_max=10, distrib='log', plot=False, max_inflight=10000):
 
     if bias != 'none':
         if plot:
@@ -128,7 +128,6 @@ def MakeDataParallel(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data, sens
         args = [(bias, d_in, n_pulse_plateau, n_sat, len_in, len_out, sensitivity, weight_f, weight_l) for _ in range(n_data)]
 
     results = []
-    max_inflight = 10000  # Limite de tâches simultanées
     inflight = deque()
 
     with ProcessPoolExecutor() as executor, tqdm(total=n_data, desc="Génération") as pbar:
@@ -168,7 +167,7 @@ def MakeDataParallel(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data, sens
 def GetData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_data_validation=1000, sensitivity=0.1,
             weight_f=None, weight_l=None, bias='none', std_min=1., std_max=5., mean_min=-10., mean_max=10.,
             distrib='log', plot=False, save_path=None, parallel=False, type='complete', size_tampon_source=10,
-            size_focus_source=20, size_tampon_target=15, size_focus_target=30):
+            size_focus_source=20, size_tampon_target=15, size_focus_target=30, max_inflight=None):
     make_data = MakeDataParallel if parallel else MakeData
 
     if bias == 'none':
@@ -191,6 +190,9 @@ def GetData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_da
                   'mean_min': mean_min,
                   'mean_max': mean_max,
                   'distrib': distrib}
+
+    if max_inflight is not None:
+        kwargs['max_inflight'] = max_inflight
 
     return_param = {
         'size_tampon_source': size_tampon_source,
@@ -332,7 +334,7 @@ def return_data(data, type, param=None):
     elif type == 'complete':
         return input_data, output_data, [add_mask, mult_mask], output_data.std(dim=[-1, -2], keepdim=True)
     elif type == 'complete_windowed':
-        return window(input_data, output_data, mult_mask, param)
+        return window(input_data, output_data, mult_mask, add_mask, param)
     else:
         return ValueError('invalid type argument')
 
@@ -349,7 +351,7 @@ def decode(input_data, encode_data):
 
     return decoded_data
 
-def window(input_data, output_data, mult_mask, param):
+def window(input_data, output_data, mult_mask, add_mask, param):
     size_tampon_source = param['size_tampon_source']
     size_focus_source = param['size_focus_source']
     size_tampon_target = param['size_tampon_target']
@@ -383,23 +385,25 @@ def window(input_data, output_data, mult_mask, param):
     batch_size = len(new_output_data)
     batch_idx = torch.arange(batch_size).view(batch_size, 1, 1).expand(-1, windowed_input_data.shape[1], size_tampon_target + size_focus_target)
     windowed_output_data = new_output_data[batch_idx, window_indices]
-    mask = torch.zeros(*new_output_data.shape[:-1], 1)
-    mask[0, :size_tampon_target] = 1
+    mask = torch.nn.functional.pad((1 - mult_mask + add_mask), (0, 0, size_tampon_target, 0), value=-1)
+    mask = torch.nn.functional.pad(mask, (0, 0, 0, size_focus_target - 1), value=1)
     mask = mask[batch_idx, window_indices]
-    target_start_mask = mask.reshape(-1, *mask.shape[2:])
+    mask = mask.reshape(-1, *mask.shape[2:])
+    target_start_mask = (- mask + mask ** 2) / 2
+    target_end_mask = (mask + mask ** 2) / 2
 
-    target_end_mult_mask = torch.lt(
+    target_window_mult_mask = torch.lt(
         torch.arange(-size_tampon_target, size_focus_target).view(1, 1, size_tampon_target + size_focus_target),
         (arg[:, 1:] - arg[:, :-1]).unsqueeze(-1)
-    ).unsqueeze(-1).logical_not()
+    ).unsqueeze(-1).logical_not().to(torch.float32)
 
-    target_end_add_mask = torch.eq(
+    target_window_add_mask = torch.eq(
         torch.arange(-size_tampon_target, size_focus_target).view(1, 1, size_tampon_target + size_focus_target),
         (arg[:, 1:] - arg[:, :-1]).unsqueeze(-1)
-    ).unsqueeze(-1)
+    ).unsqueeze(-1).to(torch.float32)
 
-    target_end_mult_mask = target_end_mult_mask.reshape(-1, *target_end_mult_mask.shape[2:])
-    target_end_add_mask = target_end_add_mask.reshape(-1, *target_end_add_mask.shape[2:])
+    target_window_mult_mask = target_window_mult_mask.reshape(-1, *target_window_mult_mask.shape[2:])
+    target_window_add_mask = target_window_add_mask.reshape(-1, *target_window_add_mask.shape[2:])
 
     mask = torch.zeros(*new_input_data.shape[:-1], 1)
     mask[:, :size_tampon_source] = 1
@@ -407,14 +411,13 @@ def window(input_data, output_data, mult_mask, param):
     mask = mask.unfold(1, size_tampon_source + size_focus_source, size_focus_source).transpose(2, 3)
     mask = mask.reshape(-1, *mask.shape[2:])
     source_start_mask = (mask + mask ** 2) / 2
-    source_end_mask = (mask - mask ** 2) / 2
+    source_end_mask = (-mask + mask ** 2) / 2
 
     windowed_output_data = windowed_output_data.reshape(-1, *windowed_output_data.shape[2:])
     windowed_input_data = windowed_input_data.reshape(-1, *windowed_input_data.shape[2:]).transpose(1, 2)
 
-    return windowed_input_data, windowed_output_data, [source_start_mask, source_end_mask, target_start_mask, target_end_add_mask, target_end_mult_mask]
+    return windowed_input_data, windowed_output_data, [source_start_mask, source_end_mask, target_start_mask, target_end_mask, target_window_add_mask, target_window_mult_mask]
 
 if __name__ == '__main__':
-
-    T= GetData(7, 10, 4, 100, 120, 16, 8,
-                   bias='all', std_min=0.1, std_max=1, mean_min=-1, mean_max=1, type='complete_windowed', parallel=False, plot=False)
+    T = MakeData(10, 6, 5, 500, 700, 50000, 0.1, bias='freq', distrib='log')
+    T= MakeDataParallel2(10, 6, 5, 500, 700, 50000, 0.1, bias='freq', distrib='log', max_inflight=1000)

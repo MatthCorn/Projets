@@ -68,7 +68,7 @@ if __name__ == '__main__':
              },
              "mult_grad": 10000,
              "weight_decay": 1e-3,
-             "NDataT": 1000000,
+             "NDataT": 4000000,
              "NDataV": 1000,
              "batch_size": 1000,
              "n_iter": 100,

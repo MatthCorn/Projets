@@ -39,8 +39,8 @@ class TransformerTranslator(nn.Module):
         self.last_decoder = FeedForward(d_in=d_att, d_out=d_out, widths=[16], dropout=0)
 
 
-    def forward(self, source, target, mask):
-        source_start_mask, source_end_mask, target_start_mask, target_end_mask = mask
+    def forward(self, source, target, input_mask, window_mask):
+        source_start_mask, source_end_mask, target_start_mask, target_end_mask = input_mask
 
         # source.shape = (batch_size, len_in, d_in)
         # target.shape = (batch_size, len_out, d_out)
@@ -52,7 +52,7 @@ class TransformerTranslator(nn.Module):
         # target.shape = (batch_size, len_out, d_att)
 
         src = src + self.start_token() * source_start_mask + self.end_token() * source_end_mask
-        trg = trg + self.start_token() * target_start_mask
+        trg = trg + self.start_token() * target_start_mask + self.end_token() * target_end_mask
 
         trg = torch.concat((self.start_token().expand(trg.size(0), 1, -1), trg), dim=1)
 
@@ -68,7 +68,7 @@ class TransformerTranslator(nn.Module):
             trg = decoder(target=trg, source=src, mask=self.mask_decoder)
         # trg.shape = (batch_size, len_out + 1, d_att)
 
-        trg = trg - self.end_token() * target_end_mask
+        trg[:, :-1] = trg[:, :-1] - self.end_token() * window_mask
         trg = self.last_decoder(trg)
         # trg.shape = (batch_size, len_out + 1, d_out)
 
