@@ -182,19 +182,22 @@ def GetData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_da
 
     if parallel:
         with ProcessPoolExecutor() as executor:
-            GetDataSecond(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_data_validation=n_data_validation,
-                          sensitivity=sensitivity, weight_f=weight_f, weight_l=weight_l, bias=bias, std_min=std_min, std_max=std_max,
-                          mean_min=mean_min, mean_max=mean_max, distrib=distrib, plot=plot, save_path=save_path, parallel=parallel,
-                          type=type, size_tampon_source=size_tampon_source, size_focus_source=size_focus_source,
-                          size_tampon_target=size_tampon_target, size_focus_target=size_focus_target,
-                          max_inflight=max_inflight, executor=executor)
+            return GetDataSecond(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training,
+                                 n_data_validation=n_data_validation, sensitivity=sensitivity, weight_f=weight_f,
+                                 weight_l=weight_l, bias=bias, std_min=std_min, std_max=std_max, mean_min=mean_min,
+                                 mean_max=mean_max, distrib=distrib, plot=plot, save_path=save_path, parallel=parallel,
+                                 type=type, size_tampon_source=size_tampon_source, size_focus_source=size_focus_source,
+                                 size_tampon_target=size_tampon_target, size_focus_target=size_focus_target,
+                                 max_inflight=max_inflight, executor=executor)
 
     else:
-        GetDataSecond(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_data_validation=n_data_validation,
-                      sensitivity=sensitivity, weight_f=weight_f, weight_l=weight_l, bias=bias, std_min=std_min,
-                      std_max=std_max, mean_min=mean_min, mean_max=mean_max, distrib=distrib, plot=plot, save_path=save_path,
-                      parallel=parallel, type=type, size_tampon_source=size_tampon_source, size_focus_source=size_focus_source,
-                      size_tampon_target=size_tampon_target, size_focus_target=size_focus_target, max_inflight=max_inflight)
+        return GetDataSecond(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training,
+                             n_data_validation=n_data_validation, sensitivity=sensitivity, weight_f=weight_f,
+                             weight_l=weight_l, bias=bias, std_min=std_min, std_max=std_max, mean_min=mean_min,
+                             mean_max=mean_max, distrib=distrib, plot=plot, save_path=save_path, parallel=parallel,
+                             type=type, size_tampon_source=size_tampon_source, size_focus_source=size_focus_source,
+                             size_tampon_target=size_tampon_target, size_focus_target=size_focus_target,
+                             max_inflight=max_inflight)
 
 def GetDataSecond(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_data_validation=1000, sensitivity=0.1,
             weight_f=None, weight_l=None, bias='none', std_min=1., std_max=5., mean_min=-10., mean_max=10.,
