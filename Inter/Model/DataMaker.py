@@ -99,7 +99,8 @@ from concurrent.futures import ProcessPoolExecutor
 from collections import deque
 
 def MakeDataParallel(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data, sensitivity=0.1, weight_f=None, weight_l=None,
-                     bias='none', std_min=1, std_max=5, mean_min=-10, mean_max=10, distrib='log', plot=False, max_inflight=10000):
+                     bias='none', std_min=1, std_max=5, mean_min=-10, mean_max=10, distrib='log', plot=False,
+                     executor=None, max_inflight=10000):
 
     if bias != 'none':
         if plot:
@@ -130,24 +131,34 @@ def MakeDataParallel(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data, sens
     results = []
     inflight = deque()
 
-    with ProcessPoolExecutor() as executor, tqdm(total=n_data, desc="Génération") as pbar:
-        it = iter(args)
+    with tqdm(total=n_data, desc="Génération") as pbar:
+        should_shutdown = False
+        if executor is None:
+            executor = ProcessPoolExecutor()
+            should_shutdown = True
 
-        # Pré-remplissage
-        for _ in range(min(max_inflight, n_data)):
-            inflight.append(executor.submit(generate_sample, next(it)))
+        try:
+            it = iter(args)
 
-        while inflight:
-            # Attendre qu'une tâche se termine
-            done = inflight.popleft()
-            results.append(done.result())
-            pbar.update(1)
-
-            # En soumettre une nouvelle si dispo
-            try:
+            # Pré-remplissage
+            for _ in range(min(max_inflight, n_data)):
                 inflight.append(executor.submit(generate_sample, next(it)))
-            except StopIteration:
-                continue
+
+            while inflight:
+                # Attendre qu'une tâche se termine
+                done = inflight.popleft()
+                results.append(done.result())
+                pbar.update(1)
+
+                # En soumettre une nouvelle si dispo
+                try:
+                    inflight.append(executor.submit(generate_sample, next(it)))
+                except StopIteration:
+                    continue
+        finally:
+            if should_shutdown:
+                executor.shutdown()
+
 
     # Extraction des résultats
     input_data, plateau_data, selected_plateau_data, len_output_data, output_data = zip(*results)
@@ -168,6 +179,27 @@ def GetData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_da
             weight_f=None, weight_l=None, bias='none', std_min=1., std_max=5., mean_min=-10., mean_max=10.,
             distrib='log', plot=False, save_path=None, parallel=False, type='complete', size_tampon_source=10,
             size_focus_source=20, size_tampon_target=15, size_focus_target=30, max_inflight=None):
+
+    if parallel:
+        with ProcessPoolExecutor() as executor:
+            GetDataSecond(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_data_validation=n_data_validation,
+                          sensitivity=sensitivity, weight_f=weight_f, weight_l=weight_l, bias=bias, std_min=std_min, std_max=std_max,
+                          mean_min=mean_min, mean_max=mean_max, distrib=distrib, plot=plot, save_path=save_path, parallel=parallel,
+                          type=type, size_tampon_source=size_tampon_source, size_focus_source=size_focus_source,
+                          size_tampon_target=size_tampon_target, size_focus_target=size_focus_target,
+                          max_inflight=max_inflight, executor=executor)
+
+    else:
+        GetDataSecond(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_data_validation=n_data_validation,
+                      sensitivity=sensitivity, weight_f=weight_f, weight_l=weight_l, bias=bias, std_min=std_min,
+                      std_max=std_max, mean_min=mean_min, mean_max=mean_max, distrib=distrib, plot=plot, save_path=save_path,
+                      parallel=parallel, type=type, size_tampon_source=size_tampon_source, size_focus_source=size_focus_source,
+                      size_tampon_target=size_tampon_target, size_focus_target=size_focus_target, max_inflight=max_inflight)
+
+def GetDataSecond(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_data_validation=1000, sensitivity=0.1,
+            weight_f=None, weight_l=None, bias='none', std_min=1., std_max=5., mean_min=-10., mean_max=10.,
+            distrib='log', plot=False, save_path=None, parallel=False, type='complete', size_tampon_source=10,
+            size_focus_source=20, size_tampon_target=15, size_focus_target=30, max_inflight=None, executor=None):
     make_data = MakeDataParallel if parallel else MakeData
 
     if bias == 'none':
@@ -193,6 +225,9 @@ def GetData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_da
 
     if max_inflight is not None:
         kwargs['max_inflight'] = max_inflight
+
+    if executor is not None:
+        kwargs['executor'] = executor
 
     return_param = {
         'size_tampon_source': size_tampon_source,
