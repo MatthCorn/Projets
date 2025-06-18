@@ -264,7 +264,7 @@ def GetDataSecond(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training
         except:
             continue
 
-        if kwargs_file == kwargs:
+        if kwargs_file == {k: v for k, v in kwargs.items() if k != 'executor'}:
             weight_l = np.load(os.path.join(save_path, file, 'weight_l.npy'))
             weight_f = np.load(os.path.join(save_path, file, 'weight_f.npy'))
 
@@ -324,7 +324,7 @@ def GetDataSecond(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training
     weight_l = weight_l / np.linalg.norm(weight_l)
     np.save(os.path.join(save_path, file, 'weight_f'), weight_f)
     np.save(os.path.join(save_path, file, 'weight_l'), weight_l)
-    saveObjAsXml(kwargs, os.path.join(save_path, file, 'kwargs.xml'))
+    saveObjAsXml({k: v for k, v in kwargs.items() if k != 'executor'}, os.path.join(save_path, file, 'kwargs.xml'))
 
     n_data = {'training': n_data_training, 'validation': n_data_validation}
     output = []
@@ -458,4 +458,4 @@ def window(input_data, output_data, mult_mask, add_mask, param):
 
 if __name__ == '__main__':
     T = MakeData(10, 6, 5, 500, 700, 50000, 0.1, bias='freq', distrib='log')
-    T= MakeDataParallel2(10, 6, 5, 500, 700, 50000, 0.1, bias='freq', distrib='log', max_inflight=1000)
+    T= MakeDataParallel(10, 6, 5, 500, 700, 50000, 0.1, bias='freq', distrib='log', max_inflight=1000)
