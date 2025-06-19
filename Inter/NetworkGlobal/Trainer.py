@@ -8,6 +8,9 @@ import torch
 from tqdm import tqdm
 
 if __name__ == '__main__':
+    import multiprocessing as mp
+    mp.set_start_method('spawn', force=True)
+
     ################################################################################################################################################
     # pour sauvegarder toutes les informations de l'apprentissage
     import os
