@@ -144,7 +144,7 @@ class TransformToImage(Scene):
         TI = []
         TM = []
         e = 0
-        output_square = [
+        output_squares = [
             Square(side_length=square_size, fill_color=None, stroke_color=BLUE, stroke_width=8, fill_opacity=0.5).move_to(
                 LEFT * 7 + RIGHT * ((i + 1 / 2) * square_size) +
                 (4 - square_size) * DOWN
@@ -183,7 +183,7 @@ class TransformToImage(Scene):
                     if time_checkpoint[i + 1] - TM[j] > 0.3:
                         exit_TI, exit_TM, exit_P, triangle = TI.pop(j), TM.pop(j), mesureur.pop(j), mesureur_shape.pop(j)
                         self.play(
-                            Transform(triangle, output_square[e], rate_func=smooth, run_time=0.5)
+                            Transform(triangle, output_squares[e], rate_func=smooth, run_time=0.5)
                         )
                         e += 1
                     else:
@@ -243,7 +243,7 @@ class TransformToImage(Scene):
                 if time_checkpoint[i + 1] - TM[j] > 0.3:
                     exit_TI, exit_TM, exit_P, triangle = TI.pop(j), TM.pop(j), mesureur.pop(j), mesureur_shape.pop(j)
                     self.play(
-                        Transform(triangle, output_square[e], rate_func=smooth, run_time=0.5)
+                        Transform(triangle, output_squares[e], rate_func=smooth, run_time=0.5)
                     )
                     e += 1
                 else:
@@ -256,7 +256,7 @@ class TransformToImage(Scene):
         while mesureur != []:
             exit_P, triangle = mesureur.pop(), mesureur_shape.pop()
             self.play(
-                Transform(triangle, output_square[e], rate_func=smooth, run_time=0.5)
+                Transform(triangle, output_squares[e], rate_func=smooth, run_time=0.5)
             )
             e += 1
 
