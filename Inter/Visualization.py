@@ -159,7 +159,7 @@ def PlotEvalParam(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobal\Save\2025-06-04__09-59'
+    save_path = r'C:\Users\matth\Documents\Python\Projets\Inter\NetworkDetection\Save\2025-06-21__16-03'
 
     PlotError(save_path)
 

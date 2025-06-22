@@ -141,8 +141,8 @@ def VisualizeScenario(save_path):
     import torch
 
     param = loadXmlAsObj(os.path.join(save_path, 'param'))
-    weight_l = torch.load(os.path.join(save_path, 'WeightL'))
-    weight_f = torch.load(os.path.join(save_path, 'WeightF'))
+    weight_l = torch.load(os.path.join(save_path, 'WeightL'), weights_only=False)
+    weight_f = torch.load(os.path.join(save_path, 'WeightF'), weights_only=False)
 
     [Input, Output, Masks, _], _ = GetData(
         d_in=param['d_in'],
@@ -171,6 +171,7 @@ def VisualizeScenario(save_path):
                               n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], width_FF=param['width_FF'], len_in=param['len_in'],
                               len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'])
     N.load_state_dict(torch.load(os.path.join(save_path, 'Last_network')))
+    print(sum(p.numel() for p in N.parameters() if p.requires_grad))
     Prediction = N(Input, Output, Masks)[:, :-1, :]
 
     df = param['sensitivity']
@@ -318,7 +319,7 @@ def VisualizeScenario(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobal\Save\2025-06-13__19-35'
+    save_path = r'C:\Users\matth\Documents\Python\Projets\Inter\NetworkGlobal\Save\2025-06-13__19-35'
 
     PlotError(save_path)
 

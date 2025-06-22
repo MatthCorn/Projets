@@ -56,10 +56,11 @@ if __name__ == '__main__':
              'len_out': 5,
              'len_seq_in': 20,
              'len_seq_out': 30,
+             "sensitivity": 0.1,
              "d_in": 10,
              "d_att": 128,
              "WidthsEmbedding": [32],
-             "width_FF": [128],
+             "width_FF": [256],
              'n_heads': 4,
              "dropout": 0,
              'norm': 'post',
@@ -73,18 +74,17 @@ if __name__ == '__main__':
              "weight_decay": 1e-3,
              "NDataT": 50000,
              "NDataV": 1000,
-             "sensitivity": 0.1,
              "batch_size": 1000,
-             "n_iter": 10,
+             "n_iter": 100,
              "training_strategy": [
-                 {"mean": [-5, 5], "std": [1, 2]},
+                 {"mean": [-5, 5], "std": [0.2, 1]},
              ],
              "distrib": "log",
              "plot_distrib": "log",
              "error_weighting": "y",
              "max_lr": 5,
              "FreqGradObs": 1/100,
-             "warmup": 1}
+             "warmup": 5}
 
     try:
         import json
@@ -144,8 +144,8 @@ if __name__ == '__main__':
     PlottingError = []
     PlottingPerf = []
 
-    n_updates = int(NDataT  * param['len_seq_out'] / batch_size) * n_iter
-    warmup_steps = int(NDataT  * param['len_seq_out']  / batch_size * param["warmup"])
+    n_updates = int(NDataT * param['len_seq_out'] / batch_size) * n_iter
+    warmup_steps = int(NDataT * param['len_seq_out'] / batch_size * param["warmup"])
     lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"], max_steps=n_updates, type=param["lr_option"]["type"])
 
     PlottingInput, PlottingOutput, PlottingStd = GetData(
