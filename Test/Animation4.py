@@ -64,7 +64,7 @@ class TransformToImage(Scene):
         sensibility = 0.2
         level = np.random.normal(0, 1, num_input_squares)
 
-        target_rect_scale = 12 / (starting_time[-1] + duration[-1])
+        target_rect_scale = 11 / (starting_time[-1] + duration[-1])
 
         for i in range(num_input_squares):
             width = target_rect_scale * duration[i]
@@ -122,7 +122,10 @@ class TransformToImage(Scene):
 
             print(target_rectangles[i].get_left()[0] + 7)
             print(starting_time[i] * target_rect_scale)
-            while (tc_o != starting_time[i] * target_rect_scale) and (i_checkpoint < len(time_checkpoint) - 1):
+            while (
+                    ((i != len(input_squares) - 1) and ((tc_o != starting_time[i] * target_rect_scale) and (i_checkpoint < len(time_checkpoint)))) or
+                    ((i == len(input_squares) - 1) and (i_checkpoint < len(time_checkpoint)))
+            ):
                 tc_o = time_checkpoint[i_checkpoint]
                 i_checkpoint += 1
                 li = []
