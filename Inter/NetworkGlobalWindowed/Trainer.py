@@ -1,4 +1,5 @@
-from Inter.Model.DataMaker import GetData
+# from Inter.Model.DataMaker import GetData
+from Inter.NetworkGlobalWindowed.SpecialUtils import GetData
 from Inter.NetworkGlobalWindowed.Network import TransformerTranslator
 from Complete.LRScheduler import Scheduler
 from GradObserver.GradObserverClass import DictGradObserver
@@ -48,16 +49,16 @@ if __name__ == '__main__':
         p.nice(psutil.HIGH_PRIORITY_CLASS)
     ################################################################################################################################################
 
-    param = {"n_encoder": 10,
-             "n_decoder": 10,
+    param = {"n_encoder": 1,
+             "n_decoder": 1,
              "len_in": 500,
              "len_out": 700,
              "len_in_window": 20,
              "len_out_window": 30,
              'size_tampon_source': 8,
              'size_tampon_target': 12,
-             "n_pulse_plateau": 6,
-             "n_sat": 5,
+             "n_pulse_plateau": 4,
+             "n_sat": 4,
              "sensitivity": 0.1,
              "d_in": 10,
              "d_att": 128,
@@ -74,17 +75,16 @@ if __name__ == '__main__':
              },
              "mult_grad": 10000,
              "weight_decay": 1e-3,
-             "NDataT": 50000,
+             "NDataT": 10000,
              "NDataV": 100,
              "batch_size": 1000,
-             "n_iter": 100,
+             "n_iter": 30,
              "training_strategy": [
-                 {"mean": [-5, 5], "std": [0.2, 1]},
-                 {"mean": [-5, 5], "std": [0.2, 1]},
+                 {"mean": [-5, 5], "std": [5, 5]},
              ],
              "distrib": "log",
              "plot_distrib": "log",
-             'mask': "edge+",
+             'mask': "edge",
              "error_weighting": "y",
              "max_lr": 5,
              "FreqGradObs": 1/3,
@@ -167,7 +167,6 @@ if __name__ == '__main__':
         weight_f=weight_f,
         weight_l=weight_l,
         plot=True,
-        type='complete_windowed',
         size_focus_source=param['len_in_window'] - param['size_tampon_source'],
         size_tampon_source=param['size_tampon_source'],
         size_tampon_target=param['size_tampon_target'],
@@ -202,7 +201,6 @@ if __name__ == '__main__':
             distrib=param["plot_distrib"],
             weight_f=weight_f,
             weight_l=weight_l,
-            type='complete_windowed',
             size_focus_source=param['len_in_window'] - param['size_tampon_source'],
             size_tampon_source=param['size_tampon_source'],
             size_tampon_target=param['size_tampon_target'],

@@ -127,7 +127,7 @@ class Simulator:
             # le vecteur de suivi n° j n'est plus mise-à-jour : l'information interceptée est complète
             if self.T - self.TM[j] == 2:
                 TI, TM, P = self.TI.pop(j), self.TM.pop(j), self.P.pop(j)
-                # on ajoute deux informations : le temps d'intercepté et la date de début d'interception
+                # on ajoute deux informations : le temps d'interception et la date de début d'interception
                 P += [TM - TI, len(self.R) - TI]
                 # le vecteur intercepté est ajouté à self.R
                 self.R.append(P)

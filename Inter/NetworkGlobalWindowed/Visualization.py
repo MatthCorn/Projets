@@ -318,7 +318,7 @@ def VisualizeScenario(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\matth\Documents\Python\Projets\Inter\NetworkGlobalWindowed\Save\2025-06-20__18-48(3)'
+    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobalWindowed\Save\2025-06-30__12-05'
 
     PlotError(save_path)
 
