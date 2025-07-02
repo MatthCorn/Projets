@@ -171,15 +171,15 @@ def window_2(input_data, output_data, mult_mask, add_mask, param):
     windowed_output_data = windowed_output_data.reshape(-1, *windowed_output_data.shape[2:])
     windowed_input_data = windowed_input_data.reshape(-1, *windowed_input_data.shape[2:]).transpose(1, 2)
 
-    # I, O = decode(input_data, plateau_data), decode(input_data, selected_plateau_data)
-    # batch_size, seq_len, _ = output_data.shape
-    # _, n_sat, dim = O.shape
-    #
-    # O_reshaped = O.reshape(batch_size, seq_len, n_sat, dim)
-    # M = O_reshaped.mean(dim=1, keepdim=True)
-    # Std = torch.norm(O_reshaped - M, dim=[1, 2, 3], p=2, keepdim=True) / np.sqrt((seq_len - 1) * n_sat * dim)
-    # Std = Std.expand(batch_size, seq_len, 1, 1).reshape(batch_size * seq_len, 1, 1)
-    #
-    # M = windowed_output_data.mean(dim=1)
+    mask = 1 - target_window_mult_mask
+    mask[:, :size_tampon_target] = 0
+    mean = (windowed_output_data * mask).sum(dim=1, keepdim=True) / (mask.sum(dim=1, keepdim=True) + 1e-5)
+    std = torch.sqrt(
+        ((windowed_output_data - mean) ** 2).sum(dim=[1, 2], keepdim=True) /
+        ((abs(mask.sum(dim=1, keepdim=True) - 1) + 1e-5) * windowed_output_data.shape[-1])
+    )
 
-    return windowed_input_data, windowed_output_data, [source_start_mask, source_end_mask, target_start_mask, target_end_mask, target_window_add_mask, target_window_mult_mask]
+    return (windowed_input_data, windowed_output_data,
+            [source_start_mask, source_end_mask, target_start_mask,
+             target_end_mask, target_window_add_mask, target_window_mult_mask],
+            std)
