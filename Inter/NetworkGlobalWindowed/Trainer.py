@@ -1,4 +1,3 @@
-# from Inter.Model.DataMaker import GetData
 from Inter.NetworkGlobalWindowed.SpecialUtils import GetData
 from Inter.NetworkGlobalWindowed.Network import TransformerTranslator
 from Complete.LRScheduler import Scheduler
@@ -49,8 +48,8 @@ if __name__ == '__main__':
         p.nice(psutil.HIGH_PRIORITY_CLASS)
     ################################################################################################################################################
 
-    param = {"n_encoder": 1,
-             "n_decoder": 1,
+    param = {"n_encoder": 10,
+             "n_decoder": 10,
              "len_in": 500,
              "len_out": 700,
              "len_in_window": 20,
@@ -69,16 +68,16 @@ if __name__ == '__main__':
              'norm': 'post',
              "optim": "Adam",
              "lr_option": {
-                 "value": 1e-4,
+                 "value": 3e-5,
                  "reset": "y",
                  "type": "cos"
              },
              "mult_grad": 10000,
              "weight_decay": 1e-3,
-             "NDataT": 10000,
+             "NDataT": 50000,
              "NDataV": 100,
              "batch_size": 1000,
-             "n_iter": 30,
+             "n_iter": 200,
              "training_strategy": [
                  {"mean": [-5, 5], "std": [5, 5]},
              ],
@@ -88,7 +87,7 @@ if __name__ == '__main__':
              "error_weighting": "y",
              "max_lr": 5,
              "FreqGradObs": 1/3,
-             "warmup": 5}
+             "warmup": 10}
 
     try:
         import json
