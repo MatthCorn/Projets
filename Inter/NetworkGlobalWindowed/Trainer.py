@@ -83,7 +83,6 @@ if __name__ == '__main__':
              ],
              "distrib": "log",
              "plot_distrib": "log",
-             'mask': "edge",
              "error_weighting": "y",
              "max_lr": 5,
              "FreqGradObs": 1/3,
@@ -149,7 +148,7 @@ if __name__ == '__main__':
     warmup_steps = int(NDataT / batch_size * param["warmup"]) + 1
     lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"], max_steps=n_updates, type=param["lr_option"]["type"])
 
-    PlottingInput, PlottingOutput, PlottingMasks = GetData(
+    PlottingInput, PlottingOutput, PlottingMasks, PlottingStd = GetData(
         d_in=param['d_in'],
         n_pulse_plateau=param["n_pulse_plateau"],
         n_sat=param["n_sat"],
@@ -183,7 +182,8 @@ if __name__ == '__main__':
             warmup_steps = int(NDataT / batch_size * param["warmup"]) + 1
             lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"], max_steps=n_updates, type=param["lr_option"]["type"])
 
-        [(TrainingInput, TrainingOutput, TrainingMasks), (ValidationInput, ValidationOutput, ValidationMasks)] = GetData(
+        [(TrainingInput, TrainingOutput, TrainingMasks, TrainingStd),
+         (ValidationInput, ValidationOutput, ValidationMasks, ValidationStd)] = GetData(
             d_in=param['d_in'],
             n_pulse_plateau=param['n_pulse_plateau'],
             n_sat=param['n_sat'],
@@ -219,6 +219,7 @@ if __name__ == '__main__':
                 InputMiniBatch = TrainingInput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
                 OutputMiniBatch = TrainingOutput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
                 MaskMiniBatch = [mask[p * mini_batch_size:(p + 1) * mini_batch_size].to(device) for mask in TrainingMasks]
+                StdMiniBatch = TrainingStd[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
 
                 for k in range(n_batch):
                     optimizer.zero_grad(set_to_none=True)
@@ -226,13 +227,16 @@ if __name__ == '__main__':
                     InputBatch = InputMiniBatch[k * batch_size:(k + 1) * batch_size]
                     OutputBatch = OutputMiniBatch[k * batch_size:(k + 1) * batch_size]
                     MaskBatch = [mask[k * batch_size:(k + 1) * batch_size].to(device) for mask in MaskMiniBatch]
+                    StdBatch = StdMiniBatch[k * batch_size:(k + 1) * batch_size]
 
-                    InputMask = [MaskBatch[c] for c in range(4)]
-                    WindowMask = MaskBatch[4] if param['mask'] in ['edge', 'edge+'] else MaskBatch[5]
-                    ErrorMask = (1 - MaskBatch[5] + MaskBatch[4]) if param['mask'] in ['edge'] else torch.ones(MaskBatch[4].shape, device=MaskBatch[4].device)
-                    Prediction = N(InputBatch, OutputBatch, InputMask, WindowMask)[:, :-1, :]
+                    if param['error_weighting'] == 'n':
+                        StdBatch = torch.mean(StdBatch)
 
-                    err = torch.norm((Prediction - OutputBatch * WindowMask) * ErrorMask, p=2) / (ErrorMask.sum() * d_out).sqrt()
+                    InputMask = MaskBatch[:-1]
+                    WindowMask = MaskBatch[-1]
+                    Prediction = N(InputBatch, OutputBatch, InputMask)[:, :-1, :]
+
+                    err = torch.norm((Prediction - OutputBatch) / StdBatch * WindowMask, p=2) / (WindowMask.sum() * d_out).sqrt()
 
                     (param["mult_grad"] * err).backward()
                     optimizer.step()
@@ -251,13 +255,16 @@ if __name__ == '__main__':
                 Input = ValidationInput.to(device)
                 Output = ValidationOutput.to(device)
                 Mask = [mask.to(device) for mask in ValidationMasks]
+                Std = ValidationStd.to(device)
 
-                InputMask = [Mask[c] for c in range(4)]
-                WindowMask = Mask[4] if param['mask'] in ['edge', 'edge+'] else Mask[5]
-                ErrorMask = (1 - Mask[5] + Mask[4]) if param['mask'] in ['edge'] else torch.ones(Mask[4].shape, device=Mask[4].device)
-                Prediction = N(Input, Output, InputMask, WindowMask)[:, :-1, :]
+                if param['error_weighting'] == 'n':
+                    Std = torch.mean(Std)
 
-                err = torch.norm((Prediction - Output * WindowMask) * ErrorMask, p=2) / (ErrorMask.sum() * d_out).sqrt()
+                InputMask = Mask[:-1]
+                WindowMask = Mask[-1]
+                Prediction = N(Input, Output, InputMask)[:, :-1, :]
+
+                err = torch.norm((Prediction - Output) / Std * WindowMask, p=2) / (WindowMask.sum() * d_out).sqrt()
 
                 ValidationError.append(float(err))
 
@@ -271,13 +278,16 @@ if __name__ == '__main__':
                     Input = PlottingInput.to(device)
                     Output = PlottingOutput.to(device)
                     Mask = [mask.to(device) for mask in PlottingMasks]
+                    Std = PlottingStd.to(device)
 
-                    InputMask = [Mask[c] for c in range(4)]
-                    WindowMask = Mask[4] if param['mask'] in ['edge', 'edge+'] else Mask[5]
-                    ErrorMask = (1 - Mask[5] + Mask[4]) if param['mask'] in ['edge'] else torch.ones(Mask[4].shape, device=Mask[4].device)
-                    Prediction = N(Input, Output, InputMask, WindowMask)[:, :-1, :]
+                    if param['error_weighting'] == 'n':
+                        Std = torch.mean(Std)
 
-                    err = torch.norm((Prediction - Output * WindowMask) * ErrorMask, p=2) / (ErrorMask.sum(dim=[-1, -2]) * d_out).sqrt()
+                    InputMask = Mask[:-1]
+                    WindowMask = Mask[-1]
+                    Prediction = N(Input, Output, InputMask)[:, :-1, :]
+
+                    err = torch.norm((Prediction - Output) / Std * WindowMask, p=2) / (WindowMask.sum(dim=[-1, -2]) * d_out).sqrt()
                     err = err.reshape(-1, NWindows).mean(dim=-1)
                     PlottingError.append(err.reshape(res_GIF, res_GIF).tolist())
 
