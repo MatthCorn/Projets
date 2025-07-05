@@ -264,7 +264,7 @@ def GetDataSecond(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training
         except:
             continue
 
-        if kwargs_file == {k: v for k, v in kwargs.items() if k != 'executor'}:
+        if kwargs_file == {k: v for k, v in kwargs.items() if not k in ['executor', 'max_inflight']}:
             weight_l = np.load(os.path.join(save_path, file, 'weight_l.npy'))
             weight_f = np.load(os.path.join(save_path, file, 'weight_f.npy'))
 
@@ -324,7 +324,7 @@ def GetDataSecond(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training
     weight_l = weight_l / np.linalg.norm(weight_l)
     np.save(os.path.join(save_path, file, 'weight_f'), weight_f)
     np.save(os.path.join(save_path, file, 'weight_l'), weight_l)
-    saveObjAsXml({k: v for k, v in kwargs.items() if k != 'executor'}, os.path.join(save_path, file, 'kwargs.xml'))
+    saveObjAsXml({k: v for k, v in kwargs.items() if not k in ['executor', 'max_inflight']}, os.path.join(save_path, file, 'kwargs.xml'))
 
     n_data = {'training': n_data_training, 'validation': n_data_validation}
     output = []
@@ -370,7 +370,11 @@ def return_data(data, type, param=None):
     elif type == 'tracking':
         return input_data, selected_plateau_data, output_data, [add_mask, mult_mask], output_data.std(dim=[-1, -2], keepdim=True)
     elif type == 'complete':
-        return input_data, output_data, [add_mask, mult_mask], output_data.std(dim=[-1, -2], keepdim=True)
+        Mask = (mult_mask - add_mask)[:, :-1]
+        M = (output_data * Mask).sum(dim=1, keepdim=True) / (Mask.sum(dim=1, keepdim=True) + 1e-5)
+        Var = ((output_data - M) ** 2 * Mask).sum(dim=[1, 2], keepdim=True) / (abs(Mask.sum(dim=1, keepdim=True) - 1) + 1e-5)
+        Std = torch.sqrt(Var)
+        return input_data, output_data, [add_mask, mult_mask], Std
     else:
         return ValueError('invalid type argument')
 

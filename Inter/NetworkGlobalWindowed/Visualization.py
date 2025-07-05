@@ -166,7 +166,7 @@ def VisualizeScenario(save_path):
         parallel=True
     )
 
-    from Inter.NetworkGlobal.Network import TransformerTranslator
+    from Inter.NetworkGlobalWindowed.Network import TransformerTranslator
     N = TransformerTranslator(param['d_in'], param['d_in'] + 1, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
                               n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], width_FF=param['width_FF'], len_in=param['len_in'],
                               len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'])
@@ -318,7 +318,7 @@ def VisualizeScenario(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobalWindowed\Save\2025-07-01__18-27'
+    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobalWindowed\Save\2025-07-05__09-33'
 
     PlotError(save_path)
 

@@ -77,9 +77,9 @@ if __name__ == '__main__':
              "NDataT": 50000,
              "NDataV": 100,
              "batch_size": 1000,
-             "n_iter": 200,
+             "n_iter": 50,
              "training_strategy": [
-                 {"mean": [-5, 5], "std": [5, 5]},
+                 {"mean": [-5, 5], "std": [0.2, 1]},
              ],
              "distrib": "log",
              "plot_distrib": "log",
