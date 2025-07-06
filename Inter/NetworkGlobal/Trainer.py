@@ -71,7 +71,7 @@ if __name__ == '__main__':
              },
              "mult_grad": 10000,
              "weight_decay": 1e-3,
-             "NDataT": 500000,
+             "NDataT": 50000,
              "NDataV": 1000,
              "batch_size": 1000,
              "n_iter": 100,
@@ -222,6 +222,8 @@ if __name__ == '__main__':
 
                     if param['error_weighting'] == 'n':
                         StdBatch = torch.mean(StdBatch)
+
+                    InputBatch = torch.normal(0, 1, size=InputBatch.shape, device=device)
 
                     Prediction = N(InputBatch, OutputBatch, TargetMaskBatch)[:, :-1, :]
 

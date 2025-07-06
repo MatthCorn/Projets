@@ -74,7 +74,7 @@ if __name__ == '__main__':
              },
              "mult_grad": 10000,
              "weight_decay": 1e-3,
-             "NDataT": 200000,
+             "NDataT": 100000,
              "NDataV": 100,
              "batch_size": 1000,
              "n_iter": 50,
@@ -234,6 +234,7 @@ if __name__ == '__main__':
 
                     InputMask = MaskBatch[:-1]
                     WindowMask = MaskBatch[-1]
+                    InputBatch = torch.normal(0, 1, size=InputBatch.shape, device=device)
                     Prediction = N(InputBatch, OutputBatch, InputMask)[:, :-1, :]
 
                     err = torch.norm((Prediction - OutputBatch) / StdBatch * WindowMask, p=2) / (WindowMask.sum() * d_out).sqrt()
