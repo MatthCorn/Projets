@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<Dictionary>
+ <List Key="TrainingError">
+  <Object Value="1.1002931493946488"/>
+ </List>
+ <List Key="ValidationError">
+  <Object Value="0.9816018342971802"/>
+ </List>
+ <List Key="PlottingError">
+  <List>
+   <List>
+    <Object Value="inf"/>
+    <Object Value="9.94908618927002"/>
+   </List>
+   <List>
+    <Object Value="16.703819274902344"/>
+    <Object Value="9.922832489013672"/>
+   </List>
+  </List>
+ </List>
+</Dictionary>

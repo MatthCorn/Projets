@@ -77,7 +77,7 @@ if __name__ == '__main__':
              "NDataT": 100000,
              "NDataV": 100,
              "batch_size": 1000,
-             "n_iter": 50,
+             "n_iter": 100,
              "training_strategy": [
                  {"mean": [-5, 5], "std": [0.2, 1]},
              ],
@@ -86,7 +86,7 @@ if __name__ == '__main__':
              "error_weighting": "y",
              "max_lr": 5,
              "FreqGradObs": 1/3,
-             "warmup": 10}
+             "warmup": 1}
 
     try:
         import json
@@ -102,7 +102,7 @@ if __name__ == '__main__':
     freq_checkpoint = 1/10
     nb_frames_GIF = 100
     nb_frames_window = int(nb_frames_GIF / len(param["training_strategy"]))
-    res_GIF = 10
+    res_GIF = 2
     n_iter_window = int(param["n_iter"] / len(param["training_strategy"]))
 
     if torch.cuda.is_available():
@@ -234,10 +234,10 @@ if __name__ == '__main__':
 
                     InputMask = MaskBatch[:-1]
                     WindowMask = MaskBatch[-1]
-                    InputBatch = torch.normal(0, 1, size=InputBatch.shape, device=device)
+
                     Prediction = N(InputBatch, OutputBatch, InputMask)[:, :-1, :]
 
-                    err = torch.norm((Prediction - OutputBatch) / StdBatch * WindowMask, p=2) / (WindowMask.sum() * d_out).sqrt()
+                    err = torch.norm((Prediction - OutputBatch) / StdBatch * WindowMask, p=2) / (abs(WindowMask.sum() - batch_size) * d_out).sqrt()
 
                     (param["mult_grad"] * err).backward()
                     optimizer.step()
@@ -265,7 +265,7 @@ if __name__ == '__main__':
                 WindowMask = Mask[-1]
                 Prediction = N(Input, Output, InputMask)[:, :-1, :]
 
-                err = torch.norm((Prediction - Output) / Std * WindowMask, p=2) / (WindowMask.sum() * d_out).sqrt()
+                err = torch.norm((Prediction - Output) / Std * WindowMask, p=2) / ((WindowMask.sum() - NDataV) * d_out).sqrt()
 
                 ValidationError.append(float(err))
 

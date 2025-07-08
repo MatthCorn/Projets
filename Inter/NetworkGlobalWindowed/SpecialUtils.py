@@ -93,17 +93,20 @@ def window(input_data, output_data, mult_mask, add_mask, param):
         (arg[:, 1:] - arg[:, :-1]).unsqueeze(-1)
     ).unsqueeze(-1).logical_not().to(torch.float32)
 
-    window_mask = 1 - window_mask.reshape(-1, *window_mask.shape[2:])
-    window_mask[:, :size_tampon_target] = 0
+    window_mask = 1 - window_mask
+    window_mask[:, :, :size_tampon_target] = 0
+
+    mean = (windowed_output_data * window_mask).sum(dim=2, keepdim=True).expand(windowed_output_data.shape) / (
+            window_mask.sum(dim=2, keepdim=True) + 1e-5) * window_mask
+
+    std = torch.norm(mean - windowed_output_data * window_mask, dim=[1, 2, 3], p=2) / (
+            windowed_output_data.shape[-1] * (window_mask.sum(dim=[1, 2, 3]) - windowed_output_data.shape[1])).sqrt()
+
+    std = std.unsqueeze(-1).expand(-1, windowed_output_data.shape[1]).reshape(-1, 1, 1)
 
     windowed_output_data = windowed_output_data.reshape(-1, *windowed_output_data.shape[2:])
     windowed_input_data = windowed_input_data.reshape(-1, *windowed_input_data.shape[2:]).transpose(1, 2)
-
-    mean = (windowed_output_data * window_mask).sum(dim=1, keepdim=True) / (window_mask.sum(dim=1, keepdim=True) + 1e-5)
-    std = torch.sqrt(
-        ((windowed_output_data - mean) ** 2).sum(dim=[1, 2], keepdim=True) /
-        ((abs(window_mask.sum(dim=1, keepdim=True) - 1) + 1e-5) * windowed_output_data.shape[-1])
-    )
+    window_mask = window_mask.reshape(-1, *window_mask.shape[2:])
 
     return (windowed_input_data, windowed_output_data,
             [source_pad_mask, source_end_mask, target_pad_mask,

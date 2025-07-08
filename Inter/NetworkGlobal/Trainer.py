@@ -71,7 +71,7 @@ if __name__ == '__main__':
              },
              "mult_grad": 10000,
              "weight_decay": 1e-3,
-             "NDataT": 50000,
+             "NDataT": 150000,
              "NDataV": 1000,
              "batch_size": 1000,
              "n_iter": 100,
@@ -218,16 +218,14 @@ if __name__ == '__main__':
                     TargetMaskBatch = [TargetMaskMiniBatch[0][k * batch_size:(k + 1) * batch_size].to(device),
                                        TargetMaskMiniBatch[1][k * batch_size:(k + 1) * batch_size].to(device)]
                     StdBatch = StdMiniBatch[k * batch_size:(k + 1) * batch_size]
-                    Mask = (TargetMaskBatch[1] - TargetMaskBatch[0])[:, :-1]
+                    Mask = TargetMaskBatch[1][:, :-1]
 
                     if param['error_weighting'] == 'n':
                         StdBatch = torch.mean(StdBatch)
 
-                    InputBatch = torch.normal(0, 1, size=InputBatch.shape, device=device)
-
                     Prediction = N(InputBatch, OutputBatch, TargetMaskBatch)[:, :-1, :]
 
-                    err = torch.norm((Prediction - OutputBatch) / StdBatch, p=2) / sqrt(torch.sum(Mask) * d_out)
+                    err = torch.norm((Prediction - OutputBatch) / StdBatch, p=2) / sqrt((torch.sum(Mask) - batch_size) * d_out)
                     (param["mult_grad"] * err).backward()
                     optimizer.step()
                     if lr_scheduler is not None:
@@ -246,14 +244,14 @@ if __name__ == '__main__':
                 Output = ValidationOutput.to(device)
                 TargetMask = [ValidationMasks[0].to(device), ValidationMasks[1].to(device)]
                 Std = ValidationStd.to(device)
-                Mask = (TargetMask[1] - TargetMask[0])[:, :-1]
+                Mask = TargetMask[1][:, :-1]
 
                 if param['error_weighting'] == 'n':
                     Std = torch.mean(Std)
 
                 Prediction = N(Input, Output, TargetMask)[:, :-1, :]
 
-                err = torch.norm((Prediction - Output) / Std, p=2) / sqrt(torch.sum(Mask) * d_out)
+                err = torch.norm((Prediction - Output) / Std, p=2) / sqrt((torch.sum(Mask) - NDataV) * d_out)
                 ValidationError.append(float(err))
 
             TrainingError.append(error)
@@ -267,14 +265,14 @@ if __name__ == '__main__':
                     Output = PlottingOutput.to(device)
                     TargetMask = [PlottingMasks[0].to(device), PlottingMasks[1].to(device)]
                     Std = PlottingStd.to(device)
-                    Mask = (TargetMask[1] - TargetMask[0])[:, :-1]
+                    Mask = TargetMask[1][:, :-1]
 
                     if param['error_weighting'] == 'n':
                         Std = torch.mean(Std)
 
                     Prediction = N(Input, Output, TargetMask)[:, :-1, :]
 
-                    err = torch.norm((Prediction - Output) / Std, p=2, dim=[-1, -2]) / torch.sqrt(torch.sum(Mask) * d_out)
+                    err = torch.norm((Prediction - Output) / Std, p=2, dim=[-1, -2]) / torch.sqrt((torch.sum(Mask, dim=[1, 2]) - 1) * d_out)
                     PlottingError.append(err.reshape(res_GIF, res_GIF).tolist())
 
             if time_for_checkpoint:

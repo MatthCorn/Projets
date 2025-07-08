@@ -1,0 +1,129 @@
+<?xml version="1.0" ?>
+<Dictionary>
+ <List Key="TrainingError">
+  <Object Value="1.2923733901977539"/>
+  <Object Value="1.238458366394043"/>
+  <Object Value="1.2014671039581297"/>
+  <Object Value="1.1641176724433897"/>
+  <Object Value="1.1277811026573183"/>
+  <Object Value="1.1017753410339353"/>
+  <Object Value="1.0857642841339106"/>
+  <Object Value="1.074615857601166"/>
+  <Object Value="1.0688860535621645"/>
+  <Object Value="1.0641158127784731"/>
+ </List>
+ <List Key="ValidationError">
+  <Object Value="1.2578014135360718"/>
+  <Object Value="1.2216600179672241"/>
+  <Object Value="1.1834440231323242"/>
+  <Object Value="1.1425827741622925"/>
+  <Object Value="1.1095919609069824"/>
+  <Object Value="1.088045358657837"/>
+  <Object Value="1.0747426748275757"/>
+  <Object Value="1.0675748586654663"/>
+  <Object Value="1.0616109371185303"/>
+  <Object Value="1.0583176612854004"/>
+ </List>
+ <List Key="PlottingError">
+  <List>
+   <List>
+    <Object Value="inf"/>
+    <Object Value="11.86707878112793"/>
+   </List>
+   <List>
+    <Object Value="19.775108337402344"/>
+    <Object Value="12.108271598815918"/>
+   </List>
+  </List>
+  <List>
+   <List>
+    <Object Value="inf"/>
+    <Object Value="11.690903663635254"/>
+   </List>
+   <List>
+    <Object Value="19.481534957885742"/>
+    <Object Value="11.928516387939453"/>
+   </List>
+  </List>
+  <List>
+   <List>
+    <Object Value="inf"/>
+    <Object Value="11.465746879577637"/>
+   </List>
+   <List>
+    <Object Value="19.106334686279297"/>
+    <Object Value="11.698781967163086"/>
+   </List>
+  </List>
+  <List>
+   <List>
+    <Object Value="inf"/>
+    <Object Value="11.234951972961426"/>
+   </List>
+   <List>
+    <Object Value="18.721744537353516"/>
+    <Object Value="11.463297843933105"/>
+   </List>
+  </List>
+  <List>
+   <List>
+    <Object Value="inf"/>
+    <Object Value="11.053203582763672"/>
+   </List>
+   <List>
+    <Object Value="18.418880462646484"/>
+    <Object Value="11.27785587310791"/>
+   </List>
+  </List>
+  <List>
+   <List>
+    <Object Value="inf"/>
+    <Object Value="10.93435287475586"/>
+   </List>
+   <List>
+    <Object Value="18.220829010009766"/>
+    <Object Value="11.156588554382324"/>
+   </List>
+  </List>
+  <List>
+   <List>
+    <Object Value="inf"/>
+    <Object Value="10.854255676269531"/>
+   </List>
+   <List>
+    <Object Value="18.08735466003418"/>
+    <Object Value="11.074862480163574"/>
+   </List>
+  </List>
+  <List>
+   <List>
+    <Object Value="inf"/>
+    <Object Value="10.799864768981934"/>
+   </List>
+   <List>
+    <Object Value="17.996721267700195"/>
+    <Object Value="11.019367218017578"/>
+   </List>
+  </List>
+  <List>
+   <List>
+    <Object Value="inf"/>
+    <Object Value="10.758626937866211"/>
+   </List>
+   <List>
+    <Object Value="17.928001403808594"/>
+    <Object Value="10.977291107177734"/>
+   </List>
+  </List>
+  <List>
+   <List>
+    <Object Value="inf"/>
+    <Object Value="10.730879783630371"/>
+   </List>
+   <List>
+    <Object Value="17.88176727294922"/>
+    <Object Value="10.948981285095215"/>
+   </List>
+  </List>
+ </List>
+</Dictionary>

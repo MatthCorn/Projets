@@ -370,10 +370,9 @@ def return_data(data, type, param=None):
     elif type == 'tracking':
         return input_data, selected_plateau_data, output_data, [add_mask, mult_mask], output_data.std(dim=[-1, -2], keepdim=True)
     elif type == 'complete':
-        Mask = (mult_mask - add_mask)[:, :-1]
-        M = (output_data * Mask).sum(dim=1, keepdim=True) / (Mask.sum(dim=1, keepdim=True) + 1e-5)
-        Var = ((output_data - M) ** 2 * Mask).sum(dim=[1, 2], keepdim=True) / (abs(Mask.sum(dim=1, keepdim=True) - 1) + 1e-5)
-        Std = torch.sqrt(Var)
+        Mask = mult_mask[:, :-1]
+        M = output_data.sum(dim=1, keepdim=True).expand(output_data.shape) / (Mask.sum(dim=1, keepdim=True) + 1e-5) * Mask
+        Std = torch.norm(M-output_data, dim=[1, 2], keepdim=True) / torch.sqrt(output_data.shape[2] * abs(torch.sum(Mask, dim=1, keepdim=True) - 1) + 1e-5)
         return input_data, output_data, [add_mask, mult_mask], Std
     else:
         return ValueError('invalid type argument')
