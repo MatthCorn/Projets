@@ -137,7 +137,7 @@ def value_to_rgb(value, min_val=0, max_val=2, colormap='plasma'):
     return rgb
 
 def VisualizeScenario(save_path):
-    from Inter.Model.DataMaker import GetData
+    from Inter.NetworkGlobalWindowed.SpecialUtils import GetData
     import torch
 
     param = loadXmlAsObj(os.path.join(save_path, 'param'))
@@ -146,9 +146,9 @@ def VisualizeScenario(save_path):
 
     [Input, Output, Masks, _], _ = GetData(
         d_in=param['d_in'],
-        n_pulse_plateau=param["n_pulse_plateau"],
-        n_sat=param["n_sat"],
-        len_in=param["len_in"],
+        n_pulse_plateau=param['n_pulse_plateau'],
+        n_sat=param['n_sat'],
+        len_in=param['len_in'],
         len_out=param["len_out"],
         n_data_training=1,
         n_data_validation=1,
@@ -161,9 +161,12 @@ def VisualizeScenario(save_path):
         distrib=param["plot_distrib"],
         weight_f=weight_f,
         weight_l=weight_l,
-        plot=False,
-        type='complete',
-        parallel=True
+        size_focus_source=param['len_in_window'] - param['size_tampon_source'],
+        size_tampon_source=param['size_tampon_source'],
+        size_tampon_target=param['size_tampon_target'],
+        size_focus_target=param['len_out_window'] - param['size_tampon_target'],
+        parallel=True,
+        max_inflight=500,
     )
 
     from Inter.NetworkGlobalWindowed.Network import TransformerTranslator
@@ -171,18 +174,46 @@ def VisualizeScenario(save_path):
                               n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], width_FF=param['width_FF'], len_in=param['len_in'],
                               len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'])
     N.load_state_dict(torch.load(os.path.join(save_path, 'Last_network')))
-    Prediction = N(Input, Output, Masks)[:, :-1, :]
+
+    InputMask = Masks[:-1]
+    WindowMask = Masks[-1]
+
+    Prediction = N(Input, Output, InputMask)[:, :-1, :] * WindowMask
+
+    size_focus_source = param['len_in_window'] - param['size_tampon_source']
+    size_tampon_source = param['size_tampon_source']
+    size_tampon_target = param['size_tampon_target']
+    size_focus_target = param['len_out_window'] - param['size_tampon_target']
+
+    Prediction[:, :, -1] = Prediction[:, :, -1] + (
+        torch.arange(Prediction.shape[0]).view(-1, 1) * size_focus_source +
+        torch.arange(-size_tampon_target, size_focus_target).view(1, -1)
+    ) * WindowMask[:, :, -1]
+
+    Prediction = Prediction[WindowMask.to(bool).squeeze(-1)]
+
+    Output[:, :, -1] = Output[:, :, -1] + (
+        torch.arange(Output.shape[0]).view(-1, 1) * size_focus_source +
+        torch.arange(-size_tampon_target, size_focus_target).view(1, -1)
+    ) * WindowMask[:, :, -1]
+
+    Output = Output[WindowMask.to(bool).squeeze(-1)]
+
+    SourceMask = 1 - Masks[0] - Masks[1]
+    SourceMask[:, :size_tampon_source] = 0
+
+    Input = Input[SourceMask.to(bool).squeeze(-1)]
 
     df = param['sensitivity']
     range_plot = param['len_in'] + param['n_pulse_plateau']
-    f_min = Input[:, :, 0].min() - 5 * df
-    f_max = Input[:, :, 0].max() + 5 * df
-    l_std = Input[0, :, 1].std()
+    f_min = Input[:, 0].min() - 5 * df
+    f_max = Input[:, 0].max() + 5 * df
+    l_std = Input[:, 1].std()
 
     from matplotlib import colors
     fig, (ax1, ax2, ax3) = plt.subplots(1, 3, subplot_kw={'projection': '3d'})
 
-    L = Input[0].tolist()
+    L = Input.tolist()
     for i, vector in enumerate(L):
         T1 = i
         T2 = T1 + vector[-1]
@@ -206,9 +237,9 @@ def VisualizeScenario(save_path):
         r, g, b, a = value_to_rgb(N)
         ax1.plot_surface(surf[..., 0], surf[..., 1], surf[..., 2], color=(r, g, b, a))
 
-    R = Output[0][:Masks[0][0, :, 0].tolist().index(1.)].tolist()
+    R = Output.tolist()
     for i, vector in enumerate(R):
-        T1 = i - vector[-1]
+        T1 = vector[-1]
         T2 = T1 + vector[-2]
         F = vector[0]
         N = 0.5 * np.tanh(vector[1]/l_std) + 1
@@ -231,9 +262,9 @@ def VisualizeScenario(save_path):
         r, g, b, a = value_to_rgb(N)
         ax2.plot_surface(surf[..., 0], surf[..., 1], surf[..., 2], color=(r, g, b, a))
 
-    L = Prediction[0][:Masks[0][0, :, 0].tolist().index(1.)].tolist()
+    L = Prediction.tolist()
     for i, vector in enumerate(L):
-        T1 = i - vector[-1]
+        T1 = vector[-1]
         T2 = T1 + vector[-2]
         F = vector[0]
         N = 0.5 * np.tanh(vector[1]/l_std) + 1
@@ -318,7 +349,7 @@ def VisualizeScenario(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobalWindowed\Save\2025-07-08__16-56'
+    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobalWindowed\Save\2025-07-08__16-59'
 
     PlotError(save_path)
 
