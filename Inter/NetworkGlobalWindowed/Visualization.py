@@ -136,6 +136,8 @@ def value_to_rgb(value, min_val=0, max_val=2, colormap='plasma'):
 
     return rgb
 
+updating = False  # flag global pour éviter récursion
+
 def VisualizeScenario(save_path):
     from Inter.NetworkGlobalWindowed.SpecialUtils import GetData
     import torch
@@ -211,140 +213,112 @@ def VisualizeScenario(save_path):
     l_std = Input[:, 1].std()
 
     from matplotlib import colors
-    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, subplot_kw={'projection': '3d'})
+    from matplotlib.patches import Rectangle
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
 
     L = Input.tolist()
-    for i, vector in enumerate(L):
+    enum_L_sorted = sorted(enumerate(L), key=lambda x: x[1])
+    for i, vector in enum_L_sorted:
         T1 = i
         T2 = T1 + vector[-1]
         F = vector[0]
         N = 0.5 * np.tanh(vector[1]/l_std) + 1
-        sommets = [
-            [T1, F, N],
-            [T2, F, N],
-            [T1, F - df, 0],
-            [T1, F + df, 0],
-            [T2, F + df, 0],
-            [T2, F - df, 0]
-        ]
 
-        surf = np.array([[sommets[0], sommets[0], sommets[0], sommets[0]],
-                         [sommets[0], sommets[2], sommets[3], sommets[0]],
-                         [sommets[1], sommets[5], sommets[4], sommets[1]],
-                         [sommets[1], sommets[1], sommets[1], sommets[1]]])
-
-        # Plot the surface
         r, g, b, a = value_to_rgb(N)
-        ax1.plot_surface(surf[..., 0], surf[..., 1], surf[..., 2], color=(r, g, b, a))
+
+        rect = Rectangle((T1, F - df),  # coin bas gauche
+                     T2 - T1,       # largeur
+                     2 * df,        # hauteur
+                     facecolor=(r, g, b, 0.8),
+                     edgecolor='k',
+                     linewidth=0.3)
+        ax1.add_patch(rect)
 
     R = Output.tolist()
-    for i, vector in enumerate(R):
+    R.sort(key=lambda x: x[1])
+    for vector in R:
         T1 = vector[-1]
         T2 = T1 + vector[-2]
         F = vector[0]
         N = 0.5 * np.tanh(vector[1]/l_std) + 1
 
-        sommets = [
-            [T1, F, N],
-            [T2, F, N],
-            [T1, F - df, 0],
-            [T1, F + df, 0],
-            [T2, F + df, 0],
-            [T2, F - df, 0]
-        ]
-
-        surf = np.array([[sommets[0], sommets[0], sommets[0], sommets[0]],
-                         [sommets[0], sommets[2], sommets[3], sommets[0]],
-                         [sommets[1], sommets[5], sommets[4], sommets[1]],
-                         [sommets[1], sommets[1], sommets[1], sommets[1]]])
-
-        # Plot the surface
         r, g, b, a = value_to_rgb(N)
-        ax2.plot_surface(surf[..., 0], surf[..., 1], surf[..., 2], color=(r, g, b, a))
+
+        rect = Rectangle((T1, F - df),  # coin bas gauche
+                         T2 - T1,  # largeur
+                         2 * df,  # hauteur
+                         facecolor=(r, g, b, 0.8),
+                         edgecolor='k',
+                         linewidth=0.3)
+        ax2.add_patch(rect)
 
     L = Prediction.tolist()
-    for i, vector in enumerate(L):
+    L.sort(key=lambda x: x[1])
+    for vector in L:
         T1 = vector[-1]
         T2 = T1 + vector[-2]
         F = vector[0]
         N = 0.5 * np.tanh(vector[1]/l_std) + 1
 
-        sommets = [
-            [T1, F, N],
-            [T2, F, N],
-            [T1, F - df, 0],
-            [T1, F + df, 0],
-            [T2, F + df, 0],
-            [T2, F - df, 0]
-        ]
-
-        surf = np.array([[sommets[0], sommets[0], sommets[0], sommets[0]],
-                         [sommets[0], sommets[2], sommets[3], sommets[0]],
-                         [sommets[1], sommets[5], sommets[4], sommets[1]],
-                         [sommets[1], sommets[1], sommets[1], sommets[1]]])
-
-        # Plot the surface
         r, g, b, a = value_to_rgb(N)
-        ax3.plot_surface(surf[..., 0], surf[..., 1], surf[..., 2], color=(r, g, b, a))
 
-    # Define the colormap and normalization (vmin, vmax)
-    cmap = plt.get_cmap('plasma')  # You can choose 'plasma', 'coolwarm', etc.
-    norm = colors.Normalize(vmin=0, vmax=2)  # Define the range for the colorbar
+        rect = Rectangle((T1, F - df),  # coin bas gauche
+                         T2 - T1,  # largeur
+                         2 * df,  # hauteur
+                         facecolor=(r, g, b, 0.8),
+                         edgecolor='k',
+                         linewidth=0.3)
+        ax3.add_patch(rect)
 
-    # Create a ScalarMappable to be used for the colorbar
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+    cmap = plt.get_cmap('plasma')
+    norm = colors.Normalize(vmin=0, vmax=2)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
-    sm.set_array([])  # Optional, required in some cases to avoid warnings
+    sm.set_array([])
 
-    from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+    divider = make_axes_locatable(ax3)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    plt.colorbar(sm, cax=cax)
 
-    cax1 = inset_axes(ax1, width="5%", height="72%", loc='right', borderpad=0.05)
-    fig.colorbar(sm, cax=cax1)
-    cax2 = inset_axes(ax2, width="5%", height="72%", loc='right', borderpad=0.05)
-    fig.colorbar(sm, cax=cax2)
-    cax3 = inset_axes(ax3, width="5%", height="72%", loc='right', borderpad=0.05)
-    fig.colorbar(sm, cax=cax3)
-    plt.tight_layout()
-
-    ax1.set_xlim(-2, range_plot)
-    ax1.set_ylim(f_min, f_max)
-    ax1.set_zlim(0, 2)
-    ax1.set_box_aspect([2, 2, 0.5])
-    ax1.zaxis.set_ticks([])  # Remove z-axis ticks
-    ax1.zaxis.set_ticklabels([])  # Remove z-axis tick labels
-    ax1.zaxis.label.set_visible(False)  # Hide z-axis label
-    ax1.zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
-    ax1.set_xlabel('temps')
     ax1.set_ylabel('fréquence')
-    ax1.set_proj_type('ortho')
-    ax1.view_init(elev=90, azim=-90)
-    ax1.set_xlim(-2, range_plot)
-    ax2.set_ylim(f_min, f_max)
-    ax2.set_zlim(0, 2)
-    ax2.set_box_aspect([2, 2, 0.5])
-    ax2.zaxis.set_ticks([])  # Remove z-axis ticks
-    ax2.zaxis.set_ticklabels([])  # Remove z-axis tick labels
-    ax2.zaxis.label.set_visible(False)  # Hide z-axis label
-    ax2.zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
-    ax2.set_xlabel('temps')
-    ax2.set_ylabel('fréquence')
-    ax2.set_proj_type('ortho')
-    ax2.view_init(elev=90, azim=-90)
-    ax1.set_xlim(-2, range_plot)
-    ax3.set_ylim(f_min, f_max)
-    ax3.set_zlim(0, 2)
-    ax3.set_box_aspect([2, 2, 0.5])
-    ax3.zaxis.set_ticks([])  # Remove z-axis ticks
-    ax3.zaxis.set_ticklabels([])  # Remove z-axis tick labels
-    ax3.zaxis.label.set_visible(False)  # Hide z-axis label
-    ax3.zaxis.line.set_color((1.0, 1.0, 1.0, 0.0))
-    ax3.set_xlabel('temps')
-    ax3.set_ylabel('fréquence')
-    ax3.set_proj_type('ortho')
-    ax3.view_init(elev=90, azim=-90)
+    for ax in (ax1, ax2, ax3):
+        ax.set_xlim(-2, range_plot)
+        ax.set_ylim(f_min, f_max)
+        ax.set_xlabel('temps')
+
+    ax2.set_yticks([])
+    ax3.set_yticks([])
+
 
     ax1.set_title("Source sequence")
     ax2.set_title("Target sequence")
     ax3.set_title("Predicted sequence")
+
+    plt.tight_layout()
+
+    def on_lim_changed(event_ax):
+        global updating
+        if updating:
+            return  # on est déjà en train de mettre à jour, on sort
+
+        updating = True
+        try:
+            xlim = event_ax.get_xlim()
+            ylim = event_ax.get_ylim()
+
+            for ax in (ax1, ax2, ax3):
+                if ax is not event_ax:
+                    ax.set_xlim(xlim)
+                    ax.set_ylim(ylim)
+            event_ax.figure.canvas.draw_idle()
+        finally:
+            updating = False
+
+    # Attacher l'événement
+    for ax in (ax1, ax2, ax3):
+        ax.callbacks.connect('xlim_changed', on_lim_changed)
+        ax.callbacks.connect('ylim_changed', on_lim_changed)
 
     plt.show()
 
