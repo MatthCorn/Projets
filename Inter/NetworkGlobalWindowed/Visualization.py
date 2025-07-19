@@ -143,8 +143,8 @@ def VisualizeScenario(save_path):
     import torch
 
     param = loadXmlAsObj(os.path.join(save_path, 'param'))
-    weight_l = torch.load(os.path.join(save_path, 'WeightL'))
-    weight_f = torch.load(os.path.join(save_path, 'WeightF'))
+    weight_l = torch.load(os.path.join(save_path, 'WeightL'), weights_only=False)
+    weight_f = torch.load(os.path.join(save_path, 'WeightF'), weights_only=False)
 
     [Input, Output, Masks, _], _ = GetData(
         d_in=param['d_in'],
@@ -323,7 +323,7 @@ def VisualizeScenario(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobalWindowed\Save\2025-07-08__16-59'
+    save_path = r'C:\Users\matth\Documents\Python\Projets\Inter\NetworkGlobalWindowed\Save\2025-07-08__16-59'
 
     PlotError(save_path)
 
