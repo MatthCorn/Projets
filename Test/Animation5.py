@@ -56,8 +56,9 @@ class TransformToImage(Scene):
 
         # Barre rouge qui scanne
         bar = Line(UP , DOWN, color=RED).scale(0.7 * square_size_in)
-        bar_start = LEFT * 7 + RIGHT * n_tamp_in + (4 - square_size_in) * UP
-        bar.move_to(bar_start)
+        target_x = input_squares[0].get_center()[0]
+        target_y = input_squares[0].get_center()[1]
+        bar.move_to([target_x, target_y, 0])
         self.play(FadeIn(bar))
 
         # Génération aléatoire des rectangles cible (on pourra modifier ici)
@@ -107,10 +108,10 @@ class TransformToImage(Scene):
         self.rect_puls = []
 
         pos = 100 * LEFT
-        focus_in = Rectangle(width=n_focus_in * square_size_in, height=square_size_in, fill_color=None, stroke_width=10, fill_opacity=0., stroke_color=BLACK).move_to(pos)
-        tamp_in = Rectangle(width=n_tamp_in * square_size_in, height=square_size_in, fill_color=None, stroke_width=10, fill_opacity=0., stroke_color=RED).move_to(pos)
-        focus_out = Rectangle(width=n_focus_out * square_size_out, height=square_size_out, fill_color=None, stroke_width=10, fill_opacity=0., stroke_color=BLACK).move_to(pos)
-        tamp_out = Rectangle(width=n_tamp_out * square_size_out, height=square_size_out, fill_color=None, stroke_width=10, fill_opacity=0., stroke_color=RED).move_to(pos)
+        focus_in = Rectangle(width=n_focus_in * square_size_in, height=square_size_in, fill_color=None, stroke_width=10, fill_opacity=0., stroke_color=RED).move_to(pos)
+        tamp_in = Rectangle(width=n_tamp_in * square_size_in, height=square_size_in, fill_color=None, stroke_width=10, fill_opacity=0., stroke_color=GREEN).move_to(pos)
+        focus_out = Rectangle(width=n_focus_out * square_size_out, height=square_size_out, fill_color=None, stroke_width=10, fill_opacity=0., stroke_color=RED).move_to(pos)
+        tamp_out = Rectangle(width=n_tamp_out * square_size_out, height=square_size_out, fill_color=None, stroke_width=10, fill_opacity=0., stroke_color=GREEN).move_to(pos)
         foc_in_li = [
             Rectangle(width=square_size_in, height=square_size_in, fill_color=None, stroke_width=5,
                       fill_opacity=0., stroke_color=BLACK).move_to(pos) for _ in range(n_focus_in)
@@ -132,7 +133,7 @@ class TransformToImage(Scene):
         focus_out.set_z_index(2)
 
         for x in foc_in_li + tamp_in_li + foc_ou_li + tamp_ou_li:
-            x.set_z_index(2)
+            x.set_z_index(3)
             self.add(x)
 
 
