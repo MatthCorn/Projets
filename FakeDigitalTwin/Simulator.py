@@ -122,7 +122,7 @@ if __name__ == '__main__':
     TOA = 0
     Dt = 0
     AntP = []
-    for k in range(20):
+    for k in range(30):
         DF = 0.1 * np.random.random() - 0.05
         F = 10 + 0.5 * np.random.random()
         AntP.append(Pulse(TOA=TOA, LI=0.5 + 2 * np.random.random(), FreqStart=F, FreqEnd=F + DF, Level=5.5 * np.random.random()))
@@ -152,6 +152,10 @@ if __name__ == '__main__':
     DT = DigitalTwin(Param)
     DT.forward(AntPulses=AntP)
 
+    import matplotlib.pyplot as plt
+    from matplotlib.patches import Polygon
+    import random
+
     def value_to_rgb(value, min_val=0, max_val=5.5, colormap='plasma'):
         # Normalize the value between 0 and 1
         normalized_value = (value - min_val) / (max_val - min_val)
@@ -167,8 +171,20 @@ if __name__ == '__main__':
 
         return rgb
 
-    import matplotlib.pyplot as plt
-    import random
+    fig, ax = plt.subplots(1)
+
+    L = AntP
+
+    for pulse in L:
+        T1 = pulse.TOA
+        T2 = T1 + pulse.LI
+        N = pulse.Level
+        r, g, b = random.random(), random.random(), random.random()
+        Rectangle = Polygon(((T1, 0), (T1, N), (T2, N), (T2, 0)), fc=(r, g, b, 0.1), ec=(0, 0, 0, 1), lw=2)
+        ax.add_artist(Rectangle)
+
+    plt.show()
+
     df = Param['M_local'] * Param['Fe_List'][1] / Param['Nint']
 
     from matplotlib import colors
