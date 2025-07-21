@@ -121,6 +121,60 @@ def PlotError(save_path):
 
     plt.show()
 
+def ErrorOverPosition(save_path):
+    from Inter.NetworkGlobalWindowed.SpecialUtils import GetData
+    import torch
+
+    param = loadXmlAsObj(os.path.join(save_path, 'param'))
+    weight_l = torch.load(os.path.join(save_path, 'WeightL'), weights_only=False)
+    weight_f = torch.load(os.path.join(save_path, 'WeightF'), weights_only=False)
+
+    [Input, Output, Masks, _], _ = GetData(
+        d_in=param['d_in'],
+        n_pulse_plateau=param['n_pulse_plateau'],
+        n_sat=param['n_sat'],
+        len_in=param['len_in'],
+        len_out=param["len_out"],
+        n_data_training=10,
+        n_data_validation=1,
+        sensitivity=param["sensitivity"],
+        bias='freq',
+        mean_min=min([window["mean"][0] for window in param["training_strategy"]]),
+        mean_max=max([window["mean"][1] for window in param["training_strategy"]]),
+        std_min=min([window["std"][0] for window in param["training_strategy"]]),
+        std_max=max([window["std"][1] for window in param["training_strategy"]]),
+        distrib=param["plot_distrib"],
+        weight_f=weight_f,
+        weight_l=weight_l,
+        size_focus_source=param['len_in_window'] - param['size_tampon_source'],
+        size_tampon_source=param['size_tampon_source'],
+        size_tampon_target=param['size_tampon_target'],
+        size_focus_target=param['len_out_window'] - param['size_tampon_target'],
+        parallel=True,
+        max_inflight=500,
+    )
+
+    from Inter.NetworkGlobalWindowed.Network import TransformerTranslator
+    N = TransformerTranslator(param['d_in'], param['d_in'] + 1, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
+                              n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], width_FF=param['width_FF'], len_in=param['len_in'],
+                              len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'])
+    N.load_state_dict(torch.load(os.path.join(save_path, 'Last_network')))
+
+    InputMask = Masks[:-1]
+    WindowMask = Masks[-1]
+
+    Prediction = N(Input, Output, InputMask)[:, :-1, :] * WindowMask
+
+    err = torch.sum((Prediction - Output) ** 2 * WindowMask, dim=[0, 2]) / ((torch.sum(WindowMask, dim=[0, 2]) + 1e-5) * (param['d_in'] + 1))
+    err = err.sqrt().tolist()
+
+    id_min = torch.argmax(1 - (torch.sum(WindowMask, dim=[0, 2]) == 0).to(float))
+    id_max = param['len_out_window'] - 1 - torch.argmax((1 - (torch.sum(WindowMask, dim=[0, 2]) == 0).to(float)).flip(dims=[0]))
+
+    plt.plot(err)
+    plt.xlim([id_min, id_max])
+    plt.show()
+
 def ErrorOverLength(save_path):
     from Inter.NetworkGlobalWindowed.SpecialUtils import GetData
     import torch
@@ -401,7 +455,7 @@ def VisualizeScenario(save_path):
 if __name__ == '__main__':
     save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobalWindowed\Save\2025-07-18__14-13(1)'
 
-    ErrorOverLength(save_path)
+    # ErrorOverPosition(save_path)
 
     PlotError(save_path)
 
