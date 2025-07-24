@@ -10,23 +10,20 @@ class Scheduler(LambdaLR):
                  warmup_steps: int,
                  max_steps: int = 1000,
                  ramp_steps: int = 100,
-                 dropping_step_list: int = [-1],
-                 dropping_factor: float = 10,
                  max: float = 1.,
                  type=None,
                  last_epoch: int = -1,
-                 verbose: bool = False) -> None:
+                 verbose: bool = False,
+                 last_lr = 0,
+                 target_lr = 0) -> None:
         self.dim_embed = dim_embed
         self.warmup_steps = warmup_steps
         self.max_steps = max_steps
         self.ramp_steps = ramp_steps
         self.type = type
-        self.dropping_step_list = dropping_step_list
-        self.dropping_factor = dropping_factor
         self.max = max
-        self.last_lr = 0
-        self.target_lr = 0
-        self.mult_fact = 1
+        self.last_lr = last_lr
+        self.target_lr = target_lr
 
         super().__init__(optimizer, self.calc_lr, last_epoch, verbose)
 
@@ -48,13 +45,22 @@ class Scheduler(LambdaLR):
             return self.last_lr
 
         self.target_lr = self.max * min(step / self.warmup_steps, (step / self.warmup_steps) ** (-0.5))
-        if step in self.dropping_step_list:
-            self.mult_fact /= self.dropping_factor
-        self.target_lr = self.mult_fact * self.target_lr
         new_lr = 0.95 * self.last_lr + 0.05 * self.target_lr
         self.last_lr = new_lr
         return new_lr
 
+    def get_hparams(self):
+        return {
+            "dim_embed": self.dim_embed,
+            "warmup_steps": self.warmup_steps,
+            "max_steps": self.max_steps,
+            "ramp_steps": self.ramp_steps,
+            "max": self.max,
+            "type": self.type,
+            "last_lr": self.last_lr,
+            "target_lr": self.target_lr,
+            "last_epoch": self.last_epoch
+        }
 
 
 if __name__ == '__main__':

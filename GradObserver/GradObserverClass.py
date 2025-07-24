@@ -19,7 +19,6 @@ class GradObserver:
             self.bins = torch.linspace(self.mean - 2 * self.std, self.mean + 2 * self.std, self.length)
             self.freq = torch.ones(self.length - 1) / (self.length - 1)
 
-
     def update(self):
         param = list(self.module.parameters())[0]
         grad = torch.log10(torch.abs(param.grad.detach().cpu()))
@@ -77,7 +76,7 @@ def GetType(module):
     return str(type(module)).split("'")[1].split(".")[-1]
 
 class DictGradObserver(dict):
-    def __init__(self, network, adam_obs=False):
+    def __init__(self, network):
         super().__init__()
         self.NetToDict(network)
 
@@ -91,15 +90,15 @@ class DictGradObserver(dict):
             else:
                 self.__setitem__(name, DictGradObserver(module))
 
-            # if module._get_name() in ['Dropout', 'LayerNorm', ]:
-            #     self.__setitem__(name, module._get_name())
-            #
-            # elif module._get_name() in ['Linear', 'LearnableParameters', ]:
-            #     self.__setitem__(name, GradObserver(module))
-            #
-            # else:
-            #     self.__setitem__(name, DictGradObserver(module))
-
+    def reconnect(self, network):
+        for name, module in network.named_children():
+            if list(module.named_children()) == []:
+                if list(module.parameters()) == []:
+                    pass
+                else:
+                    self.__getitem__(name).module = module
+            else:
+                self.__getitem__(name).reconnect(module)
 
     def update(self):
         for item in self.values():
