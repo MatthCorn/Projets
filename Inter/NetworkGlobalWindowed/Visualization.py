@@ -129,13 +129,13 @@ def ErrorOverPosition(save_path):
     weight_l = torch.load(os.path.join(save_path, 'WeightL'), weights_only=False)
     weight_f = torch.load(os.path.join(save_path, 'WeightF'), weights_only=False)
 
-    [Input, Output, Masks, _], _ = GetData(
+    [Input, Output, Masks, Std], _ = GetData(
         d_in=param['d_in'],
         n_pulse_plateau=param['n_pulse_plateau'],
         n_sat=param['n_sat'],
         len_in=param['len_in'],
         len_out=param["len_out"],
-        n_data_training=10,
+        n_data_training=200,
         n_data_validation=1,
         sensitivity=param["sensitivity"],
         bias='freq',
@@ -165,7 +165,7 @@ def ErrorOverPosition(save_path):
 
     Prediction = N(Input, Output, InputMask)[:, :-1, :] * WindowMask
 
-    err = torch.sum((Prediction - Output) ** 2 * WindowMask, dim=[0, 2]) / ((torch.sum(WindowMask, dim=[0, 2]) + 1e-5) * (param['d_in'] + 1))
+    err = torch.sum(((Prediction - Output) / Std) ** 2 * WindowMask, dim=[0, 2]) / ((torch.sum(WindowMask, dim=[0, 2]) + 1e-5) * (param['d_in'] + 1))
     err = err.sqrt().tolist()
 
     id_min = torch.argmax(1 - (torch.sum(WindowMask, dim=[0, 2]) == 0).to(float))
@@ -453,9 +453,9 @@ def VisualizeScenario(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobalWindowed\Save\2025-07-18__14-13(1)'
+    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobalWindowed\Save\2025-07-25__11-57'
 
-    # ErrorOverPosition(save_path)
+    ErrorOverPosition(save_path)
 
     PlotError(save_path)
 
