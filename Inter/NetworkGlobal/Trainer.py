@@ -147,7 +147,7 @@ if __name__ == '__main__':
     save_dir = os.path.join(local, 'Inter', 'NetworkGlobal', 'Save')
     data_dir = os.path.join(local, 'Inter', 'Data')
 
-    try :
+    try:
         from Tools.XMLTools import loadXmlAsObj
         resume_from = param["resume_from"]
 
@@ -230,8 +230,6 @@ if __name__ == '__main__':
         if param["lr_option"]["reset"] == "y" and (j == 0):
             optimizer = optimizers[param['optim']](N.parameters(), weight_decay=param["weight_decay"], lr=param["lr_option"]["value"])
 
-            n_updates = int(NDataT / batch_size) * n_iter_window
-            warmup_steps = int(NDataT / batch_size * param["warmup"])
             lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"], max_steps=n_updates, type=param["lr_option"]["type"])
 
         [(TrainingInput, TrainingOutput, TrainingMasks, TrainingStd), (ValidationInput, ValidationOutput, ValidationMasks, ValidationStd)] = GetData(

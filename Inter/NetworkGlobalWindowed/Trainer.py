@@ -8,46 +8,10 @@ from tqdm import tqdm
 
 if __name__ == '__main__':
     import multiprocessing as mp
-
     mp.set_start_method('spawn', force=True)
 
     ################################################################################################################################################
-    # pour sauvegarder toutes les informations de l'apprentissage
-    import os
-    import datetime
-    from Tools.XMLTools import saveObjAsXml
-    import pickle
-    import time
-
-    local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
-    base_folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
-    save_dir = os.path.join(local, 'Inter', 'NetworkGlobalWindowed', 'Save')
-    data_dir = os.path.join(local, 'Inter', 'Data')
-
-    attempt = 0
-    while True:
-        folder = f"{base_folder}({attempt})" if attempt > 0 else base_folder
-        save_path = os.path.join(save_dir, folder)
-
-        try:
-            os.makedirs(save_path, exist_ok=False)
-            break
-        except FileExistsError:
-            attempt += 1
-            time.sleep(0.1)
-
-    print(f"Dossier créé : {save_path}")
-    ################################################################################################################################################
-
-    ################################################################################################################################################
-    # pour les performances
-    import psutil, sys
-
-    p = psutil.Process(os.getpid())
-
-    if sys.platform == "win32":
-        p.nice(psutil.HIGH_PRIORITY_CLASS)
-    ################################################################################################################################################
+    # création des paramètres de la simulation
 
     param = {"n_encoder": 10,
              "n_decoder": 10,
@@ -87,21 +51,33 @@ if __name__ == '__main__':
              "error_weighting": "y",
              "max_lr": 5,
              "FreqGradObs": 1 / 3,
-             "warmup": 1}
+             "warmup": 1,
+             "resume_from": '2025-07-25__10-33'}
 
     try:
         import json
         import sys
-
         json_file = sys.argv[1]
         with open(json_file, "r") as f:
             temp_param = json.load(f)
         param.update(temp_param)
     except:
         print("nothing loaded")
+    ################################################################################################################################################
+
+    ################################################################################################################################################
+    # pour les performances
+    import psutil, sys, os
+
+    p = psutil.Process(os.getpid())
+
+    if sys.platform == "win32":
+        p.nice(psutil.HIGH_PRIORITY_CLASS)
+    ################################################################################################################################################
+
     d_out = param['d_in'] + 1
 
-    freq_checkpoint = 1 / 10
+    freq_checkpoint = 1/10
     nb_frames_GIF = 100
     nb_frames_window = int(nb_frames_GIF / len(param["training_strategy"]))
     res_GIF = 10
@@ -118,18 +94,8 @@ if __name__ == '__main__':
                               len_in=param['len_in'],
                               len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'],
                               width_FF=param['width_FF'])
-    DictGrad = DictGradObserver(N)
 
     N.to(device)
-
-    optimizers = {
-        "AdamW": torch.optim.AdamW,
-        "Adam": torch.optim.Adam,
-        "SGD": torch.optim.SGD,
-    }
-
-    optimizer = optimizers[param['optim']](N.parameters(), weight_decay=param["weight_decay"],
-                                           lr=param["lr_option"]["value"])
 
     NWindows = (param['len_in'] // (param['len_in_window'] - param['size_tampon_source']) + 1)
     NDataT = NWindows * param['NDataT']
@@ -141,19 +107,18 @@ if __name__ == '__main__':
     weight_l = torch.tensor([0., 1.] + [0.] * (param['d_in'] - 3)).numpy()
 
     mini_batch_size = 50000
-    n_minibatch = int(NDataT / mini_batch_size)
+    n_minibatch = int(NDataT/mini_batch_size)
     batch_size = param["batch_size"]
-    n_batch = int(mini_batch_size / batch_size)
+    n_batch = int(mini_batch_size/batch_size)
 
     n_iter = param["n_iter"]
-    TrainingError = []
-    ValidationError = []
-    PlottingError = []
 
-    n_updates = int(NDataT / batch_size) * n_iter
-    warmup_steps = int(NDataT / batch_size * param["warmup"]) + 1
-    lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"], max_steps=n_updates,
-                             type=param["lr_option"]["type"])
+    if param['lr_option']['reset'] == 'y':
+        n_updates = int(NDataT / batch_size) * n_iter_window
+        warmup_steps = int(NDataT / batch_size * param["warmup"])
+    else:
+        n_updates = int(NDataT / batch_size) * n_iter
+        warmup_steps = int(NDataT / batch_size * param["warmup"])
 
     PlottingInput, PlottingOutput, PlottingMasks, PlottingStd = GetData(
         d_in=param['d_in'],
@@ -179,20 +144,105 @@ if __name__ == '__main__':
         parallel=False
     )
 
-    best_state_dict = N.state_dict().copy()
+    optimizers = {
+        "AdamW": torch.optim.AdamW,
+        "Adam": torch.optim.Adam,
+        "SGD": torch.optim.SGD,
+    }
 
-    for window in param["training_strategy"]:
-        if param["lr_option"]["reset"] == "y":
-            optimizer = optimizers[param['optim']](N.parameters(), weight_decay=param["weight_decay"],
-                                                   lr=param["lr_option"]["value"])
+    ################################################################################################################################################
+    import pickle
+    from Tools.XMLTools import saveObjAsXml
+    local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
+    save_dir = os.path.join(local, 'Inter', 'NetworkGlobalWindowed', 'Save')
+    data_dir = os.path.join(local, 'Inter', 'Data')
 
-            n_updates = int(NDataT / batch_size) * n_iter_window
-            warmup_steps = int(NDataT / batch_size * param["warmup"]) + 1
-            lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"], max_steps=n_updates,
-                                     type=param["lr_option"]["type"])
+    try:
+        from Tools.XMLTools import loadXmlAsObj
+        resume_from = param["resume_from"]
 
-        [(TrainingInput, TrainingOutput, TrainingMasks, TrainingStd),
-         (ValidationInput, ValidationOutput, ValidationMasks, ValidationStd)] = GetData(
+        save_path = os.path.join(save_dir, resume_from)
+
+        print(f"Reprise à partir du checkpoint : {save_path}")
+        N.load_state_dict(torch.load(os.path.join(save_path, "Last_network")))
+        with open(os.path.join(save_path, "DictGrad.pkl"), "rb") as f:
+            DictGrad = pickle.load(f)
+        DictGrad.reconnect(N)
+
+        checkpoint = torch.load(os.path.join(save_path, "Scheduler.pt"))
+
+        optimizer = optimizers[param['optim']](N.parameters(), weight_decay=param["weight_decay"],
+                                               lr=param["lr_option"]["value"])
+
+        for group in optimizer.param_groups:
+            group.setdefault("initial_lr", group["lr"])
+
+        lr_scheduler = Scheduler(optimizer=optimizer, **checkpoint["scheduler_hparams"])
+
+        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+
+        lr_scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
+
+        error_dict = loadXmlAsObj(os.path.join(save_path, "error"))
+        TrainingError = error_dict["TrainingError"]
+        ValidationError = error_dict["ValidationError"]
+        PlottingError = error_dict["PlottingError"]
+
+        j = len(TrainingError) % n_iter_window
+        window_index = len(TrainingError) // n_iter_window
+        print(f"Reprise à la fenêtre {window_index}, itération {j}")
+
+    except Exception as e:
+        print(f"Erreur lors de la reprise du checkpoint : {e}")
+        print("Lancement d'un entraînement depuis zéro.")
+
+
+        # pour sauvegarder toutes les informations de l'apprentissage
+        import datetime
+        import time
+
+        base_folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
+
+        attempt = 0
+        while True:
+            folder = f"{base_folder}({attempt})" if attempt > 0 else base_folder
+            save_path = os.path.join(save_dir, folder)
+
+            try:
+                os.makedirs(save_path, exist_ok=False)
+                break
+            except FileExistsError:
+                attempt += 1
+                time.sleep(0.1)
+
+        print(f"Dossier créé : {save_path}")
+
+        optimizer = optimizers[param['optim']](N.parameters(), weight_decay=param["weight_decay"],
+                                               lr=param["lr_option"]["value"])
+        lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"], max_steps=n_updates,
+                                 type=param["lr_option"]["type"])
+
+        DictGrad = DictGradObserver(N)
+
+        TrainingError = []
+        ValidationError = []
+        PlottingError = []
+
+        window_index = 0
+        j = 0
+
+        best_state_dict = N.state_dict().copy()
+
+    ################################################################################################################################################
+
+    while window_index < len(param["training_strategy"]):
+        window = param["training_strategy"][window_index]
+        if param["lr_option"]["reset"] == "y" and (j == 0):
+            optimizer = optimizers[param['optim']](N.parameters(), weight_decay=param["weight_decay"], lr=param["lr_option"]["value"])
+
+            lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"], max_steps=n_updates, type=param["lr_option"]["type"])
+
+        [(TrainingInput, TrainingOutput, TrainingMasks, TrainingStd), (ValidationInput, ValidationOutput, ValidationMasks, ValidationStd)] = GetData(
             d_in=param['d_in'],
             n_pulse_plateau=param['n_pulse_plateau'],
             n_sat=param['n_sat'],
@@ -218,7 +268,9 @@ if __name__ == '__main__':
             max_inflight=500,
         )
 
-        for j in tqdm(range(n_iter_window)):
+        pbar = tqdm(total=n_iter_window, initial=j)
+        while j < n_iter_window:
+
             error = 0
             time_to_observe = (int(j * param["FreqGradObs"]) == (j * param["FreqGradObs"]))
             time_for_checkpoint = (int(j * freq_checkpoint) == (j * freq_checkpoint))
@@ -313,22 +365,38 @@ if __name__ == '__main__':
                 error = {"TrainingError": TrainingError,
                          "ValidationError": ValidationError,
                          "PlottingError": PlottingError}
-                saveObjAsXml(param, os.path.join(save_path, "param"))
+                saveObjAsXml(
+                    {k: v for k, v in param.items() if k != 'resume_from'},
+                    os.path.join(save_path, "param"))
                 saveObjAsXml(error, os.path.join(save_path, "error"))
                 torch.save(best_state_dict, os.path.join(save_path, "Best_network"))
                 torch.save(N.state_dict().copy(), os.path.join(save_path, "Last_network"))
                 torch.save(weight_l, os.path.join(save_path, "WeightL"))
                 torch.save(weight_f, os.path.join(save_path, "WeightF"))
+                torch.save({
+                    "scheduler_state_dict": lr_scheduler.state_dict(),
+                    "optimizer_state_dict": optimizer.state_dict(),
+                    "scheduler_hparams": lr_scheduler.get_hparams()
+                }, os.path.join(save_path, "Scheduler.pt"))
+
                 with open(os.path.join(save_path, "DictGrad.pkl"), "wb") as file:
                     pickle.dump(DictGrad, file)
                 with open(os.path.join(save_path, "ParamObs.pkl"), "wb") as file:
                     ParamObs = DictParamObserver(N)
                     pickle.dump(ParamObs, file)
 
+            j += 1
+            pbar.n = j
+            pbar.refresh()
+
+        window_index += 1
+
     error = {"TrainingError": TrainingError,
              "ValidationError": ValidationError,
              "PlottingError": PlottingError}
-    saveObjAsXml(param, os.path.join(save_path, "param"))
+    saveObjAsXml(
+        {k: v for k, v in param.items() if k != 'resume_from'},
+        os.path.join(save_path, "param"))
     saveObjAsXml(error, os.path.join(save_path, "error"))
     torch.save(best_state_dict, os.path.join(save_path, "Best_network"))
     torch.save(N.state_dict().copy(), os.path.join(save_path, "Last_network"))
@@ -339,4 +407,3 @@ if __name__ == '__main__':
     with open(os.path.join(save_path, "ParamObs.pkl"), "wb") as file:
         ParamObs = DictParamObserver(N)
         pickle.dump(ParamObs, file)
-
