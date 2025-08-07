@@ -157,7 +157,10 @@ def ErrorOverPosition(save_path):
     from Inter.NetworkGlobalWindowed.Network import TransformerTranslator
     N = TransformerTranslator(param['d_in'], param['d_in'] + 1, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
                               n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], width_FF=param['width_FF'], len_in=param['len_in'],
-                              len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'])
+                              len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'],
+                              size_tampon_target=param['size_tampon_target'],
+                              size_tampon_source=param['size_tampon_source']
+                              )
     N.load_state_dict(torch.load(os.path.join(save_path, 'Last_network')))
 
     InputMask = Masks[:-1]
@@ -211,7 +214,10 @@ def ErrorOverLength(save_path):
     from Inter.NetworkGlobalWindowed.Network import TransformerTranslator
     N = TransformerTranslator(param['d_in'], param['d_in'] + 1, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
                               n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], width_FF=param['width_FF'], len_in=param['len_in'],
-                              len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'])
+                              len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'],
+                              size_tampon_target=param['size_tampon_target'],
+                              size_tampon_source=param['size_tampon_source']
+                              )
     N.load_state_dict(torch.load(os.path.join(save_path, 'Last_network')))
 
     InputMask = Masks[:-1]
@@ -304,7 +310,10 @@ def VisualizeScenario(save_path):
     from Inter.NetworkGlobalWindowed.Network import TransformerTranslator
     N = TransformerTranslator(param['d_in'], param['d_in'] + 1, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
                               n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], width_FF=param['width_FF'], len_in=param['len_in'],
-                              len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'])
+                              len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'],
+                              size_tampon_target=param['size_tampon_target'],
+                              size_tampon_source=param['size_tampon_source']
+                              )
     N.load_state_dict(torch.load(os.path.join(save_path, 'Last_network')))
 
     InputMask = Masks[:-1]

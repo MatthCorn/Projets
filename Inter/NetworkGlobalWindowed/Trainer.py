@@ -93,7 +93,9 @@ if __name__ == '__main__':
                               n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'],
                               len_in=param['len_in'],
                               len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'],
-                              width_FF=param['width_FF'])
+                              width_FF=param['width_FF'],
+                              size_tampon_target=param['size_tampon_target'],
+                              size_tampon_source=param['size_tampon_source'])
 
     N.to(device)
 
