@@ -28,10 +28,10 @@ class Simulator:
             self.sensor_simulator.load_model(model_path)
 
     def step(self):
+        res = 0
         if (self.T == 0) or (len(self.V) > 0):
             add = True
 
-            v = self.make_vector()
             if self.T >= self.n:
                 # sélection d'un indice dans les vecteurs du palier, correspondant au vecteur disparaissant
                 m = len(self.V)
@@ -46,6 +46,8 @@ class Simulator:
                 self.L[i] += [a_out]
 
             if self.T < self.N:
+                res = 1
+                v = self.make_vector()
                 # on ajoute le nouveau vecteur dans self.L et self.V, ainsi que son âge actuel dans self.A
                 self.L.append(v)
                 self.V.append(v)
@@ -61,6 +63,7 @@ class Simulator:
         self.sensor_simulator.Process(self.V)
         if add:
             self.add(self.sensor_simulator.V.numpy(), self.D)
+        return res
 
     def run(self):
         while self.sensor_simulator.running:

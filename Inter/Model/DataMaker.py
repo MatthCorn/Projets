@@ -226,7 +226,7 @@ def GetDataSecond(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training
                   'mean_max': mean_max,
                   'distrib': distrib}
 
-    if max_inflight is not None:
+    if max_inflight is not None and parallel:
         kwargs['max_inflight'] = max_inflight
 
     if executor is not None:

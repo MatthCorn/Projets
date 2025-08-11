@@ -24,9 +24,7 @@ class Simulator(GlobalSimulator):
                     P = torch.nn.functional.pad(P, (0, 0, 0, self.n_mes - len(P)))
 
                 self.mem_mesureur.append(P.tolist())
-            i += 1
-
-            self.step()
+            i += self.step()
         self.mem_mesureur.append(torch.zeros((self.n_mes, self.dim)).tolist())
 
 
@@ -232,7 +230,7 @@ def GetDataSecond(d_in, n_pulse_plateau, n_sat, n_mes, period_mes, len_in, len_o
                   'mean_max': mean_max,
                   'distrib': distrib}
 
-    if max_inflight is not None:
+    if max_inflight is not None and parallel:
         kwargs['max_inflight'] = max_inflight
 
     if executor is not None:
@@ -377,16 +375,16 @@ def GetData(d_in, n_pulse_plateau, n_sat, n_mes, len_in, len_out, n_data_trainin
 
     if plot:
         input_data, output_data, mem_data, [add_mask, mult_mask], _ = data
-        return window(input_data, output_data, mult_mask, add_mask, window_param)
+        return window(input_data, output_data, mem_data, mult_mask, add_mask, window_param)
 
     else:
         data_training, data_validation = data
         input_data_t, output_data_t, mem_data_t, [add_mask_t, mult_mask_t], _ = data_training
         input_data_v, output_data_v, mem_data_v, [add_mask_v, mult_mask_v], _ = data_validation
-        return (window(input_data_t, output_data_t, mult_mask_t, add_mask_t, window_param),
-                window(input_data_v, output_data_v, mult_mask_v, add_mask_v, window_param))
+        return (window(input_data_t, output_data_t, mem_data_t, mult_mask_t, add_mask_t, window_param),
+                window(input_data_v, output_data_v, mem_data_v, mult_mask_v, add_mask_v, window_param))
 
-def window(input_data, output_data, mult_mask, add_mask, param):
+def window(input_data, output_data, mem_data, mult_mask, add_mask, param):
     size_tampon_source = param['size_tampon_source']
     size_focus_source = param['size_focus_source']
     size_tampon_target = param['size_tampon_target']
@@ -473,5 +471,5 @@ def window(input_data, output_data, mult_mask, add_mask, param):
 if __name__ == '__main__':
     T = GetData(9, 7, 5, 6, 100, 120, 1000, n_data_validation=1000, sensitivity=0.1,
             weight_f=None, weight_l=None, bias='none', std_min=1., std_max=5., mean_min=-10., mean_max=10.,
-            distrib='log', plot=True, save_path=None, parallel=True, size_tampon_source=3,
+            distrib='log', plot=True, save_path=None, parallel=False, size_tampon_source=3,
             size_focus_source=7, size_tampon_target=4, size_focus_target=9, max_inflight=100)
