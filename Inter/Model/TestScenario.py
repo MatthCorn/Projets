@@ -26,9 +26,9 @@ if __name__ == '__main__':
     n = 10
     range_plot = N + n
     dim = 10
-    S = Simulator(n, N, dim, sensitivity=df, seed=None)
+    # S = Simulator(n, N, dim, sensitivity=df, seed=None)
     # S = BiasedSimulator(1, 3, n, N, dim, sensitivity=df, seed=None)
-    # S = FreqBiasedSimulator(1.2, 1, n, N, dim, sensitivity=df, seed=None)
+    S = FreqBiasedSimulator(1.2, 1, n, N, dim, sensitivity=df, seed=None)
     S.run()
 
 

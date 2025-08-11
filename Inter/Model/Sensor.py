@@ -2,10 +2,11 @@ import torch
 from torch.nn.functional import pad
 
 class Simulator:
-    def __init__(self, dim, sensitivity, n_sat, WeightF=None, WeightL=None, model_path=None):
+    def __init__(self, dim, sensitivity, n_sat, n_mes=6, WeightF=None, WeightL=None, model_path=None):
         self.dim = dim
         self.sensitivity = sensitivity
         self.n_sat = n_sat
+        self.n_mes = n_mes
         self.weight_f = torch.tensor(WeightF, dtype=torch.float) if WeightF is not None else torch.tensor([1., 0.] + [0.] * (self.dim - 2))
         self.weight_f = self.weight_f / torch.norm(self.weight_f)
         self.weight_l = torch.tensor(WeightL, dtype=torch.float) if WeightL is not None else torch.tensor([0., 1.] + [0.] * (self.dim - 2))
@@ -99,20 +100,22 @@ class Simulator:
         # sinon, on compare les informations interceptées aux vecteurs de suivi pour traitement
         self.running = True
         fV = torch.matmul(self.V, self.weight_f)
+        lV = torch.matmul(self.V, self.weight_l)
         fP = torch.matmul(torch.tensor(self.P), self.weight_f)
         lP = torch.matmul(torch.tensor(self.P), self.weight_l)
         correlation = torch.abs(fV.unsqueeze(-1) - fP.unsqueeze(-2)) < self.sensitivity
         m = len(self.P)
-        for i in range(len(self.V)):
+        for i in lV.argsort(descending=True):
             selected_instance = []
             for j in range(m):
                 if correlation[i, j] and (self.TM[j] < self.T):
                     selected_instance.append(j)
             # traitement 1 : pas de corrélation entre V[i] et P : création d'un nouveau vecteur de suivi
             if selected_instance == []:
-                self.P.append(self.V[i].tolist())
-                self.TM.append(self.T)
-                self.TI.append(self.T - 1)
+                if len(self.P) < self.n_mes:
+                    self.P.append(self.V[i].tolist())
+                    self.TM.append(self.T)
+                    self.TI.append(self.T - 1)
             # traitement 2 : corrélation entre V[i] et plusieurs vecteurs de suivi P[j1], P[j2] ...
             else:
                 # on détermine le vecteur de suivi avec corrélation de niveau le plus haut
