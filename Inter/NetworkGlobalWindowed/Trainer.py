@@ -91,8 +91,8 @@ if __name__ == '__main__':
     N = TransformerTranslator(param['d_in'], d_out, d_att=param['d_att'], n_heads=param['n_heads'],
                               n_encoders=param['n_encoder'],
                               n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'],
-                              len_in=param['len_in'],
-                              len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'],
+                              len_in=param['len_in_window'],
+                              len_out=param['len_out_window'], norm=param['norm'], dropout=param['dropout'],
                               width_FF=param['width_FF'],
                               size_tampon_target=param['size_tampon_target'],
                               size_tampon_source=param['size_tampon_source'])

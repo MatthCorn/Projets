@@ -13,8 +13,8 @@ if __name__ == '__main__':
     ################################################################################################################################################
     # création des paramètres de la simulation
 
-    param = {"n_encoder": 2,
-             "n_decoder": 2,
+    param = {"n_encoder": 10,
+             "n_decoder": 10,
              "len_in": 500,
              "len_out": 700,
              "len_in_window": 20,
@@ -40,9 +40,9 @@ if __name__ == '__main__':
              },
              "mult_grad": 10000,
              "weight_decay": 1e-3,
-             "NDataT": 500,
+             "NDataT": 2000,
              "NDataV": 100,
-             "batch_size": 100,
+             "batch_size": 1000,
              "n_iter": 100,
              "training_strategy": [
                  {"mean": [-5, 5], "std": [0.2, 1]},
@@ -81,7 +81,7 @@ if __name__ == '__main__':
     freq_checkpoint = 1/10
     nb_frames_GIF = 100
     nb_frames_window = int(nb_frames_GIF / len(param["training_strategy"]))
-    res_GIF = 10
+    res_GIF = 2
     n_iter_window = int(param["n_iter"] / len(param["training_strategy"]))
 
     if torch.cuda.is_available():
@@ -92,9 +92,9 @@ if __name__ == '__main__':
     N = TransformerTranslator(param['d_in'], d_out, d_att=param['d_att'], n_heads=param['n_heads'],
                               n_encoders=param['n_encoder'],
                               n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'],
-                              len_in=param['len_in'], n_mes=param['n_mes'],
-                              len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'],
-                              width_FF=param['width_FF'],
+                              len_in=param['len_in_window'], n_mes=param['n_mes'],
+                              len_out=param['len_out_window'], norm=param['norm'],
+                              dropout=param['dropout'], width_FF=param['width_FF'],
                               size_tampon_target=param['size_tampon_target'],
                               size_tampon_source=param['size_tampon_source'])
 
@@ -109,7 +109,7 @@ if __name__ == '__main__':
     weight_f = torch.tensor([1., 0.] + [0.] * (param['d_in'] - 3)).numpy()
     weight_l = torch.tensor([0., 1.] + [0.] * (param['d_in'] - 3)).numpy()
 
-    mini_batch_size = 500
+    mini_batch_size = 50000
     n_minibatch = int(NDataT/mini_batch_size)
     batch_size = param["batch_size"]
     n_batch = int(mini_batch_size/batch_size)
@@ -271,7 +271,7 @@ if __name__ == '__main__':
             size_focus_target=param['len_out_window'] - param['size_tampon_target'],
             save_path=data_dir,
             parallel=True,
-            max_inflight=500,
+            max_inflight=20,
         )
 
         pbar = tqdm(total=n_iter_window, initial=j)

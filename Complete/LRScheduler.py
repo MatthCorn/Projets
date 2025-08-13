@@ -13,7 +13,6 @@ class Scheduler(LambdaLR):
                  max: float = 1.,
                  type=None,
                  last_epoch: int = -1,
-                 verbose: bool = False,
                  last_lr = 0,
                  target_lr = 0) -> None:
         self.dim_embed = dim_embed
@@ -25,7 +24,7 @@ class Scheduler(LambdaLR):
         self.last_lr = last_lr
         self.target_lr = target_lr
 
-        super().__init__(optimizer, self.calc_lr, last_epoch, verbose)
+        super().__init__(optimizer, self.calc_lr, last_epoch)
 
     def calc_lr(self, step):
         step += 1
