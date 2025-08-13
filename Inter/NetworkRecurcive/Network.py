@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-from Complete.Transformer.EncoderTransformer import EncoderLayer
 from Complete.Transformer.EasyFeedForward import FeedForward
 from Complete.Transformer.DecoderTransformer import DecoderLayer
 from Complete.Transformer.PositionalEncoding import PositionalEncoding
@@ -28,10 +27,15 @@ class TransformerTranslator(nn.Module):
         self.end_token = LearnableParameters(torch.normal(0, 1, [1, 1, d_att]))
         self.start_token = LearnableParameters(torch.normal(0, 1, [1, 1, d_att]))
         self.pad_token = LearnableParameters(torch.normal(0, 1, [1, 1, d_att]))
+        self.mem_out_seq = LearnableParameters(torch.normal(0, 1, [1, n_mes, d_att]))
+        self.latent_seq = LearnableParameters(torch.normal(0, 1, [1, len_in, d_att]))
+
+        self.mem_encoder = DecoderLayer(d_att=d_att, n_heads=n_heads, norm=norm, width_FF=width_FF, dropout_A=dropout, dropout_FF=dropout)
+        self.mem_decoder = DecoderLayer(d_att=d_att, n_heads=n_heads, norm=norm, width_FF=width_FF, dropout_A=dropout, dropout_FF=dropout)
 
         self.encoders = nn.ModuleList()
         for i in range(n_encoders):
-            self.encoders.append(EncoderLayer(d_att=d_att, n_heads=n_heads, norm=norm, width_FF=width_FF, dropout_FF=dropout, dropout_SA=dropout))
+            self.encoders.append(DecoderLayer(d_att=d_att, n_heads=n_heads, norm=norm, width_FF=width_FF, dropout_A=dropout, dropout_FF=dropout))
 
         self.decoders = nn.ModuleList()
         for i in range(n_decoders):
@@ -39,11 +43,17 @@ class TransformerTranslator(nn.Module):
 
         self.register_buffer("mask_decoder", torch.tril(torch.ones(len_out + 1, len_out + 1)).unsqueeze(0).unsqueeze(0), persistent=False)
 
-        self.last_decoder = FeedForward(d_in=d_att, d_out=d_out, widths=[16], dropout=0)
+        self.vec_decoder = FeedForward(d_in=d_att, d_out=d_out, widths=[16], dropout=0)
 
 
     def forward(self, source, target, mem, len_mem, input_mask):
         source_pad_mask, source_end_mask, target_pad_mask, target_end_mask = input_mask
+
+        mem_mask_in = torch.arange(mem.shape[2]).unsqueeze(0).unsqueeze(2).to(len_mem.device) >= len_mem[:, :-1].unsqueeze(2)
+        mem_mask_in = mem_mask_in.to(torch.float)
+        mem_mask_out = torch.arange(mem.shape[2]).unsqueeze(0).unsqueeze(2).to(len_mem.device) >= len_mem[:, 1:].unsqueeze(2)
+        mem_mask_out = mem_mask_out.to(torch.float)
+        mem_in = nn.functional.pad(mem[:, 0], (0, 1))
 
         # source.shape = (batch_size, len_in, d_in)
         # target.shape = (batch_size, len_out, d_out)
@@ -51,39 +61,46 @@ class TransformerTranslator(nn.Module):
 
         trg = self.dec_embedding(target)
         src = self.enc_embedding(source)
-
-        mem_in = self.enc_embedding(nn.functional.pad(mem[:, 0], (0, 1)))
-        mem_mask_in = torch.arange(mem_in.shape[1]).unsqueeze(0) < len_mem[:, 1:]
-        mem_in[mem_mask_in.logical_not()] = mem_in[mem_mask_in.logical_not()] * 0 + self.pad_token()
-        mem_in = self.mem_pos_encoding(mem_in)
+        mem_in = self.enc_embedding(mem_in)
 
         # source.shape = (batch_size, len_in, d_att)
         # target.shape = (batch_size, len_out, d_att)
 
-        src = (src +
+        src = (src * (1 - source_end_mask) * (1 - source_pad_mask) +
                self.end_token() * source_end_mask +
                self.pad_token() * source_pad_mask)
-        trg = (trg +
+        trg = (trg * (1 - target_end_mask) * (1 - target_pad_mask) +
                self.end_token() * target_end_mask +
                self.pad_token() * target_pad_mask)
+        mem_in = (mem_in * (1 - mem_mask_in) +
+                  self.pad_token() * mem_mask_in)
 
         src = torch.concat((src[:, :self.size_tampon_source], self.start_token().expand(trg.size(0), 1, -1), src[:, self.size_tampon_source:]), dim=1)
         trg = torch.concat((trg[:, :self.size_tampon_target], self.start_token().expand(trg.size(0), 1, -1), trg[:, self.size_tampon_target:]), dim=1)
 
         trg = self.dec_pos_encoding(trg)
         src = self.enc_pos_encoding(src)
+        mem_in = self.mem_pos_encoding(mem_in)
+
         # trg.shape = (batch_size, len_out + 1, d_att)
         # src.shape = (batch_size, len_in + 1, d_att)
 
+        latent = self.enc_pos_encoding(self.latent_seq())
+        latent = self.mem_encoder(target=latent, source=mem_in)
+
         for encoder in self.encoders:
-            src = encoder(src)
+            latent = encoder(target=latent, source=src)
+
+        mem_out = self.mem_decoder(target=self.enc_pos_encoding(self.mem_out_seq()), source=latent)
+        mem_out = (mem_out - self.pad_token() * mem_mask_out)
+        mem_out = self.vec_decoder(mem_out)
 
         for decoder in self.decoders:
-            trg = decoder(target=trg, source=src, mask=self.mask_decoder)
+            trg = decoder(target=trg, source=latent, mask=self.mask_decoder)
         # trg.shape = (batch_size, len_out + 1, d_att)
 
         trg[:, :-1] = trg[:, :-1] - self.end_token() * target_end_mask
-        trg = self.last_decoder(trg)
+        trg = self.vec_decoder(trg)
         # trg.shape = (batch_size, len_out + 1, d_out)
 
-        return trg
+        return trg, mem_out

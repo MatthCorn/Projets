@@ -1,5 +1,5 @@
-from Inter.NetworkGlobalWindowed.SpecialUtils import GetData
-from Inter.NetworkGlobalWindowed.Network import TransformerTranslator
+from Inter.NetworkRecurcive.DataMaker import GetData
+from Inter.NetworkRecurcive.Network import TransformerTranslator
 from Complete.LRScheduler import Scheduler
 from GradObserver.GradObserverClass import DictGradObserver
 from Tools.ParamObs import DictParamObserver
@@ -13,8 +13,8 @@ if __name__ == '__main__':
     ################################################################################################################################################
     # création des paramètres de la simulation
 
-    param = {"n_encoder": 10,
-             "n_decoder": 10,
+    param = {"n_encoder": 2,
+             "n_decoder": 2,
              "len_in": 500,
              "len_out": 700,
              "len_in_window": 20,
@@ -23,6 +23,7 @@ if __name__ == '__main__':
              'size_tampon_target': 12,
              "n_pulse_plateau": 6,
              "n_sat": 5,
+             "n_mes": 6,
              "sensitivity": 0.1,
              "d_in": 10,
              "d_att": 128,
@@ -39,9 +40,9 @@ if __name__ == '__main__':
              },
              "mult_grad": 10000,
              "weight_decay": 1e-3,
-             "NDataT": 100000,
+             "NDataT": 500,
              "NDataV": 100,
-             "batch_size": 1000,
+             "batch_size": 100,
              "n_iter": 100,
              "training_strategy": [
                  {"mean": [-5, 5], "std": [0.2, 1]},
@@ -52,7 +53,7 @@ if __name__ == '__main__':
              "max_lr": 5,
              "FreqGradObs": 1 / 3,
              "warmup": 1,
-             "resume_from": '2025-07-25__10-33'}
+             "resume_from": 'None'}
 
     try:
         import json
@@ -91,7 +92,7 @@ if __name__ == '__main__':
     N = TransformerTranslator(param['d_in'], d_out, d_att=param['d_att'], n_heads=param['n_heads'],
                               n_encoders=param['n_encoder'],
                               n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'],
-                              len_in=param['len_in'],
+                              len_in=param['len_in'], n_mes=param['n_mes'],
                               len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'],
                               width_FF=param['width_FF'],
                               size_tampon_target=param['size_tampon_target'],
@@ -108,7 +109,7 @@ if __name__ == '__main__':
     weight_f = torch.tensor([1., 0.] + [0.] * (param['d_in'] - 3)).numpy()
     weight_l = torch.tensor([0., 1.] + [0.] * (param['d_in'] - 3)).numpy()
 
-    mini_batch_size = 50000
+    mini_batch_size = 500
     n_minibatch = int(NDataT/mini_batch_size)
     batch_size = param["batch_size"]
     n_batch = int(mini_batch_size/batch_size)
@@ -122,10 +123,11 @@ if __name__ == '__main__':
         n_updates = int(NDataT / batch_size) * n_iter
         warmup_steps = int(NDataT / batch_size * param["warmup"])
 
-    PlottingInput, PlottingOutput, PlottingMasks, PlottingStd = GetData(
+    PlottingInput, PlottingOutput, PlottingMem, PlottingLenMem, PlottingMasks, PlottingStd = GetData(
         d_in=param['d_in'],
         n_pulse_plateau=param["n_pulse_plateau"],
         n_sat=param["n_sat"],
+        n_mes=param["n_mes"],
         len_in=param["len_in"],
         len_out=param["len_out"],
         n_data_training=res_GIF,
@@ -157,7 +159,7 @@ if __name__ == '__main__':
     from Tools.XMLTools import saveObjAsXml
     local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
     save_dir = os.path.join(local, 'Inter', 'NetworkGlobalWindowed', 'Save')
-    data_dir = os.path.join(local, 'Inter', 'Data')
+    data_dir = None#os.path.join(local, 'Inter', 'Data')
 
     try:
         from Tools.XMLTools import loadXmlAsObj
@@ -244,10 +246,12 @@ if __name__ == '__main__':
 
             lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"], max_steps=n_updates, type=param["lr_option"]["type"])
 
-        [(TrainingInput, TrainingOutput, TrainingMasks, TrainingStd), (ValidationInput, ValidationOutput, ValidationMasks, ValidationStd)] = GetData(
+        [(TrainingInput, TrainingOutput, TrainingMem, TrainingLenMem, TrainingMasks, TrainingStd),
+         (ValidationInput, ValidationOutput, ValidationMem, ValidationLenMem, ValidationMasks, ValidationStd)] = GetData(
             d_in=param['d_in'],
             n_pulse_plateau=param['n_pulse_plateau'],
             n_sat=param['n_sat'],
+            n_mes=param['n_mes'],
             len_in=param['len_in'],
             len_out=param["len_out"],
             n_data_training=param['NDataT'],
@@ -274,13 +278,15 @@ if __name__ == '__main__':
         while j < n_iter_window:
 
             error = 0
-            time_to_observe = (int(j * param["FreqGradObs"]) == (j * param["FreqGradObs"]))
+            time_to_observe = False#(int(j * param["FreqGradObs"]) == (j * param["FreqGradObs"]))
             time_for_checkpoint = (int(j * freq_checkpoint) == (j * freq_checkpoint))
             time_for_GIF = (j in torch.linspace(0, n_iter_window, nb_frames_window, dtype=int))
 
             for p in range(n_minibatch):
                 InputMiniBatch = TrainingInput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
                 OutputMiniBatch = TrainingOutput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
+                MemMiniBatch = TrainingMem[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
+                LenMemMiniBatch = TrainingLenMem[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
                 MaskMiniBatch = [mask[p * mini_batch_size:(p + 1) * mini_batch_size].to(device) for mask in
                                  TrainingMasks]
                 StdMiniBatch = TrainingStd[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
@@ -290,6 +296,8 @@ if __name__ == '__main__':
 
                     InputBatch = InputMiniBatch[k * batch_size:(k + 1) * batch_size]
                     OutputBatch = OutputMiniBatch[k * batch_size:(k + 1) * batch_size]
+                    MemBatch = MemMiniBatch[k * batch_size:(k + 1) * batch_size]
+                    LenMemBatch = LenMemMiniBatch[k * batch_size:(k + 1) * batch_size]
                     MaskBatch = [mask[k * batch_size:(k + 1) * batch_size].to(device) for mask in MaskMiniBatch]
                     StdBatch = StdMiniBatch[k * batch_size:(k + 1) * batch_size]
 
@@ -299,7 +307,8 @@ if __name__ == '__main__':
                     InputMask = MaskBatch[:-1]
                     WindowMask = MaskBatch[-1]
 
-                    Prediction = N(InputBatch, OutputBatch, InputMask)[:, :-1, :]
+                    Prediction, PredictionMem = N(InputBatch, OutputBatch, MemBatch, LenMemBatch, InputMask)
+                    Prediction = Prediction[:, :-1, :]
 
                     err = torch.norm((Prediction - OutputBatch) / StdBatch * WindowMask, p=2) / (
                                 abs(WindowMask.sum() - batch_size) * d_out).sqrt()
@@ -320,6 +329,9 @@ if __name__ == '__main__':
             with torch.no_grad():
                 Input = ValidationInput.to(device)
                 Output = ValidationOutput.to(device)
+                Mem = ValidationMem.to(device)
+                LenMem = ValidationLenMem.to(device)
+
                 Mask = [mask.to(device) for mask in ValidationMasks]
                 Std = ValidationStd.to(device)
 
@@ -328,7 +340,8 @@ if __name__ == '__main__':
 
                 InputMask = Mask[:-1]
                 WindowMask = Mask[-1]
-                Prediction = N(Input, Output, InputMask)[:, :-1, :]
+                Prediction, PredictionMem = N(Input, Output, Mem, LenMem, InputMask)
+                Prediction = Prediction[:, :-1, :]
 
                 err = torch.norm((Prediction - Output) / Std * WindowMask, p=2) / (
                             (WindowMask.sum() - NDataV) * d_out).sqrt()
@@ -344,6 +357,8 @@ if __name__ == '__main__':
                 with torch.no_grad():
                     Input = PlottingInput.to(device)
                     Output = PlottingOutput.to(device)
+                    Mem = PlottingMem.to(device)
+                    LenMem = PlottingLenMem.to(device)
                     Mask = [mask.to(device) for mask in PlottingMasks]
                     Std = PlottingStd.to(device)
 
@@ -352,7 +367,8 @@ if __name__ == '__main__':
 
                     InputMask = Mask[:-1]
                     WindowMask = Mask[-1]
-                    Prediction = N(Input, Output, InputMask)[:, :-1, :]
+                    Prediction, PredictionMem = N(Input, Output, Mem, LenMem, InputMask)
+                    Prediction = Prediction[:, :-1, :]
 
                     err = torch.norm((Prediction - Output) / Std * WindowMask, p=2) / (
                                 WindowMask.sum(dim=[-1, -2]) * d_out).sqrt()
