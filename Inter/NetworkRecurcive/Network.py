@@ -10,7 +10,7 @@ from Complete.Transformer.LearnableModule import LearnableParameters
 class TransformerTranslator(nn.Module):
 
     def __init__(self, d_in, d_out, d_att=32, n_heads=4, n_encoders=3, n_decoders=3, width_FF=[32], widths_embedding=[32],
-                 len_in=10, len_out=20, norm='post', dropout=0, size_tampon_target=12, size_tampon_source=8):
+                 len_in=10, len_out=20, n_mes=6, norm='post', dropout=0, size_tampon_target=12, size_tampon_source=8):
         super().__init__()
         self.d_in = d_in
         self.d_out = d_out
@@ -22,6 +22,7 @@ class TransformerTranslator(nn.Module):
         self.dec_embedding = FeedForward(d_in=d_out, d_out=d_att, widths=widths_embedding, dropout=dropout)
 
         self.enc_pos_encoding = PositionalEncoding(d_att=d_att, dropout=dropout, max_len=len_in + 1)
+        self.mem_pos_encoding = PositionalEncoding(d_att=d_att, dropout=dropout, max_len=n_mes)
         self.dec_pos_encoding = PositionalEncoding(d_att=d_att, dropout=dropout, max_len=len_out + 1)
 
         self.end_token = LearnableParameters(torch.normal(0, 1, [1, 1, d_att]))
@@ -41,14 +42,20 @@ class TransformerTranslator(nn.Module):
         self.last_decoder = FeedForward(d_in=d_att, d_out=d_out, widths=[16], dropout=0)
 
 
-    def forward(self, source, target, input_mask):
+    def forward(self, source, target, mem, len_mem, input_mask):
         source_pad_mask, source_end_mask, target_pad_mask, target_end_mask = input_mask
 
         # source.shape = (batch_size, len_in, d_in)
         # target.shape = (batch_size, len_out, d_out)
+        # mem.shape = (batch_size, 2, n_mesureur, d_in - 1)
 
         trg = self.dec_embedding(target)
         src = self.enc_embedding(source)
+
+        mem_in = self.enc_embedding(nn.functional.pad(mem[:, 0], (0, 1)))
+        mem_mask_in = torch.arange(mem_in.shape[1]).unsqueeze(0) < len_mem[:, 1:]
+        mem_in[mem_mask_in.logical_not()] = mem_in[mem_mask_in.logical_not()] * 0 + self.pad_token()
+        mem_in = self.mem_pos_encoding(mem_in)
 
         # source.shape = (batch_size, len_in, d_att)
         # target.shape = (batch_size, len_out, d_att)

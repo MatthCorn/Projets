@@ -53,10 +53,10 @@ class TransformerTranslator(nn.Module):
         # source.shape = (batch_size, len_in, d_att)
         # target.shape = (batch_size, len_out, d_att)
 
-        src = (src +
+        src = (src * (1 - source_end_mask) * (1 - source_pad_mask) +
                self.end_token() * source_end_mask +
                self.pad_token() * source_pad_mask)
-        trg = (trg +
+        trg = (trg * (1 - target_end_mask) * (1 - target_pad_mask) +
                self.end_token() * target_end_mask +
                self.pad_token() * target_pad_mask)
 

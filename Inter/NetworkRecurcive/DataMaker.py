@@ -11,12 +11,14 @@ class Simulator(GlobalSimulator):
         super().__init__(*args, **{k: v for (k,v) in kwargs.items() if k != 'period_mes'})
         self.period_mesureur = kwargs['period_mes']
         self.mem_mesureur = []
+        self.len_mem_mesureur = []
 
     def run(self):
         i = 0
         while self.sensor_simulator.running:
             if not i % self.period_mesureur:
                 P = self.sensor_simulator.P
+                self.len_mem_mesureur.append(len(P))
                 if P == []:
                     P = torch.zeros((self.n_mes, self.dim))
                 else:
@@ -26,7 +28,7 @@ class Simulator(GlobalSimulator):
                 self.mem_mesureur.append(P.tolist())
             i += self.step()
         self.mem_mesureur.append(torch.zeros((self.n_mes, self.dim)).tolist())
-
+        self.len_mem_mesureur.append(0)
 
 
 class BiasedSimulator(BiasedSimulatorTemplate, Simulator):
@@ -69,12 +71,13 @@ def generate_sample(args):
     len_output_seq = len(S.sensor_simulator.R)
     output_seq = (S.sensor_simulator.R + [[0.] * (d_in + 1)] * (len_out - len_output_seq))[:len_out]
     mem_mesureur = S.mem_mesureur
+    len_mem_mesureur = S.len_mem_mesureur
 
-    return input_seq, len_output_seq, output_seq, mem_mesureur
+    return input_seq, len_output_seq, output_seq, mem_mesureur, len_mem_mesureur
 
 def MakeData(d_in, n_pulse_plateau, n_sat, n_mes, period_mes, len_in, len_out, n_data, sensitivity=0.1, weight_f=None, weight_l=None,
              bias='none', std_min=1, std_max=5, mean_min=-10, mean_max=10, distrib='log', plot=False):
-    input_data, len_output_data, output_data, mem_data = [], [], [], []
+    input_data, len_output_data, output_data, mem_data, len_mem_data = [], [], [], [], []
     if bias != 'none':
         if plot:
             spacing = lambda x: np.linspace(0, 1, x)
@@ -99,27 +102,29 @@ def MakeData(d_in, n_pulse_plateau, n_sat, n_mes, period_mes, len_in, len_out, n
         if bias != 'none':
             mean = mean_list[i]
             std = std_list[i]
-            input_seq, len_output_seq, output_seq, mem_mesureur = (
+            input_seq, len_output_seq, output_seq, mem_mesureur, len_mem_mesureur = (
                 generate_sample((bias, std, mean, d_in, n_pulse_plateau, n_sat, n_mes, period_mes, len_in, len_out, sensitivity, weight_f, weight_l)))
         else:
-            input_seq, len_output_seq, output_seq, mem_mesureur = (
+            input_seq, len_output_seq, output_seq, mem_mesureur, len_mem_mesureur = (
                 generate_sample((bias, d_in, n_pulse_plateau, n_sat, n_mes, period_mes, len_in, len_out, sensitivity, weight_f, weight_l)))
 
         input_data.append(input_seq)
         len_output_data.append(len_output_seq)
         output_data.append(output_seq)
         mem_data.append(mem_mesureur)
+        len_mem_data.append(len_mem_mesureur)
 
     input_data = torch.tensor(input_data, dtype=torch.float)
     output_data = torch.tensor(output_data, dtype=torch.float)
     mem_data = torch.tensor(mem_data, dtype=torch.float)
+    len_mem_data = torch.tensor(len_mem_data, dtype=torch.float)
 
     len_element_output = torch.tensor(len_output_data).unsqueeze(-1)
     arrange = torch.arange(len_out + 1).unsqueeze(0).expand(n_data, -1)
     add_mask = torch.tensor(len_element_output == arrange, dtype=torch.float).unsqueeze(-1)
     mult_mask = torch.tensor(len_element_output >= arrange, dtype=torch.float).unsqueeze(-1)
 
-    return input_data, add_mask, mult_mask, output_data, mem_data
+    return input_data, add_mask, mult_mask, output_data, mem_data, len_mem_data
 
 from concurrent.futures import ProcessPoolExecutor
 from collections import deque
@@ -187,18 +192,19 @@ def MakeDataParallel(d_in, n_pulse_plateau, n_sat, n_mes, period_mes, len_in, le
 
 
     # Extraction des résultats
-    input_data, len_output_data, output_data, mem_data = zip(*results)
+    input_data, len_output_data, output_data, mem_data, len_mem_data = zip(*results)
 
     input_data = torch.tensor(input_data, dtype=torch.float)
     output_data = torch.tensor(output_data, dtype=torch.float)
     mem_data = torch.tensor(mem_data, dtype=torch.float)
+    len_mem_data = torch.tensor(len_mem_data, dtype=torch.float)
 
     len_element_output = torch.tensor(len_output_data).unsqueeze(-1)
     arrange = torch.arange(len_out + 1).unsqueeze(0).expand(n_data, -1)
     add_mask = torch.tensor(len_element_output == arrange, dtype=torch.float).unsqueeze(-1)
     mult_mask = torch.tensor(len_element_output >= arrange, dtype=torch.float).unsqueeze(-1)
 
-    return input_data, add_mask, mult_mask, output_data, mem_data
+    return input_data, add_mask, mult_mask, output_data, mem_data, len_mem_data
 
 def GetDataSecond(d_in, n_pulse_plateau, n_sat, n_mes, period_mes, len_in, len_out, n_data_training, n_data_validation=1000, sensitivity=0.1,
             weight_f=None, weight_l=None, bias='none', std_min=1., std_max=5., mean_min=-10., mean_max=10.,
@@ -274,27 +280,31 @@ def GetDataSecond(d_in, n_pulse_plateau, n_sat, n_mes, period_mes, len_in, len_o
                 mult_mask_ = torch.load(os.path.join(save_path, file, phase + '_mult_mask'))
                 output_data_ = torch.load(os.path.join(save_path, file, phase + '_output_data'))
                 mem_data_ = torch.load(os.path.join(save_path, file, phase + '_mem_data'))
+                len_mem_data_ = torch.load(os.path.join(save_path, file, phase + '_len_mem_data'))
 
                 if len(input_data_) < n_data[phase]:
-                    input_data, add_mask, mult_mask, output_data, mem_data = (
+                    input_data, add_mask, mult_mask, output_data, mem_data, len_mem_data = (
                         make_data(n_data=n_data[phase] - len(input_data_), weight_f=weight_f, weight_l=weight_l, **kwargs))
 
                     input_data_ = torch.cat((input_data_, input_data), dim=0)
                     add_mask_ = torch.cat((add_mask_, add_mask), dim=0)
                     mult_mask_ = torch.cat((mult_mask_, mult_mask), dim=0)
                     mem_data_ = torch.cat((mem_data_, mem_data), dim=0)
+                    len_mem_data_ = torch.cat((len_mem_data_, len_mem_data), dim=0)
 
                     torch.save(input_data_, os.path.join(save_path, file, phase + '_input_data'))
                     torch.save(add_mask_, os.path.join(save_path, file, phase + '_add_mask'))
                     torch.save(mult_mask_, os.path.join(save_path, file, phase + '_mult_mask'))
                     torch.save(output_data_, os.path.join(save_path, file, phase + '_output_data'))
                     torch.save(mem_data_, os.path.join(save_path, file, phase + '_mem_data'))
+                    torch.save(len_mem_data_, os.path.join(save_path, file, phase + '_len_mem_data'))
 
                 output.append(list(return_data(input_data_[:n_data[phase]],
                                                add_mask_[:n_data[phase]],
                                                mult_mask_[:n_data[phase]],
                                                output_data_[:n_data[phase]],
-                                               mem_data_[:n_data[phase]]
+                                               mem_data_[:n_data[phase]],
+                                               len_mem_data_[:n_data[phase]]
                                                )))
 
             return output
@@ -322,7 +332,7 @@ def GetDataSecond(d_in, n_pulse_plateau, n_sat, n_mes, period_mes, len_in, len_o
     output = []
     for phase in n_data.keys():
 
-        input_data, add_mask, mult_mask, output_data, mem_data = (
+        input_data, add_mask, mult_mask, output_data, mem_data, len_mem_data = (
             make_data(n_data=n_data[phase], weight_f=weight_f, weight_l=weight_l, **kwargs))
 
         torch.save(input_data, os.path.join(save_path, file, phase + '_input_data'))
@@ -330,21 +340,23 @@ def GetDataSecond(d_in, n_pulse_plateau, n_sat, n_mes, period_mes, len_in, len_o
         torch.save(mult_mask, os.path.join(save_path, file, phase + '_mult_mask'))
         torch.save(output_data, os.path.join(save_path, file, phase + '_output_data'))
         torch.save(mem_data, os.path.join(save_path, file, phase + '_mem_data'))
+        torch.save(len_mem_data, os.path.join(save_path, file, phase + '_len_mem_data'))
 
         output.append(list(return_data(input_data,
                                        add_mask,
                                        mult_mask,
                                        output_data,
-                                       mem_data)))
+                                       mem_data,
+                                       len_mem_data)))
 
     return output
 
 def return_data(*args):
-    input_data, add_mask, mult_mask, output_data, mem_data = args
+    input_data, add_mask, mult_mask, output_data, mem_data, len_mem_data = args
     Mask = mult_mask[:, :-1]
     M = output_data.sum(dim=1, keepdim=True).expand(output_data.shape) / (Mask.sum(dim=1, keepdim=True) + 1e-5) * Mask
     Std = torch.norm(M-output_data, dim=[1, 2], keepdim=True) / torch.sqrt(output_data.shape[2] * abs(torch.sum(Mask, dim=1, keepdim=True) - 1) + 1e-5)
-    return input_data, output_data, mem_data, [add_mask, mult_mask], Std
+    return input_data, output_data, mem_data, len_mem_data, [add_mask, mult_mask], Std
 
 
 def GetData(d_in, n_pulse_plateau, n_sat, n_mes, len_in, len_out, n_data_training, n_data_validation=1000, sensitivity=0.1,
@@ -374,17 +386,17 @@ def GetData(d_in, n_pulse_plateau, n_sat, n_mes, len_in, len_out, n_data_trainin
                              max_inflight=max_inflight)
 
     if plot:
-        input_data, output_data, mem_data, [add_mask, mult_mask], _ = data
-        return window(input_data, output_data, mem_data, mult_mask, add_mask, window_param)
+        input_data, output_data, mem_data, len_mem_data, [add_mask, mult_mask], _ = data
+        return window(input_data, output_data, mem_data, len_mem_data, mult_mask, add_mask, window_param)
 
     else:
         data_training, data_validation = data
-        input_data_t, output_data_t, mem_data_t, [add_mask_t, mult_mask_t], _ = data_training
-        input_data_v, output_data_v, mem_data_v, [add_mask_v, mult_mask_v], _ = data_validation
-        return (window(input_data_t, output_data_t, mem_data_t, mult_mask_t, add_mask_t, window_param),
-                window(input_data_v, output_data_v, mem_data_v, mult_mask_v, add_mask_v, window_param))
+        input_data_t, output_data_t, mem_data_t, len_mem_data_t, [add_mask_t, mult_mask_t], _ = data_training
+        input_data_v, output_data_v, mem_data_v, len_mem_data_v, [add_mask_v, mult_mask_v], _ = data_validation
+        return (window(input_data_t, output_data_t, mem_data_t, len_mem_data_t, mult_mask_t, add_mask_t, window_param),
+                window(input_data_v, output_data_v, mem_data_v, len_mem_data_v, mult_mask_v, add_mask_v, window_param))
 
-def window(input_data, output_data, mem_data, mult_mask, add_mask, param):
+def window(input_data, output_data, mem_data, len_mem_data, mult_mask, add_mask, param):
     size_tampon_source = param['size_tampon_source']
     size_focus_source = param['size_focus_source']
     size_tampon_target = param['size_tampon_target']
@@ -463,13 +475,15 @@ def window(input_data, output_data, mem_data, mult_mask, add_mask, param):
     windowed_input_data = windowed_input_data.reshape(-1, *windowed_input_data.shape[2:]).transpose(1, 2)
     window_mask = window_mask.reshape(-1, *window_mask.shape[2:])
 
-    return (windowed_input_data, windowed_output_data,
+    mem_data = torch.cat((mem_data[:, :-1].unsqueeze(2), mem_data[:, 1:].unsqueeze(2)), dim=2).reshape(-1, 2, *mem_data.shape[2:])
+    len_mem_data = torch.cat((len_mem_data[:, :-1].unsqueeze(2), len_mem_data[:, 1:].unsqueeze(2)), dim=2).reshape(-1, 2, *len_mem_data.shape[2:])
+
+    return (windowed_input_data, windowed_output_data, mem_data, len_mem_data,
             [source_pad_mask, source_end_mask, target_pad_mask,
-             target_end_mask, window_mask],
-            std)
+             target_end_mask, window_mask], std)
 
 if __name__ == '__main__':
     T = GetData(9, 7, 5, 6, 100, 120, 1000, n_data_validation=1000, sensitivity=0.1,
             weight_f=None, weight_l=None, bias='none', std_min=1., std_max=5., mean_min=-10., mean_max=10.,
-            distrib='log', plot=True, save_path=None, parallel=False, size_tampon_source=3,
+            distrib='log', plot=True, save_path=None, parallel=True, size_tampon_source=3,
             size_focus_source=7, size_tampon_target=4, size_focus_target=9, max_inflight=100)
