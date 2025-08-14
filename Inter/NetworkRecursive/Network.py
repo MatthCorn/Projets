@@ -43,17 +43,14 @@ class TransformerTranslator(nn.Module):
 
         self.register_buffer("mask_decoder", torch.tril(torch.ones(len_out + 1, len_out + 1)).unsqueeze(0).unsqueeze(0), persistent=False)
 
-        self.vec_decoder = FeedForward(d_in=d_att, d_out=d_out, widths=[16], dropout=0)
+        self.mem_decoderFF = FeedForward(d_in=d_att, d_out=d_in - 1, widths=[16], dropout=0)
+        self.pulse_decoder = FeedForward(d_in=d_att, d_out=d_out, widths=[16], dropout=0)
 
 
-    def forward(self, source, target, mem, len_mem, input_mask):
-        source_pad_mask, source_end_mask, target_pad_mask, target_end_mask = input_mask
+    def forward(self, source, target, mem_in, input_mask):
+        source_pad_mask, source_end_mask, target_pad_mask, target_end_mask, pad_mem_in_mask, pad_mem_out_mask = input_mask
 
-        mem_mask_in = torch.arange(mem.shape[2]).unsqueeze(0).unsqueeze(2).to(len_mem.device) >= len_mem[:, :-1].unsqueeze(2)
-        mem_mask_in = mem_mask_in.to(torch.float)
-        mem_mask_out = torch.arange(mem.shape[2]).unsqueeze(0).unsqueeze(2).to(len_mem.device) >= len_mem[:, 1:].unsqueeze(2)
-        mem_mask_out = mem_mask_out.to(torch.float)
-        mem_in = nn.functional.pad(mem[:, 0], (0, 1))
+        mem_in = nn.functional.pad(mem_in, (0, 1))
 
         # source.shape = (batch_size, len_in, d_in)
         # target.shape = (batch_size, len_out, d_out)
@@ -72,8 +69,8 @@ class TransformerTranslator(nn.Module):
         trg = (trg * (1 - target_end_mask) * (1 - target_pad_mask) +
                self.end_token() * target_end_mask +
                self.pad_token() * target_pad_mask)
-        mem_in = (mem_in * (1 - mem_mask_in) +
-                  self.pad_token() * mem_mask_in)
+        mem_in = (mem_in * (1 - pad_mem_in_mask) +
+                  self.pad_token() * pad_mem_in_mask)
 
         src = torch.concat((src[:, :self.size_tampon_source], self.start_token().expand(trg.size(0), 1, -1), src[:, self.size_tampon_source:]), dim=1)
         trg = torch.concat((trg[:, :self.size_tampon_target], self.start_token().expand(trg.size(0), 1, -1), trg[:, self.size_tampon_target:]), dim=1)
@@ -92,15 +89,15 @@ class TransformerTranslator(nn.Module):
             latent = encoder(target=latent, source=src)
 
         mem_out = self.mem_decoder(target=self.enc_pos_encoding(self.mem_out_seq()), source=latent)
-        mem_out = (mem_out - self.pad_token() * mem_mask_out)
-        mem_out = self.vec_decoder(mem_out)
+        mem_out = (mem_out - self.pad_token() * pad_mem_out_mask)
+        mem_out = self.mem_decoderFF(mem_out)
 
         for decoder in self.decoders:
             trg = decoder(target=trg, source=latent, mask=self.mask_decoder)
         # trg.shape = (batch_size, len_out + 1, d_att)
 
         trg[:, :-1] = trg[:, :-1] - self.end_token() * target_end_mask
-        trg = self.vec_decoder(trg)
+        trg = self.pulse_decoder(trg)
         # trg.shape = (batch_size, len_out + 1, d_out)
 
         return trg, mem_out

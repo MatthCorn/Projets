@@ -1,6 +1,7 @@
 import torch
 from Tools.XMLTools import loadXmlAsObj, saveObjAsXml
 import os
+import gc
 from tqdm import tqdm
 import numpy as np
 import time
@@ -189,7 +190,6 @@ def MakeDataParallel(d_in, n_pulse_plateau, n_sat, n_mes, period_mes, len_in, le
         finally:
             if should_shutdown:
                 executor.shutdown()
-
 
     # Extraction des résultats
     input_data, len_output_data, output_data, mem_data, len_mem_data = zip(*results)
@@ -469,18 +469,34 @@ def window(input_data, output_data, mem_data, len_mem_data, mult_mask, add_mask,
     std = torch.norm(mean - windowed_output_data * window_mask, dim=[1, 2, 3], p=2) / (
             windowed_output_data.shape[-1] * (window_mask.sum(dim=[1, 2, 3]) - windowed_output_data.shape[1])).sqrt()
 
-    std = std.unsqueeze(-1).expand(-1, windowed_output_data.shape[1]).reshape(-1, 1, 1)
+    std_output = std.unsqueeze(-1).expand(-1, windowed_output_data.shape[1]).reshape(-1, 1, 1)
 
     windowed_output_data = windowed_output_data.reshape(-1, *windowed_output_data.shape[2:])
     windowed_input_data = windowed_input_data.reshape(-1, *windowed_input_data.shape[2:]).transpose(1, 2)
     window_mask = window_mask.reshape(-1, *window_mask.shape[2:])
 
-    mem_data = torch.cat((mem_data[:, :-1].unsqueeze(2), mem_data[:, 1:].unsqueeze(2)), dim=2).reshape(-1, 2, *mem_data.shape[2:])
-    len_mem_data = torch.cat((len_mem_data[:, :-1].unsqueeze(2), len_mem_data[:, 1:].unsqueeze(2)), dim=2).reshape(-1, 2, *len_mem_data.shape[2:])
+    mem_in_data = mem_data[:, :-1].reshape(-1, *mem_data.shape[2:])
+    mem_out_data = mem_data[:, 1:].reshape(-1, *mem_data.shape[2:])
 
-    return (windowed_input_data, windowed_output_data, mem_data, len_mem_data,
-            [source_pad_mask, source_end_mask, target_pad_mask,
-             target_end_mask, window_mask], std)
+    mem_mask_in = torch.arange(mem_data.shape[2]).unsqueeze(0).unsqueeze(1).unsqueeze(-1) >= len_mem_data[:, :-1].unsqueeze(2).unsqueeze(-1)
+    mem_mask_out = torch.arange(mem_data.shape[2]).unsqueeze(0).unsqueeze(1).unsqueeze(-1) >= len_mem_data[:, 1:].unsqueeze(2).unsqueeze(-1)
+    mem_mask_in = mem_mask_in.to(torch.float)
+    mem_mask_out = mem_mask_out.to(torch.float)
+
+    mean = (mem_data[:, 1:] * (1 - mem_mask_out)).sum(dim=2, keepdim=True).expand(mem_data[:, 1:].shape) / (
+            (1 - mem_mask_out).sum(dim=2, keepdim=True) + 1e-5) * (1 - mem_mask_out)
+
+    std = torch.norm(mean - mem_data[:, 1:] * (1 - mem_mask_out), dim=[1, 2, 3], p=2) / (
+            mem_data[:, 1:].shape[-1] * ((1 - mem_mask_out).sum(dim=[1, 2, 3]) - mem_data[:, 1:].shape[1])).sqrt()
+
+    std_mem = std.unsqueeze(-1).expand(-1, mem_data[:, 1:].shape[1]).reshape(-1, 1, 1)
+
+    mem_mask_in = mem_mask_in.reshape(*mem_in_data.shape[:2], 1)
+    mem_mask_out = mem_mask_out.reshape(*mem_in_data.shape[:2], 1)
+
+    return (windowed_input_data, windowed_output_data, mem_in_data, mem_out_data,
+            [source_pad_mask, source_end_mask, target_pad_mask, target_end_mask,
+             mem_mask_in, mem_mask_out, window_mask], std_output, std_mem)
 
 if __name__ == '__main__':
     T = GetData(9, 7, 5, 6, 100, 120, 1000, n_data_validation=1000, sensitivity=0.1,

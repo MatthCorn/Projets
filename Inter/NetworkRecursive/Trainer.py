@@ -1,10 +1,11 @@
-from Inter.NetworkRecurcive.DataMaker import GetData
-from Inter.NetworkRecurcive.Network import TransformerTranslator
+from Inter.NetworkRecursive.DataMaker import GetData
+from Inter.NetworkRecursive.Network import TransformerTranslator
 from Complete.LRScheduler import Scheduler
 from GradObserver.GradObserverClass import DictGradObserver
 from Tools.ParamObs import DictParamObserver
 import torch
 from tqdm import tqdm
+from math import sqrt
 
 if __name__ == '__main__':
     import multiprocessing as mp
@@ -40,7 +41,7 @@ if __name__ == '__main__':
              },
              "mult_grad": 10000,
              "weight_decay": 1e-3,
-             "NDataT": 2000,
+             "NDataT": 200,
              "NDataV": 100,
              "batch_size": 1000,
              "n_iter": 100,
@@ -123,7 +124,7 @@ if __name__ == '__main__':
         n_updates = int(NDataT / batch_size) * n_iter
         warmup_steps = int(NDataT / batch_size * param["warmup"])
 
-    PlottingInput, PlottingOutput, PlottingMem, PlottingLenMem, PlottingMasks, PlottingStd = GetData(
+    PlottingInput, PlottingOutput, PlottingMemIn, PlottingMemOut, PlottingMasks, PlottingOutStd, PlottingMemStd = GetData(
         d_in=param['d_in'],
         n_pulse_plateau=param["n_pulse_plateau"],
         n_sat=param["n_sat"],
@@ -158,8 +159,8 @@ if __name__ == '__main__':
     import pickle
     from Tools.XMLTools import saveObjAsXml
     local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
-    save_dir = os.path.join(local, 'Inter', 'NetworkGlobalWindowed', 'Save')
-    data_dir = None#os.path.join(local, 'Inter', 'Data')
+    save_dir = os.path.join(local, 'Inter', 'NetworkRecursive', 'Save')
+    data_dir = os.path.join(local, 'Inter', 'Data')
 
     try:
         from Tools.XMLTools import loadXmlAsObj
@@ -191,6 +192,9 @@ if __name__ == '__main__':
         TrainingError = error_dict["TrainingError"]
         ValidationError = error_dict["ValidationError"]
         PlottingError = error_dict["PlottingError"]
+        TrainingMemError = error_dict["TrainingMemError"]
+        ValidationMemError = error_dict["ValidationMemError"]
+        PlottingMemError = error_dict["PlottingMemError"]
 
         j = len(TrainingError) % n_iter_window
         window_index = len(TrainingError) // n_iter_window
@@ -231,6 +235,9 @@ if __name__ == '__main__':
         TrainingError = []
         ValidationError = []
         PlottingError = []
+        TrainingMemError = []
+        ValidationMemError = []
+        PlottingMemError = []
 
         window_index = 0
         j = 0
@@ -246,8 +253,8 @@ if __name__ == '__main__':
 
             lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"], max_steps=n_updates, type=param["lr_option"]["type"])
 
-        [(TrainingInput, TrainingOutput, TrainingMem, TrainingLenMem, TrainingMasks, TrainingStd),
-         (ValidationInput, ValidationOutput, ValidationMem, ValidationLenMem, ValidationMasks, ValidationStd)] = GetData(
+        [(TrainingInput, TrainingOutput, TrainingMemIn, TrainingMemOut, TrainingMasks, TrainingOutStd, TrainingMemStd),
+         (ValidationInput, ValidationOutput, ValidationMemIn, ValidationMemOut, ValidationMasks, ValidationOutStd, ValidationMemStd)] = GetData(
             d_in=param['d_in'],
             n_pulse_plateau=param['n_pulse_plateau'],
             n_sat=param['n_sat'],
@@ -271,35 +278,38 @@ if __name__ == '__main__':
             size_focus_target=param['len_out_window'] - param['size_tampon_target'],
             save_path=data_dir,
             parallel=True,
-            max_inflight=20,
+            max_inflight=5,
         )
 
         pbar = tqdm(total=n_iter_window, initial=j)
         while j < n_iter_window:
 
             error = 0
-            time_to_observe = False#(int(j * param["FreqGradObs"]) == (j * param["FreqGradObs"]))
+            error_mem = 0
+            time_to_observe = (int(j * param["FreqGradObs"]) == (j * param["FreqGradObs"]))
             time_for_checkpoint = (int(j * freq_checkpoint) == (j * freq_checkpoint))
             time_for_GIF = (j in torch.linspace(0, n_iter_window, nb_frames_window, dtype=int))
 
             for p in range(n_minibatch):
                 InputMiniBatch = TrainingInput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
                 OutputMiniBatch = TrainingOutput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
-                MemMiniBatch = TrainingMem[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
-                LenMemMiniBatch = TrainingLenMem[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
+                MemInMiniBatch = TrainingMemIn[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
+                MemOutMiniBatch = TrainingMemOut[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
                 MaskMiniBatch = [mask[p * mini_batch_size:(p + 1) * mini_batch_size].to(device) for mask in
                                  TrainingMasks]
-                StdMiniBatch = TrainingStd[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
+                OutStdMiniBatch = TrainingOutStd[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
+                MemStdMiniBatch = TrainingMemStd[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
 
                 for k in range(n_batch):
                     optimizer.zero_grad(set_to_none=True)
 
                     InputBatch = InputMiniBatch[k * batch_size:(k + 1) * batch_size]
                     OutputBatch = OutputMiniBatch[k * batch_size:(k + 1) * batch_size]
-                    MemBatch = MemMiniBatch[k * batch_size:(k + 1) * batch_size]
-                    LenMemBatch = LenMemMiniBatch[k * batch_size:(k + 1) * batch_size]
+                    MemInBatch = MemInMiniBatch[k * batch_size:(k + 1) * batch_size]
+                    MemOutBatch = MemOutMiniBatch[k * batch_size:(k + 1) * batch_size]
                     MaskBatch = [mask[k * batch_size:(k + 1) * batch_size].to(device) for mask in MaskMiniBatch]
-                    StdBatch = StdMiniBatch[k * batch_size:(k + 1) * batch_size]
+                    OutStdBatch = OutStdMiniBatch[k * batch_size:(k + 1) * batch_size]
+                    MemStdBatch = MemStdMiniBatch[k * batch_size:(k + 1) * batch_size]
 
                     if param['error_weighting'] == 'n':
                         StdBatch = torch.mean(StdBatch)
@@ -307,13 +317,16 @@ if __name__ == '__main__':
                     InputMask = MaskBatch[:-1]
                     WindowMask = MaskBatch[-1]
 
-                    Prediction, PredictionMem = N(InputBatch, OutputBatch, MemBatch, LenMemBatch, InputMask)
+                    Prediction, PredictionMemOut = N(InputBatch, OutputBatch, MemInBatch, InputMask)
                     Prediction = Prediction[:, :-1, :]
 
-                    err = torch.norm((Prediction - OutputBatch) / StdBatch * WindowMask, p=2) / (
+                    err = torch.norm((Prediction - OutputBatch) / OutStdBatch * WindowMask, p=2) / (
                                 abs(WindowMask.sum() - batch_size) * d_out).sqrt()
 
-                    (param["mult_grad"] * err).backward()
+                    err_mem = torch.norm((PredictionMemOut - MemOutBatch) / MemStdBatch) / sqrt(
+                            MemOutBatch.shape[0] * MemOutBatch.shape[1] * MemOutBatch.shape[2])
+
+                    (param["mult_grad"] * (err + err_mem)).backward()
                     optimizer.step()
                     if lr_scheduler is not None:
                         lr_scheduler.step()
@@ -322,6 +335,7 @@ if __name__ == '__main__':
                         DictGrad.update()
 
                     error += float(err) / (n_batch * n_minibatch)
+                    error_mem += float(err_mem) / (n_batch * n_minibatch)
 
             if time_to_observe:
                 DictGrad.next(j)
@@ -329,26 +343,32 @@ if __name__ == '__main__':
             with torch.no_grad():
                 Input = ValidationInput.to(device)
                 Output = ValidationOutput.to(device)
-                Mem = ValidationMem.to(device)
-                LenMem = ValidationLenMem.to(device)
+                MemIn = ValidationMemIn.to(device)
+                MemOut = ValidationMemOut.to(device)
 
                 Mask = [mask.to(device) for mask in ValidationMasks]
-                Std = ValidationStd.to(device)
+                OutStd = ValidationOutStd.to(device)
+                MemStd = ValidationMemStd.to(device)
 
                 if param['error_weighting'] == 'n':
                     Std = torch.mean(Std)
 
                 InputMask = Mask[:-1]
                 WindowMask = Mask[-1]
-                Prediction, PredictionMem = N(Input, Output, Mem, LenMem, InputMask)
+                Prediction, PredictionMemOut = N(Input, Output, MemIn, InputMask)
                 Prediction = Prediction[:, :-1, :]
 
-                err = torch.norm((Prediction - Output) / Std * WindowMask, p=2) / (
+                err = torch.norm((Prediction - Output) / OutStd * WindowMask, p=2) / (
                             (WindowMask.sum() - NDataV) * d_out).sqrt()
 
+                err_mem = torch.norm((PredictionMemOut - MemOut) / MemStd) / sqrt(
+                    MemOut.shape[0] * MemOut.shape[1] * MemOut.shape[2])
+
                 ValidationError.append(float(err))
+                ValidationMemError.append(float(err_mem))
 
             TrainingError.append(error)
+            TrainingMemError.append(error_mem)
 
             if error == min(TrainingError):
                 best_state_dict = N.state_dict().copy()
@@ -357,23 +377,30 @@ if __name__ == '__main__':
                 with torch.no_grad():
                     Input = PlottingInput.to(device)
                     Output = PlottingOutput.to(device)
-                    Mem = PlottingMem.to(device)
-                    LenMem = PlottingLenMem.to(device)
+                    MemIn = PlottingMemIn.to(device)
+                    MemOut = PlottingMemOut.to(device)
                     Mask = [mask.to(device) for mask in PlottingMasks]
-                    Std = PlottingStd.to(device)
+                    OutStd = PlottingOutStd.to(device)
+                    MemStd = PlottingMemStd.to(device)
 
                     if param['error_weighting'] == 'n':
                         Std = torch.mean(Std)
 
                     InputMask = Mask[:-1]
                     WindowMask = Mask[-1]
-                    Prediction, PredictionMem = N(Input, Output, Mem, LenMem, InputMask)
+                    Prediction, PredictionMemOut = N(Input, Output, MemIn, InputMask)
                     Prediction = Prediction[:, :-1, :]
 
-                    err = torch.norm((Prediction - Output) / Std * WindowMask, p=2) / (
-                                WindowMask.sum(dim=[-1, -2]) * d_out).sqrt()
+                    err = torch.norm((Prediction - Output) * WindowMask / OutStd, p=2, dim=[-1, -2]) / (
+                            (WindowMask.sum(dim=[-1, -2]) - 1) * d_out).sqrt()
                     err = err.reshape(-1, NWindows).mean(dim=-1)
+
+                    err_mem = torch.norm((PredictionMemOut - MemOut) / OutStd, p=2, dim=[-1, -2]) / sqrt(
+                            MemOut.shape[1] * MemOut.shape[1])
+                    err_mem = err_mem.reshape(-1, NWindows).mean(dim=-1)
+
                     PlottingError.append(err.reshape(res_GIF, res_GIF).tolist())
+                    PlottingMemError.append(err_mem.reshape(res_GIF, res_GIF).tolist())
 
             if time_for_checkpoint:
                 try:
@@ -382,7 +409,11 @@ if __name__ == '__main__':
                     pass
                 error = {"TrainingError": TrainingError,
                          "ValidationError": ValidationError,
-                         "PlottingError": PlottingError}
+                         "PlottingError": PlottingError,
+                         "TrainingMemError": TrainingMemError,
+                         "ValidationMemError": ValidationMemError,
+                         "PlottingMemError": PlottingMemError
+                         }
                 saveObjAsXml(
                     {k: v for k, v in param.items() if k != 'resume_from'},
                     os.path.join(save_path, "param"))
@@ -411,7 +442,11 @@ if __name__ == '__main__':
 
     error = {"TrainingError": TrainingError,
              "ValidationError": ValidationError,
-             "PlottingError": PlottingError}
+             "PlottingError": PlottingError,
+             "TrainingMemError": TrainingMemError,
+             "ValidationMemError": ValidationMemError,
+             "PlottingMemError": PlottingMemError
+             }
     saveObjAsXml(
         {k: v for k, v in param.items() if k != 'resume_from'},
         os.path.join(save_path, "param"))

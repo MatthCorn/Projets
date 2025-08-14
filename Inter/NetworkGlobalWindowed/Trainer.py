@@ -354,9 +354,10 @@ if __name__ == '__main__':
                     WindowMask = Mask[-1]
                     Prediction = N(Input, Output, InputMask)[:, :-1, :]
 
-                    err = torch.norm((Prediction - Output) / Std * WindowMask, p=2) / (
-                                WindowMask.sum(dim=[-1, -2]) * d_out).sqrt()
+                    err = torch.norm((Prediction - Output) * WindowMask / Std, p=2, dim=[-1, -2]) / (
+                            (WindowMask.sum(dim=[-1, -2]) - 1) * d_out).sqrt()
                     err = err.reshape(-1, NWindows).mean(dim=-1)
+
                     PlottingError.append(err.reshape(res_GIF, res_GIF).tolist())
 
             if time_for_checkpoint:
