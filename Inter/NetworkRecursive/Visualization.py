@@ -133,6 +133,7 @@ def ErrorOverPosition(save_path):
         d_in=param['d_in'],
         n_pulse_plateau=param['n_pulse_plateau'],
         n_sat=param['n_sat'],
+        n_mes=param['n_mes'],
         len_in=param['len_in'],
         len_out=param["len_out"],
         n_data_training=200,
@@ -156,8 +157,8 @@ def ErrorOverPosition(save_path):
 
     from Inter.NetworkGlobalWindowed.Network import TransformerTranslator
     N = TransformerTranslator(param['d_in'], param['d_in'] + 1, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
-                              n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], width_FF=param['width_FF'], len_in=param['len_in'],
-                              len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'],
+                              n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], width_FF=param['width_FF'], len_in=param['len_in_window'],
+                              len_out=param['len_out_window'], norm=param['norm'], dropout=param['dropout'],
                               size_tampon_target=param['size_tampon_target'],
                               size_tampon_source=param['size_tampon_source']
                               )
@@ -190,6 +191,7 @@ def ErrorOverLength(save_path):
         d_in=param['d_in'],
         n_pulse_plateau=param['n_pulse_plateau'],
         n_sat=param['n_sat'],
+        n_mes=param['n_mes'],
         len_in=param['len_in'],
         len_out=param["len_out"],
         n_data_training=1,
@@ -213,8 +215,8 @@ def ErrorOverLength(save_path):
 
     from Inter.NetworkGlobalWindowed.Network import TransformerTranslator
     N = TransformerTranslator(param['d_in'], param['d_in'] + 1, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
-                              n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], width_FF=param['width_FF'], len_in=param['len_in'],
-                              len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'],
+                              n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], width_FF=param['width_FF'], len_in=param['len_in_window'],
+                              len_out=param['len_out_window'], norm=param['norm'], dropout=param['dropout'],
                               size_tampon_target=param['size_tampon_target'],
                               size_tampon_source=param['size_tampon_source']
                               )
@@ -286,6 +288,7 @@ def VisualizeScenario(save_path):
         d_in=param['d_in'],
         n_pulse_plateau=param['n_pulse_plateau'],
         n_sat=param['n_sat'],
+        n_mes=param['n_mes'],
         len_in=param['len_in'],
         len_out=param["len_out"],
         n_data_training=1,
@@ -309,8 +312,8 @@ def VisualizeScenario(save_path):
 
     from Inter.NetworkGlobalWindowed.Network import TransformerTranslator
     N = TransformerTranslator(param['d_in'], param['d_in'] + 1, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
-                              n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], width_FF=param['width_FF'], len_in=param['len_in'],
-                              len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'],
+                              n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], width_FF=param['width_FF'], len_in=param['len_in_window'],
+                              len_out=param['len_out_window'], norm=param['norm'], dropout=param['dropout'],
                               size_tampon_target=param['size_tampon_target'],
                               size_tampon_source=param['size_tampon_source']
                               )

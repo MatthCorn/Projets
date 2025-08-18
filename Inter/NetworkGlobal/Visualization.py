@@ -148,6 +148,7 @@ def VisualizeScenario(save_path):
         d_in=param['d_in'],
         n_pulse_plateau=param["n_pulse_plateau"],
         n_sat=param["n_sat"],
+        n_mes=param['n_mes'],
         len_in=param["len_in"],
         len_out=param["len_out"],
         n_data_training=1,
