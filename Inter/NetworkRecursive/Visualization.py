@@ -28,23 +28,35 @@ def MakeGIF(PlottingData, NData, training_strategy, frac, distrib, save_path):
     y_ticks = np.linspace(0, NData, 7)
 
     # Prepare the figure
-    fig, ax = plt.subplots(1, 1, figsize=(8, 4))
+    fig, ax = plt.subplots(1, 2, figsize=(8, 4))
 
     # Update function for FuncAnimation
     def update(frame):
-        ax.clear()
+        ax[0].clear()
+        ax[1].clear()
 
-        ax.set_xticks(x_ticks - 0.5)
-        ax.set_xticklabels([f"{val:.1f}" for val in plot_x_ticks] if distrib == 'uniform' else [f"{val:.0e}" for val in plot_x_ticks])
-        ax.set_yticks(y_ticks - 0.5)
-        ax.set_yticklabels([f"{val:.1f}" for val in plot_y_ticks])
+        ax[0].set_xticks(x_ticks - 0.5)
+        ax[0].set_xticklabels([f"{val:.1f}" for val in plot_x_ticks] if distrib == 'uniform' else [f"{val:.0e}" for val in plot_x_ticks])
+        ax[0].set_yticks(y_ticks - 0.5)
+        ax[0].set_yticklabels([f"{val:.1f}" for val in plot_y_ticks])
 
-        ax.set_xlabel("standard deviation")
-        ax.set_ylabel("mean")
+        ax[1].set_xticks(x_ticks - 0.5)
+        ax[1].set_xticklabels([f"{val:.1f}" for val in plot_x_ticks] if distrib == 'uniform' else [f"{val:.0e}" for val in plot_x_ticks])
+        ax[1].set_yticks(y_ticks - 0.5)
+        ax[1].set_yticklabels([f"{val:.1f}" for val in plot_y_ticks])
 
-        ax.set_title("error :" + str(frame))
+        ax[0].set_xlabel("standard deviation")
+        ax[0].set_ylabel("mean")
+
+        ax[1].set_xlabel("standard deviation")
+        ax[1].set_ylabel("mean")
+
+        ax[0].set_title("error :" + str(frame))
+        ax[1].set_title("accuracy :" + str(frame))
         error_im = PlottingData[0][frame]
-        im0 = ax.imshow(error_im, cmap="cool_r", vmin=0, vmax=1)
+        error_mem_im = PlottingData[1][frame]
+        im0 = ax[0].imshow(error_im, cmap="cool_r", vmin=0, vmax=1)
+        im1 = ax[1].imshow(error_mem_im, cmap="cool", vmin=0, vmax=1)
 
         current_strat = training_strategy[int(frame/frames*frac * len(training_strategy))]
         current_mean_min = current_strat['mean'][0]
@@ -69,22 +81,32 @@ def MakeGIF(PlottingData, NData, training_strategy, frac, distrib, save_path):
             NData * (1 - alpha_std_max) - 0.5,
             NData * (1 - alpha_std_min) - 0.5
         ]
-        ax0 = ax.plot(square_x, square_y, 'black', linewidth=1)
+        ax0 = ax[0].plot(square_x, square_y, 'black', linewidth=1)
+        ax1 = ax[1].plot(square_x, square_y, 'black', linewidth=1)
 
         try:
             update.cbar0.remove()
         except:
             pass
+        try:
+            update.cbar1.remove()
+        except:
+            pass
 
-        divider0 = make_axes_locatable(ax)
+        divider0 = make_axes_locatable(ax[0])
         cax0 = divider0.append_axes("right", size="5%", pad=0.05)
 
+        divider1 = make_axes_locatable(ax[1])
+        cax1 = divider1.append_axes("right", size="5%", pad=0.05)
+
         cax0.yaxis.set_ticks_position('right')
+        cax1.yaxis.set_ticks_position('right')
 
         update.cbar0 = plt.colorbar(im0, cax=cax0)
+        update.cbar1 = plt.colorbar(im1, cax=cax1)
 
         plt.tight_layout()
-        return ax0
+        return ax0, ax1
 
     # Create animation
     ani = FuncAnimation(fig, update, frames=frames, blit=False)
@@ -97,7 +119,7 @@ def PathToGIF(save_path):
     param = loadXmlAsObj(os.path.join(save_path, 'param'))
     distrib = param['plot_distrib'] if 'plot_distrib' in param.keys() else param['distrib']
     training_strategy = param['training_strategy']
-    PlottingData = [error['PlottingError']]
+    PlottingData = [error['PlottingError'], error['PlottingMemError']]
     NData = len(PlottingData[0][0])
     frac = len(error['TrainingError']) / param['n_iter']
 
@@ -107,8 +129,10 @@ def PlotError(save_path):
     error = loadXmlAsObj(os.path.join(save_path, 'error'))
     TrainingError = error['TrainingError']
     ValidationError = error['ValidationError']
+    TrainingMemError = error['TrainingMemError']
+    ValidationMemError = error['ValidationMemError']
 
-    fig, ax1 = plt.subplots(1, 1)
+    fig, (ax1, ax2) = plt.subplots(2, 1)
 
     ax1.plot(TrainingError, 'r', label="Training")
     ax1.plot(ValidationError, 'b', label="Validation")
@@ -116,6 +140,12 @@ def PlotError(save_path):
     ax1.set_ylim(bottom=0)
     ax1.legend(loc='upper right')
     ax1.set_title("Erreur")
+
+    ax2.plot(TrainingMemError, 'r', label="Training")
+    ax2.plot(ValidationMemError, 'b', label="Validation")
+    ax2.set_ylim(bottom=0)
+    ax2.legend(loc='upper right')
+    ax2.set_title("Erreur mémoire")
 
     fig.tight_layout(pad=1.0)
 
@@ -129,7 +159,7 @@ def ErrorOverPosition(save_path):
     weight_l = torch.load(os.path.join(save_path, 'WeightL'), weights_only=False)
     weight_f = torch.load(os.path.join(save_path, 'WeightF'), weights_only=False)
 
-    [Input, Output, Masks, Std], _ = GetData(
+    [Input, Output, MemIn, _, Masks, Std, _], _  = GetData(
         d_in=param['d_in'],
         n_pulse_plateau=param['n_pulse_plateau'],
         n_sat=param['n_sat'],
@@ -167,8 +197,8 @@ def ErrorOverPosition(save_path):
     InputMask = Masks[:-1]
     WindowMask = Masks[-1]
 
-    Prediction = N(Input, Output, InputMask)[:, :-1, :] * WindowMask
-
+    Prediction, _ = N(Input, Output, MemIn, InputMask)
+    Prediction = Prediction[:, :-1, :] * WindowMask
     err = torch.sum(((Prediction - Output) / Std) ** 2 * WindowMask, dim=[0, 2]) / ((torch.sum(WindowMask, dim=[0, 2]) + 1e-5) * (param['d_in'] + 1))
     err = err.sqrt().tolist()
 
@@ -178,86 +208,6 @@ def ErrorOverPosition(save_path):
     plt.plot(err)
     plt.xlim([id_min, id_max])
     plt.show()
-
-def ErrorOverLength(save_path):
-    from Inter.NetworkGlobalWindowed.SpecialUtils import GetData
-    import torch
-
-    param = loadXmlAsObj(os.path.join(save_path, 'param'))
-    weight_l = torch.load(os.path.join(save_path, 'WeightL'), weights_only=False)
-    weight_f = torch.load(os.path.join(save_path, 'WeightF'), weights_only=False)
-
-    [Input, Output, Masks, _], _ = GetData(
-        d_in=param['d_in'],
-        n_pulse_plateau=param['n_pulse_plateau'],
-        n_sat=param['n_sat'],
-        n_mes=param['n_mes'],
-        len_in=param['len_in'],
-        len_out=param["len_out"],
-        n_data_training=1,
-        n_data_validation=1,
-        sensitivity=param["sensitivity"],
-        bias='freq',
-        mean_min=min([window["mean"][0] for window in param["training_strategy"]]),
-        mean_max=max([window["mean"][1] for window in param["training_strategy"]]),
-        std_min=min([window["std"][0] for window in param["training_strategy"]]),
-        std_max=max([window["std"][1] for window in param["training_strategy"]]),
-        distrib=param["plot_distrib"],
-        weight_f=weight_f,
-        weight_l=weight_l,
-        size_focus_source=param['len_in_window'] - param['size_tampon_source'],
-        size_tampon_source=param['size_tampon_source'],
-        size_tampon_target=param['size_tampon_target'],
-        size_focus_target=param['len_out_window'] - param['size_tampon_target'],
-        parallel=True,
-        max_inflight=500,
-    )
-
-    from Inter.NetworkGlobalWindowed.Network import TransformerTranslator
-    N = TransformerTranslator(param['d_in'], param['d_in'] + 1, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
-                              n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], width_FF=param['width_FF'], len_in=param['len_in_window'],
-                              len_out=param['len_out_window'], norm=param['norm'], dropout=param['dropout'],
-                              size_tampon_target=param['size_tampon_target'],
-                              size_tampon_source=param['size_tampon_source']
-                              )
-    N.load_state_dict(torch.load(os.path.join(save_path, 'Last_network')))
-
-    InputMask = Masks[:-1]
-    WindowMask = Masks[-1]
-
-    Prediction = N(Input, Output, InputMask)[:, :-1, :] * WindowMask
-
-    size_focus_source = param['len_in_window'] - param['size_tampon_source']
-    size_tampon_target = param['size_tampon_target']
-    size_focus_target = param['len_out_window'] - param['size_tampon_target']
-
-    Prediction[:, :, -1] = Prediction[:, :, -1] + (
-        torch.arange(Prediction.shape[0]).view(-1, 1) * size_focus_source +
-        torch.arange(-size_tampon_target, size_focus_target).view(1, -1)
-    ) * WindowMask[:, :, -1]
-
-    Prediction = Prediction[WindowMask.to(bool).squeeze(-1)]
-
-    Output[:, :, -1] = Output[:, :, -1] + (
-        torch.arange(Output.shape[0]).view(-1, 1) * size_focus_source +
-        torch.arange(-size_tampon_target, size_focus_target).view(1, -1)
-    ) * WindowMask[:, :, -1]
-
-    Output = Output[WindowMask.to(bool).squeeze(-1)]
-
-    LI_list = []
-    err_list = []
-
-    R = Output.tolist()
-    L = Prediction.tolist()
-    for vector, predicted_vector in zip(R, L):
-        LI_list.append(vector[-2])
-        err_list.append(np.linalg.norm(np.array(vector) - np.array(predicted_vector)))
-
-    plt.plot(LI_list, err_list, '+')
-    plt.show()
-
-
 
 def value_to_rgb(value, min_val=0, max_val=2, colormap='plasma'):
     # Normalize the value between 0 and 1
@@ -283,8 +233,7 @@ def VisualizeScenario(save_path):
     param = loadXmlAsObj(os.path.join(save_path, 'param'))
     weight_l = torch.load(os.path.join(save_path, 'WeightL'), weights_only=False)
     weight_f = torch.load(os.path.join(save_path, 'WeightF'), weights_only=False)
-
-    [Input, Output, Masks, _], _ = GetData(
+    [Input, Output, MemIn, _, Masks, *_], _ = GetData(
         d_in=param['d_in'],
         n_pulse_plateau=param['n_pulse_plateau'],
         n_sat=param['n_sat'],
@@ -322,7 +271,8 @@ def VisualizeScenario(save_path):
     InputMask = Masks[:-1]
     WindowMask = Masks[-1]
 
-    Prediction = N(Input, Output, InputMask)[:, :-1, :] * WindowMask
+    Prediction, _ = N(Input, Output, MemIn, InputMask)
+    Prediction = Prediction[:, :-1, :] * WindowMask
 
     size_focus_source = param['len_in_window'] - param['size_tampon_source']
     size_tampon_source = param['size_tampon_source']

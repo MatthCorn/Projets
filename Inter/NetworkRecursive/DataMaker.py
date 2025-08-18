@@ -19,16 +19,22 @@ class Simulator(GlobalSimulator):
         while self.sensor_simulator.running:
             if not i % self.period_mesureur:
                 P = self.sensor_simulator.P
+                TI = self.sensor_simulator.TI
+                TM = self.sensor_simulator.TM
+                t =  self.sensor_simulator.T
+
+                P = [p + [t - tm, tm - ti] for p, ti, tm in zip(P, TI, TM)]
+
                 self.len_mem_mesureur.append(len(P))
                 if P == []:
-                    P = torch.zeros((self.n_mes, self.dim))
+                    P = torch.zeros((self.n_mes, self.dim + 2))
                 else:
                     P = torch.tensor(P)
                     P = torch.nn.functional.pad(P, (0, 0, 0, self.n_mes - len(P)))
 
                 self.mem_mesureur.append(P.tolist())
             i += self.step()
-        self.mem_mesureur.append(torch.zeros((self.n_mes, self.dim)).tolist())
+        self.mem_mesureur.append(torch.zeros((self.n_mes, self.dim + 2)).tolist())
         self.len_mem_mesureur.append(0)
 
 
@@ -243,9 +249,9 @@ def GetDataSecond(d_in, n_pulse_plateau, n_sat, n_mes, period_mes, len_in, len_o
         kwargs['executor'] = executor
 
     if plot or (save_path is None):
-        weight_f = weight_f if weight_f is not None else np.array([1., 0.] + [0.] * (d_in - 3))
+        weight_f = weight_f if weight_f is not None else np.array([1., 0.] + [0.] * (d_in - 1))
         weight_f = weight_f / np.linalg.norm(weight_f)
-        weight_l = weight_l if weight_l is not None else np.array([0., 1.] + [0.] * (d_in - 3))
+        weight_l = weight_l if weight_l is not None else np.array([0., 1.] + [0.] * (d_in - 1))
         weight_l = weight_l / np.linalg.norm(weight_l)
 
         if plot:
@@ -320,9 +326,9 @@ def GetDataSecond(d_in, n_pulse_plateau, n_sat, n_mes, period_mes, len_in, len_o
             attempt += 1
             time.sleep(0.1)
 
-    weight_f = weight_f if weight_f is not None else np.array([1., 0.] + [0.] * (d_in - 3))
+    weight_f = weight_f if weight_f is not None else np.array([1., 0.] + [0.] * (d_in - 1))
     weight_f = weight_f / np.linalg.norm(weight_f)
-    weight_l = weight_l if weight_l is not None else np.array([0., 1.] + [0.] * (d_in - 3))
+    weight_l = weight_l if weight_l is not None else np.array([0., 1.] + [0.] * (d_in - 1))
     weight_l = weight_l / np.linalg.norm(weight_l)
     np.save(os.path.join(save_path, file, 'weight_f'), weight_f)
     np.save(os.path.join(save_path, file, 'weight_l'), weight_l)

@@ -43,22 +43,20 @@ class TransformerTranslator(nn.Module):
 
         self.register_buffer("mask_decoder", torch.tril(torch.ones(len_out + 1, len_out + 1)).unsqueeze(0).unsqueeze(0), persistent=False)
 
-        self.mem_decoderFF = FeedForward(d_in=d_att, d_out=d_in - 1, widths=[16], dropout=0)
+        self.mem_decoderFF = FeedForward(d_in=d_att, d_out=d_in + 1, widths=[16], dropout=0)
         self.pulse_decoder = FeedForward(d_in=d_att, d_out=d_out, widths=[16], dropout=0)
 
 
     def forward(self, source, target, mem_in, input_mask):
         source_pad_mask, source_end_mask, target_pad_mask, target_end_mask, pad_mem_in_mask, pad_mem_out_mask = input_mask
 
-        mem_in = nn.functional.pad(mem_in, (0, 1))
-
         # source.shape = (batch_size, len_in, d_in)
         # target.shape = (batch_size, len_out, d_out)
-        # mem.shape = (batch_size, 2, n_mesureur, d_in - 1)
+        # mem.shape = (batch_size, 2, n_mesureur, d_in + 1)
 
         trg = self.dec_embedding(target)
         src = self.enc_embedding(source)
-        mem_in = self.enc_embedding(mem_in)
+        mem_in = self.dec_embedding(mem_in)
 
         # source.shape = (batch_size, len_in, d_att)
         # target.shape = (batch_size, len_out, d_att)
