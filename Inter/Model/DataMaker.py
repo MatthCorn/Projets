@@ -20,16 +20,16 @@ def generate_sample(args):
 
     """ Génère un échantillon unique basé sur les paramètres. """
     if args[0] == 'none':
-        d_in, n_pulse_plateau, n_sat, len_in, len_out, sensitivity, weight_f, weight_l = args[1:]
-        S = Simulator(n_pulse_plateau, len_in, d_in - 1, n_sat=n_sat,
+        d_in, n_pulse_plateau, n_sat, n_mes, len_in, len_out, sensitivity, weight_f, weight_l = args[1:]
+        S = Simulator(n_pulse_plateau, len_in, d_in - 1, n_sat=n_sat, n_mes=n_mes,
                       sensitivity=sensitivity, WeightF=weight_f, WeightL=weight_l)
     elif args[0] == 'freq':
-        std, mean, d_in, n_pulse_plateau, n_sat, len_in, len_out, sensitivity, weight_f, weight_l = args[1:]
-        S = FreqBiasedSimulator(std, mean, n_pulse_plateau, len_in, d_in - 1, n_sat=n_sat,
+        std, mean, d_in, n_pulse_plateau, n_sat, n_mes, len_in, len_out, sensitivity, weight_f, weight_l = args[1:]
+        S = FreqBiasedSimulator(std, mean, n_pulse_plateau, len_in, d_in - 1, n_sat=n_sat, n_mes=n_mes,
                                 sensitivity=sensitivity, WeightF=weight_f, WeightL=weight_l)
     elif args[0] == 'all':
-        std, mean, d_in, n_pulse_plateau, n_sat, len_in, len_out, sensitivity, weight_f, weight_l = args[1:]
-        S = BiasedSimulator(std, mean, n_pulse_plateau, len_in, d_in - 1, n_sat=n_sat,
+        std, mean, d_in, n_pulse_plateau, n_sat, n_mes, len_in, len_out, sensitivity, weight_f, weight_l = args[1:]
+        S = BiasedSimulator(std, mean, n_pulse_plateau, len_in, d_in - 1, n_sat=n_sat, n_mes=n_mes,
                             sensitivity=sensitivity, WeightF=weight_f, WeightL=weight_l)
     else:
         raise ValueError
@@ -44,7 +44,7 @@ def generate_sample(args):
 
     return input_seq, plateau_seq, selected_plateau_seq, len_output_seq, output_seq
 
-def MakeData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data, sensitivity=0.1, weight_f=None, weight_l=None,
+def MakeData(d_in, n_pulse_plateau, n_sat, n_mes, len_in, len_out, n_data, sensitivity=0.1, weight_f=None, weight_l=None,
              bias='none', std_min=1, std_max=5, mean_min=-10, mean_max=10, distrib='log', plot=False):
     input_data, plateau_data, selected_plateau_data, len_output_data, output_data = [], [], [], [], []
     if bias != 'none':
@@ -72,10 +72,10 @@ def MakeData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data, sensitivity=
             mean = mean_list[i]
             std = std_list[i]
             input_seq, plateau_seq, selected_plateau_seq, len_output_seq, output_seq = (
-                generate_sample((bias, std, mean, d_in, n_pulse_plateau, n_sat, len_in, len_out, sensitivity, weight_f, weight_l)))
+                generate_sample((bias, std, mean, d_in, n_pulse_plateau, n_sat, n_mes, len_in, len_out, sensitivity, weight_f, weight_l)))
         else:
             input_seq, plateau_seq, selected_plateau_seq, len_output_seq, output_seq = (
-                generate_sample((bias, d_in, n_pulse_plateau, n_sat, len_in, len_out, sensitivity, weight_f, weight_l)))
+                generate_sample((bias, d_in, n_pulse_plateau, n_sat, n_mes, len_in, len_out, sensitivity, weight_f, weight_l)))
 
         input_data.append(input_seq)
         plateau_data.append(plateau_seq)
@@ -98,7 +98,7 @@ def MakeData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data, sensitivity=
 from concurrent.futures import ProcessPoolExecutor
 from collections import deque
 
-def MakeDataParallel(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data, sensitivity=0.1, weight_f=None, weight_l=None,
+def MakeDataParallel(d_in, n_pulse_plateau, n_sat, n_mes, len_in, len_out, n_data, sensitivity=0.1, weight_f=None, weight_l=None,
                      bias='none', std_min=1, std_max=5, mean_min=-10, mean_max=10, distrib='log', plot=False,
                      executor=None, max_inflight=10000):
 
@@ -123,10 +123,10 @@ def MakeDataParallel(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data, sens
             mean_list, std_list = mean_list.flatten(), std_list.flatten()
 
         """ Génère n_data échantillons en parallèle avec ProcessPoolExecutor. """
-        args = [(bias, std_list[i], mean_list[i], d_in, n_pulse_plateau, n_sat, len_in, len_out, sensitivity, weight_f, weight_l) for i in range(n_data)]
+        args = [(bias, std_list[i], mean_list[i], d_in, n_pulse_plateau, n_sat, n_mes, len_in, len_out, sensitivity, weight_f, weight_l) for i in range(n_data)]
 
     else:
-        args = [(bias, d_in, n_pulse_plateau, n_sat, len_in, len_out, sensitivity, weight_f, weight_l) for _ in range(n_data)]
+        args = [(bias, d_in, n_pulse_plateau, n_sat, n_mes, len_in, len_out, sensitivity, weight_f, weight_l) for _ in range(n_data)]
 
     results = []
     inflight = deque()
@@ -175,14 +175,14 @@ def MakeDataParallel(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data, sens
 
     return input_data, plateau_data, selected_plateau_data, add_mask, mult_mask, output_data
 
-def GetData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_data_validation=1000, sensitivity=0.1,
+def GetData(d_in, n_pulse_plateau, n_sat, n_mes, len_in, len_out, n_data_training, n_data_validation=1000, sensitivity=0.1,
             weight_f=None, weight_l=None, bias='none', std_min=1., std_max=5., mean_min=-10., mean_max=10.,
             distrib='log', plot=False, save_path=None, parallel=False, type='complete', size_tampon_source=10,
             size_focus_source=20, size_tampon_target=15, size_focus_target=30, max_inflight=None):
 
     if parallel:
         with ProcessPoolExecutor() as executor:
-            return GetDataSecond(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training,
+            return GetDataSecond(d_in, n_pulse_plateau, n_sat, n_mes, len_in, len_out, n_data_training,
                                  n_data_validation=n_data_validation, sensitivity=sensitivity, weight_f=weight_f,
                                  weight_l=weight_l, bias=bias, std_min=std_min, std_max=std_max, mean_min=mean_min,
                                  mean_max=mean_max, distrib=distrib, plot=plot, save_path=save_path, parallel=parallel,
@@ -191,7 +191,7 @@ def GetData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_da
                                  max_inflight=max_inflight, executor=executor)
 
     else:
-        return GetDataSecond(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training,
+        return GetDataSecond(d_in, n_pulse_plateau, n_sat, n_mes, len_in, len_out, n_data_training,
                              n_data_validation=n_data_validation, sensitivity=sensitivity, weight_f=weight_f,
                              weight_l=weight_l, bias=bias, std_min=std_min, std_max=std_max, mean_min=mean_min,
                              mean_max=mean_max, distrib=distrib, plot=plot, save_path=save_path, parallel=parallel,
@@ -199,7 +199,7 @@ def GetData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_da
                              size_tampon_target=size_tampon_target, size_focus_target=size_focus_target,
                              max_inflight=max_inflight)
 
-def GetDataSecond(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_data_validation=1000, sensitivity=0.1,
+def GetDataSecond(d_in, n_pulse_plateau, n_sat, n_mes, len_in, len_out, n_data_training, n_data_validation=1000, sensitivity=0.1,
             weight_f=None, weight_l=None, bias='none', std_min=1., std_max=5., mean_min=-10., mean_max=10.,
             distrib='log', plot=False, save_path=None, parallel=False, type='complete', size_tampon_source=10,
             size_focus_source=20, size_tampon_target=15, size_focus_target=30, max_inflight=None, executor=None):
@@ -209,6 +209,7 @@ def GetDataSecond(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training
         kwargs = {'d_in': d_in,
                   'n_pulse_plateau': n_pulse_plateau,
                   'n_sat': n_sat,
+                  'n_mes': n_mes,
                   'len_in': len_in,
                   'len_out': len_out,
                   'sensitivity': sensitivity}
@@ -216,6 +217,7 @@ def GetDataSecond(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training
         kwargs = {'d_in': d_in,
                   'n_pulse_plateau': n_pulse_plateau,
                   'n_sat': n_sat,
+                  'n_mes': n_mes,
                   'len_in': len_in,
                   'len_out': len_out,
                   'sensitivity': sensitivity,

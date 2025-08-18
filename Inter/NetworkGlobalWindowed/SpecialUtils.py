@@ -1,7 +1,7 @@
 import torch
 from Inter.Model.DataMaker import GetData as GD
 
-def GetData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_data_validation=1000, sensitivity=0.1,
+def GetData(d_in, n_pulse_plateau, n_sat, n_mes, len_in, len_out, n_data_training, n_data_validation=1000, sensitivity=0.1,
             weight_f=None, weight_l=None, bias='none', std_min=1., std_max=5., mean_min=-10., mean_max=10.,
             distrib='log', plot=False, save_path=None, parallel=False, size_tampon_source=10,
             size_focus_source=20, size_tampon_target=15, size_focus_target=30, max_inflight=None):
@@ -11,7 +11,7 @@ def GetData(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_da
         'size_tampon_target': size_tampon_target,
         'size_focus_target': size_focus_target,
     }
-    data = GD(d_in, n_pulse_plateau, n_sat, len_in, len_out, n_data_training, n_data_validation=n_data_validation,
+    data = GD(d_in, n_pulse_plateau, n_sat, n_mes, len_in, len_out, n_data_training, n_data_validation=n_data_validation,
                    sensitivity=sensitivity, weight_f=weight_f, weight_l=weight_l, bias=bias, std_min=std_min,
                    std_max=std_max, mean_min=mean_min, mean_max=mean_max, distrib=distrib, plot=plot,
                    save_path=save_path,  parallel=parallel, type='complete', size_tampon_source=size_tampon_source,
