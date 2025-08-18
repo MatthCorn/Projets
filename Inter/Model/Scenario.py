@@ -3,7 +3,7 @@ from Inter.Model.Sensor import Simulator as SensorSimulator
 from functools import partial
 
 class Simulator:
-    def __init__(self, n, N, dim, n_sat=5, n_mes=6, sensitivity=0.2, seed=None, WeightF=None, WeightL=None, model_path=None):
+    def __init__(self, n, N, dim, n_sat=5, n_mes=100, sensitivity=0.2, seed=None, WeightF=None, WeightL=None, model_path=None):
         self.n = n  # Nombre de vecteurs présents simultanément
         self.N = N  # Nombre total de vecteurs dans le scénario
         self.n_sat = n_sat # Nombre max de vecteurs pouvant être détectés simultanément
