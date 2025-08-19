@@ -295,6 +295,7 @@ def GetDataSecond(d_in, n_pulse_plateau, n_sat, n_mes, period_mes, len_in, len_o
                     input_data_ = torch.cat((input_data_, input_data), dim=0)
                     add_mask_ = torch.cat((add_mask_, add_mask), dim=0)
                     mult_mask_ = torch.cat((mult_mask_, mult_mask), dim=0)
+                    output_data_ = torch.cat((output_data_, output_data), dim=0)
                     mem_data_ = torch.cat((mem_data_, mem_data), dim=0)
                     len_mem_data_ = torch.cat((len_mem_data_, len_mem_data), dim=0)
 

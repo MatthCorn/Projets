@@ -41,10 +41,10 @@ if __name__ == '__main__':
              },
              "mult_grad": 10000,
              "weight_decay": 1e-3,
-             "NDataT": 200,
+             "NDataT": 100000,
              "NDataV": 100,
              "batch_size": 1000,
-             "n_iter": 100,
+             "n_iter": 50,
              "training_strategy": [
                  {"mean": [-5, 5], "std": [0.2, 1]},
              ],
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     freq_checkpoint = 1/10
     nb_frames_GIF = 100
     nb_frames_window = int(nb_frames_GIF / len(param["training_strategy"]))
-    res_GIF = 2
+    res_GIF = 10
     n_iter_window = int(param["n_iter"] / len(param["training_strategy"]))
 
     if torch.cuda.is_available():
