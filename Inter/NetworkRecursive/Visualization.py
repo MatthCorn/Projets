@@ -152,7 +152,7 @@ def PlotError(save_path):
     plt.show()
 
 def ErrorOverPosition(save_path):
-    from Inter.NetworkGlobalWindowed.SpecialUtils import GetData
+    from Inter.NetworkRecursive.DataMaker import GetData
     import torch
 
     param = loadXmlAsObj(os.path.join(save_path, 'param'))
@@ -185,7 +185,7 @@ def ErrorOverPosition(save_path):
         max_inflight=500,
     )
 
-    from Inter.NetworkGlobalWindowed.Network import TransformerTranslator
+    from Inter.NetworkRecursive.Network import TransformerTranslator
     N = TransformerTranslator(param['d_in'], param['d_in'] + 1, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
                               n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], width_FF=param['width_FF'], len_in=param['len_in_window'],
                               len_out=param['len_out_window'], norm=param['norm'], dropout=param['dropout'],
@@ -227,7 +227,7 @@ def value_to_rgb(value, min_val=0, max_val=2, colormap='plasma'):
 updating = False  # flag global pour éviter récursion
 
 def VisualizeScenario(save_path):
-    from Inter.NetworkGlobalWindowed.SpecialUtils import GetData
+    from Inter.NetworkRecursive.DataMaker import GetData
     import torch
 
     param = loadXmlAsObj(os.path.join(save_path, 'param'))
@@ -259,7 +259,7 @@ def VisualizeScenario(save_path):
         max_inflight=500,
     )
 
-    from Inter.NetworkGlobalWindowed.Network import TransformerTranslator
+    from Inter.NetworkRecursive.Network import TransformerTranslator
     N = TransformerTranslator(param['d_in'], param['d_in'] + 1, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
                               n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], width_FF=param['width_FF'], len_in=param['len_in_window'],
                               len_out=param['len_out_window'], norm=param['norm'], dropout=param['dropout'],
@@ -415,7 +415,7 @@ def VisualizeScenario(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobalWindowed\Save\2025-07-27__11-29'
+    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkRecursive\Save\2025-08-19__16-26'
 
     ErrorOverPosition(save_path)
 

@@ -44,9 +44,9 @@ if __name__ == '__main__':
              "NDataT": 100000,
              "NDataV": 100,
              "batch_size": 1000,
-             "n_iter": 50,
+             "n_iter": 70,
              "training_strategy": [
-                 {"mean": [-5, 5], "std": [0.2, 1]},
+                 {"mean": [-5, 5], "std": [2, 5]},
              ],
              "distrib": "log",
              "plot_distrib": "log",
