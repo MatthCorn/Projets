@@ -54,7 +54,8 @@ if __name__ == '__main__':
              "max_lr": 5,
              "FreqGradObs": 1 / 3,
              "warmup": 1,
-             "resume_from": 'None'}
+             "resume_from": 'None',
+             "max_inflight": 50}
 
     try:
         import json
@@ -278,7 +279,7 @@ if __name__ == '__main__':
             size_focus_target=param['len_out_window'] - param['size_tampon_target'],
             save_path=data_dir,
             parallel=True,
-            max_inflight=5,
+            max_inflight=param['max_inflight'],
         )
 
         pbar = tqdm(total=n_iter_window, initial=j)
