@@ -52,7 +52,6 @@ if __name__ == '__main__':
              "error_weighting": "y",
              "max_lr": 5,
              "FreqGradObs": 1 / 3,
-             "l" : 0,
              "warmup": 1,
              "resume_from": '2025-07-25__10-33'}
 
@@ -95,7 +94,7 @@ if __name__ == '__main__':
                               n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'],
                               len_in=param['len_in_window'],
                               len_out=param['len_out_window'], norm=param['norm'], dropout=param['dropout'],
-                              width_FF=param['width_FF'], l=param['l'],
+                              width_FF=param['width_FF'],
                               size_tampon_target=param['size_tampon_target'],
                               size_tampon_source=param['size_tampon_source'])
 

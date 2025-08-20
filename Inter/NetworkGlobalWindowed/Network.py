@@ -10,9 +10,8 @@ from Complete.Transformer.LearnableModule import LearnableParameters
 class TransformerTranslator(nn.Module):
 
     def __init__(self, d_in, d_out, d_att=32, n_heads=4, n_encoders=3, n_decoders=3, width_FF=[32], widths_embedding=[32],
-                 len_in=10, len_out=20, norm='post', dropout=0, size_tampon_target=12, size_tampon_source=8, l=0):
+                 len_in=10, len_out=20, norm='post', dropout=0, size_tampon_target=12, size_tampon_source=8):
         super().__init__()
-        self.l = l
         self.d_in = d_in
         self.d_out = d_out
         self.d_att = d_att
@@ -53,21 +52,14 @@ class TransformerTranslator(nn.Module):
 
         # source.shape = (batch_size, len_in, d_att)
         # target.shape = (batch_size, len_out, d_att)
-        if self.l == 0:
-            src = (src * (1 - source_end_mask) * (1 - source_pad_mask) +
-                   self.end_token() * source_end_mask +
-                   self.pad_token() * source_pad_mask)
-            trg = (trg * (1 - target_end_mask) * (1 - target_pad_mask) +
-                   self.end_token() * target_end_mask +
-                   self.pad_token() * target_pad_mask)
 
-        else:
-            src = (src +
-                   self.end_token() * source_end_mask +
-                   self.pad_token() * source_pad_mask)
-            trg = (trg +
-                   self.end_token() * target_end_mask +
-                   self.pad_token() * target_pad_mask)
+        src = (src * (1 - source_end_mask) * (1 - source_pad_mask) +
+               self.end_token() * source_end_mask +
+               self.pad_token() * source_pad_mask)
+        trg = (trg * (1 - target_end_mask) * (1 - target_pad_mask) +
+               self.end_token() * target_end_mask +
+               self.pad_token() * target_pad_mask)
+
 
         src = torch.concat((src[:, :self.size_tampon_source], self.start_token().expand(trg.size(0), 1, -1), src[:, self.size_tampon_source:]), dim=1)
         trg = torch.concat((trg[:, :self.size_tampon_target], self.start_token().expand(trg.size(0), 1, -1), trg[:, self.size_tampon_target:]), dim=1)

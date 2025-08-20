@@ -52,7 +52,6 @@
  <String Key="error_weighting" Value="y"/>
  <Object Key="max_lr" Value="5"/>
  <Object Key="FreqGradObs" Value="0.33"/>
- <Object Key="l" Value="0"/>
  <Object Key="warmup" Value="5"/>
  <String Key="mask" Value="edge+"/>
 </Dictionary>
