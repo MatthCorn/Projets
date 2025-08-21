@@ -1,5 +1,7 @@
 from Inter.NetworkRecursive.DataMaker import GetData
-from Inter.NetworkRecursive.Network import TransformerTranslator
+from Inter.NetworkRecursive.Network import TransformerTranslator as N1
+from Inter.NetworkRecursive.Network2 import TransformerTranslator as N2
+from Inter.NetworkRecursive.Network3 import TransformerTranslator as N3
 from Complete.LRScheduler import Scheduler
 from GradObserver.GradObserverClass import DictGradObserver
 from Tools.ParamObs import DictParamObserver
@@ -14,12 +16,12 @@ if __name__ == '__main__':
     ################################################################################################################################################
     # création des paramètres de la simulation
 
-    param = {"n_encoder": 10,
-             "n_decoder": 10,
+    param = {"n_encoder": 1,
+             "n_decoder": 1,
              "len_in": 500,
              "len_out": 700,
-             "len_in_window": 20,
-             "len_out_window": 30,
+             "len_in_window": 40,
+             "len_out_window": 50,
              'size_tampon_source': 8,
              'size_tampon_target': 12,
              "n_pulse_plateau": 6,
@@ -41,7 +43,7 @@ if __name__ == '__main__':
              },
              "mult_grad": 10000,
              "weight_decay": 1e-3,
-             "NDataT": 100000,
+             "NDataT": 10000,
              "NDataV": 100,
              "batch_size": 1000,
              "n_iter": 70,
@@ -54,8 +56,9 @@ if __name__ == '__main__':
              "max_lr": 5,
              "FreqGradObs": 1 / 3,
              "warmup": 1,
+             "network": 2,
              "resume_from": 'None',
-             "max_inflight": 50}
+             "max_inflight": 10}
 
     try:
         import json
@@ -77,6 +80,7 @@ if __name__ == '__main__':
     if sys.platform == "win32":
         p.nice(psutil.HIGH_PRIORITY_CLASS)
     ################################################################################################################################################
+    TransformerTranslator = [N1, N2, N3][param["network"]]
 
     d_out = param['d_in'] + 1
 
@@ -243,9 +247,8 @@ if __name__ == '__main__':
         window_index = 0
         j = 0
 
-        best_state_dict = N.state_dict().copy()
-
     ################################################################################################################################################
+    best_state_dict = N.state_dict().copy()
 
     while window_index < len(param["training_strategy"]):
         window = param["training_strategy"][window_index]
