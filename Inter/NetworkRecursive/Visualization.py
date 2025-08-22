@@ -3,6 +3,9 @@ from matplotlib.animation import FuncAnimation, PillowWriter
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
 from Tools.XMLTools import loadXmlAsObj
+from Inter.NetworkRecursive.Network import TransformerTranslator as N1
+from Inter.NetworkRecursive.Network2 import TransformerTranslator as N2
+from Inter.NetworkRecursive.Network3 import TransformerTranslator as N3
 
 import os
 
@@ -185,7 +188,10 @@ def ErrorOverPosition(save_path):
         max_inflight=500,
     )
 
-    from Inter.NetworkRecursive.Network import TransformerTranslator
+    try:
+        TransformerTranslator = [N1, N2, N3][param['network']]
+    except:
+        from Inter.NetworkRecursive.Network import TransformerTranslator
     N = TransformerTranslator(param['d_in'], param['d_in'] + 1, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
                               n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], width_FF=param['width_FF'], len_in=param['len_in_window'],
                               len_out=param['len_out_window'], norm=param['norm'], dropout=param['dropout'],
@@ -259,7 +265,10 @@ def VisualizeScenario(save_path):
         max_inflight=500,
     )
 
-    from Inter.NetworkRecursive.Network import TransformerTranslator
+    try :
+        TransformerTranslator = [N1, N2, N3][param['network']]
+    except:
+        from Inter.NetworkRecursive.Network import TransformerTranslator
     N = TransformerTranslator(param['d_in'], param['d_in'] + 1, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
                               n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], width_FF=param['width_FF'], len_in=param['len_in_window'],
                               len_out=param['len_out_window'], norm=param['norm'], dropout=param['dropout'],
@@ -415,7 +424,7 @@ def VisualizeScenario(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkRecursive\Save\2025-08-19__16-26'
+    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkRecursive\Save\2025-08-21__13-30(1)'
 
     ErrorOverPosition(save_path)
 

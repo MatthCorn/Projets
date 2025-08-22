@@ -1,0 +1,59 @@
+<?xml version="1.0" ?>
+<Dictionary>
+ <Object Key="n_encoder" Value="10"/>
+ <Object Key="n_decoder" Value="10"/>
+ <Object Key="len_in" Value="500"/>
+ <Object Key="len_out" Value="700"/>
+ <Object Key="len_in_window" Value="40"/>
+ <Object Key="len_out_window" Value="50"/>
+ <Object Key="size_tampon_source" Value="4"/>
+ <Object Key="size_tampon_target" Value="5"/>
+ <Object Key="n_pulse_plateau" Value="6"/>
+ <Object Key="n_sat" Value="5"/>
+ <Object Key="n_mes" Value="6"/>
+ <Object Key="sensitivity" Value="0.1"/>
+ <Object Key="d_in" Value="10"/>
+ <Object Key="d_att" Value="128"/>
+ <List Key="widths_embedding">
+  <Object Value="32"/>
+ </List>
+ <List Key="width_FF">
+  <Object Value="256"/>
+ </List>
+ <Object Key="n_heads" Value="4"/>
+ <Object Key="dropout" Value="0"/>
+ <String Key="norm" Value="post"/>
+ <String Key="optim" Value="Adam"/>
+ <Dictionary Key="lr_option">
+  <Object Key="value" Value="3e-05"/>
+  <String Key="reset" Value="y"/>
+  <String Key="type" Value="cos"/>
+ </Dictionary>
+ <Object Key="mult_grad" Value="10000"/>
+ <Object Key="weight_decay" Value="0.001"/>
+ <Object Key="NDataT" Value="100000"/>
+ <Object Key="NDataV" Value="100"/>
+ <Object Key="batch_size" Value="1000"/>
+ <Object Key="n_iter" Value="200"/>
+ <List Key="training_strategy">
+  <Dictionary>
+   <List Key="mean">
+    <Object Value="-5"/>
+    <Object Value="5"/>
+   </List>
+   <List Key="std">
+    <Object Value="2"/>
+    <Object Value="5"/>
+   </List>
+  </Dictionary>
+ </List>
+ <String Key="distrib" Value="log"/>
+ <String Key="plot_distrib" Value="log"/>
+ <String Key="error_weighting" Value="y"/>
+ <Object Key="max_lr" Value="5"/>
+ <Object Key="FreqGradObs" Value="0.33"/>
+ <Object Key="warmup" Value="5"/>
+ <Object Key="network" Value="1"/>
+ <Object Key="max_inflight" Value="100"/>
+ <String Key="mask" Value="edge+"/>
+</Dictionary>
