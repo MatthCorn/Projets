@@ -8,6 +8,7 @@ from Tools.ParamObs import DictParamObserver
 import torch
 from tqdm import tqdm
 from math import sqrt
+import time
 
 if __name__ == '__main__':
     import multiprocessing as mp
@@ -84,7 +85,7 @@ if __name__ == '__main__':
 
     d_out = param['d_in'] + 1
 
-    freq_checkpoint = 1/10
+    period_checkpoint = 15 * 60  # en secondes
     nb_frames_GIF = 100
     nb_frames_window = int(nb_frames_GIF / len(param["training_strategy"]))
     res_GIF = 10
@@ -212,7 +213,6 @@ if __name__ == '__main__':
 
         # pour sauvegarder toutes les informations de l'apprentissage
         import datetime
-        import time
 
         base_folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
 
@@ -249,7 +249,7 @@ if __name__ == '__main__':
 
     ################################################################################################################################################
     best_state_dict = N.state_dict().copy()
-
+    t = time.time()
     while window_index < len(param["training_strategy"]):
         window = param["training_strategy"][window_index]
         if param["lr_option"]["reset"] == "y" and (j == 0):
@@ -291,7 +291,6 @@ if __name__ == '__main__':
             error = 0
             error_mem = 0
             time_to_observe = (int(j * param["FreqGradObs"]) == (j * param["FreqGradObs"]))
-            time_for_checkpoint = (int(j * freq_checkpoint) == (j * freq_checkpoint))
             time_for_GIF = (j in torch.linspace(0, n_iter_window, nb_frames_window, dtype=int))
 
             for p in range(n_minibatch):
@@ -340,6 +339,39 @@ if __name__ == '__main__':
 
                     error += float(err) / (n_batch * n_minibatch)
                     error_mem += float(err_mem) / (n_batch * n_minibatch)
+
+                    if time.time() - t > period_checkpoint:
+                        t = time.time()
+                        try:
+                            os.mkdir(save_path)
+                        except:
+                            pass
+                        error = {"TrainingError": TrainingError,
+                                 "ValidationError": ValidationError,
+                                 "PlottingError": PlottingError,
+                                 "TrainingMemError": TrainingMemError,
+                                 "ValidationMemError": ValidationMemError,
+                                 "PlottingMemError": PlottingMemError
+                                 }
+                        saveObjAsXml(
+                            {k: v for k, v in param.items() if k != 'resume_from'},
+                            os.path.join(save_path, "param"))
+                        saveObjAsXml(error, os.path.join(save_path, "error"))
+                        torch.save(best_state_dict, os.path.join(save_path, "Best_network"))
+                        torch.save(N.state_dict().copy(), os.path.join(save_path, "Last_network"))
+                        torch.save(weight_l, os.path.join(save_path, "WeightL"))
+                        torch.save(weight_f, os.path.join(save_path, "WeightF"))
+                        torch.save({
+                            "scheduler_state_dict": lr_scheduler.state_dict(),
+                            "optimizer_state_dict": optimizer.state_dict(),
+                            "scheduler_hparams": lr_scheduler.get_hparams()
+                        }, os.path.join(save_path, "Scheduler.pt"))
+
+                        with open(os.path.join(save_path, "DictGrad.pkl"), "wb") as file:
+                            pickle.dump(DictGrad, file)
+                        with open(os.path.join(save_path, "ParamObs.pkl"), "wb") as file:
+                            ParamObs = DictParamObserver(N)
+                            pickle.dump(ParamObs, file)
 
             if time_to_observe:
                 DictGrad.next(j)
@@ -405,38 +437,6 @@ if __name__ == '__main__':
 
                     PlottingError.append(err.reshape(res_GIF, res_GIF).tolist())
                     PlottingMemError.append(err_mem.reshape(res_GIF, res_GIF).tolist())
-
-            if time_for_checkpoint:
-                try:
-                    os.mkdir(save_path)
-                except:
-                    pass
-                error = {"TrainingError": TrainingError,
-                         "ValidationError": ValidationError,
-                         "PlottingError": PlottingError,
-                         "TrainingMemError": TrainingMemError,
-                         "ValidationMemError": ValidationMemError,
-                         "PlottingMemError": PlottingMemError
-                         }
-                saveObjAsXml(
-                    {k: v for k, v in param.items() if k != 'resume_from'},
-                    os.path.join(save_path, "param"))
-                saveObjAsXml(error, os.path.join(save_path, "error"))
-                torch.save(best_state_dict, os.path.join(save_path, "Best_network"))
-                torch.save(N.state_dict().copy(), os.path.join(save_path, "Last_network"))
-                torch.save(weight_l, os.path.join(save_path, "WeightL"))
-                torch.save(weight_f, os.path.join(save_path, "WeightF"))
-                torch.save({
-                    "scheduler_state_dict": lr_scheduler.state_dict(),
-                    "optimizer_state_dict": optimizer.state_dict(),
-                    "scheduler_hparams": lr_scheduler.get_hparams()
-                }, os.path.join(save_path, "Scheduler.pt"))
-
-                with open(os.path.join(save_path, "DictGrad.pkl"), "wb") as file:
-                    pickle.dump(DictGrad, file)
-                with open(os.path.join(save_path, "ParamObs.pkl"), "wb") as file:
-                    ParamObs = DictParamObserver(N)
-                    pickle.dump(ParamObs, file)
 
             j += 1
             pbar.n = j
