@@ -368,13 +368,13 @@ if __name__ == '__main__':
                     os.mkdir(save_path)
                 except:
                     pass
-                error = {"TrainingError": TrainingError,
+                error_dict = {"TrainingError": TrainingError,
                          "ValidationError": ValidationError,
                          "PlottingError": PlottingError}
                 saveObjAsXml(
                     {k: v for k, v in param.items() if k != 'resume_from'},
                     os.path.join(save_path, "param"))
-                saveObjAsXml(error, os.path.join(save_path, "error"))
+                saveObjAsXml(error_dict, os.path.join(save_path, "error"))
                 torch.save(best_state_dict, os.path.join(save_path, "Best_network"))
                 torch.save(N.state_dict().copy(), os.path.join(save_path, "Last_network"))
                 torch.save(weight_l, os.path.join(save_path, "WeightL"))
@@ -397,13 +397,13 @@ if __name__ == '__main__':
 
         window_index += 1
 
-    error = {"TrainingError": TrainingError,
+    error_dict = {"TrainingError": TrainingError,
              "ValidationError": ValidationError,
              "PlottingError": PlottingError}
     saveObjAsXml(
         {k: v for k, v in param.items() if k != 'resume_from'},
         os.path.join(save_path, "param"))
-    saveObjAsXml(error, os.path.join(save_path, "error"))
+    saveObjAsXml(error_dict, os.path.join(save_path, "error"))
     torch.save(best_state_dict, os.path.join(save_path, "Best_network"))
     torch.save(N.state_dict().copy(), os.path.join(save_path, "Last_network"))
     torch.save(weight_l, os.path.join(save_path, "WeightL"))
