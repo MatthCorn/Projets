@@ -202,10 +202,9 @@ if __name__ == '__main__':
         ValidationMemError = error_dict["ValidationMemError"]
         PlottingMemError = error_dict["PlottingMemError"]
 
-        window_index = checkpoint['scheduler_state_dict']['last_epoch'] // (n_iter_window * n_batch * n_minibatch)
-        j = checkpoint['scheduler_state_dict']['last_epoch'] // (n_batch * n_minibatch)
-        p = checkpoint['scheduler_state_dict']['last_epoch'] // n_batch
-        k = checkpoint['scheduler_state_dict']['last_epoch'] % n_batch
+        window_index, r = divmod(checkpoint['scheduler_state_dict']['last_epoch'] + 1, n_iter_window * n_batch * n_minibatch)
+        j, r = divmod(r, n_batch * n_minibatch)
+        p, k = divmod(r, n_batch)
 
         print(f"Reprise à la fenêtre {window_index}, itération {j}")
 
