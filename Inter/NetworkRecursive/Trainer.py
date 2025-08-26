@@ -202,8 +202,11 @@ if __name__ == '__main__':
         ValidationMemError = error_dict["ValidationMemError"]
         PlottingMemError = error_dict["PlottingMemError"]
 
-        j = len(TrainingError) % n_iter_window
-        window_index = len(TrainingError) // n_iter_window
+        window_index = checkpoint['scheduler_state_dict']['last_epoch'] // (n_iter_window * n_batch * n_minibatch)
+        j = checkpoint['scheduler_state_dict']['last_epoch'] // (n_batch * n_minibatch)
+        p = checkpoint['scheduler_state_dict']['last_epoch'] // n_batch
+        k = checkpoint['scheduler_state_dict']['last_epoch'] % n_batch
+
         print(f"Reprise à la fenêtre {window_index}, itération {j}")
 
     except Exception as e:
@@ -244,8 +247,7 @@ if __name__ == '__main__':
         ValidationMemError = []
         PlottingMemError = []
 
-        window_index = 0
-        j = 0
+        window_index, j, p, k = 0, 0, 0, 0
 
     ################################################################################################################################################
     best_state_dict = N.state_dict().copy()
@@ -293,7 +295,7 @@ if __name__ == '__main__':
             time_to_observe = (int(j * param["FreqGradObs"]) == (j * param["FreqGradObs"]))
             time_for_GIF = (j in torch.linspace(0, n_iter_window, nb_frames_window, dtype=int))
 
-            for p in range(n_minibatch):
+            while p < n_minibatch:
                 InputMiniBatch = TrainingInput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
                 OutputMiniBatch = TrainingOutput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
                 MemInMiniBatch = TrainingMemIn[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
@@ -302,8 +304,9 @@ if __name__ == '__main__':
                                  TrainingMasks]
                 OutStdMiniBatch = TrainingOutStd[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
                 MemStdMiniBatch = TrainingMemStd[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
+                p += 1
 
-                for k in range(n_batch):
+                while k < n_batch:
                     optimizer.zero_grad(set_to_none=True)
 
                     InputBatch = InputMiniBatch[k * batch_size:(k + 1) * batch_size]
@@ -313,6 +316,7 @@ if __name__ == '__main__':
                     MaskBatch = [mask[k * batch_size:(k + 1) * batch_size].to(device) for mask in MaskMiniBatch]
                     OutStdBatch = OutStdMiniBatch[k * batch_size:(k + 1) * batch_size]
                     MemStdBatch = MemStdMiniBatch[k * batch_size:(k + 1) * batch_size]
+                    k += 1
 
                     if param['error_weighting'] == 'n':
                         StdBatch = torch.mean(StdBatch)
@@ -372,7 +376,9 @@ if __name__ == '__main__':
                         with open(os.path.join(save_path, "ParamObs.pkl"), "wb") as file:
                             ParamObs = DictParamObserver(N)
                             pickle.dump(ParamObs, file)
-
+                k = 0
+            p = 0
+            
             if time_to_observe:
                 DictGrad.next(j)
 
