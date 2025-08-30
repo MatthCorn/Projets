@@ -158,6 +158,7 @@ def ErrorOverPosition(save_path):
     from Inter.NetworkRecursive.DataMaker import GetData
     import torch
 
+    device = torch.device("cpu")
     param = loadXmlAsObj(os.path.join(save_path, 'param'))
     weight_l = torch.load(os.path.join(save_path, 'WeightL'), weights_only=False)
     weight_f = torch.load(os.path.join(save_path, 'WeightF'), weights_only=False)
@@ -185,7 +186,7 @@ def ErrorOverPosition(save_path):
         size_tampon_target=param['size_tampon_target'],
         size_focus_target=param['len_out_window'] - param['size_tampon_target'],
         parallel=True,
-        max_inflight=500,
+        max_inflight=10,
     )
 
     try:
@@ -200,12 +201,13 @@ def ErrorOverPosition(save_path):
                               )
     N.load_state_dict(torch.load(os.path.join(save_path, 'Last_network')))
 
-    InputMask = Masks[:-1]
-    WindowMask = Masks[-1]
+    InputMask = [mask.to(device) for mask in Masks[:-1]]
+    WindowMask = Masks[-1].to(device)
 
-    Prediction, _ = N(Input, Output, MemIn, InputMask)
+    N.to(device)
+    Prediction, _ = N(Input.to(device), Output.to(device), MemIn.to(device), InputMask)
     Prediction = Prediction[:, :-1, :] * WindowMask
-    err = torch.sum(((Prediction - Output) / Std) ** 2 * WindowMask, dim=[0, 2]) / ((torch.sum(WindowMask, dim=[0, 2]) + 1e-5) * (param['d_in'] + 1))
+    err = torch.sum(((Prediction - Output) / Std.to(device)) ** 2 * WindowMask, dim=[0, 2]) / ((torch.sum(WindowMask, dim=[0, 2]) + 1e-5) * (param['d_in'] + 1))
     err = err.sqrt().tolist()
 
     id_min = torch.argmax(1 - (torch.sum(WindowMask, dim=[0, 2]) == 0).to(float))
@@ -424,12 +426,12 @@ def VisualizeScenario(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkRecursive\Save\2025-08-24__16-50(2)'
-
-    ErrorOverPosition(save_path)
+    save_path = r'C:\Users\matth\Documents\Python\Projets\Inter\NetworkRecursive\Save\2025-08-24__16-50(2)'
 
     PlotError(save_path)
 
     VisualizeScenario(save_path)
+
+    ErrorOverPosition(save_path)
 
     # PathToGIF(save_path)
