@@ -76,3 +76,28 @@ class TransformerTranslator(nn.Module):
             trg = self.last_decoder(trg)
 
         return trg
+
+    def recursive_eval(self, source, target, n=0):
+
+        trg = self.dec_embedding(target)
+        src = self.enc_embedding(source)
+
+        trg = torch.concat((self.start_token().expand(trg.size(0), 1, -1), trg), dim=1)
+
+        trg = self.dec_pos_encoding(trg)
+        src = self.enc_pos_encoding(src)
+
+        for encoder in self.encoders:
+            src = encoder(src)
+
+        for decoder in self.decoders:
+            trg = decoder(target=trg, source=src, mask=self.mask_decoder)
+
+        add_mask = torch.zeros((1, target.shape[1] + 1, 1), device=target.device)
+        add_mask[0, n] += 1
+
+        is_end = torch.norm(self.last_decoder(trg - self.end_token()) * add_mask)
+
+        trg = self.last_decoder(trg)
+
+        return trg, is_end

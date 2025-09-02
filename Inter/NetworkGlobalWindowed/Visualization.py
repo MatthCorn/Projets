@@ -276,6 +276,96 @@ def value_to_rgb(value, min_val=0, max_val=2, colormap='plasma'):
 
 updating = False  # flag global pour éviter récursion
 
+def RecursiveGeneration(save_path):
+    from Inter.NetworkGlobalWindowed.SpecialUtils import GetData
+    import torch
+
+    param = loadXmlAsObj(os.path.join(save_path, 'param'))
+    weight_l = torch.load(os.path.join(save_path, 'WeightL'), weights_only=False)
+    weight_f = torch.load(os.path.join(save_path, 'WeightF'), weights_only=False)
+
+    [Input, Output, Masks, _], _ = GetData(
+        d_in=param['d_in'],
+        n_pulse_plateau=param['n_pulse_plateau'],
+        n_sat=param['n_sat'],
+        n_mes=param['n_mes'],
+        len_in=param['len_in'],
+        len_out=param["len_out"],
+        n_data_training=1,
+        n_data_validation=1,
+        sensitivity=param["sensitivity"],
+        bias='freq',
+        mean_min=min([window["mean"][0] for window in param["training_strategy"]]),
+        mean_max=max([window["mean"][1] for window in param["training_strategy"]]),
+        std_min=min([window["std"][0] for window in param["training_strategy"]]),
+        std_max=max([window["std"][1] for window in param["training_strategy"]]),
+        distrib=param["plot_distrib"],
+        weight_f=weight_f,
+        weight_l=weight_l,
+        size_focus_source=param['len_in_window'] - param['size_tampon_source'],
+        size_tampon_source=param['size_tampon_source'],
+        size_tampon_target=param['size_tampon_target'],
+        size_focus_target=param['len_out_window'] - param['size_tampon_target'],
+        parallel=True,
+        max_inflight=500,
+    )
+
+    from Inter.NetworkGlobalWindowed.Network import TransformerTranslator
+    N = TransformerTranslator(param['d_in'], param['d_in'] + 1, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
+                              n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], width_FF=param['width_FF'], len_in=param['len_in_window'],
+                              len_out=param['len_out_window'], norm=param['norm'], dropout=param['dropout'],
+                              size_tampon_target=param['size_tampon_target'],
+                              size_tampon_source=param['size_tampon_source']
+                              )
+    N.load_state_dict(torch.load(os.path.join(save_path, 'Last_network')))
+
+    InputMask = Masks[:-2]
+
+    LocalOutput = Output[0 : 1]
+    total_pulse_predicted = 0
+    for i_win in range(len(Input)):
+        LocalInput, LocalInputMask = (Input[i_win : (i_win + 1)],
+                                      [mask[i_win : (i_win + 1)] for mask in InputMask])
+        LocalInputMask[2] = torch.zeros_like(LocalInputMask[2])
+        LocalInputMask[2][:, :max(0, (param['size_tampon_target'] - total_pulse_predicted))] = 1
+
+        LocalPrediction = LocalOutput
+        end_list = []
+        for n in range(param['len_out_window'] - param['size_tampon_target']):
+            LocalPrediction, is_end = N.recursive_eval(LocalInput, LocalPrediction, LocalInputMask, n)
+            LocalPrediction = LocalPrediction[:, :-1]
+            end_list.append(float(is_end))
+
+        diff = LocalPrediction[:, param['size_tampon_target']:].unsqueeze(1) - LocalPrediction[:, param['size_tampon_target']:].unsqueeze(2)
+        diff = torch.norm(diff, p=2, dim=-1)
+        diff = diff[0].tolist()
+        plt.imshow(diff)
+        plt.show()
+
+        end_list = N.eval_end(LocalInput, LocalPrediction, LocalInputMask)
+        plt.plot(end_list)
+        plt.show()
+        n_pulse_predicted = [x > 0.1 for x in end_list].index(False)
+        total_pulse_predicted += n_pulse_predicted
+        LocalOutput = torch.cat([
+            LocalOutput[:, n_pulse_predicted : param['size_tampon_target']],
+            LocalPrediction[:, param['size_tampon_target'] : (n_pulse_predicted + param['size_tampon_target'])]
+        ], dim=0)
+
+
+
+    size_focus_source = param['len_in_window'] - param['size_tampon_source']
+    size_tampon_source = param['size_tampon_source']
+    size_tampon_target = param['size_tampon_target']
+    size_focus_target = param['len_out_window'] - param['size_tampon_target']
+
+    Prediction[:, :, -1] = Prediction[:, :, -1] + (
+        torch.arange(Prediction.shape[0]).view(-1, 1) * size_focus_source +
+        torch.arange(-size_tampon_target, size_focus_target).view(1, -1)
+    ) * WindowMask[:, :, -1]
+
+    Prediction = Prediction[WindowMask.to(bool).squeeze(-1)]
+
 def VisualizeScenario(save_path):
     from Inter.NetworkGlobalWindowed.SpecialUtils import GetData
     import torch
@@ -467,9 +557,9 @@ def VisualizeScenario(save_path):
 if __name__ == '__main__':
     save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobalWindowed\Save\2025-08-18__15-21(2)'
 
-    # ErrorOverPosition(save_path)
+    RecursiveGeneration(save_path)
 
-    # PlotError(save_path)
+    PlotError(save_path)
 
     VisualizeScenario(save_path)
 

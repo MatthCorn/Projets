@@ -136,6 +136,171 @@ def value_to_rgb(value, min_val=0, max_val=2, colormap='plasma'):
 
     return rgb
 
+def RecursiveGeneration(save_path):
+    from Inter.Model.DataMaker import GetData
+    import torch
+
+    param = loadXmlAsObj(os.path.join(save_path, 'param'))
+    weight_l = torch.load(os.path.join(save_path, 'WeightL'), weights_only=False)
+    weight_f = torch.load(os.path.join(save_path, 'WeightF'), weights_only=False)
+
+    [Input, Output, Masks, _], _ = GetData(
+        d_in=param['d_in'],
+        n_pulse_plateau=param["n_pulse_plateau"],
+        n_sat=param["n_sat"],
+        n_mes=param['n_mes'],
+        len_in=param["len_in"],
+        len_out=param["len_out"],
+        n_data_training=1,
+        n_data_validation=1,
+        sensitivity=param["sensitivity"],
+        bias='freq',
+        mean_min=min([window["mean"][0] for window in param["training_strategy"]]),
+        mean_max=max([window["mean"][1] for window in param["training_strategy"]]),
+        std_min=min([window["std"][0] for window in param["training_strategy"]]),
+        std_max=max([window["std"][1] for window in param["training_strategy"]]),
+        distrib=param["plot_distrib"],
+        weight_f=weight_f,
+        weight_l=weight_l,
+        plot=False,
+        type='complete',
+        parallel=True
+    )
+
+    from Inter.NetworkGlobal.Network import TransformerTranslator
+    N = TransformerTranslator(param['d_in'], param['d_in'] + 1, d_att=param['d_att'], n_heads=param['n_heads'],
+                              n_encoders=param['n_encoder'],
+                              n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'],
+                              width_FF=param['width_FF'], len_in=param['len_in'],
+                              len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'])
+    N.load_state_dict(torch.load(os.path.join(save_path, 'Last_network')))
+    print(sum(p.numel() for p in N.parameters() if p.requires_grad))
+    end_list = []
+
+    Prediction = Output
+    for n in range(param['len_out']):
+        Prediction, is_end = N.recursive_eval(Input, Prediction, n)
+        Prediction = Prediction[:, :-1, :]
+        end_list.append(float(is_end))
+
+    Prediction, is_end = N.recursive_eval(Input, Prediction, n + 1)
+    Prediction = Prediction[:, :-1, :]
+    end_list.append(float(is_end))
+
+    GuidedPrediction = N(Input, Output, Masks)[:, :-1, :]
+
+    plt.plot(end_list, 'r')
+    plt.plot(Masks[1][0, :, 0].tolist(), 'b')
+    plt.show()
+
+    df = param['sensitivity']
+    range_plot = param['len_in'] + param['n_pulse_plateau']
+    f_min = Input[:, :, 0].min() - 5 * df
+    f_max = Input[:, :, 0].max() + 5 * df
+    l_std = Input[0, :, 1].std()
+
+    from matplotlib import colors
+    from matplotlib.patches import Rectangle
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
+
+    L = Input[0].tolist()
+    for i, vector in enumerate(L):
+        T1 = i
+        T2 = T1 + vector[-1]
+        F = vector[0]
+        N = 0.5 * np.tanh(vector[1] / l_std) + 1
+
+        r, g, b, a = value_to_rgb(N)
+
+        rect = Rectangle((T1, F - df),  # coin bas gauche
+                         T2 - T1,  # largeur
+                         2 * df,  # hauteur
+                         facecolor=(r, g, b, 0.8),
+                         edgecolor='k',
+                         linewidth=0.3)
+        ax1.add_patch(rect)
+
+    R = Output[0][:Masks[0][0, :, 0].tolist().index(1.)].tolist()
+    for i, vector in enumerate(R):
+        T1 = i - vector[-1]
+        T2 = T1 + vector[-2]
+        F = vector[0]
+        N = 0.5 * np.tanh(vector[1] / l_std) + 1
+
+        r, g, b, a = value_to_rgb(N)
+
+        rect = Rectangle((T1, F - df),  # coin bas gauche
+                         T2 - T1,  # largeur
+                         2 * df,  # hauteur
+                         facecolor=(r, g, b, 0.8),
+                         edgecolor='k',
+                         linewidth=0.3)
+        ax2.add_patch(rect)
+
+    n_pulse_predicted = [x > 0.1 for x in end_list].index(False)
+    L = Prediction[0][:n_pulse_predicted].tolist()
+    for i, vector in enumerate(L):
+        T1 = i - vector[-1]
+        T2 = T1 + vector[-2]
+        F = vector[0]
+        N = 0.5 * np.tanh(vector[1] / l_std) + 1
+
+        r, g, b, a = value_to_rgb(N)
+
+        rect = Rectangle((T1, F - df),  # coin bas gauche
+                         T2 - T1,  # largeur
+                         2 * df,  # hauteur
+                         facecolor=(r, g, b, 0.8),
+                         edgecolor='k',
+                         linewidth=0.3)
+        ax3.add_patch(rect)
+
+    L = GuidedPrediction[0][:Masks[0][0, :, 0].tolist().index(1.)].tolist()
+    for i, vector in enumerate(L):
+        T1 = i - vector[-1]
+        T2 = T1 + vector[-2]
+        F = vector[0]
+        N = 0.5 * np.tanh(vector[1]/l_std) + 1
+
+        r, g, b, a = value_to_rgb(N)
+
+        rect = Rectangle((T1, F - df),  # coin bas gauche
+                         T2 - T1,  # largeur
+                         2 * df,  # hauteur
+                         facecolor=(r, g, b, 0.8),
+                         edgecolor='k',
+                         linewidth=0.3)
+        ax4.add_patch(rect)
+
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+    cmap = plt.get_cmap('plasma')
+    norm = colors.Normalize(vmin=0, vmax=2)
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+    sm.set_array([])
+
+    for ax in (ax2, ax4):
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes("right", size="5%", pad=0.05)
+        plt.colorbar(sm, cax=cax)
+        ax.set_yticks([])
+
+    ax1.set_ylabel('fréquence')
+    ax3.set_ylabel('fréquence')
+    for ax in (ax1, ax2, ax3, ax4):
+        ax.set_xlim(-2, range_plot)
+        ax.set_ylim(f_min, f_max)
+        ax.set_xlabel('temps')
+
+
+    ax1.set_title("Source sequence")
+    ax2.set_title("Target sequence")
+    ax3.set_title("Recursive Predicted sequence")
+    ax4.set_title("Guided Predicted sequence")
+
+    plt.tight_layout()
+
+
 def VisualizeScenario(save_path):
     from Inter.Model.DataMaker import GetData
     import torch
@@ -320,10 +485,10 @@ def VisualizeScenario(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobal\Save\2025-07-24__16-44'
+    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobal\Save\2025-06-13__19-35'
+
+    RecursiveGeneration(save_path)
 
     PlotError(save_path)
-
-    VisualizeScenario(save_path)
 
     # PathToGIF(save_path)
