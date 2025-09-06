@@ -67,11 +67,6 @@ def window(input_data, output_data, mult_mask, add_mask, param):
 
     window_mask[:, :, :size_tampon_target] = 0
 
-    target_end_mask = torch.eq(
-        torch.arange(-size_tampon_target, size_focus_target).view(1, 1, size_tampon_target + size_focus_target),
-        upcoming_pulse.sum(dim=1).unsqueeze(-1)
-    ).unsqueeze(-1).to(torch.float32)
-
     # modification de l'encodage du ToA dans la séquence de sortie
     output_data[:, :, -1] = - output_data[:, :, -1] + torch.arange(output_data.shape[1]).view(1, -1) * mult_mask[:, 1:, 0]
     new_output_data = torch.nn.functional.pad(output_data, (0, 0, size_tampon_target, size_focus_target))
@@ -98,6 +93,7 @@ def window(input_data, output_data, mult_mask, add_mask, param):
 
     mask = mask.reshape(-1, *mask.shape[2:])
     target_pad_mask = (mask + mask ** 2) / 2
+    target_end_mask = (-mask + mask ** 2) / 2
 
     mean = (windowed_output_data * window_mask).sum(dim=2, keepdim=True).expand(windowed_output_data.shape) / (
             window_mask.sum(dim=2, keepdim=True) + 1e-5) * window_mask
@@ -109,9 +105,7 @@ def window(input_data, output_data, mult_mask, add_mask, param):
 
     windowed_output_data = windowed_output_data.reshape(-1, *windowed_output_data.shape[2:])
     windowed_input_data = windowed_input_data.reshape(-1, *windowed_input_data.shape[2:]).transpose(1, 2)
-    window_mask += target_end_mask
     window_mask = window_mask.reshape(-1, *window_mask.shape[2:])
-    target_end_mask = target_end_mask.reshape(-1, *target_end_mask.shape[2:])
 
     return (windowed_input_data, windowed_output_data,
             [source_pad_mask, source_end_mask, target_pad_mask,
