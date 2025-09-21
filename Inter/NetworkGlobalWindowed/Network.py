@@ -82,7 +82,6 @@ class TransformerTranslator(nn.Module):
 
         return trg
 
-
     def recursive_eval(self, source, target, input_mask, n=0):
         source_pad_mask, source_end_mask, target_pad_mask = input_mask
 
@@ -115,31 +114,3 @@ class TransformerTranslator(nn.Module):
         trg = self.last_decoder(trg)
 
         return trg, is_end
-
-    def eval_end(self, source, target, input_mask):
-        source_pad_mask, source_end_mask, target_pad_mask = input_mask
-
-        trg = self.dec_embedding(target)
-        src = self.enc_embedding(source)
-
-        src = (src * (1 - source_end_mask) * (1 - source_pad_mask) +
-               self.end_token() * source_end_mask +
-               self.pad_token() * source_pad_mask)
-        trg = (trg * (1 - target_pad_mask) +
-               self.pad_token() * target_pad_mask)
-
-        src = torch.concat((src[:, :self.size_tampon_source], self.start_token().expand(trg.size(0), 1, -1), src[:, self.size_tampon_source:]), dim=1)
-        trg = torch.concat((trg[:, :self.size_tampon_target], self.start_token().expand(trg.size(0), 1, -1), trg[:, self.size_tampon_target:]), dim=1)
-
-        trg = self.dec_pos_encoding(trg)
-        src = self.enc_pos_encoding(src)
-
-        for encoder in self.encoders:
-            src = encoder(src)
-
-        for decoder in self.decoders:
-            trg = decoder(target=trg, source=src, mask=self.mask_decoder)
-
-        diff = self.last_decoder(trg - self.end_token())
-
-        return torch.norm(diff, p=2, dim=-1)[0].tolist()
