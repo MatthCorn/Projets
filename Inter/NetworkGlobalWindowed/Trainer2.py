@@ -52,7 +52,7 @@ def auto_num_workers(max_cap=None):
         max_cap = default_cap
 
     # règle empirique : on garde 1 cœur pour le système
-    n_workers = max(0, min(n_cpu - 1, max_cap))
+    n_workers = max(0, min(n_cpu - 2, max_cap))
     return n_workers
 
 
@@ -329,8 +329,9 @@ if __name__ == '__main__':
         train_loader = DataLoader(
             train_dataset,
             batch_size=param["batch_size"],
-            shuffle=True,
+            shuffle=False,
             num_workers=auto_num_workers(),
+            persistent_workers=True,
             pin_memory=True if device.type == "cuda" else False
         )
 
@@ -338,7 +339,8 @@ if __name__ == '__main__':
             val_dataset,
             batch_size=param["batch_size"],
             shuffle=False,
-            num_workers=2,
+            num_workers=1,
+            persistent_workers=True,
             pin_memory=True if device.type == "cuda" else False
         )
 
