@@ -276,84 +276,6 @@ def value_to_rgb(value, min_val=0, max_val=2, colormap='plasma'):
 
 updating = False  # flag global pour éviter récursion
 
-def RecursiveGeneration(save_path):
-    from Inter.NetworkGlobalWindowed.SpecialUtils import GetData
-    import torch
-
-    param = loadXmlAsObj(os.path.join(save_path, 'param'))
-    weight_l = torch.load(os.path.join(save_path, 'WeightL'), weights_only=False)
-    weight_f = torch.load(os.path.join(save_path, 'WeightF'), weights_only=False)
-
-    [Input, Output, Masks, _], _ = GetData(
-        d_in=param['d_in'],
-        n_pulse_plateau=param['n_pulse_plateau'],
-        n_sat=param['n_sat'],
-        n_mes=param['n_mes'],
-        len_in=param['len_in'],
-        len_out=param["len_out"],
-        n_data_training=1,
-        n_data_validation=1,
-        sensitivity=param["sensitivity"],
-        bias='freq',
-        mean_min=min([window["mean"][0] for window in param["training_strategy"]]),
-        mean_max=max([window["mean"][1] for window in param["training_strategy"]]),
-        std_min=min([window["std"][0] for window in param["training_strategy"]]),
-        std_max=max([window["std"][1] for window in param["training_strategy"]]),
-        distrib=param["plot_distrib"],
-        weight_f=weight_f,
-        weight_l=weight_l,
-        size_focus_source=param['len_in_window'] - param['size_tampon_source'],
-        size_tampon_source=param['size_tampon_source'],
-        size_tampon_target=param['size_tampon_target'],
-        size_focus_target=param['len_out_window'] - param['size_tampon_target'],
-        parallel=True,
-        max_inflight=500,
-    )
-
-    from Inter.NetworkGlobalWindowed.Network import TransformerTranslator
-    N = TransformerTranslator(param['d_in'], param['d_in'] + 1, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
-                              n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], width_FF=param['width_FF'], len_in=param['len_in_window'],
-                              len_out=param['len_out_window'], norm=param['norm'], dropout=param['dropout'],
-                              size_tampon_target=param['size_tampon_target'],
-                              size_tampon_source=param['size_tampon_source']
-                              )
-    N.load_state_dict(torch.load(os.path.join(save_path, 'Last_network')))
-
-    size_focus_source = param['len_in_window'] - param['size_tampon_source']
-    size_tampon_source = param['size_tampon_source']
-    size_tampon_target = param['size_tampon_target']
-    size_focus_target = param['len_out_window'] - param['size_tampon_target']
-
-    InputMask = Masks[:-2]
-    WindowMask = Masks[-1]
-
-    LocalOutput = Output[0: 1]
-    total_pulse_predicted = 0
-    for i_win in range(len(Input)):
-        LocalWindowMask = WindowMask[i_win: (i_win + 1)]
-        LocalInput, LocalInputMask = (Input[i_win: (i_win + 1)],
-                                      [mask[i_win: (i_win + 1)] for mask in InputMask])
-        LocalInputMask[2] = torch.zeros_like(LocalInputMask[2])
-        LocalInputMask[2][:, :max(0, (size_tampon_target - total_pulse_predicted))] = 1
-
-        end_list = []
-        for n in range(size_focus_target):
-            LocalPrediction, is_end = N.recursive_eval(LocalInput, LocalOutput, LocalInputMask, n)
-            LocalOutput[:, -size_focus_target:, :] = LocalPrediction[:, -size_focus_target-1:-1]
-
-            end_list.append(float(is_end))
-
-        ToE = (LocalOutput[0, :, -1] +
-               LocalOutput[0, :, -2] +
-               torch.arange(-size_tampon_target, size_focus_target))
-
-        ToEb = (Output[0: 1][0, :, -1] +
-               Output[0: 1][0, :, -2] +
-               torch.arange(-size_tampon_target, size_focus_target))
-
-        n_pulse_predicted = [x < size_tampon_target for x in ToE].index(False)
-        total_pulse_predicted += n_pulse_predicted
-
 def VisualizeScenario(save_path):
     from Inter.NetworkGlobalWindowed.SpecialUtils import GetData
     import torch
@@ -542,9 +464,10 @@ def VisualizeScenario(save_path):
 
     plt.show()
 
-def TempVisualizeScenario(save_path):
+def RecVisualizeScenario(save_path):
     from Inter.NetworkGlobalWindowed.SpecialUtils import GetData
     import torch
+    from tqdm import tqdm
 
     param = loadXmlAsObj(os.path.join(save_path, 'param'))
     weight_l = torch.load(os.path.join(save_path, 'WeightL'), weights_only=False)
@@ -585,15 +508,60 @@ def TempVisualizeScenario(save_path):
                               )
     N.load_state_dict(torch.load(os.path.join(save_path, 'Last_network')))
 
-    InputMask = Masks[:-1]
-    WindowMask = Masks[-1]
-
-    Prediction = N(Input, Output, InputMask)[:, :-1, :] * WindowMask
 
     size_focus_source = param['len_in_window'] - param['size_tampon_source']
     size_tampon_source = param['size_tampon_source']
     size_tampon_target = param['size_tampon_target']
     size_focus_target = param['len_out_window'] - param['size_tampon_target']
+
+    InputMask = Masks[:2]
+
+    LocalOutput = torch.zeros(1, size_tampon_target + size_focus_target, param['d_in'] + 1)
+    RecPrediction = []
+    RecWindowMask = []
+    for i_win in tqdm(range(len(Input))):
+        LocalInput = Input[i_win: (i_win + 1)]
+        LocalInputMask = [mask[i_win: (i_win + 1)] for mask in InputMask] + [torch.zeros(1, size_tampon_target + size_focus_target, 1)]
+        LocalInputMask[2][:, :size_tampon_target] = 1
+
+        end_list = []
+        for n in range(size_focus_target):
+            with torch.no_grad():
+                LocalPrediction, is_end = N.recursive_eval(LocalInput, LocalOutput, LocalInputMask, n, fast=True)
+            LocalOutput[:, -size_focus_target:, :] = LocalPrediction[:, -size_focus_target-1:-1]
+
+            end_list.append(float(is_end))
+
+        ToE_Prediction = (LocalOutput[0, :, -1] +
+                          LocalOutput[0, :, -2] +
+                          torch.arange(-size_tampon_target, size_focus_target)).round()
+
+        n_pulse_predicted = 0
+        while ToE_Prediction[size_tampon_target:][n_pulse_predicted] < size_focus_source - 1:
+            n_pulse_predicted += 1
+
+        RecPrediction.append(LocalOutput.clone())
+        LocalWindowMask = torch.zeros(1, size_tampon_target + size_focus_target, 1)
+        LocalWindowMask[:, size_tampon_target : (size_tampon_target + n_pulse_predicted) ] = 1
+        RecWindowMask.append(LocalWindowMask)
+
+        LocalOutput[:, :size_tampon_target] = LocalOutput[:, n_pulse_predicted : (size_tampon_target + n_pulse_predicted)]
+        LocalInputMask[2][:, :size_tampon_target] = LocalInputMask[2][:, n_pulse_predicted : (size_tampon_target + n_pulse_predicted)]
+
+    RecPrediction = torch.cat(RecPrediction, dim=0)
+    RecWindowMask = torch.cat(RecWindowMask, dim=0)
+
+    RecPrediction[:, :, -1] = RecPrediction[:, :, -1] + (
+            torch.arange(RecPrediction.shape[0]).view(-1, 1) * size_focus_source +
+            torch.arange(-size_tampon_target, size_focus_target).view(1, -1)
+    ) * RecWindowMask[:, :, -1]
+
+    RecPrediction = RecPrediction[RecWindowMask.to(bool).squeeze(-1)]
+
+    InputMask = Masks[:-1]
+    WindowMask = Masks[-1]
+
+    Prediction = N(Input, Output, InputMask)[:, :-1, :] * WindowMask
 
     Prediction[:, :, -1] = Prediction[:, :, -1] + (
         torch.arange(Prediction.shape[0]).view(-1, 1) * size_focus_source +
@@ -676,6 +644,24 @@ def TempVisualizeScenario(save_path):
                          facecolor=(r, g, b, 0.8),
                          edgecolor='k',
                          linewidth=0.3)
+        ax4.add_patch(rect)
+
+    L = RecPrediction.tolist()
+    L.sort(key=lambda x: x[1])
+    for vector in L:
+        T1 = vector[-1]
+        T2 = T1 + vector[-2]
+        F = vector[0]
+        N = 0.5 * np.tanh(vector[1]/l_std) + 1
+
+        r, g, b, a = value_to_rgb(N)
+
+        rect = Rectangle((T1, F - df),  # coin bas gauche
+                         T2 - T1,  # largeur
+                         2 * df,  # hauteur
+                         facecolor=(r, g, b, 0.8),
+                         edgecolor='k',
+                         linewidth=0.3)
         ax3.add_patch(rect)
 
     from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -716,7 +702,7 @@ def TempVisualizeScenario(save_path):
             xlim = event_ax.get_xlim()
             ylim = event_ax.get_ylim()
 
-            for ax in (ax1, ax2, ax3):
+            for ax in (ax1, ax2, ax3, ax4):
                 if ax is not event_ax:
                     ax.set_xlim(xlim)
                     ax.set_ylim(ylim)
@@ -734,7 +720,7 @@ def TempVisualizeScenario(save_path):
 if __name__ == '__main__':
     save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobalWindowed\Save\2025-08-18__15-21(2)'
 
-    # TempVisualizeScenario(save_path)
+    RecVisualizeScenario(save_path)
 
     PlotError(save_path)
 
