@@ -1,7 +1,6 @@
 import torch
 from Tools.XMLTools import loadXmlAsObj, saveObjAsXml
 import os
-import gc
 from tqdm import tqdm
 import numpy as np
 import time
@@ -419,20 +418,27 @@ def window(input_data, output_data, mem_data, len_mem_data, mult_mask, add_mask,
 
     windowed_input_data = new_input_data.unfold(1, size_tampon_source + size_focus_source, size_focus_source)
 
-    time_of_arrival_window = size_focus_source * torch.arange(1, windowed_input_data.shape[1] + 1)
+    time_of_arrival_window = size_focus_source * torch.arange(1, windowed_input_data.shape[1] + 1) - 1
+    time_of_arrival_window[time_of_arrival_window >= input_data.shape[1]] = output_data.shape[1] - 1
     time_of_emission = torch.arange(output_data.shape[1]) - output_data[:, :, -1] + output_data[:, :, -2]
-    time_of_emission = time_of_emission * mult_mask[:, 1:, 0] + (1 - mult_mask[:, 1:, 0]) * windowed_input_data.shape[1] * size_focus_source
-    time_of_emission += (1 - mult_mask[:, :-1, 0])
-    time_of_emission = torch.nn.functional.pad(time_of_emission, (0, size_focus_target), value=windowed_input_data.shape[1] * size_focus_source + 1)
-    time_of_emission = torch.nn.functional.pad(time_of_emission, (size_tampon_target, 0), value=-1.)
-    time_of_emission[:, size_tampon_target - 1] = 0.
+    time_of_emission = time_of_emission * mult_mask[:, 1:, 0] + (1 - mult_mask[:, 1:, 0]) * output_data.shape[1]
+    pulse_arrived = torch.nn.functional.pad(torch.lt(
+        time_of_emission.unsqueeze(-1),
+        time_of_arrival_window.unsqueeze(0).unsqueeze(0)
+    ), (1, 0), value=False).to(torch.float32)
 
-    comp = torch.gt(time_of_emission.unsqueeze(-1), time_of_arrival_window.unsqueeze(0).unsqueeze(0))
-    arg = torch.nn.functional.pad(comp.to(torch.int).argmax(dim=1), (1, 0), value=size_tampon_target)
+    upcoming_pulse = pulse_arrived[:, :, 1:] - pulse_arrived[:, :, :-1]
 
     idx = torch.arange(size_tampon_target + size_focus_target).view(1, 1, size_tampon_target + size_focus_target)
-    starts = arg[:, :-1].unsqueeze(-1) - size_tampon_target
+    starts = upcoming_pulse.argmax(dim=1).unsqueeze(-1)
     window_indices = starts + idx
+
+    window_mask = torch.lt(
+        torch.arange(-size_tampon_target, size_focus_target).view(1, 1, size_tampon_target + size_focus_target),
+        upcoming_pulse.sum(dim=1).unsqueeze(-1)
+    ).unsqueeze(-1).to(torch.float32)
+
+    window_mask[:, :, :size_tampon_target] = 0
 
     # modification de l'encodage du ToA dans la séquence de sortie
     output_data[:, :, -1] = - output_data[:, :, -1] + torch.arange(output_data.shape[1]).view(1, -1) * mult_mask[:, 1:, 0]
@@ -456,19 +462,11 @@ def window(input_data, output_data, mem_data, len_mem_data, mult_mask, add_mask,
     windowed_output_data[:, :, :, -1] = windowed_output_data[:, :, :, -1] - (
         torch.arange(windowed_output_data.shape[1]).view(1, -1, 1) * size_focus_source +
         torch.arange(-size_tampon_target, size_focus_target).view(1, 1, -1)
-    ) * (1 - mask[..., 0].abs())
+    )
 
     mask = mask.reshape(-1, *mask.shape[2:])
-    target_end_mask = (- mask + mask ** 2) / 2
+    target_end_mask = (-mask + mask ** 2) / 2
     target_pad_mask = (mask + mask ** 2) / 2
-
-    window_mask = torch.lt(
-        torch.arange(-size_tampon_target, size_focus_target).view(1, 1, size_tampon_target + size_focus_target),
-        (arg[:, 1:] - arg[:, :-1]).unsqueeze(-1)
-    ).unsqueeze(-1).logical_not().to(torch.float32)
-
-    window_mask = 1 - window_mask
-    window_mask[:, :, :size_tampon_target] = 0
 
     mean = (windowed_output_data * window_mask).sum(dim=2, keepdim=True).expand(windowed_output_data.shape) / (
             window_mask.sum(dim=2, keepdim=True) + 1e-5) * window_mask
@@ -480,7 +478,7 @@ def window(input_data, output_data, mem_data, len_mem_data, mult_mask, add_mask,
 
     windowed_output_data = windowed_output_data.reshape(-1, *windowed_output_data.shape[2:])
     windowed_input_data = windowed_input_data.reshape(-1, *windowed_input_data.shape[2:]).transpose(1, 2)
-    window_mask = window_mask.reshape(-1, *window_mask.shape[2:])
+    window_mask = window_mask.reshape(-1, *window_mask.shape[2:]) + target_end_mask
 
     mem_in_data = mem_data[:, :-1].reshape(-1, *mem_data.shape[2:])
     mem_out_data = mem_data[:, 1:].reshape(-1, *mem_data.shape[2:])

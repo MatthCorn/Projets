@@ -718,13 +718,13 @@ def RecVisualizeScenario(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobalWindowed\Save\2025-08-18__15-21(2)'
-
-    RecVisualizeScenario(save_path)
+    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobalWindowed\Save\2025-09-25__21-02'
 
     PlotError(save_path)
 
     ErrorOverPosition(save_path)
+
+    RecVisualizeScenario(save_path)
 
     VisualizeScenario(save_path)
 

@@ -107,12 +107,6 @@ def window(input_data, output_data, mult_mask, add_mask, param):
     windowed_input_data = windowed_input_data.reshape(-1, *windowed_input_data.shape[2:]).transpose(1, 2)
     window_mask = window_mask.reshape(-1, *window_mask.shape[2:]) + target_end_mask
 
-    # output = windowed_output_data.clone()
-    # output[:, :, -1] = output[:, :, -1] + (
-    #     torch.arange(-size_tampon_target, size_focus_target).view(1, -1)
-    # )
-    # toe = (output[:, :, -2] + output[:, :, -1])
-
     return (windowed_input_data, windowed_output_data,
             [source_pad_mask, source_end_mask, target_pad_mask,
              target_end_mask, window_mask],

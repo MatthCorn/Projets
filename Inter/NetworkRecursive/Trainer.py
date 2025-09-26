@@ -1,7 +1,5 @@
 from Inter.NetworkRecursive.DataMaker import GetData
-from Inter.NetworkRecursive.Network import TransformerTranslator as N1
-from Inter.NetworkRecursive.Network2 import TransformerTranslator as N2
-from Inter.NetworkRecursive.Network3 import TransformerTranslator as N3
+from Inter.NetworkRecursive.Network import TransformerTranslator
 from Complete.LRScheduler import Scheduler
 from GradObserver.GradObserverClass import DictGradObserver
 from Tools.ParamObs import DictParamObserver
@@ -57,7 +55,6 @@ if __name__ == '__main__':
              "max_lr": 5,
              "FreqGradObs": 1 / 3,
              "warmup": 1,
-             "network": 2,
              "resume_from": 'None',
              "max_inflight": 10}
 
@@ -81,8 +78,6 @@ if __name__ == '__main__':
     if sys.platform == "win32":
         p.nice(psutil.HIGH_PRIORITY_CLASS)
     ################################################################################################################################################
-    TransformerTranslator = [N1, N2, N3][param["network"]]
-
     d_out = param['d_in'] + 1
 
     period_checkpoint = 15 * 60  # en secondes
