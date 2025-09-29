@@ -102,7 +102,7 @@ class TransformerTranslator(nn.Module):
 
     def recursive_eval(self, source, target, mem_in, input_mask, n=0, fast=False):
         if not (fast and n>0):
-            source_pad_mask, source_end_mask, _, pad_mem_in_mask = input_mask
+            source_pad_mask, source_end_mask, pad_mem_in_mask, _ = input_mask
 
             src = self.enc_embedding(source)
             mem_in = self.mem_embedding(mem_in)
@@ -133,19 +133,19 @@ class TransformerTranslator(nn.Module):
                 latent = encoder(latent)
 
             mem_out = latent[:, -self.n_mes:]
-            is_mem_empty = self.mem_decoderFF(mem_out - self.pad_token())
+            is_pad_mem = torch.norm(self.mem_decoderFF(mem_out - self.pad_token()), dim=[0, 2], p=2)
             mem_out = self.mem_decoderFF(mem_out)
 
             self.latent_mem = latent
             self.mem_out_mem = mem_out
-            self.is_mem_empty_mem = is_mem_empty
+            self.is_pad_mem = is_pad_mem
 
         else:
             latent = self.latent_mem
             mem_out = self.mem_out_mem
-            is_mem_empty = self.is_mem_empty_mem
+            is_pad_mem = self.is_pad_mem
 
-        target_pad_mask = input_mask[2]
+        target_pad_mask = input_mask[-1]
         # target.shape = (batch_size, len_out, d_out)
 
         trg = self.dec_embedding(target)
@@ -172,4 +172,4 @@ class TransformerTranslator(nn.Module):
 
         trg = self.pulse_decoder(trg)
 
-        return trg, is_end, mem_out, is_mem_empty
+        return trg, is_end, mem_out, is_pad_mem

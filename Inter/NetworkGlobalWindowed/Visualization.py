@@ -517,17 +517,18 @@ def RecVisualizeScenario(save_path):
     InputMask = Masks[:2]
 
     LocalOutput = torch.zeros(1, size_tampon_target + size_focus_target, param['d_in'] + 1)
+    LocalTargetPadMask = torch.zeros(1, size_tampon_target + size_focus_target, 1)
+    LocalTargetPadMask[:, :size_tampon_target] = 1
     RecPrediction = []
     RecWindowMask = []
     for i_win in tqdm(range(len(Input))):
         LocalInput = Input[i_win: (i_win + 1)]
-        LocalInputMask = [mask[i_win: (i_win + 1)] for mask in InputMask] + [torch.zeros(1, size_tampon_target + size_focus_target, 1)]
-        LocalInputMask[2][:, :size_tampon_target] = 1
+        LocalInputMask = [mask[i_win: (i_win + 1)] for mask in InputMask]
 
         end_list = []
         for n in range(size_focus_target):
             with torch.no_grad():
-                LocalPrediction, is_end = N.recursive_eval(LocalInput, LocalOutput, LocalInputMask, n, fast=True)
+                LocalPrediction, is_end = N.recursive_eval(LocalInput, LocalOutput, LocalInputMask + [LocalTargetPadMask], n, fast=True)
             LocalOutput[:, -size_focus_target:, :] = LocalPrediction[:, -size_focus_target-1:-1]
 
             end_list.append(float(is_end))
@@ -542,11 +543,11 @@ def RecVisualizeScenario(save_path):
 
         RecPrediction.append(LocalOutput.clone())
         LocalWindowMask = torch.zeros(1, size_tampon_target + size_focus_target, 1)
-        LocalWindowMask[:, size_tampon_target : (size_tampon_target + n_pulse_predicted) ] = 1
+        LocalWindowMask[:, size_tampon_target: (size_tampon_target + n_pulse_predicted) ] = 1
         RecWindowMask.append(LocalWindowMask)
 
-        LocalOutput[:, :size_tampon_target] = LocalOutput[:, n_pulse_predicted : (size_tampon_target + n_pulse_predicted)]
-        LocalInputMask[2][:, :size_tampon_target] = LocalInputMask[2][:, n_pulse_predicted : (size_tampon_target + n_pulse_predicted)]
+        LocalOutput[:, :size_tampon_target] = LocalOutput[:, n_pulse_predicted: (size_tampon_target + n_pulse_predicted)].clone()
+        LocalTargetPadMask[:, :size_tampon_target] = LocalTargetPadMask[:, n_pulse_predicted: (size_tampon_target + n_pulse_predicted)].clone()
 
     RecPrediction = torch.cat(RecPrediction, dim=0)
     RecWindowMask = torch.cat(RecWindowMask, dim=0)
@@ -718,11 +719,11 @@ def RecVisualizeScenario(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobalWindowed\Save\2025-09-25__21-02'
+    save_path = r'C:\Users\matth\Documents\Python\Projets\Inter\NetworkGlobalWindowed\Save\2025-09-25__21-02'
 
     PlotError(save_path)
 
-    ErrorOverPosition(save_path)
+    # ErrorOverPosition(save_path)
 
     RecVisualizeScenario(save_path)
 
