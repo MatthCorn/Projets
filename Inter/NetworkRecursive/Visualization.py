@@ -494,7 +494,7 @@ def RecVisualizeScenario(save_path):
                           torch.arange(-size_tampon_target, size_focus_target)).round()
 
         n_pulse_predicted = 0
-        while ToE_Prediction[size_tampon_target:][n_pulse_predicted] < size_focus_source - 1:
+        while (n_pulse_predicted < size_focus_target) and (ToE_Prediction[size_tampon_target:][n_pulse_predicted] < size_focus_source - 1):
             n_pulse_predicted += 1
 
         RecPrediction.append(LocalOutput.clone())
@@ -502,9 +502,11 @@ def RecVisualizeScenario(save_path):
         LocalWindowMask[:, size_tampon_target: (size_tampon_target + n_pulse_predicted)] = 1
         RecWindowMask.append(LocalWindowMask)
 
-        LocalOutput[:, :size_tampon_target] = LocalOutput[:, n_pulse_predicted: (size_tampon_target + n_pulse_predicted)].clone()
-        LocalTargetPadMask[:, :size_tampon_target] = LocalTargetPadMask[:, n_pulse_predicted: (size_tampon_target + n_pulse_predicted)].clone()
-        LocalPadMemInMask = (is_pad_mem < 0.1).to(torch.float32).reshape(1, -1, 1)
+        n_pulse_kept = min(n_pulse_predicted, size_tampon_target)
+        LocalOutput[0, :, -1] += torch.arange(-size_tampon_target, size_focus_target)
+        LocalOutput[:, (size_tampon_target - n_pulse_kept): size_tampon_target] = LocalOutput[:, (size_tampon_target + n_pulse_predicted - n_pulse_kept): (size_tampon_target + n_pulse_predicted)].clone()
+        LocalOutput[0, :, -1] -= torch.arange(-size_tampon_target, size_focus_target) + size_focus_source
+        LocalTargetPadMask[:, (size_tampon_target - n_pulse_kept): size_tampon_target] = LocalTargetPadMask[:, (size_tampon_target + n_pulse_predicted - n_pulse_kept): (size_tampon_target + n_pulse_predicted)].clone()
 
     RecPrediction = torch.cat(RecPrediction, dim=0)
     RecWindowMask = torch.cat(RecWindowMask, dim=0)
@@ -682,7 +684,7 @@ def RecVisualizeScenario(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\matth\Documents\Python\Projets\Inter\NetworkRecursive\Save\2025-08-24__16-50(2)'
+    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkRecursive\Save\2025-08-24__16-50(2)'
 
     RecVisualizeScenario(save_path)
 

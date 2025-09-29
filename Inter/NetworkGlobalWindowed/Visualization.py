@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, PillowWriter
+from matplotlib.pyplot import title
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
 from Tools.XMLTools import loadXmlAsObj
@@ -523,8 +524,6 @@ def RecVisualizeScenario(save_path):
     LocalTargetPadMask[:, :size_tampon_target] = 1
     RecPrediction = []
     RecWindowMask = []
-    n_total_pulse_pred = 0
-    n_total_pulse_target = 0
     for i_win in tqdm(range(len(Input))):
         LocalInput = Input[i_win: (i_win + 1)]
         LocalInputMask = [mask[i_win: (i_win + 1)] for mask in InputMask]
@@ -545,22 +544,10 @@ def RecVisualizeScenario(save_path):
         while (n_pulse_predicted < size_focus_target) and (ToE_Prediction[size_tampon_target:][n_pulse_predicted] < size_focus_source - 1):
             n_pulse_predicted += 1
 
-        n_pulse_target = int(WindowMask[i_win].sum())
-        print(n_pulse_predicted)
-        print(n_pulse_target)
-        local_plot(LocalOutput[0, max(0,size_tampon_target - n_total_pulse_pred):(n_pulse_predicted + size_tampon_target)].clone(),
-                   Output[i_win, max(0,size_tampon_target - n_total_pulse_target):(n_pulse_target + size_tampon_target)].clone(),
-                   param)
-
-        n_total_pulse_pred += n_pulse_predicted
-        n_total_pulse_target += n_pulse_target
-
         RecPrediction.append(LocalOutput.clone())
         LocalWindowMask = torch.zeros(1, size_tampon_target + size_focus_target, 1)
         LocalWindowMask[:, size_tampon_target: (size_tampon_target + n_pulse_predicted) ] = 1
         RecWindowMask.append(LocalWindowMask)
-
-        n_pulse_predicted = n_pulse_target
 
         n_pulse_kept = min(n_pulse_predicted, size_tampon_target)
         LocalOutput[0, :, -1] += torch.arange(-size_tampon_target, size_focus_target)
@@ -568,9 +555,16 @@ def RecVisualizeScenario(save_path):
         LocalOutput[0, :, -1] -= torch.arange(-size_tampon_target, size_focus_target) + size_focus_source
         LocalTargetPadMask[:, (size_tampon_target - n_pulse_kept): size_tampon_target] = LocalTargetPadMask[:, (size_tampon_target + n_pulse_predicted - n_pulse_kept): (size_tampon_target + n_pulse_predicted)].clone()
 
-        local_plot(LocalOutput[0, max(0,size_tampon_target - n_total_pulse_pred):size_tampon_target].clone(),
-                   Output[i_win + 1, max(0,size_tampon_target - n_total_pulse_target):size_tampon_target].clone(),
-                   param)
+        plt.plot(end_list, label=str(i_win))
+
+    plt.legend()
+    plt.show()
+
+    Last_Input = Input[-1:]
+    Last_Output = Output[-1:]
+    LastInputMasks = [mask[-1:] for mask in Masks[:-1]]
+    LastWindowMask = Masks[-1][-1:]
+    Last_Prediction = N(Last_Input, Last_Output, LastInputMasks)[:, :-1, :]
 
     RecPrediction = torch.cat(RecPrediction, dim=0)
     RecWindowMask = torch.cat(RecWindowMask, dim=0)
@@ -740,106 +734,6 @@ def RecVisualizeScenario(save_path):
         ax.callbacks.connect('ylim_changed', on_lim_changed)
 
     plt.show()
-
-def local_plot(pred, output, param):
-    df = param['sensitivity']
-    f_min = output[:, 0].min() - 5 * df
-    f_max = output[:, 0].max() + 5 * df
-    l_std = output[:, 1].std()
-
-    pred[:, -1] += torch.arange(0, len(pred), 1)
-    output[:, -1] += torch.arange(0, len(output), 1)
-
-    from matplotlib import colors
-    from matplotlib.patches import Rectangle
-    fig, (ax1, ax2) = plt.subplots(1, 2)
-
-
-    R = output.tolist()
-    R.sort(key=lambda x: x[1])
-    for vector in R:
-        T1 = vector[-1]
-        T2 = T1 + vector[-2]
-        F = vector[0]
-        N = 0.5 * np.tanh(vector[1]/l_std) + 1
-
-        r, g, b, a = value_to_rgb(N)
-
-        rect = Rectangle((T1, F - df),  # coin bas gauche
-                         T2 - T1,  # largeur
-                         2 * df,  # hauteur
-                         facecolor=(r, g, b, 0.8),
-                         edgecolor='k',
-                         linewidth=0.3)
-        ax2.add_patch(rect)
-
-    L = pred.tolist()
-    L.sort(key=lambda x: x[1])
-    for vector in L:
-        T1 = vector[-1]
-        T2 = T1 + vector[-2]
-        F = vector[0]
-        N = 0.5 * np.tanh(vector[1]/l_std) + 1
-
-        r, g, b, a = value_to_rgb(N)
-
-        rect = Rectangle((T1, F - df),  # coin bas gauche
-                         T2 - T1,  # largeur
-                         2 * df,  # hauteur
-                         facecolor=(r, g, b, 0.8),
-                         edgecolor='k',
-                         linewidth=0.3)
-        ax1.add_patch(rect)
-
-    from mpl_toolkits.axes_grid1 import make_axes_locatable
-
-    cmap = plt.get_cmap('plasma')
-    norm = colors.Normalize(vmin=0, vmax=2)
-    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
-    sm.set_array([])
-
-    divider = make_axes_locatable(ax2)
-    cax = divider.append_axes("right", size="5%", pad=0.05)
-    plt.colorbar(sm, cax=cax)
-
-    x_min = min(pred[:, -1].min(), output[:, -1].min())
-    x_max = max((pred[:, -1] + pred[:, -2]).max(), (output[:, -1] + output[:, -2]).max())
-    for ax in (ax1, ax2):
-        ax.set_xlim(x_min, x_max)
-        ax.set_ylim(f_min, f_max)
-        ax.set_xlabel('temps')
-        ax.set_ylabel('fréquence')
-
-    ax1.set_title("pred")
-    ax2.set_title("target")
-
-    def on_lim_changed(event_ax):
-        global updating
-        if updating:
-            return  # on est déjà en train de mettre à jour, on sort
-
-        updating = True
-        try:
-            xlim = event_ax.get_xlim()
-            ylim = event_ax.get_ylim()
-
-            for ax in (ax1, ax2):
-                if ax is not event_ax:
-                    ax.set_xlim(xlim)
-                    ax.set_ylim(ylim)
-            event_ax.figure.canvas.draw_idle()
-        finally:
-            updating = False
-
-    # Attacher l'événement
-    for ax in (ax1, ax2):
-        ax.callbacks.connect('xlim_changed', on_lim_changed)
-        ax.callbacks.connect('ylim_changed', on_lim_changed)
-
-    plt.tight_layout()
-    plt.show()
-    plt.close()
-
 
 if __name__ == '__main__':
     save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobalWindowed\Save\2025-09-25__23-05'
