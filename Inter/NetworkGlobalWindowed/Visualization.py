@@ -517,7 +517,6 @@ def RecVisualizeScenario(save_path):
     size_focus_target = param['len_out_window'] - param['size_tampon_target']
 
     InputMask = Masks[:2]
-    WindowMask = Masks[-1]
 
     LocalOutput = torch.zeros(1, size_tampon_target + size_focus_target, param['d_in'] + 1)
     LocalTargetPadMask = torch.zeros(1, size_tampon_target + size_focus_target, 1)
@@ -544,6 +543,10 @@ def RecVisualizeScenario(save_path):
         while (n_pulse_predicted < size_focus_target) and (ToE_Prediction[size_tampon_target:][n_pulse_predicted] < size_focus_source - 1):
             n_pulse_predicted += 1
 
+        if i_win == len(Input) - 1:
+            threshold = 0.5
+            n_pulse_predicted = [x < threshold for x in end_list].index(True)
+
         RecPrediction.append(LocalOutput.clone())
         LocalWindowMask = torch.zeros(1, size_tampon_target + size_focus_target, 1)
         LocalWindowMask[:, size_tampon_target: (size_tampon_target + n_pulse_predicted) ] = 1
@@ -554,17 +557,6 @@ def RecVisualizeScenario(save_path):
         LocalOutput[:, (size_tampon_target - n_pulse_kept): size_tampon_target] = LocalOutput[:, (size_tampon_target + n_pulse_predicted - n_pulse_kept): (size_tampon_target + n_pulse_predicted)].clone()
         LocalOutput[0, :, -1] -= torch.arange(-size_tampon_target, size_focus_target) + size_focus_source
         LocalTargetPadMask[:, (size_tampon_target - n_pulse_kept): size_tampon_target] = LocalTargetPadMask[:, (size_tampon_target + n_pulse_predicted - n_pulse_kept): (size_tampon_target + n_pulse_predicted)].clone()
-
-        plt.plot(end_list, label=str(i_win))
-
-    plt.legend()
-    plt.show()
-
-    Last_Input = Input[-1:]
-    Last_Output = Output[-1:]
-    LastInputMasks = [mask[-1:] for mask in Masks[:-1]]
-    LastWindowMask = Masks[-1][-1:]
-    Last_Prediction = N(Last_Input, Last_Output, LastInputMasks)[:, :-1, :]
 
     RecPrediction = torch.cat(RecPrediction, dim=0)
     RecWindowMask = torch.cat(RecWindowMask, dim=0)
@@ -736,14 +728,14 @@ def RecVisualizeScenario(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobalWindowed\Save\2025-09-25__23-05'
+    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobalWindowed\Save\2025-09-29__14-00'
 
-    # PlotError(save_path)
+    PlotError(save_path)
 
-    # ErrorOverPosition(save_path)
+    ErrorOverPosition(save_path)
 
     RecVisualizeScenario(save_path)
 
-    VisualizeScenario(save_path)
+    # VisualizeScenario(save_path)
 
     # PathToGIF(save_path)

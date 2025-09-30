@@ -465,9 +465,6 @@ def RecVisualizeScenario(save_path):
 
     InputMask = Masks[:2]
 
-    # source_pad_mask, source_end_mask, target_pad_mask, target_end_mask, pad_mem_in_mask, pad_mem_out_mask = input_mask
-    # source_pad_mask, source_end_mask, pad_mem_in_mask, _ = input_mask
-
     LocalOutput = torch.zeros(1, size_tampon_target + size_focus_target, param['d_in'] + 1)
     LocalMemIn = torch.zeros(1, param['n_mes'], param['d_in'] + 1)
     LocalPadMemInMask = torch.zeros(1, param['n_mes'], 1)
@@ -480,6 +477,9 @@ def RecVisualizeScenario(save_path):
         LocalInput = Input[i_win: (i_win + 1)]
         LocalInputMask = [mask[i_win: (i_win + 1)] for mask in InputMask]
 
+        print('i_win : ', i_win)
+        print('MemInPad : ', Masks[4][i_win + 1, :, 0].to(int).tolist())
+
         end_list = []
         for n in range(size_focus_target):
             with torch.no_grad():
@@ -488,6 +488,14 @@ def RecVisualizeScenario(save_path):
             LocalOutput[:, -size_focus_target:, :] = LocalPrediction[:, -size_focus_target-1:-1]
 
             end_list.append(float(is_end))
+
+        LocalMemIn = LocalMemOut
+        threeshold = 0.001
+        LocalPadMemInMask = (is_pad_mem < threeshold).reshape(1, -1, 1).to(dtype=torch.float32)
+
+        # if i_win < len(Input) - 1:
+        #     PadMemOut = Masks[4][i_win + 1, :, 0]
+        #     print(LocalPadMemInMask[0, :, 0].to(int) + 1j * PadMemOut)
 
         ToE_Prediction = (LocalOutput[0, :, -1] +
                           LocalOutput[0, :, -2] +
@@ -686,7 +694,7 @@ def RecVisualizeScenario(save_path):
 if __name__ == '__main__':
     save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkRecursive\Save\2025-08-24__16-50(2)'
 
-    RecVisualizeScenario(save_path)
+    # RecVisualizeScenario(save_path)
 
     PlotError(save_path)
 
