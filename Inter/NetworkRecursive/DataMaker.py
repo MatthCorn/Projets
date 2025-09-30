@@ -476,7 +476,7 @@ def window(input_data, output_data, mem_data, len_mem_data, mult_mask, add_mask,
 
     std_output = std.unsqueeze(-1).expand(-1, windowed_output_data.shape[1]).reshape(-1, 1, 1)
 
-    windowed_output_data = windowed_output_data.reshape(-1, *windowed_output_data.shape[2:])
+    windowed_output_data = windowed_output_data.reshape(-1, *windowed_output_data.shape[2:]) * (1 - target_end_mask)
     windowed_input_data = windowed_input_data.reshape(-1, *windowed_input_data.shape[2:]).transpose(1, 2)
     window_mask = window_mask.reshape(-1, *window_mask.shape[2:]) + target_end_mask
 
