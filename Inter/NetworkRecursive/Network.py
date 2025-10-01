@@ -101,7 +101,7 @@ class TransformerTranslator(nn.Module):
 
         return trg, mem_out
 
-    def calibrate_thresholds(self, source, target, mem_in, input_mask):
+    def calibrate_thresholds(self, source, target, mem_in, input_mask, window_mask, n_data):
         source_pad_mask, source_end_mask, target_pad_mask, target_end_mask, pad_mem_in_mask, pad_mem_out_mask = input_mask
 
         # source.shape = (batch_size, len_in, d_in)
@@ -146,19 +146,35 @@ class TransformerTranslator(nn.Module):
 
         mem_out = latent[:, -self.n_mes:]
 
+        is_pad_token = torch.norm(mem_out - self.pad_token(), keepdim=True) / torch.norm(self.pad_token())
+
         for decoder in self.decoders:
             trg = decoder(target=trg, source=latent, mask=self.mask_decoder)
         # trg.shape = (batch_size, len_out + 1, d_att)
 
-        is_end_token = torch.norm(trg - self.end_token(), dim=[-1], keepdim=True) / torch.norm(self.pad_token())
+        is_end_token = torch.norm(trg - self.end_token(), keepdim=True) / torch.norm(self.pad_token())
+
         trg = self.pulse_decoder(trg)
-        trg[:, :-1] = trg[:, :-1] * (1 - target_end_mask) + is_end_token * target_end_mask
-        # trg.shape = (batch_size, len_out + 1, d_out)
+        trg = trg.reshape(n_data, -1, *trg.shape[1:])
+        trg = trg[:, :-1]
+        trg = trg.reshape(-1, *trg.shape[2:])
 
-        is_pad_token = torch.norm(mem_out - self.pad_token(), dim=[-1], keepdim=True) / torch.norm(self.pad_token())
-        mem_out = self.mem_decoderFF(mem_out) * (1 - pad_mem_out_mask) + pad_mem_out_mask * is_pad_token
+        window_mask = window_mask.reshape(n_data, -1, *window_mask.shape[1:])
+        window_mask = window_mask[:, :-1]
+        window_mask.reshape(-1, *window_mask.shape[2:])
 
-        return trg, mem_out
+        is_last_token = trg[:, :-1]
+        from Tools.MCC import best_mcc_threshold_torch
+
+        best_thr_pad, best_mcc_pad = best_mcc_threshold_torch(1 - pad_mem_out_mask.reshape(-1), is_pad_token.reshape(-1))
+        best_thr_end, best_mcc_end = best_mcc_threshold_torch(1 - target_end_mask.reshape(-1), is_end_token.reshape(-1))
+
+        print('best_thr_pad : ', best_thr_pad)
+        print('best_mcc_pad : ', best_mcc_pad)
+        print('best_thr_end : ', best_thr_end)
+        print('best_mcc_end : ', best_mcc_end)
+
+        return best_thr_pad, best_thr_end
 
     def recursive_eval(self, source, target, mem_in, input_mask, n=0, fast=False):
         if not (fast and n>0):
