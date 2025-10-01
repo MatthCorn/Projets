@@ -156,25 +156,31 @@ class TransformerTranslator(nn.Module):
 
         trg = self.pulse_decoder(trg)
         trg = trg.reshape(n_data, -1, *trg.shape[1:])
-        trg = trg[:, :-1]
+        trg = trg[:, :-1, self.size_tampon_target:-1]
         trg = trg.reshape(-1, *trg.shape[2:])
 
         window_mask = window_mask.reshape(n_data, -1, *window_mask.shape[1:])
-        window_mask = window_mask[:, :-1]
-        window_mask.reshape(-1, *window_mask.shape[2:])
+        window_mask = window_mask[:, :-1, self.size_tampon_target:]
+        window_mask = window_mask.reshape(-1, *window_mask.shape[2:])
 
-        is_last_token = trg[:, :-1]
+        id = torch.arange(window_mask.shape[1]).reshape(1, -1, 1) < window_mask.sum(dim=1, keepdim=True) + 1
+
+        is_last_token = trg[:, :, -1:] + torch.arange(trg.shape[1]).reshape(1, -1, 1)
+        is_last_token = is_last_token[id]
+        window_mask = window_mask[id]
+
         from Tools.MCC import best_mcc_threshold_torch
 
         best_thr_pad, best_mcc_pad = best_mcc_threshold_torch(1 - pad_mem_out_mask.reshape(-1), is_pad_token.reshape(-1))
         best_thr_end, best_mcc_end = best_mcc_threshold_torch(1 - target_end_mask.reshape(-1), is_end_token.reshape(-1))
+        best_thr_last, best_mcc_last = best_mcc_threshold_torch(1 - window_mask, is_last_token)
 
         print('best_thr_pad : ', best_thr_pad)
         print('best_mcc_pad : ', best_mcc_pad)
         print('best_thr_end : ', best_thr_end)
         print('best_mcc_end : ', best_mcc_end)
 
-        return best_thr_pad, best_thr_end
+        return best_thr_pad, best_thr_end, best_thr_last
 
     def recursive_eval(self, source, target, mem_in, input_mask, n=0, fast=False):
         if not (fast and n>0):
