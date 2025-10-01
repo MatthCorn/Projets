@@ -477,9 +477,6 @@ def RecVisualizeScenario(save_path):
         LocalInput = Input[i_win: (i_win + 1)]
         LocalInputMask = [mask[i_win: (i_win + 1)] for mask in InputMask]
 
-        print('i_win : ', i_win)
-        print('MemInPad : ', Masks[4][i_win + 1, :, 0].to(int).tolist())
-
         end_list = []
         for n in range(size_focus_target):
             with torch.no_grad():
@@ -490,12 +487,8 @@ def RecVisualizeScenario(save_path):
             end_list.append(float(is_end))
 
         LocalMemIn = LocalMemOut
-        threeshold = 0.001
+        threeshold = 0.02
         LocalPadMemInMask = (is_pad_mem < threeshold).reshape(1, -1, 1).to(dtype=torch.float32)
-
-        # if i_win < len(Input) - 1:
-        #     PadMemOut = Masks[4][i_win + 1, :, 0]
-        #     print(LocalPadMemInMask[0, :, 0].to(int) + 1j * PadMemOut)
 
         ToE_Prediction = (LocalOutput[0, :, -1] +
                           LocalOutput[0, :, -2] +
@@ -504,6 +497,10 @@ def RecVisualizeScenario(save_path):
         n_pulse_predicted = 0
         while (n_pulse_predicted < size_focus_target) and (ToE_Prediction[size_tampon_target:][n_pulse_predicted] < size_focus_source - 1):
             n_pulse_predicted += 1
+
+        if i_win == len(Input) - 1:
+            threshold = 0.5
+            n_pulse_predicted = [x < threshold for x in end_list].index(True)
 
         RecPrediction.append(LocalOutput.clone())
         LocalWindowMask = torch.zeros(1, size_tampon_target + size_focus_target, 1)
@@ -692,7 +689,7 @@ def RecVisualizeScenario(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkRecursive\Save\2025-08-24__16-50(2)'
+    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkRecursive\Save\2025-09-30__17-21'
 
     # RecVisualizeScenario(save_path)
 

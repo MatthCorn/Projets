@@ -87,16 +87,76 @@ class TransformerTranslator(nn.Module):
             latent = encoder(latent)
 
         mem_out = latent[:, -self.n_mes:]
-        mem_out = (mem_out - self.pad_token() * pad_mem_out_mask)
-        mem_out = self.mem_decoderFF(mem_out)
+        is_pad_token = torch.norm(mem_out - self.pad_token(), dim=[-1], keepdim=True) / torch.norm(self.pad_token())
+        mem_out = self.mem_decoderFF(mem_out) * (1 - pad_mem_out_mask) + pad_mem_out_mask * is_pad_token
 
         for decoder in self.decoders:
             trg = decoder(target=trg, source=latent, mask=self.mask_decoder)
         # trg.shape = (batch_size, len_out + 1, d_att)
 
-        trg[:, :-1] = trg[:, :-1] - self.end_token() * target_end_mask
+        is_end_token = torch.norm(trg - self.end_token(), dim=[-1], keepdim=True) / torch.norm(self.pad_token())
         trg = self.pulse_decoder(trg)
+        trg[:, :-1] = trg[:, :-1] * (1 - target_end_mask) + is_end_token[:, :-1] * target_end_mask
         # trg.shape = (batch_size, len_out + 1, d_out)
+
+        return trg, mem_out
+
+    def calibrate_thresholds(self, source, target, mem_in, input_mask):
+        source_pad_mask, source_end_mask, target_pad_mask, target_end_mask, pad_mem_in_mask, pad_mem_out_mask = input_mask
+
+        # source.shape = (batch_size, len_in, d_in)
+        # target.shape = (batch_size, len_out, d_out)
+        # mem.shape = (batch_size, 2, n_mesureur, d_in + 1)
+
+        trg = self.dec_embedding(target)
+        src = self.enc_embedding(source)
+        mem_in = self.mem_embedding(mem_in)
+
+        # source.shape = (batch_size, len_in, d_att)
+        # target.shape = (batch_size, len_out, d_att)
+
+        src = (src * (1 - source_end_mask) * (1 - source_pad_mask) +
+               self.end_token() * source_end_mask +
+               self.pad_token() * source_pad_mask)
+        trg = (trg * (1 - target_end_mask) * (1 - target_pad_mask) +
+               self.end_token() * target_end_mask +
+               self.pad_token() * target_pad_mask)
+        mem_in = (mem_in * (1 - pad_mem_in_mask) +
+                  self.pad_token() * pad_mem_in_mask)
+
+        latent = torch.concat((
+            src[:, :self.size_tampon_source],
+            self.start_token().expand(trg.size(0), 1, -1),
+            src[:, self.size_tampon_source:],
+            self.start_token().expand(trg.size(0), 1, -1),
+            mem_in
+        ), dim=1)
+
+        trg = torch.concat((trg[:, :self.size_tampon_target], self.start_token().expand(trg.size(0), 1, -1),
+                            trg[:, self.size_tampon_target:]), dim=1)
+
+        trg = self.dec_pos_encoding(trg)
+        latent = self.enc_pos_encoding(latent)
+
+        # trg.shape = (batch_size, len_out + 1, d_att)
+        # src.shape = (batch_size, len_in + n_mes + 2, d_att)
+
+        for encoder in self.encoders:
+            latent = encoder(latent)
+
+        mem_out = latent[:, -self.n_mes:]
+
+        for decoder in self.decoders:
+            trg = decoder(target=trg, source=latent, mask=self.mask_decoder)
+        # trg.shape = (batch_size, len_out + 1, d_att)
+
+        is_end_token = torch.norm(trg - self.end_token(), dim=[-1], keepdim=True) / torch.norm(self.pad_token())
+        trg = self.pulse_decoder(trg)
+        trg[:, :-1] = trg[:, :-1] * (1 - target_end_mask) + is_end_token * target_end_mask
+        # trg.shape = (batch_size, len_out + 1, d_out)
+
+        is_pad_token = torch.norm(mem_out - self.pad_token(), dim=[-1], keepdim=True) / torch.norm(self.pad_token())
+        mem_out = self.mem_decoderFF(mem_out) * (1 - pad_mem_out_mask) + pad_mem_out_mask * is_pad_token
 
         return trg, mem_out
 
@@ -133,7 +193,7 @@ class TransformerTranslator(nn.Module):
                 latent = encoder(latent)
 
             mem_out = latent[:, -self.n_mes:]
-            is_pad_mem = torch.norm(self.mem_decoderFF(mem_out - self.pad_token()), dim=[0, 2], p=2)
+            is_pad_mem = torch.norm(mem_out - self.pad_token(), dim=[-1], keepdim=True) / torch.norm(self.pad_token())
             mem_out = self.mem_decoderFF(mem_out)
 
             self.latent_mem = latent
@@ -168,7 +228,7 @@ class TransformerTranslator(nn.Module):
         target_end_mask = torch.zeros_like(target_pad_mask)
         target_end_mask[0, n + self.size_tampon_target] = 1
 
-        is_end = torch.norm(self.pulse_decoder((trg[:, :-1] - self.end_token())) * target_end_mask)
+        is_end = torch.norm((trg[:, :-1] - self.end_token()) * target_end_mask)
 
         trg = self.pulse_decoder(trg)
 
