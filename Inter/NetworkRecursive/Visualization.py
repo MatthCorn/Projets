@@ -433,7 +433,7 @@ def RecVisualizeScenario(save_path):
     n_data_calibration = 50
 
     ([Input, Output, MemIn, _, Masks, *_],
-    [CalibrationInput, CalibrationOutput, CalibrationMemIn, CalibrationMemOut, CalibrationMasks, *_]) = GetData(
+    [CalibrationInput, CalibrationOutput, CalibrationMemIn, _, CalibrationMasks, *_]) = GetData(
         d_in=param['d_in'],
         n_pulse_plateau=param['n_pulse_plateau'],
         n_sat=param['n_sat'],
@@ -699,11 +699,11 @@ def RecVisualizeScenario(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkRecursive\Save\2025-10-01__16-24'
+    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkRecursive\Save\2025-10-01__16-59'
 
-    # RecVisualizeScenario(save_path)
+    PlotError(save_path)
 
-    # PlotError(save_path)
+    RecVisualizeScenario(save_path)
 
     ErrorOverPosition(save_path)
 

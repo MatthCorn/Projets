@@ -157,8 +157,7 @@ class TransformerTranslator(nn.Module):
 
         target_end_mask = target_end_mask.reshape(n_data, -1, *is_end_token.shape[1:])[:, -1]
 
-        id_end = window_mask.to(bool)
-        id_end = id_end.reshape(n_data, -1, *id_end.shape[1:])[:, -1]
+        id_end = window_mask.to(bool).reshape(n_data, -1, *window_mask.shape[1:])[:, -1]
 
         is_end_token = is_end_token[id_end]
         target_end_mask = target_end_mask[id_end]

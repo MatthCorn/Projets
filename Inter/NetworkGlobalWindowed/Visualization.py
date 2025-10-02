@@ -475,7 +475,10 @@ def RecVisualizeScenario(save_path):
     weight_l = torch.load(os.path.join(save_path, 'WeightL'), weights_only=False)
     weight_f = torch.load(os.path.join(save_path, 'WeightF'), weights_only=False)
 
-    [Input, Output, Masks, _], _ = GetData(
+    n_data_calibration = 50
+
+    ([Input, Output, Masks, _],
+     [CalibrationInput, CalibrationOutput, CalibrationMasks, _]) = GetData(
         d_in=param['d_in'],
         n_pulse_plateau=param['n_pulse_plateau'],
         n_sat=param['n_sat'],
@@ -483,7 +486,7 @@ def RecVisualizeScenario(save_path):
         len_in=param['len_in'],
         len_out=param["len_out"],
         n_data_training=1,
-        n_data_validation=1,
+        n_data_validation=n_data_calibration,
         sensitivity=param["sensitivity"],
         bias='freq',
         mean_min=min([window["mean"][0] for window in param["training_strategy"]]),
@@ -510,6 +513,8 @@ def RecVisualizeScenario(save_path):
                               )
     N.load_state_dict(torch.load(os.path.join(save_path, 'Last_network')))
 
+    end_threshold, last_threshold = N.calibrate_thresholds(CalibrationInput, CalibrationOutput, CalibrationMasks[:-1],
+                                                           CalibrationMasks[-1], n_data_calibration)
 
     size_focus_source = param['len_in_window'] - param['size_tampon_source']
     size_tampon_source = param['size_tampon_source']
@@ -540,12 +545,11 @@ def RecVisualizeScenario(save_path):
                           torch.arange(-size_tampon_target, size_focus_target)).round()
 
         n_pulse_predicted = 0
-        while (n_pulse_predicted < size_focus_target) and (ToE_Prediction[size_tampon_target:][n_pulse_predicted] < size_focus_source - 1):
+        while (n_pulse_predicted < size_focus_target) and (ToE_Prediction[size_tampon_target:][n_pulse_predicted] < last_threshold):
             n_pulse_predicted += 1
 
         if i_win == len(Input) - 1:
-            threshold = 0.5
-            n_pulse_predicted = [x < threshold for x in end_list].index(True)
+            n_pulse_predicted = [x < end_threshold for x in end_list].index(True)
 
         RecPrediction.append(LocalOutput.clone())
         LocalWindowMask = torch.zeros(1, size_tampon_target + size_focus_target, 1)
@@ -728,11 +732,11 @@ def RecVisualizeScenario(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobalWindowed\Save\2025-09-29__14-00'
+    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobalWindowed\Save\2025-09-29__14-00(1)'
 
-    PlotError(save_path)
+    # PlotError(save_path)
 
-    ErrorOverPosition(save_path)
+    # ErrorOverPosition(save_path)
 
     RecVisualizeScenario(save_path)
 
