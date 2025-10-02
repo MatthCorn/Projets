@@ -199,15 +199,21 @@ def ErrorOverPosition(save_path):
     WindowMask = Masks[-1].to(device)
 
     N.to(device)
-    Prediction, _ = N(Input.to(device), Output.to(device), MemIn.to(device), InputMask)
+    with torch.no_grad():
+        Prediction, _ = N(Input.to(device), Output.to(device), MemIn.to(device), InputMask)
     Prediction = Prediction[:, :-1, :] * WindowMask
-    err = torch.sum(((Prediction - Output) / Std.to(device)) ** 2 * WindowMask, dim=[0, 2]) / ((torch.sum(WindowMask, dim=[0, 2]) + 1e-5) * (param['d_in'] + 1))
-    err = err.sqrt().tolist()
+
+    n_element = torch.sum(WindowMask, dim=[0, 2])
+    err = (torch.sum(((Prediction - Output) / Std.to(device)) ** 2 * WindowMask, dim=[0, 2]) / ((n_element + 1e-5) * (param['d_in'] + 1))).sqrt()
+    avg_err = torch.sum(((err ** 2) * n_element / torch.sum(n_element))).sqrt()
+    std = (torch.sum((torch.norm((Prediction - Output) / Std.to(device), dim=-1) / np.sqrt(param['d_in'] + 1) - avg_err) ** 2 * WindowMask[..., 0]) / torch.sum(n_element)).sqrt()
 
     id_min = torch.argmax(1 - (torch.sum(WindowMask, dim=[0, 2]) == 0).to(float))
     id_max = param['len_out_window'] - 1 - torch.argmax((1 - (torch.sum(WindowMask, dim=[0, 2]) == 0).to(float)).flip(dims=[0]))
 
-    plt.plot(err)
+    plt.plot(err.tolist(), 'b')
+    plt.plot(torch.max(torch.zeros_like(err), err - 10*std / n_element.sqrt()).tolist(), 'r')
+    plt.plot(torch.min(torch.ones_like(err), err + 10*std / n_element.sqrt()).tolist(), 'r')
     plt.xlim([id_min, id_max])
     plt.show()
 
@@ -462,7 +468,7 @@ def RecVisualizeScenario(save_path):
     N.load_state_dict(torch.load(os.path.join(save_path, 'Last_network')))
 
     pad_threshold, end_threshold, last_threshold = N.calibrate_thresholds(CalibrationInput, CalibrationOutput, CalibrationMemIn,
-                           CalibrationMasks[:-1], CalibrationMasks[-1], n_data_calibration)
+                                                                          CalibrationMasks[:-1], CalibrationMasks[-1], n_data_calibration)
 
     size_focus_source = param['len_in_window'] - param['size_tampon_source']
     size_tampon_source = param['size_tampon_source']
@@ -500,8 +506,7 @@ def RecVisualizeScenario(save_path):
                           torch.arange(-size_tampon_target, size_focus_target)).round()
 
         n_pulse_predicted = 0
-        threshold = size_focus_source - 1
-        while (n_pulse_predicted < size_focus_target) and (ToE_Prediction[size_tampon_target:][n_pulse_predicted] < threshold):
+        while (n_pulse_predicted < size_focus_target) and (ToE_Prediction[size_tampon_target:][n_pulse_predicted] < last_threshold):
             n_pulse_predicted += 1
 
         if i_win == len(Input) - 1:
@@ -694,11 +699,11 @@ def RecVisualizeScenario(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\matth\Documents\Python\Projets\Inter\NetworkRecursive\Save\2025-09-30__17-21'
+    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkRecursive\Save\2025-10-01__16-24'
 
-    RecVisualizeScenario(save_path)
+    # RecVisualizeScenario(save_path)
 
-    PlotError(save_path)
+    # PlotError(save_path)
 
     ErrorOverPosition(save_path)
 

@@ -146,39 +146,47 @@ class TransformerTranslator(nn.Module):
 
         mem_out = latent[:, -self.n_mes:]
 
-        is_pad_token = torch.norm(mem_out - self.pad_token(), keepdim=True) / torch.norm(self.pad_token())
+        is_pad_token = torch.norm(mem_out - self.pad_token(), dim=-1, keepdim=True) / torch.norm(self.pad_token())
 
         for decoder in self.decoders:
             trg = decoder(target=trg, source=latent, mask=self.mask_decoder)
         # trg.shape = (batch_size, len_out + 1, d_att)
 
-        is_end_token = torch.norm(trg - self.end_token(), keepdim=True) / torch.norm(self.pad_token())
+        is_end_token = torch.norm(trg[:, :-1] - self.end_token(), dim=-1, keepdim=True) / torch.norm(self.pad_token())
+        is_end_token = is_end_token.reshape(n_data, -1, *is_end_token.shape[1:])[:, -1]
 
-        trg = self.pulse_decoder(trg)
-        trg = trg.reshape(n_data, -1, *trg.shape[1:])
-        trg = trg[:, :-1, self.size_tampon_target:-1]
-        trg = trg.reshape(-1, *trg.shape[2:])
+        target_end_mask = target_end_mask.reshape(n_data, -1, *is_end_token.shape[1:])[:, -1]
 
-        window_mask = window_mask.reshape(n_data, -1, *window_mask.shape[1:])
-        window_mask = window_mask[:, :-1, self.size_tampon_target:]
-        window_mask = window_mask.reshape(-1, *window_mask.shape[2:])
+        id_end = window_mask.to(bool)
+        id_end = id_end.reshape(n_data, -1, *id_end.shape[1:])[:, -1]
 
-        id = torch.arange(window_mask.shape[1]).reshape(1, -1, 1) < window_mask.sum(dim=1, keepdim=True) + 1
+        is_end_token = is_end_token[id_end]
+        target_end_mask = target_end_mask[id_end]
 
-        is_last_token = trg[:, :, -1:] + torch.arange(trg.shape[1]).reshape(1, -1, 1)
-        is_last_token = is_last_token[id]
-        window_mask = window_mask[id]
+        trg = self.pulse_decoder(trg)[:, :-1]
+        trg[:, :, -1] = trg[:, :, -1] + torch.arange(-self.size_tampon_target, trg.shape[1] - self.size_tampon_target).reshape(1, -1)
+        trg = trg.reshape(n_data, -1, *trg.shape[1:])[:, :-1].reshape(-1, *trg.shape[1:])
+
+        window_mask = window_mask.reshape(n_data, -1, *window_mask.shape[1:])[:, :-1].reshape(-1, *window_mask.shape[1:])[:, self.size_tampon_target:]
+
+        id_last = torch.arange(window_mask.shape[1]).reshape(1, -1, 1) < window_mask.sum(dim=1, keepdim=True) + 1
+
+        is_last_token = trg[:, self.size_tampon_target:, -1:] + trg[:, self.size_tampon_target:, -2:-1]
+        is_last_token = is_last_token[id_last]
+        window_mask = window_mask[id_last]
 
         from Tools.MCC import best_mcc_threshold_torch
 
         best_thr_pad, best_mcc_pad = best_mcc_threshold_torch(1 - pad_mem_out_mask.reshape(-1), is_pad_token.reshape(-1))
-        best_thr_end, best_mcc_end = best_mcc_threshold_torch(1 - target_end_mask.reshape(-1), is_end_token.reshape(-1))
+        best_thr_end, best_mcc_end = best_mcc_threshold_torch(1 - target_end_mask, is_end_token)
         best_thr_last, best_mcc_last = best_mcc_threshold_torch(1 - window_mask, is_last_token)
 
-        print('best_thr_pad : ', best_thr_pad)
-        print('best_mcc_pad : ', best_mcc_pad)
-        print('best_thr_end : ', best_thr_end)
-        print('best_mcc_end : ', best_mcc_end)
+        print('best threshold for pad_token detection : ', best_thr_pad)
+        print('best mcc score for pad_token detection : ', best_mcc_pad)
+        print('best threshold for end_token detection : ', best_thr_end)
+        print('best mcc score for end_token detection : ', best_mcc_end)
+        print('best threshold for last_ detection : ', best_thr_last)
+        print('best mcc score for last_ detection : ', best_mcc_last)
 
         return best_thr_pad, best_thr_end, best_thr_last
 
@@ -250,7 +258,7 @@ class TransformerTranslator(nn.Module):
         target_end_mask = torch.zeros_like(target_pad_mask)
         target_end_mask[0, n + self.size_tampon_target] = 1
 
-        is_end = torch.norm((trg[:, :-1] - self.end_token()) * target_end_mask)
+        is_end = torch.norm((trg[:, :-1] - self.end_token()) * target_end_mask) / torch.norm(self.pad_token())
 
         trg = self.pulse_decoder(trg)
 

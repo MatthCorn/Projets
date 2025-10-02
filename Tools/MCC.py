@@ -36,6 +36,12 @@ def best_mcc_threshold_torch(y_true, y_score):
     # trouver MCC max
     best_idx = torch.argmax(mcc)
     best_mcc = mcc[best_idx].item()
-    best_thr = sorted_scores[best_idx].item()
 
-    return best_thr, best_mcc
+    # seuil = milieu entre deux scores (plus robuste que prendre score exact)
+    if best_idx < len(sorted_scores) - 1:
+        best_thr = (sorted_scores[best_idx] + sorted_scores[best_idx+1]) / 2
+    else:
+        # cas particulier : tout est positif, seuil = min score
+        best_thr = sorted_scores[best_idx]
+
+    return float(best_thr), best_mcc
