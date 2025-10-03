@@ -26,12 +26,9 @@ def objective(trial):
     # Appel du script externe (simulateur d'entraînement)
     result = subprocess.run(
         ["python", os.path.join("Projets", "Optuna_test", "trainer_test.py"), json_file],
-        capture_output=True,
         text=True
     )
 
-    print(result.stdout)
-    
     # Nettoyage
     os.remove(json_file)
 
