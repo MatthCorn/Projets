@@ -8,10 +8,6 @@ import random
 import time
 
 def objective(trial):
-    import torch, os
-    print(
-        f"[Worker {os.getenv('SLURM_PROCID')} | Node {os.getenv('SLURM_NODEID')}] Trial {trial.number} running on GPU {torch.cuda.current_device()}")
-
     # Hyperparamètres à tester (jouet mais en JSON comme ton vrai cas)
     params = {
         "x": trial.suggest_float("x", -10, 10),
@@ -26,8 +22,10 @@ def objective(trial):
     # Appel du script externe (simulateur d'entraînement)
     result = subprocess.run(
         ["python", os.path.join("Projets", "Optuna_test", "trainer_test.py"), json_file],
-        text=True
+        text=True, capture_output=True
     )
+
+    print(result.stdout, flush=True)
 
     # Nettoyage
     os.remove(json_file)

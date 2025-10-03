@@ -8,6 +8,10 @@ if __name__ == "__main__":
     with open(json_file, "r") as f:
         params = json.load(f)
 
+    import torch, os
+    gpu_id = torch.cuda.current_device()
+    print(f"[Worker Node {os.getenv('SLURM_NODEID')} | GPU {gpu_id}] Starting training", flush=True)
+
     x = params["x"]
     y = params["y"]
 
@@ -18,4 +22,4 @@ if __name__ == "__main__":
     error = (x - 2) ** 2 + (y + 3) ** 2
 
     # Ce print est ce que Optuna va chercher dans stdout
-    print(f"Final Error: {error}")
+    print(f"Final Error: {error}", flush=True)
