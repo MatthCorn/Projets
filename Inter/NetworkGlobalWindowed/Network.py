@@ -78,7 +78,7 @@ class TransformerTranslator(nn.Module):
 
         is_token_end = torch.norm(trg - self.end_token(), dim=-1, keepdim=True) / torch.norm(self.end_token())
         trg = self.last_decoder(trg)
-        trg = trg * (1 - target_end_mask) + target_end_mask * is_token_end
+        trg[:, :-1] = trg[:, :-1] * (1 - target_end_mask) + target_end_mask * is_token_end
         # trg.shape = (batch_size, len_out + 1, d_out)
 
         return trg
