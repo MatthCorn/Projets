@@ -30,6 +30,8 @@ def objective(trial):
         text=True
     )
 
+    print(result.stdout)
+    
     # Nettoyage
     os.remove(json_file)
 
