@@ -25,10 +25,12 @@ def objective(trial):
         text=True, capture_output=True
     )
 
-    print(result.stdout, flush=True)
+    # On peut stocker ces infos dans le trial
+    trial.set_user_attr("message", result.stdout)
 
     # Nettoyage
     os.remove(json_file)
+
 
     # Récupérer le score imprimé par trainer_test.py
     score = float("inf")
@@ -50,3 +52,6 @@ if __name__ == "__main__":
         direction="minimize"
     )
     study.optimize(objective, n_trials=50)
+
+    for t in study.trials:
+        print(t.user_attrs.get('message'))
