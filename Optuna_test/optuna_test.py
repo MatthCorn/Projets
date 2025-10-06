@@ -21,16 +21,13 @@ def objective(trial):
 
     # Appel du script externe (simulateur d'entraînement)
     result = subprocess.run(
-        ["python", os.path.join("Projets", "Optuna_test", "trainer_test.py"), json_file],
-        text=True, capture_output=True
+        ["python", "trainer_test.py", json_file],
+        capture_output=True,
+        text=True
     )
-
-    # On peut stocker ces infos dans le trial
-    trial.set_user_attr("message", result.stdout)
 
     # Nettoyage
     os.remove(json_file)
-
 
     # Récupérer le score imprimé par trainer_test.py
     score = float("inf")
@@ -38,11 +35,16 @@ def objective(trial):
         if "Final Error:" in line:
             score = float(line.split()[-1])
 
+    trial.set_user_attr('message', result.stdout)
+
     return score
 
 
 if __name__ == "__main__":
-    db_path = sys.argv[1]
+    try:
+        db_path = sys.argv[1]
+    except:
+        db_path = r'C:\Users\Matth\Documents\Projets\optuna.db'
     storage = f"sqlite:///{db_path}"
 
     study = optuna.create_study(
@@ -51,7 +53,9 @@ if __name__ == "__main__":
         load_if_exists=True,
         direction="minimize"
     )
-    study.optimize(objective, n_trials=50)
 
-    for t in study.trials:
-        print(t.user_attrs.get('message'))
+    def my_callback(study, trial):
+        print(f"{trial.user_attrs.get('message')}")
+
+    study.optimize(objective, n_trials=50, callbacks=[my_callback])
+

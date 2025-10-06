@@ -22,4 +22,4 @@ if __name__ == "__main__":
     error = (x - 2) ** 2 + (y + 3) ** 2
 
     # Ce print est ce que Optuna va chercher dans stdout
-    print(f"Final Error: {error}", flush=True)
+    print(f"Final Error: {error}")
