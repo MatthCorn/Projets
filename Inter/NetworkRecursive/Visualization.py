@@ -152,7 +152,7 @@ def PlotError(save_path):
 
     plt.show()
 
-def ErrorOverPosition(save_path):
+def ErrorOverPosition(save_path, borne=False):
     from Inter.NetworkRecursive.DataMaker import GetData
     import torch
 
@@ -212,8 +212,9 @@ def ErrorOverPosition(save_path):
     id_max = param['len_out_window'] - 1 - torch.argmax((1 - (torch.sum(WindowMask, dim=[0, 2]) == 0).to(float)).flip(dims=[0]))
 
     plt.plot(err.tolist(), 'b')
-    plt.plot(torch.max(torch.zeros_like(err), err - 10*std / n_element.sqrt()).tolist(), 'r')
-    plt.plot(torch.min(torch.ones_like(err), err + 10*std / n_element.sqrt()).tolist(), 'r')
+    if borne:
+        plt.plot(torch.max(torch.zeros_like(err), err - 10*std / n_element.sqrt()).tolist(), 'r')
+        plt.plot(torch.min(torch.ones_like(err), err + 10*std / n_element.sqrt()).tolist(), 'r')
     plt.xlim([id_min, id_max])
     plt.show()
 

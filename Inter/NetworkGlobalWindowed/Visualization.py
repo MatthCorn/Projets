@@ -734,7 +734,7 @@ def RecVisualizeScenario(save_path):
 if __name__ == '__main__':
     save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkGlobalWindowed\Save\2025-10-03__15-42'
 
-    PlotError(save_path)
+    # PlotError(save_path)
 
     # ErrorOverPosition(save_path)
 
