@@ -56,7 +56,9 @@ if __name__ == '__main__':
              "FreqGradObs": 1 / 3,
              "warmup": 1,
              "resume_from": 'None',
-             "max_inflight": 10}
+             "max_inflight": 10,
+             "period_checkpoint": 15 * 60  # en secondes
+             }
 
     try:
         import json
@@ -80,7 +82,7 @@ if __name__ == '__main__':
     ################################################################################################################################################
     d_out = param['d_in'] + 1
 
-    period_checkpoint = 15 * 60  # en secondes
+    period_checkpoint = param["period_checkpoint"]
     nb_frames_GIF = 100
     nb_frames_window = int(nb_frames_GIF / len(param["training_strategy"]))
     res_GIF = 10
@@ -207,25 +209,25 @@ if __name__ == '__main__':
         print(f"Erreur lors de la reprise du checkpoint : {e}")
         print("Lancement d'un entraînement depuis zéro.")
 
+        if period_checkpoint != -1:
+            # pour sauvegarder toutes les informations de l'apprentissage
+            import datetime
 
-        # pour sauvegarder toutes les informations de l'apprentissage
-        import datetime
+            base_folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
 
-        base_folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
+            attempt = 0
+            while True:
+                folder = f"{base_folder}({attempt})" if attempt > 0 else base_folder
+                save_path = os.path.join(save_dir, folder)
 
-        attempt = 0
-        while True:
-            folder = f"{base_folder}({attempt})" if attempt > 0 else base_folder
-            save_path = os.path.join(save_dir, folder)
+                try:
+                    os.makedirs(save_path, exist_ok=False)
+                    break
+                except FileExistsError:
+                    attempt += 1
+                    time.sleep(0.1)
 
-            try:
-                os.makedirs(save_path, exist_ok=False)
-                break
-            except FileExistsError:
-                attempt += 1
-                time.sleep(0.1)
-
-        print(f"Dossier créé : {save_path}")
+            print(f"Dossier créé : {save_path}")
 
         optimizer = optimizers[param['optim']](N.parameters(), weight_decay=param["weight_decay"],
                                                lr=param["lr_option"]["value"])
@@ -289,6 +291,7 @@ if __name__ == '__main__':
             time_to_observe = (int(j * param["FreqGradObs"]) == (j * param["FreqGradObs"]))
             time_for_GIF = (j in torch.linspace(0, n_iter_window, nb_frames_window, dtype=int))
 
+            n_minibatch_epoch = n_minibatch - p
             while p < n_minibatch:
                 InputMiniBatch = TrainingInput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
                 OutputMiniBatch = TrainingOutput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
@@ -300,6 +303,7 @@ if __name__ == '__main__':
                 MemStdMiniBatch = TrainingMemStd[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
                 p += 1
 
+                n_batch_epoch = n_batch - k
                 while k < n_batch:
                     optimizer.zero_grad(set_to_none=True)
 
@@ -332,13 +336,13 @@ if __name__ == '__main__':
                     if lr_scheduler is not None:
                         lr_scheduler.step()
 
-                    if k == 0 and time_to_observe:
+                    if k == 0 and p == 0 and time_to_observe:
                         DictGrad.update()
 
-                    error += float(err) / (n_batch * n_minibatch)
-                    error_mem += float(err_mem) / (n_batch * n_minibatch)
+                    error += float(err) / (n_batch_epoch * n_minibatch_epoch)
+                    error_mem += float(err_mem) / (n_batch_epoch * n_minibatch_epoch)
 
-                    if time.time() - t > period_checkpoint:
+                    if (time.time() - t > period_checkpoint) and (period_checkpoint > 0):
                         t = time.time()
                         try:
                             os.mkdir(save_path)
@@ -451,16 +455,18 @@ if __name__ == '__main__':
                   "ValidationMemError": ValidationMemError,
                   "PlottingMemError": PlottingMemError
                   }
-    saveObjAsXml(
-        {k: v for k, v in param.items() if k != 'resume_from'},
-        os.path.join(save_path, "param"))
-    saveObjAsXml(error_dict, os.path.join(save_path, "error"))
-    torch.save(best_state_dict, os.path.join(save_path, "Best_network"))
-    torch.save(N.state_dict().copy(), os.path.join(save_path, "Last_network"))
-    torch.save(weight_l, os.path.join(save_path, "WeightL"))
-    torch.save(weight_f, os.path.join(save_path, "WeightF"))
-    with open(os.path.join(save_path, "DictGrad.pkl"), "wb") as file:
-        pickle.dump(DictGrad, file)
-    with open(os.path.join(save_path, "ParamObs.pkl"), "wb") as file:
-        ParamObs = DictParamObserver(N)
-        pickle.dump(ParamObs, file)
+
+    if period_checkpoint != -1:
+        saveObjAsXml(
+            {k: v for k, v in param.items() if k != 'resume_from'},
+            os.path.join(save_path, "param"))
+        saveObjAsXml(error_dict, os.path.join(save_path, "error"))
+        torch.save(best_state_dict, os.path.join(save_path, "Best_network"))
+        torch.save(N.state_dict().copy(), os.path.join(save_path, "Last_network"))
+        torch.save(weight_l, os.path.join(save_path, "WeightL"))
+        torch.save(weight_f, os.path.join(save_path, "WeightF"))
+        with open(os.path.join(save_path, "DictGrad.pkl"), "wb") as file:
+            pickle.dump(DictGrad, file)
+        with open(os.path.join(save_path, "ParamObs.pkl"), "wb") as file:
+            ParamObs = DictParamObserver(N)
+            pickle.dump(ParamObs, file)
