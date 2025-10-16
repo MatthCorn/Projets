@@ -24,7 +24,7 @@ def objective(trial):
 
     # Appel du script externe (simulateur d'entraînement)
     result = subprocess.run(
-        ["python", TRAINER_SCRIPT, json_file],
+        [sys.executable, TRAINER_SCRIPT, json_file],
         capture_output=True,
         text=True
     )
