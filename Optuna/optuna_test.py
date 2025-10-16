@@ -7,6 +7,8 @@ import uuid
 import random
 import time
 
+local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
+
 def objective(trial):
     # Hyperparamètres à tester (jouet mais en JSON comme ton vrai cas)
     params = {
@@ -41,12 +43,16 @@ def objective(trial):
 
 
 if __name__ == "__main__":
-    try:
-        db_path = sys.argv[1]
-    except:
-        db_path = r'C:\Users\Matth\Documents\Projets\optuna.db'
-    storage = f"sqlite:///{db_path}"
+    job_id = os.getenv("SLURM_JOB_ID", str(uuid.uuid4().hex))  # fallback si tu testes en local
 
+    # Définir le répertoire de sauvegarde global
+    run_dir = os.path.join(local, "Optuna", "Save", f"job_{job_id}")
+    os.makedirs(run_dir, exist_ok=True)
+
+    # Définir le chemin de la base de données dans ce dossier
+    db_path = os.path.join(run_dir, "optuna.db")
+    storage = f"sqlite:///{db_path}"
+    
     study = optuna.create_study(
         study_name="distributed-test",
         storage=storage,
