@@ -38,8 +38,11 @@ def objective(trial):
         if "Final Error:" in line:
             score = float(line.split()[-1])
 
-    trial.set_user_attr('message', result.stdout)
-
+    trial.set_user_attr('message',
+                        "Current working dir:" + str(os.getcwd()) + '\n' +
+                        "trainer_test.py exists:" + str(os.path.exists("trainer_test.py")) + '\n' +
+                        "Python executable:" + str(sys.executable)
+    )
     return score
 
 
