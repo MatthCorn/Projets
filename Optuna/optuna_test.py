@@ -8,6 +8,7 @@ import random
 import time
 
 local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
+TRAINER_SCRIPT = os.path.join(local, "Optuna", "trainer_test.py")
 
 def objective(trial):
     # Hyperparamètres à tester (jouet mais en JSON comme ton vrai cas)
@@ -23,7 +24,7 @@ def objective(trial):
 
     # Appel du script externe (simulateur d'entraînement)
     result = subprocess.run(
-        ["python", "trainer_test.py", json_file],
+        ["python", TRAINER_SCRIPT, json_file],
         capture_output=True,
         text=True
     )
