@@ -40,7 +40,7 @@ def objective(trial):
 
     trial.set_user_attr('message',
                         "Current working dir:" + str(os.getcwd()) + '\n' +
-                        "trainer_test.py exists:" + str(os.path.exists("trainer_test.py")) + '\n' +
+                        "trainer_test.py exists:" + str(os.path.exists(TRAINER_SCRIPT)) + '\n' +
                         "Python executable:" + str(sys.executable)
     )
     return score
