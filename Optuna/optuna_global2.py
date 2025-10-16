@@ -46,13 +46,14 @@ def objective(trial, RUN_DIR):
     process = subprocess.Popen(
         ["python", TRAINER_SCRIPT, json_file, progress_file],
         text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT
+        stdout=None,
+        stderr=None,
+        encoding="utf-8"
     )
 
     # Boucle de surveillance
     while process.poll() is None:
-        time.sleep(10)  # toutes les 10 secondes
+        time.sleep(1)  # toutes les 10 secondes
         if os.path.exists(progress_file):
             with open(progress_file, "r") as f:
                 lines = f.readlines()
@@ -75,13 +76,12 @@ def objective(trial, RUN_DIR):
     if os.path.exists(progress_file):
         os.remove(progress_file)
 
-    # Lecture du score final
-    score = float("inf")
-    for line in stdout.splitlines():
-        if "Final Error:" in line:
-            score = float(line.split()[-1])
-
-    trial.set_user_attr("message", stdout)
+    if lines:
+        try:
+            step, score = lines[-1].split()
+            score = float(score)
+        except:
+            score = float('inf')
     return score
 
 if __name__ == "__main__":
@@ -104,8 +104,5 @@ if __name__ == "__main__":
         pruner=optuna.pruners.HyperbandPruner()
     )
 
-    def my_callback(study, trial):
-        print(f"{trial.user_attrs.get('message')}")
-
-    study.optimize(lambda x: objective(x, run_dir), n_trials=5, callbacks=[my_callback])
+    study.optimize(lambda x: objective(x, run_dir), n_trials=5)
 
