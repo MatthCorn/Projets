@@ -16,7 +16,7 @@ if __name__ == "__main__":
     y = params["y"]
 
     # Simulation d’un entraînement qui prend un peu de temps
-    time.sleep(random.uniform(0.5, 2.0))
+    time.sleep(random.uniform(0.5, 1.0))
 
     # Objectif : minimum en (x=2, y=-3)
     error = (x - 2) ** 2 + (y + 3) ** 2

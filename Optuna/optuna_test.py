@@ -57,5 +57,5 @@ if __name__ == "__main__":
     def my_callback(study, trial):
         print(f"{trial.user_attrs.get('message')}")
 
-    study.optimize(objective, n_trials=50, callbacks=[my_callback])
+    study.optimize(objective, n_trials=5, callbacks=[my_callback])
 
