@@ -5,6 +5,8 @@ import os
 import uuid
 import time
 
+os.environ["MKL_THREADING_LAYER"] = "GNU"
+
 local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
 TRAINER_SCRIPT = os.path.join(local, "Inter", "NetworkGlobal", "Trainer.py")
 
