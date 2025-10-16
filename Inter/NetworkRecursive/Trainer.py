@@ -57,7 +57,8 @@ if __name__ == '__main__':
              "warmup": 1,
              "resume_from": 'None',
              "max_inflight": 10,
-             "period_checkpoint": 15 * 60  # en secondes
+             "period_checkpoint": 15 * 60,  # en secondes
+             "nb_frames_GIF": -1
              }
 
     try:
@@ -83,7 +84,7 @@ if __name__ == '__main__':
     d_out = param['d_in'] + 1
 
     period_checkpoint = param["period_checkpoint"]
-    nb_frames_GIF = 100
+    nb_frames_GIF = param["nb_frames_GIF"]
     nb_frames_window = int(nb_frames_GIF / len(param["training_strategy"]))
     res_GIF = 10
     n_iter_window = int(param["n_iter"] / len(param["training_strategy"]))
@@ -127,30 +128,31 @@ if __name__ == '__main__':
         n_updates = int(NDataT / batch_size) * n_iter
         warmup_steps = int(NDataT / batch_size * param["warmup"])
 
-    PlottingInput, PlottingOutput, PlottingMemIn, PlottingMemOut, PlottingMasks, PlottingOutStd, PlottingMemStd = GetData(
-        d_in=param['d_in'],
-        n_pulse_plateau=param["n_pulse_plateau"],
-        n_sat=param["n_sat"],
-        n_mes=param["n_mes"],
-        len_in=param["len_in"],
-        len_out=param["len_out"],
-        n_data_training=res_GIF,
-        sensitivity=param["sensitivity"],
-        bias='freq',
-        mean_min=min([window["mean"][0] for window in param["training_strategy"]]),
-        mean_max=max([window["mean"][1] for window in param["training_strategy"]]),
-        std_min=min([window["std"][0] for window in param["training_strategy"]]),
-        std_max=max([window["std"][1] for window in param["training_strategy"]]),
-        distrib=param["plot_distrib"],
-        weight_f=weight_f,
-        weight_l=weight_l,
-        plot=True,
-        size_focus_source=param['len_in_window'] - param['size_tampon_source'],
-        size_tampon_source=param['size_tampon_source'],
-        size_tampon_target=param['size_tampon_target'],
-        size_focus_target=param['len_out_window'] - param['size_tampon_target'],
-        parallel=False
-    )
+    if nb_frames_GIF > 0:
+        PlottingInput, PlottingOutput, PlottingMemIn, PlottingMemOut, PlottingMasks, PlottingOutStd, PlottingMemStd = GetData(
+            d_in=param['d_in'],
+            n_pulse_plateau=param["n_pulse_plateau"],
+            n_sat=param["n_sat"],
+            n_mes=param["n_mes"],
+            len_in=param["len_in"],
+            len_out=param["len_out"],
+            n_data_training=res_GIF,
+            sensitivity=param["sensitivity"],
+            bias='freq',
+            mean_min=min([window["mean"][0] for window in param["training_strategy"]]),
+            mean_max=max([window["mean"][1] for window in param["training_strategy"]]),
+            std_min=min([window["std"][0] for window in param["training_strategy"]]),
+            std_max=max([window["std"][1] for window in param["training_strategy"]]),
+            distrib=param["plot_distrib"],
+            weight_f=weight_f,
+            weight_l=weight_l,
+            plot=True,
+            size_focus_source=param['len_in_window'] - param['size_tampon_source'],
+            size_tampon_source=param['size_tampon_source'],
+            size_tampon_target=param['size_tampon_target'],
+            size_focus_target=param['len_out_window'] - param['size_tampon_target'],
+            parallel=False
+        )
 
     optimizers = {
         "AdamW": torch.optim.AdamW,
@@ -288,8 +290,8 @@ if __name__ == '__main__':
 
             error = 0
             error_mem = 0
-            time_to_observe = (int(j * param["FreqGradObs"]) == (j * param["FreqGradObs"]))
-            time_for_GIF = (j in torch.linspace(0, n_iter_window, nb_frames_window, dtype=int))
+            time_to_observe = (int(j * param["FreqGradObs"]) == (j * param["FreqGradObs"])) and (param["FreqGradObs"] > 0)
+            time_for_GIF = (j in torch.linspace(0, n_iter_window, nb_frames_window, dtype=int)) and (nb_frames_GIF > 0)
 
             n_minibatch_epoch = n_minibatch - p
             while p < n_minibatch:

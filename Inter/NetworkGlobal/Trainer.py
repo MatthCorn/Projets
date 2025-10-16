@@ -52,7 +52,8 @@ if __name__ == '__main__':
              "FreqGradObs": 1/3,
              "warmup": 5,
              "resume_from": "r",
-             "period_checkpoint": 15 * 60  # en seconde
+             "period_checkpoint": 15 * 60,  # en seconde
+             "nb_frames_GIF": -1
              }
 
     try:
@@ -81,7 +82,7 @@ if __name__ == '__main__':
     d_out = param['d_in'] + 1
 
     period_checkpoint = param["period_checkpoint"]  #  <= 0 : pas de checkpoint en entrainement, -1 : pas de sauvegarde du tout
-    nb_frames_GIF = 100
+    nb_frames_GIF = param["nb_frames_GIF"]
     nb_frames_window = int(nb_frames_GIF / len(param["training_strategy"]))
     res_GIF = 50
     n_iter_window = int(param["n_iter"] / len(param["training_strategy"]))
@@ -119,27 +120,28 @@ if __name__ == '__main__':
         n_updates = int(NDataT / batch_size) * n_iter
         warmup_steps = int(NDataT / batch_size * param["warmup"])
 
-    PlottingInput, PlottingOutput, PlottingMasks, PlottingStd = GetData(
-        d_in=param['d_in'],
-        n_pulse_plateau=param["n_pulse_plateau"],
-        n_sat=param["n_sat"],
-        n_mes=param['n_mes'],
-        len_in=param["len_in"],
-        len_out=param["len_out"],
-        n_data_training=res_GIF,
-        sensitivity=param["sensitivity"],
-        bias='freq',
-        mean_min=min([window["mean"][0] for window in param["training_strategy"]]),
-        mean_max=max([window["mean"][1] for window in param["training_strategy"]]),
-        std_min=min([window["std"][0] for window in param["training_strategy"]]),
-        std_max=max([window["std"][1] for window in param["training_strategy"]]),
-        distrib=param["plot_distrib"],
-        weight_f=weight_f,
-        weight_l=weight_l,
-        plot=True,
-        type='complete',
-        parallel=True
-    )
+    if nb_frames_GIF > 0:
+        PlottingInput, PlottingOutput, PlottingMasks, PlottingStd = GetData(
+            d_in=param['d_in'],
+            n_pulse_plateau=param["n_pulse_plateau"],
+            n_sat=param["n_sat"],
+            n_mes=param['n_mes'],
+            len_in=param["len_in"],
+            len_out=param["len_out"],
+            n_data_training=res_GIF,
+            sensitivity=param["sensitivity"],
+            bias='freq',
+            mean_min=min([window["mean"][0] for window in param["training_strategy"]]),
+            mean_max=max([window["mean"][1] for window in param["training_strategy"]]),
+            std_min=min([window["std"][0] for window in param["training_strategy"]]),
+            std_max=max([window["std"][1] for window in param["training_strategy"]]),
+            distrib=param["plot_distrib"],
+            weight_f=weight_f,
+            weight_l=weight_l,
+            plot=True,
+            type='complete',
+            parallel=True
+        )
 
     optimizers = {
         "AdamW": torch.optim.AdamW,
@@ -269,8 +271,8 @@ if __name__ == '__main__':
         while j < n_iter_window:
 
             error = 0
-            time_to_observe = (int(j * param["FreqGradObs"]) == (j * param["FreqGradObs"]))
-            time_for_GIF = (j in torch.linspace(0, n_iter_window, nb_frames_window, dtype=int))
+            time_to_observe = (int(j * param["FreqGradObs"]) == (j * param["FreqGradObs"])) and (param['FreqGradObs'] > 0)
+            time_for_GIF = (j in torch.linspace(0, n_iter_window, nb_frames_window, dtype=int)) and (nb_frames_GIF > 0)
 
             n_minibatch_epoch = n_minibatch - p
             while p < n_minibatch:
