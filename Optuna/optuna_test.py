@@ -41,7 +41,8 @@ def objective(trial):
     trial.set_user_attr('message',
                         "Current working dir:" + str(os.getcwd()) + '\n' +
                         "trainer_test.py exists:" + str(os.path.exists(TRAINER_SCRIPT)) + '\n' +
-                        "Python executable:" + str(sys.executable)
+                        "Python executable:" + str(sys.executable) + '\n'
+                        "error subprocess" + str(result.stderr)
     )
     return score
 
