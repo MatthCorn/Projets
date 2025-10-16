@@ -4,8 +4,8 @@ import json
 import os
 import sys
 import uuid
-import random
-import time
+
+os.environ["MKL_THREADING_LAYER"] = "GNU"
 
 local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
 TRAINER_SCRIPT = os.path.join(local, "Optuna", "trainer_test.py")
@@ -41,7 +41,7 @@ def objective(trial):
     trial.set_user_attr('message',
                         "Current working dir:" + str(os.getcwd()) + '\n' +
                         "trainer_test.py exists:" + str(os.path.exists(TRAINER_SCRIPT)) + '\n' +
-                        "Python executable:" + str(sys.executable) + '\n'
+                        "Python executable:" + str(sys.executable) + '\n' +
                         "error subprocess" + str(result.stderr)
     )
     return score
