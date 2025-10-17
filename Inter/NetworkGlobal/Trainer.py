@@ -272,7 +272,7 @@ if __name__ == '__main__':
 
             error = 0
             time_to_observe = (int(j * param["FreqGradObs"]) == (j * param["FreqGradObs"])) and (param['FreqGradObs'] > 0)
-            time_for_GIF = (j in torch.linspace(0, n_iter_window, nb_frames_window, dtype=int)) and (nb_frames_GIF > 0)
+            time_for_GIF = (j in torch.linspace(0, n_iter_window, abs(nb_frames_window), dtype=int)) and (nb_frames_GIF > 0)
 
             n_minibatch_epoch = n_minibatch - p
             while p < n_minibatch:

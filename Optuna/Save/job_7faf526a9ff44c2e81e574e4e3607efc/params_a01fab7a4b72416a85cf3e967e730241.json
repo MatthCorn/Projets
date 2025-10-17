@@ -1,0 +1,1 @@
+{"n_encoder": null, "n_decoder": null, "d_att": null, "widths_embedding": null, "width_FF": 128, "n_heads": null, "dropout": null, "lr_option": {"value": null, "reset": "y", "type": "cos"}, "weight_decay": null, "batch_size": ["categorical", [512, 1024]], "n_iter": 10, "NDataT": 5000, "NDataV": 100, "period_checkpoint": -1, "script": "global"}

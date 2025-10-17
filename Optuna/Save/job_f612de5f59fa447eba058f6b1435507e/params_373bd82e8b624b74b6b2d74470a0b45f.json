@@ -1,1 +1,0 @@
-{"n_encoder": 4, "n_decoder": 2, "d_att": 128, "widths_embedding": [16], "width_FF": [128], "n_heads": 2, "dropout": 0.14777449164125317, "lr_option": {"value": 1.0875402328625041e-05, "reset": "y", "type": "cos"}, "weight_decay": 0.00024724584026818885, "batch_size": 512, "n_iter": 10, "NDataT": 5000, "NDataV": 100, "period_checkpoint": -1}
