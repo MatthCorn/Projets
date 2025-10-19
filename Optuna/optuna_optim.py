@@ -138,13 +138,6 @@ if __name__ == "__main__":
     except:
         print("nothing loaded")
 
-    import sys
-
-    json_file = sys.argv[1]
-    with open(json_file, "r") as f:
-        temp_param = json.load(f)
-    params.update(temp_param)
-
     print(params)
 
     study = optuna.create_study(
