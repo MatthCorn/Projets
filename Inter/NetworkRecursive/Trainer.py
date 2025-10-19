@@ -8,6 +8,9 @@ from tqdm import tqdm
 from math import sqrt
 import time
 
+import warnings
+warnings.filterwarnings("ignore")
+
 if __name__ == '__main__':
     import multiprocessing as mp
     mp.set_start_method('spawn', force=True)

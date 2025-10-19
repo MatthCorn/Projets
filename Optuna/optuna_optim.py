@@ -126,7 +126,7 @@ if __name__ == "__main__":
         "NDataV": 100,
         "period_checkpoint": -1,
         "script": 'global',
-        "n_trials": 10
+        "n_trials": 3
     }
 
     try:
