@@ -138,6 +138,8 @@ if __name__ == "__main__":
     except:
         print("nothing loaded")
 
+    print(params)
+
     study = optuna.create_study(
         study_name="distributed-test",
         storage=storage,
