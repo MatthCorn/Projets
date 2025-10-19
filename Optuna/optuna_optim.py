@@ -14,30 +14,9 @@ TRAINER_SCRIPT = {"global": os.path.join(local, "Inter", "NetworkGlobal", "Train
 
 
 def deep_suggest(trial, objet, key=None):
-    try:
-        if isinstance(objet, list):
-            if objet[0] == 'suggest':
-                trialtype, values, *kwargs = objet[1:]
-                kwargs = dict(item for d in kwargs for item in d.items())
-
-                if trialtype == 'categorical':
-                    return trial.suggest_categorical(key, values, **kwargs)
-                if trialtype == 'int':
-                    return trial.suggest_int(key, *values, **kwargs)
-                if trialtype == 'float':
-                    return trial.suggest_float(key, *values, **kwargs)
-            else:
-                return [deep_suggest(trial, x) for x in objet]
-        if isinstance(objet, dict):
-            return {key: deep_suggest(trial, value, key=key) for key, value in objet.items()}
-        return objet
-    except Exception as e:
-        print(e)
-        print(objet)
-        print('oi')
     if isinstance(objet, list):
         if objet[0] == 'suggest':
-            trialtype, values, *kwargs = objet[:1]
+            trialtype, values, *kwargs = objet[1:]
             kwargs = dict(item for d in kwargs for item in d.items())
 
             if trialtype == 'categorical':
@@ -54,28 +33,6 @@ def deep_suggest(trial, objet, key=None):
 
 
 def objective(trial, RUN_DIR, params):
-    # Hyperparamètres que l’on veut optimiser
-    # params = {
-    #     "n_encoder": trial.suggest_int("n_encoder", 2, 4),
-    #     "n_decoder": trial.suggest_int("n_decoder", 2, 4),
-    #     "d_att": trial.suggest_categorical("d_att", [64, 128, ]),
-    #     "widths_embedding": trial.suggest_categorical("widths_embedding", [[16], [32]]),
-    #     "width_FF": [trial.suggest_categorical("width_FF", [128])],
-    #     "n_heads": trial.suggest_categorical("n_heads", [2, 4]),
-    #     "dropout": trial.suggest_float("dropout", 0.0, 0.3),
-    #     "lr_option": {
-    #         "value": trial.suggest_loguniform("lr", 1e-6, 1e-3),
-    #         "reset": "y",
-    #         "type": "cos"
-    #     },
-    #     "weight_decay": trial.suggest_loguniform("weight_decay", 1e-6, 1e-2),
-    #     "batch_size": trial.suggest_categorical("batch_size", [512, 1000]),
-    #     "n_iter": 10,  # pour optuna, on réduit un peu pour tester
-    #     "NDataT": 5000,
-    #     "NDataV": 100,
-    #     "period_checkpoint": -1,
-    #     "script": 'global'
-    # }
     params = deep_suggest(trial, params)
 
     # Nom unique pour le fichier JSON
@@ -153,11 +110,12 @@ if __name__ == "__main__":
         "n_heads": ['suggest', 'categorical', [2, 4]],
         "dropout": ['suggest', 'float', [0, 0.3]],
         "lr_option": {
-            "value": ['suggest', 'float', [1e-6, 1e-3], {'log': True}],
+            "value": ['suggest', 'float', [1e-6, 1e-3], {'log': 1}],
             "reset": "y",
             "type": "cos"
         },
-        "weight_decay": ['suggest', 'float', [1e-6, 1e-2], {'log': True}],
+        "mult_grad": ["suggest", "int", [1e0, 1e4], {"log": 1}],
+        "weight_decay": ['suggest', 'float', [1e-6, 1e-2], {'log': 1}],
         "batch_size": ['suggest', 'categorical', [512, 1024]],
         "n_iter": 10,  # pour optuna, on réduit un peu pour tester
         "NDataT": 5000,
@@ -165,8 +123,6 @@ if __name__ == "__main__":
         "period_checkpoint": -1,
         "script": 'global'
     }
-
-
 
     try:
         import sys
