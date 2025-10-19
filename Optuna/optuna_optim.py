@@ -5,6 +5,9 @@ import os
 import uuid
 import time
 
+import warnings
+warnings.filterwarnings("ignore")
+
 os.environ["MKL_THREADING_LAYER"] = "GNU"
 
 local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
@@ -92,6 +95,7 @@ def objective(trial, RUN_DIR, params):
 
 if __name__ == "__main__":
     job_id = os.getenv("SLURM_JOB_ID", str(uuid.uuid4().hex))  # fallback si tu testes en local
+    n_nodes = int(os.getenv("SLURM_NNODES", "1"))  # fallback si tu testes en local
 
     # Définir le répertoire de sauvegarde global
     run_dir = os.path.join(local, "Optuna", "Save", f"job_{job_id}")
@@ -121,7 +125,8 @@ if __name__ == "__main__":
         "NDataT": 5000,
         "NDataV": 100,
         "period_checkpoint": -1,
-        "script": 'global'
+        "script": 'global',
+        "n_trials": 10
     }
 
     try:
@@ -142,5 +147,5 @@ if __name__ == "__main__":
         pruner=optuna.pruners.HyperbandPruner()
     )
 
-    study.optimize(lambda x: objective(x, run_dir, params), n_trials=5)
+    study.optimize(lambda x: objective(x, run_dir, params), n_trials=int(params['n_trials'] / n_nodes))
 
