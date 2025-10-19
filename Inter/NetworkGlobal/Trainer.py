@@ -70,8 +70,11 @@ if __name__ == '__main__':
         print("nothing loaded")
     ################################################################################################################################################
     import os
-    gpu_id = torch.cuda.current_device()
-    print(f"[Worker Node {os.getenv('SLURM_NODEID')} | GPU {gpu_id}] Starting training", flush=True)
+    try:
+        gpu_id = torch.cuda.current_device()
+        print(f"[Worker Node {os.getenv('SLURM_NODEID')} | GPU {gpu_id}] Starting training", flush=True)
+    except:
+        pass
     ################################################################################################################################################
     # pour les performances
     import psutil, sys, os
