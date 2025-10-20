@@ -126,7 +126,7 @@ if __name__ == "__main__":
             temp_param = json.load(f)
         params.update(temp_param)
     except:
-        print("nothing loaded")
+        pass
 
     job_id = params['retake_job'] if params['retake_job'] else os.getenv("SLURM_JOB_ID", str(uuid.uuid4().hex))  # fallback si tu testes en local
     n_nodes = int(os.getenv("SLURM_NNODES", "1"))  # fallback si tu testes en local
@@ -139,15 +139,25 @@ if __name__ == "__main__":
     db_path = os.path.join(run_dir, "optuna.db")
     storage = f"sqlite:///{db_path}"
 
-    print(params)
+    sampler = optuna.samplers.TPESampler(
+        multivariate=True,
+        group=True,
+        n_startup_trials=10
+    )
+
+    pruner = optuna.pruners.MedianPruner(
+        n_startup_trials=10,
+        n_warmup_steps=3,
+        interval_steps=1
+    )
 
     study = optuna.create_study(
         study_name="distributed-test",
         storage=storage,
         load_if_exists=True,
         direction="minimize",
-        sampler=optuna.samplers.TPESampler(),
-        pruner=optuna.pruners.HyperbandPruner()
+        sampler=sampler,
+        pruner=pruner
     )
 
     n_trials_done = sum(t.state in [optuna.trial.TrialState.COMPLETE, optuna.trial.TrialState.PRUNED] for t in study.trials)
