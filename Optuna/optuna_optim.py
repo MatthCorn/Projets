@@ -94,17 +94,6 @@ def objective(trial, RUN_DIR, params):
     return score
 
 if __name__ == "__main__":
-    job_id = os.getenv("SLURM_JOB_ID", str(uuid.uuid4().hex))  # fallback si tu testes en local
-    n_nodes = int(os.getenv("SLURM_NNODES", "1"))  # fallback si tu testes en local
-
-    # Définir le répertoire de sauvegarde global
-    run_dir = os.path.join(local, "Optuna", "Save", f"job_{job_id}")
-    os.makedirs(run_dir, exist_ok=True)
-
-    # Définir le chemin de la base de données dans ce dossier
-    db_path = os.path.join(run_dir, "optuna.db")
-    storage = f"sqlite:///{db_path}"
-
     params = {
         "n_encoder": ['suggest', 'int', [2, 4]],
         "n_decoder": ['suggest', 'int', [2, 4]],
@@ -114,19 +103,20 @@ if __name__ == "__main__":
         "n_heads": ['suggest', 'categorical', [2, 4]],
         "dropout": ['suggest', 'float', [0, 0.3]],
         "lr_option": {
-            "value": ['suggest', 'float', [1e-6, 1e-3], {'log': 1}],
+            "value": ['suggest', 'float', [1e-6, 1e-3], {'log': True}],
             "reset": "y",
             "type": "cos"
         },
         "mult_grad": ["suggest", "int", [1e0, 1e4], {"log": 1}],
-        "weight_decay": ['suggest', 'float', [1e-6, 1e-2], {'log': 1}],
+        "weight_decay": ['suggest', 'float', [1e-6, 1e-2], {'log': True}],
         "batch_size": ['suggest', 'categorical', [512, 1024]],
         "n_iter": 10,  # pour optuna, on réduit un peu pour tester
         "NDataT": 5000,
         "NDataV": 100,
         "period_checkpoint": -1,
         "script": 'global',
-        "n_trials": 3
+        "n_trials": 3,
+        "retake_job": False
     }
 
     try:
@@ -138,6 +128,17 @@ if __name__ == "__main__":
     except:
         print("nothing loaded")
 
+    job_id = params['retake_job'] if params['retake_job'] else os.getenv("SLURM_JOB_ID", str(uuid.uuid4().hex))  # fallback si tu testes en local
+    n_nodes = int(os.getenv("SLURM_NNODES", "1"))  # fallback si tu testes en local
+
+    # Définir le répertoire de sauvegarde global
+    run_dir = os.path.join(local, "Optuna", "Save", f"job_{job_id}")
+    os.makedirs(run_dir, exist_ok=True)
+
+    # Définir le chemin de la base de données dans ce dossier
+    db_path = os.path.join(run_dir, "optuna.db")
+    storage = f"sqlite:///{db_path}"
+
     print(params)
 
     study = optuna.create_study(
@@ -148,6 +149,9 @@ if __name__ == "__main__":
         sampler=optuna.samplers.TPESampler(),
         pruner=optuna.pruners.HyperbandPruner()
     )
+
+    n_trials_done = sum(t.state in [optuna.trial.TrialState.COMPLETE, optuna.trial.TrialState.PRUNED] for t in study.trials)
+    params['n_trials'] = params['n_trials'] - n_trials_done
 
     study.optimize(lambda x: objective(x, run_dir, params), n_trials=int(params['n_trials'] / n_nodes))
 
