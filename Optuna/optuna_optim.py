@@ -23,8 +23,8 @@ def deep_suggest(trial, objet, key=None):
             kwargs = dict(item for d in kwargs for item in d.items())
 
             if trialtype == 'categorical':
-                if isinstance(values, list):
-                    return list(trial.suggest_categorical(key, tuple(values), **kwargs))
+                if isinstance(values[0], list):
+                    return list(trial.suggest_categorical(key, [tuple(x) for x in values], **kwargs))
                 else:
                     return trial.suggest_categorical(key, values, **kwargs)
             if trialtype == 'int':
