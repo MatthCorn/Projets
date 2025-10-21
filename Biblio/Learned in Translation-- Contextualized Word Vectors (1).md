@@ -1,0 +1,1 @@
+article sur un [[Embedding]] non compatible hors langage.

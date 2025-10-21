@@ -1,0 +1,1 @@
+article abordant les difficultés d'entrainement [[Stabilité]] des deep transformers. Il propose un guide pour parvenir à cet entrainement avec une bonne utilisation du layernorm.

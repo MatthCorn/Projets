@@ -1,0 +1,1 @@
+article propose un [[Embedding]] du langage non-applicable

@@ -1,0 +1,1 @@
+article qui propose un type [[RNN]] pour la traduction, bon l'[[Histoire]] du [[GenAI]].

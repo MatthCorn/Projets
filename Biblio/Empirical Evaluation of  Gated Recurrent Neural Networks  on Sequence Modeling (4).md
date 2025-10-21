@@ -1,0 +1,1 @@
+Article sur les GRU, type [[RNN]] fondamentale et étudiée dans [[Stage]].

@@ -1,0 +1,1 @@
+article sur les GAN intéressant pour [[GenAI]].

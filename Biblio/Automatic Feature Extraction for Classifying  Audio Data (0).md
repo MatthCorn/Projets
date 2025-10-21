@@ -1,0 +1,1 @@
+article non étudié, quasiement [[Inutile]], dont on a voulu cherche une inspiration pour aider au design de notre [[Embedding]].

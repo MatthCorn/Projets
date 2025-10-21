@@ -1,0 +1,1 @@
+article dont le vocabulaire est proche du notre. le problème [[Digital Twin]] l'est moins. à relire.

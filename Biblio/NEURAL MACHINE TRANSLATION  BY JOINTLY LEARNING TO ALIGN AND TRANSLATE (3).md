@@ -1,0 +1,1 @@
+article fondamentale dans [[Histoire]]. propose les prémices de l'attention [[Attention Is All You Need (5)]].

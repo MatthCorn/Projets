@@ -1,0 +1,1 @@
+notes sur un cours qui donne des clés pour comprendre pourquoi le deeplearning fonctionne. peut servir en motivation 

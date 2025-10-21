@@ -1,0 +1,1 @@
+article motivant l'approche de type [[Continual Learning]]. Il propose un angle de vue [[Continuation Method]] qui nous intéresse particulièrement pour [[Discernement]].

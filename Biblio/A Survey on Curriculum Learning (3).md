@@ -1,0 +1,2 @@
+Revue sur le [[Continual Learning]], avec un angle Curriculum dont l'approche se focalise sur l'aspect simple puis compliqué. Aborde les motivations, propose un guide pour implémenter.
+Ce vocabulaire est utilisé pour notre article à [[EUSIPCO]] et notre étude [[Discernement]].

@@ -1,0 +1,1 @@
+article fondamentale des modèles de diffusion. pour la culture des [[GenAI]].

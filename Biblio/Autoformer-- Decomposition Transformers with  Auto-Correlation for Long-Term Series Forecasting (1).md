@@ -1,0 +1,1 @@
+Ce article propose un [[Boost Transformer]] en replaçant le mécanisme d'attention. C'est une [[Architecture]] non creusée qui cherche à réduire la complexité calculatoire et mémorielle du mécanisme d'attention. Elle est aussi centré sur les problèmes type [[Time series]].

@@ -1,0 +1,1 @@
+article à grand succès dans la génération de [[Time series]]. Il peut paraître comme une [[Architecture]] candidate directe à la résolution de [[Sequence courte]] mais est sur-adaptée aux problèmes à conditionnement temporel.

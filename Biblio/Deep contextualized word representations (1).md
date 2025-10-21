@@ -1,0 +1,1 @@
+article proposant une représentation du vocabulaire pour le [[Boost Transformer]]. on l'a trouvé en volant améliorer l'[[Embedding]] mais non-application dans notre problème.

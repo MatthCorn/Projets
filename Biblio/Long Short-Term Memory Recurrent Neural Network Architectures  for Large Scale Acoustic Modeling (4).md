@@ -1,0 +1,1 @@
+article fondamentale sur un type [[RNN]]. très utile dans [[Stage]].

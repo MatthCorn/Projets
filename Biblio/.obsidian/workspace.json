@@ -1,0 +1,210 @@
+{
+  "main": {
+    "id": "f2a8533c2952946b",
+    "type": "split",
+    "children": [
+      {
+        "id": "c4e2c68132470246",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e71265a13059c3c3",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "NEURAL MACHINE TRANSLATION  BY JOINTLY LEARNING TO ALIGN AND TRANSLATE (3).md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "NEURAL MACHINE TRANSLATION  BY JOINTLY LEARNING TO ALIGN AND TRANSLATE (3)"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "fb3459ccb90ffe4d",
+    "type": "split",
+    "children": [
+      {
+        "id": "632814f2cd9bc1da",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "3fd4fdbdd635acc8",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "4a783bfb5b44fff2",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "a3ea451b6a1b13c5",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 246.5
+  },
+  "right": {
+    "id": "069c2a68fbb5e32d",
+    "type": "split",
+    "children": [
+      {
+        "id": "4e0044e0d00a345b",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "2a5b90efb923f88c",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "240ddac66cb0e9d3",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "b9861c8d37c5ec6b",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "36071d4a013e7c9f",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "NEURAL MACHINE TRANSLATION  BY JOINTLY LEARNING TO ALIGN AND TRANSLATE (3).md",
+                "followCursor": false,
+                "showSearch": true,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of NEURAL MACHINE TRANSLATION  BY JOINTLY LEARNING TO ALIGN AND TRANSLATE (3)"
+            }
+          },
+          {
+            "id": "0b71fd0e1f898a2b",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
+            }
+          }
+        ],
+        "currentTab": 4
+      }
+    ],
+    "direction": "horizontal",
+    "width": 638.5
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false,
+      "graph:Open graph view": false
+    }
+  },
+  "active": "e71265a13059c3c3",
+  "lastOpenFiles": [
+    "MUSIC TRANSFORMER--  GENERATING MUSIC WITH LONG-TERM STRUCTURE (2).md",
+    "NEURAL MACHINE TRANSLATION  BY JOINTLY LEARNING TO ALIGN AND TRANSLATE (3).md",
+    "MULTI-TASK LEARNING FOR RADAR SIGNAL CHARACTERISATION (3).md",
+    "Metamodel-based multidisciplinary design optimization methods for  aerospace system (2).md",
+    "MetaInit-- Initializing learning by learning to initialize (3).md",
+    "MassGenie-- A Transformer-Based Deep Learning Method for  Identifying Small Molecules from Their Mass Spectra (2).md",
+    "Mamba-- Linear-Time Sequence Modeling with Selective State Spaces (4).md",
+    "Long Short-Term Memory Recurrent Neural Network Architectures  for Large Scale Acoustic Modeling (4).md",
+    "Empirical Evaluation of  Gated Recurrent Neural Networks  on Sequence Modeling (4).md",
+    "Lecture Notes on  High-Dimensional Data (3).md",
+    "Learning in Implicit Generative Models (2).md",
+    "context2vec-- Learning Generic Context Embedding  with Bidirectional LSTM (1).md",
+    "Learning Deep Transformer Models for Machine Translation (3).md",
+    "Learned in Translation-- Contextualized Word Vectors (1).md",
+    "BERT-- Pre-training of Deep Bidirectional Transformers for  Language Understanding (3).md",
+    "Layer Normalization (4).md",
+    "Informer-- Beyond Efficient Transformer for Long Sequence  Time-Series Forecasting (5).md",
+    "Improving Transformer Optimization Through Better Initialization (3).md",
+    "Improving Language Understanding  by Generative Pre-Training (2).md",
+    "GradInit-- Learning to Initialize Neural Networks for  Stable and Efficient Training (3).md",
+    "Hidden Markov model-based digital twin construction for futuristic  manufacturing systems (1).md",
+    "Improving Deep Transformer  with Depth-Scaled Initialization and Merged Attention (3).md",
+    "Attention Is All You Need (5).md",
+    "GloVe-- Global Vectors for Word Representation (1).md",
+    "Google’s Neural Machine Translation System-- Bridging the Gap  between Human and Machine Translation (2).md",
+    "Contribution/Digital Twin.md",
+    "Contribution"
+  ]
+}

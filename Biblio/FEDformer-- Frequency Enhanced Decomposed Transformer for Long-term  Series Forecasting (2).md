@@ -1,0 +1,1 @@
+article sur une [[Architecture]] proposant un [[Boost Transformer]] pour les [[Time series]]. la complexité calculatoire est diminuée mais l'approche est uniquement possible pour les problèmes temporels.

@@ -1,0 +1,1 @@
+article fondateur expliquant le mécanisme d'attention et les transformers dans leur [[Architecture]] initiale.  Important dans l'[[Histoire]].

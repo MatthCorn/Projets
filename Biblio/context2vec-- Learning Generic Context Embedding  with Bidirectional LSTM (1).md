@@ -1,0 +1,1 @@
+article sur l'apprentissage de context [[Embedding]] à partir d'une phrase. non adaptable.

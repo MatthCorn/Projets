@@ -1,0 +1,1 @@
+article fondamentale cité dans [[Attention Is All You Need (5)]]. Il assure une [[Stabilité]] dans l'entrainement en proposant les skip-connexions.

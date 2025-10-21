@@ -1,0 +1,1 @@
+article qui propose un [[Boost Transformer]] en replaçant le skip-connexion. l'objectif est l'amélioration de la [[Stabilité]].

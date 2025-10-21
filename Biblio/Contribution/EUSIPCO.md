@@ -1,0 +1,1 @@
+article sur les capacités de [[Discernement]] des réseaux de neurones, avec une proposition basé sur le [[Continual Learning]] pour maximiser les performances.

@@ -1,0 +1,1 @@
+article fondamentale faisant le pond entre les [[RNN]] et [[Stage]].

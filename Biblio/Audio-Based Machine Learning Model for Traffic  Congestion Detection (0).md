@@ -1,0 +1,1 @@
+article trouvé lors d'une recherche sur les réseaux de neurones à des problèmes de l'audio, que l'on pensait proche de notre problème initialement. Il se trouve qu'il est plutôt [[Inutile]].

@@ -1,0 +1,1 @@
+article sur l'[[Architecture]] mamba, proche [[RNN]]. propose une architecture type state spaces  rapide à entrainer. il était l'objectif du [[Stage]].
