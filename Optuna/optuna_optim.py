@@ -110,7 +110,7 @@ if __name__ == "__main__":
             "reset": "y",
             "type": "cos"
         },
-        "mult_grad": ["suggest", "int", [1e0, 1e4], {"log": 1}],
+        "mult_grad": ["suggest", "int", [1e0, 1e4], {"log": False}],
         "weight_decay": ['suggest', 'float', [1e-6, 1e-2], {'log': True}],
         "batch_size": ['suggest', 'categorical', [512, 1024]],
         "n_iter": 10,  # pour optuna, on réduit un peu pour tester
