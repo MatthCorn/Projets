@@ -4,6 +4,7 @@ import json
 import os
 import uuid
 import time
+import ast
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -24,8 +25,7 @@ def deep_suggest(trial, objet, key=None):
 
             if trialtype == 'categorical':
                 if isinstance(values[0], list):
-                    local_values = [tuple(x) for x in values]
-                    return trial.suggest_categorical(key, local_values, **kwargs)
+                    return ast.literal_eval(trial.suggest_categorical(key, [str(x) for x in values], **kwargs))
                 else:
                     return trial.suggest_categorical(key, values, **kwargs)
             if trialtype == 'int':
@@ -36,19 +36,6 @@ def deep_suggest(trial, objet, key=None):
             return [deep_suggest(trial, x) for x in objet]
     if isinstance(objet, dict):
         return {key: deep_suggest(trial, value, key=key) for key, value in objet.items()}
-    return objet
-
-def deep_transform(objet, key=None):
-    if isinstance(objet, list):
-        if objet[0] == 'suggest':
-            trialtype, values, *kwargs = objet[1:]
-            if trialtype == 'categorical':
-                if isinstance(values[0], list):
-                    values = [tuple(x) for x in values]
-            return [trialtype, values] + kwargs
-        return [deep_transform(x) for x in objet]
-    if isinstance(objet, dict):
-        return {key: deep_transform(value, key=key) for key, value in objet.items()}
     return objet
 
 
@@ -132,7 +119,7 @@ if __name__ == "__main__":
         "NDataV": 100,
         "period_checkpoint": -1,
         "script": 'global',
-        "n_trials": 3,
+        "n_trials": 10,
         "retake_job": False
     }
 
@@ -144,7 +131,6 @@ if __name__ == "__main__":
         params.update(temp_param)
     except:
         pass
-    params = deep_transform(params)
 
     job_id = params['retake_job'] if params['retake_job'] else os.getenv("SLURM_JOB_ID", str(uuid.uuid4().hex))  # fallback si tu testes en local
     n_nodes = int(os.getenv("SLURM_NNODES", "1"))  # fallback si tu testes en local
@@ -161,7 +147,7 @@ if __name__ == "__main__":
         multivariate=True,
         group=True,
         constant_liar=True,
-        n_startup_trials=4
+        n_startup_trials=10
     )
 
     pruner = optuna.pruners.MedianPruner(
