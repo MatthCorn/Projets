@@ -1,0 +1,1 @@
+article étudié pour [[EUSIPCO]]. il présente dans un paradigme de [[Mechanistic interpretability]] les capacités d'un Transformer de [[Attention Is All You Need (5)]] à trier une liste, qui se rapproche de [[Discernement]].

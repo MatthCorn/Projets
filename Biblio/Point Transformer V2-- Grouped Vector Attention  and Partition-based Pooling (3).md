@@ -1,0 +1,1 @@
+V2 de [[Point Transformer (5)]]. liée à [[Boost Transformer]] pour ensemble quelconque [[Diversification Transformer]].

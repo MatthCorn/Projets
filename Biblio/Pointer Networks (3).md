@@ -1,0 +1,1 @@
+article semblant être à la base de l'[[Attention Is All You Need (5)]]. Important pour [[Histoire]] et guider la compréhension de l'architecture.
