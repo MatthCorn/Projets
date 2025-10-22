@@ -38,6 +38,19 @@ def deep_suggest(trial, objet, key=None):
         return {key: deep_suggest(trial, value, key=key) for key, value in objet.items()}
     return objet
 
+def deep_transform(objet, key=None):
+    if isinstance(objet, list):
+        if objet[0] == 'suggest':
+            trialtype, values, *kwargs = objet[1:]
+            if trialtype == 'categorical':
+                if isinstance(values[0], list):
+                    values = [tuple(x) for x in values]
+            return [trialtype, values] + kwargs
+        return [deep_transform(x) for x in objet]
+    if isinstance(objet, dict):
+        return {key: deep_transform(value, key=key) for key, value in objet.items()}
+    return objet
+
 
 def objective(trial, RUN_DIR, params):
     params = deep_suggest(trial, params)
@@ -131,6 +144,7 @@ if __name__ == "__main__":
         params.update(temp_param)
     except:
         pass
+    params = deep_transform(params)
 
     job_id = params['retake_job'] if params['retake_job'] else os.getenv("SLURM_JOB_ID", str(uuid.uuid4().hex))  # fallback si tu testes en local
     n_nodes = int(os.getenv("SLURM_NNODES", "1"))  # fallback si tu testes en local
