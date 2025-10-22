@@ -147,7 +147,7 @@ if __name__ == "__main__":
         multivariate=True,
         group=True,
         constant_liar=True,
-        n_startup_trials=10
+        n_startup_trials=4
     )
 
     pruner = optuna.pruners.MedianPruner(
