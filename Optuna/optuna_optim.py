@@ -24,7 +24,8 @@ def deep_suggest(trial, objet, key=None):
 
             if trialtype == 'categorical':
                 if isinstance(values[0], list):
-                    return list(trial.suggest_categorical(key, [tuple(x) for x in values], **kwargs))
+                    local_values = [tuple(x) for x in values]
+                    return list(trial.suggest_categorical(key, local_values, **kwargs))
                 else:
                     return trial.suggest_categorical(key, values, **kwargs)
             if trialtype == 'int':
