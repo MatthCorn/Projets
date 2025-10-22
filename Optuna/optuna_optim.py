@@ -145,6 +145,7 @@ if __name__ == "__main__":
     sampler = optuna.samplers.TPESampler(
         multivariate=True,
         group=True,
+        constant_liar=True,
         n_startup_trials=10
     )
 
@@ -163,8 +164,13 @@ if __name__ == "__main__":
         pruner=pruner
     )
 
-    n_trials_done = sum(t.state in [optuna.trial.TrialState.COMPLETE, optuna.trial.TrialState.PRUNED] for t in study.trials)
-    params['n_trials'] = params['n_trials'] - n_trials_done
+    # Boucle jusqu’à atteindre le nombre total souhaité
+    while True:
+        n_done = len([t for t in study.trials if t.state in [optuna.trial.TrialState.COMPLETE, optuna.trial.TrialState.PRUNED]])
+        if n_done >= params['n_trials']:
+            print(f"Objectif atteint : {n_done}/{params['n_trials']} trials terminés.")
+            break
 
-    study.optimize(lambda x: objective(x, run_dir, params), n_trials=int(params['n_trials'] / n_nodes))
+        study.optimize(lambda x: objective(x, run_dir, params), n_trials=1)
+
 
