@@ -123,8 +123,9 @@ if __name__ == "__main__":
         "retake_job": False
     }
 
+    import sys
+
     try:
-        import sys
         json_file = sys.argv[1]
         with open(json_file, "r") as f:
             temp_param = json.load(f)
@@ -132,8 +133,13 @@ if __name__ == "__main__":
     except:
         pass
 
-    job_id = params['retake_job'] if params['retake_job'] else os.getenv("SLURM_JOB_ID", str(uuid.uuid4().hex))  # fallback si tu testes en local
-    n_nodes = int(os.getenv("SLURM_NNODES", "1"))  # fallback si tu testes en local
+    job_id = os.getenv("SLURM_JOB_ID", str(uuid.uuid4().hex))  # fallback si tu testes en local
+    if params['retake_job']:
+        job_id = params['retake_job']
+        json_file = os.path.join(local, "Optuna", "Save", f"job_{job_id}", f"params_{job_id}.json")
+        with open(json_file, "r") as f:
+            temp_param = json.load(f)
+        params.update(temp_param)
 
     # Définir le répertoire de sauvegarde global
     run_dir = os.path.join(local, "Optuna", "Save", f"job_{job_id}")
