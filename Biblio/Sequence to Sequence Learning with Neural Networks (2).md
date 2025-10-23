@@ -1,0 +1,1 @@
+article important pour [[Histoire]]. présente une approche bout-à-bout sur l'entrainement d'un réseau de neurones à traitement de séquence quelque soit la structure. Ils utilisent des [[RNN]].

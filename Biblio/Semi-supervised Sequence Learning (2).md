@@ -1,0 +1,1 @@
+article sur les prémisses du [[Pre Training]]. Important pour [[Histoire]]. assez ancien

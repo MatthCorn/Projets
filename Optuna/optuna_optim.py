@@ -66,17 +66,24 @@ def objective(trial, RUN_DIR, params):
             with open(progress_file, "r") as f:
                 lines = f.readlines()
             if lines:
-                try:
-                    step, score = lines[-1].split()
-                    step = int(step)
-                    score = float(score)
-                    trial.report(score, step)
+                step, score = lines[-1].split()
+                step = int(step)
+                score = float(score)
+                trial.report(score, step)
 
+                try:
                     if trial.should_prune():
                         process.terminate()
-                        raise optuna.TrialPruned()
-                except Exception:
-                    pass
+                        process.wait(timeout=30)
+                except subprocess.TimeoutExpired:
+                    try:
+                        process.kill()
+                        process.wait()
+                    except Exception as e:
+                        print(e)
+
+    if trial.should_prune():
+        raise optuna.TrialPruned()
 
     score = float('inf')
     if os.path.exists(progress_file):

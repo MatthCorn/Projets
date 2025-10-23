@@ -1,0 +1,1 @@
+article sur un [[Boost Transformer]] basé sur le [[Pre Training]]. Bon pour [[Histoire]].

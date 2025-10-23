@@ -1,0 +1,1 @@
+article qui propose un [[Boost Transformer]] pour un [[Positional Encoding]]. C'est très axé langage et pas étudié en détail.

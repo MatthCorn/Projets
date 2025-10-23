@@ -1,0 +1,1 @@
+article donnant des conseils sur le réglage du [[Attention Is All You Need (5)]] transformer pour améliorer la [[Stabilité]] quand l'architecture est lourde.

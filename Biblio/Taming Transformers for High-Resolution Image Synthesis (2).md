@@ -1,0 +1,1 @@
+article de [[Diversification Transformer]]. un peu creusé mais pas vraiment pertinent pour nous (à expliquer)
