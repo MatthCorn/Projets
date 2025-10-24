@@ -72,7 +72,7 @@ def objective(trial, RUN_DIR, params):
                 trial.report(score, step)
 
                 try:
-                    if trial.should_prune():
+                    if trial.should_prune() and params['prune']:
                         process.terminate()
                         process.wait(timeout=30)
                 except Exception as e:
@@ -83,7 +83,7 @@ def objective(trial, RUN_DIR, params):
                     except Exception as e:
                         print(e)
 
-    if trial.should_prune():
+    if trial.should_prune() and params['prune']:
         raise optuna.TrialPruned()
 
     score = float('inf')
@@ -128,6 +128,7 @@ if __name__ == "__main__":
         "period_checkpoint": -1,
         "script": 'global',
         "n_trials": 10,
+        "prune": True,
         "retake_job": False
     }
 
