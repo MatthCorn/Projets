@@ -75,7 +75,8 @@ def objective(trial, RUN_DIR, params):
                     if trial.should_prune():
                         process.terminate()
                         process.wait(timeout=30)
-                except subprocess.TimeoutExpired:
+                except Exception as e:
+                    print(e)
                     try:
                         process.kill()
                         process.wait()
