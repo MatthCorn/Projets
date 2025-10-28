@@ -362,6 +362,8 @@ if __name__ == '__main__':
                 k = 0
             p = 0
 
+            TrainingError.append(error)
+
             if time_to_observe:
                 DictGrad.next(j)
 
@@ -383,7 +385,18 @@ if __name__ == '__main__':
 
                 ValidationError.append(float(err))
 
-            TrainingError.append(error)
+            if period_checkpoint == -1:
+                if len(sys.argv) > 2:
+                    if not 'progress_file' in locals():
+                        progress_file = sys.argv[2]
+                        # On crée / vide le fichier au début
+                        with open(progress_file, "w") as f:
+                            f.write("")
+                    try:
+                        with open(progress_file, "a") as f:
+                            f.write(f"{j} {ValidationError[-1] if ValidationError else float('inf')}\n")
+                    except Exception as e:
+                        print(f"[WARN] Could not write progress: {e}", flush=True)
 
             if error == min(TrainingError):
                 best_state_dict = N.state_dict().copy()
@@ -417,6 +430,9 @@ if __name__ == '__main__':
     error_dict = {"TrainingError": TrainingError,
              "ValidationError": ValidationError,
              "PlottingError": PlottingError}
+
+    print(f"Final Error: {float(ValidationError[-1])}")
+    
     if period_checkpoint != -1:
         saveObjAsXml(
             {k: v for k, v in param.items() if k != 'resume_from'},
