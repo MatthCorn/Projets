@@ -247,8 +247,7 @@ if __name__ == '__main__':
         best_state_dict = N.state_dict().copy()
 
     ################################################################################################################################################
-    b=0
-    print(param)
+    
     while window_index < len(param["training_strategy"]):
         print("len(param['training_strategy']): ", len(param["training_strategy"]))
         print("window_index: ", window_index)
@@ -287,10 +286,9 @@ if __name__ == '__main__':
         )
 
         t = time.time()
-        # pbar = tqdm(total=n_iter_window, initial=j)
+        pbar = tqdm(total=n_iter_window, initial=j)
         while j < n_iter_window:
-            b += 1
-            print(b)
+
             error = 0
             time_to_observe = (int(j * param["FreqGradObs"]) == (j * param["FreqGradObs"])) and (param["FreqGradObs"] > 0)
             time_for_GIF = (j in torch.linspace(0, n_iter_window, abs(nb_frames_window), dtype=int)) and (nb_frames_GIF > 0)
@@ -427,8 +425,8 @@ if __name__ == '__main__':
                     PlottingError.append(err.reshape(res_GIF, res_GIF).tolist())
 
             j += 1
-            # pbar.n = j
-            # pbar.refresh()
+            pbar.n = j
+            pbar.refresh()
 
         window_index += 1
         j = 0
@@ -436,10 +434,6 @@ if __name__ == '__main__':
     error_dict = {"TrainingError": TrainingError,
              "ValidationError": ValidationError,
              "PlottingError": PlottingError}
-
-    print(lr_scheduler.get_hparams())
-    print(b)
-    print(f"Final Error: {float(ValidationError[-1])}")
     
     if period_checkpoint != -1:
         saveObjAsXml(
