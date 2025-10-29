@@ -57,7 +57,7 @@ if __name__ == '__main__':
              "max_lr": 5,
              "FreqGradObs": 1 / 3,
              "warmup": 1,
-             "resume_from": '2025-07-25__10-33',
+             "resume_from": 'r',
              "period_checkpoint": 15 * 60, # en secondes
              "nb_frames_GIF": -1
              }
@@ -247,8 +247,11 @@ if __name__ == '__main__':
         best_state_dict = N.state_dict().copy()
 
     ################################################################################################################################################
-
+    print(param)
     while window_index < len(param["training_strategy"]):
+        print("len(param['training_strategy']): ", len(param["training_strategy"]))
+        print("window_index: ", window_index)
+
         window = param["training_strategy"][window_index]
         if param["lr_option"]["reset"] == "y" and (j == 0):
             optimizer = optimizers[param['optim']](N.parameters(), weight_decay=param["weight_decay"], lr=param["lr_option"]["value"])
