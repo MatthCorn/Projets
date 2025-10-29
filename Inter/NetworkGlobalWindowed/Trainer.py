@@ -287,7 +287,7 @@ if __name__ == '__main__':
         )
 
         t = time.time()
-        pbar = tqdm(total=n_iter_window, initial=j)
+        # pbar = tqdm(total=n_iter_window, initial=j)
         while j < n_iter_window:
             b += 1
             print(b)
@@ -427,8 +427,8 @@ if __name__ == '__main__':
                     PlottingError.append(err.reshape(res_GIF, res_GIF).tolist())
 
             j += 1
-            pbar.n = j
-            pbar.refresh()
+            # pbar.n = j
+            # pbar.refresh()
 
         window_index += 1
 
@@ -436,6 +436,8 @@ if __name__ == '__main__':
              "ValidationError": ValidationError,
              "PlottingError": PlottingError}
 
+    print(lr_scheduler.get_hparams())
+    print(b)
     print(f"Final Error: {float(ValidationError[-1])}")
     
     if period_checkpoint != -1:
