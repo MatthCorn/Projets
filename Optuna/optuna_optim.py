@@ -122,6 +122,10 @@ if __name__ == "__main__":
         "mult_grad": ["suggest", "int", [1e0, 1e4], {"log": False}],
         "weight_decay": ['suggest', 'float', [1e-6, 1e-2], {'log': True}],
         "batch_size": ['suggest', 'categorical', [512, 1024]],
+        "training_strategy": [
+            {"mean": [-5, 5], "std": [1, 5]},
+            {"mean": [-5, 5], "std": [0.2, 5]}
+        ],
         "n_iter": 10,  # pour optuna, on réduit un peu pour tester
         "NDataT": 5000,
         "NDataV": 100,

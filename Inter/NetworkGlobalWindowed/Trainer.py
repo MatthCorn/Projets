@@ -247,6 +247,7 @@ if __name__ == '__main__':
         best_state_dict = N.state_dict().copy()
 
     ################################################################################################################################################
+    b=0
     print(param)
     while window_index < len(param["training_strategy"]):
         print("len(param['training_strategy']): ", len(param["training_strategy"]))
@@ -288,7 +289,8 @@ if __name__ == '__main__':
         t = time.time()
         pbar = tqdm(total=n_iter_window, initial=j)
         while j < n_iter_window:
-
+            b += 1
+            print(b)
             error = 0
             time_to_observe = (int(j * param["FreqGradObs"]) == (j * param["FreqGradObs"])) and (param["FreqGradObs"] > 0)
             time_for_GIF = (j in torch.linspace(0, n_iter_window, abs(nb_frames_window), dtype=int)) and (nb_frames_GIF > 0)
