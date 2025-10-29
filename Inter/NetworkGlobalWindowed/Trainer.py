@@ -247,11 +247,8 @@ if __name__ == '__main__':
         best_state_dict = N.state_dict().copy()
 
     ################################################################################################################################################
-    
-    while window_index < len(param["training_strategy"]):
-        print("len(param['training_strategy']): ", len(param["training_strategy"]))
-        print("window_index: ", window_index)
 
+    while window_index < len(param["training_strategy"]):
         window = param["training_strategy"][window_index]
         if param["lr_option"]["reset"] == "y" and (j == 0):
             optimizer = optimizers[param['optim']](N.parameters(), weight_decay=param["weight_decay"], lr=param["lr_option"]["value"])
