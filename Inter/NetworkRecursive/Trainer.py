@@ -452,6 +452,7 @@ if __name__ == '__main__':
             pbar.refresh()
 
         window_index += 1
+        j = 0
 
     error_dict = {"TrainingError": TrainingError,
                   "ValidationError": ValidationError,

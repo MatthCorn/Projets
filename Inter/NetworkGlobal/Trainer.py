@@ -406,6 +406,7 @@ if __name__ == '__main__':
             pbar.refresh()
 
         window_index += 1
+        j = 0
 
     error = {"TrainingError": TrainingError,
              "ValidationError": ValidationError,
