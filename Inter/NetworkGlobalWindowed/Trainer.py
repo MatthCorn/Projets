@@ -394,7 +394,7 @@ if __name__ == '__main__':
                             f.write("")
                     try:
                         with open(progress_file, "a") as f:
-                            f.write(f"{j} {ValidationError[-1] if ValidationError else float('inf')}\n")
+                            f.write(f"{j + n_iter_window * window_index} {ValidationError[-1] if ValidationError else float('inf')}\n")
                     except Exception as e:
                         print(f"[WARN] Could not write progress: {e}", flush=True)
 
