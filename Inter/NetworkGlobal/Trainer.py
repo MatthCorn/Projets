@@ -363,8 +363,10 @@ if __name__ == '__main__':
                 if param['error_weighting'] == 'n':
                     Std = torch.mean(Std)
 
+                N.eval()
                 Prediction = N(Input, Output, TargetMask)[:, :-1, :]
-
+                N.train()
+                
                 err = torch.norm((Prediction - Output) / Std, p=2) / sqrt((torch.sum(Mask) - NDataV) * d_out)
                 ValidationError.append(float(err))
 
