@@ -84,6 +84,10 @@ def objective(trial, RUN_DIR, params):
                         print(e)
 
     if trial.should_prune() and params['prune']:
+        # Nettoyage
+        os.remove(json_file)
+        if os.path.exists(progress_file):
+            os.remove(progress_file)
         raise optuna.TrialPruned()
 
     score = float('inf')

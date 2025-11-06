@@ -378,7 +378,10 @@ if __name__ == '__main__':
 
                 InputMask = Mask[:-1]
                 WindowMask = Mask[-1]
+
+                N.eval()
                 Prediction = N(Input, Output, InputMask)[:, :-1, :]
+                N.train()
 
                 err = torch.norm((Prediction - Output) / Std * WindowMask, p=2) / (
                             (WindowMask.sum() - NDataV) * d_out).sqrt()
@@ -413,7 +416,10 @@ if __name__ == '__main__':
 
                     InputMask = Mask[:-1]
                     WindowMask = Mask[-1]
+
+                    N.eval()
                     Prediction = N(Input, Output, InputMask)[:, :-1, :]
+                    N.train()
 
                     err = torch.norm((Prediction - Output) * WindowMask / Std, p=2, dim=[-1, -2]) / (
                             (WindowMask.sum(dim=[-1, -2]) - 1) * d_out).sqrt()

@@ -397,7 +397,9 @@ if __name__ == '__main__':
                     if param['error_weighting'] == 'n':
                         Std = torch.mean(Std)
 
+                    N.eval()
                     Prediction = N(Input, Output, TargetMask)[:, :-1, :]
+                    N.train()
 
                     err = torch.norm((Prediction - Output) / Std, p=2, dim=[-1, -2]) / torch.sqrt((torch.sum(Mask, dim=[1, 2]) - 1) * d_out)
                     PlottingError.append(err.reshape(res_GIF, res_GIF).tolist())

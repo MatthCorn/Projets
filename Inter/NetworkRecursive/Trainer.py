@@ -400,7 +400,11 @@ if __name__ == '__main__':
 
                 InputMask = Mask[:-1]
                 WindowMask = Mask[-1]
+
+                N.eval()
                 Prediction, PredictionMemOut = N(Input, Output, MemIn, InputMask)
+                N.train()
+
                 Prediction = Prediction[:, :-1, :]
 
                 err = torch.norm((Prediction - Output) / OutStd * WindowMask, p=2) / (
@@ -433,7 +437,11 @@ if __name__ == '__main__':
 
                     InputMask = Mask[:-1]
                     WindowMask = Mask[-1]
+
+                    N.eval()
                     Prediction, PredictionMemOut = N(Input, Output, MemIn, InputMask)
+                    N.train()
+                    
                     Prediction = Prediction[:, :-1, :]
 
                     err = torch.norm((Prediction - Output) * WindowMask / OutStd, p=2, dim=[-1, -2]) / (
