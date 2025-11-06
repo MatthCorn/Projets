@@ -1,0 +1,85 @@
+\chapter{État de l'art : PLAN (à supprimer après rédaction)}
+
+Le chapitre sur l'état de l'art se découpe en 4 parties.
+
+\section{Introduction}
+
+Cette section aborde les aspects suivants :
+\begin{itemize}
+	\item Jumeaux numériques
+	\item IA dans les jumeaux numériques
+	\item IA pour accélérer la simulation
+	\item IA dans les jumeaux numériques pour accélérer la simulation (si existe)
+\end{itemize}
+
+\section{IA générative}
+
+Cette section présente le domaine de l'IA générative. Notre problème peut y être naïvement associé mais en réalité quasiment aucune des méthodes ne sera applicable. Les aspects présentés sont:
+\begin{itemize}
+	\item Le concept d'IA générative. En notant que n'importe quelle fonction génère une sortie à partir d'une entrée et que la dérive de tout appeler IA générative est tentante.
+	\item Les VAE et spécialement VAE conditionnels
+	\item Les GAN et spécialement GAN conditionnels
+	\item Les modèles de diffusion et spécialement ceux conditionnels
+	\item Les modèles de langage et GPT
+\end{itemize}
+
+\section{Méthodes pour le traitement de séquence}
+Cette section présente les architectures connues pour leurs capacités à traiter des séquences, de leurs formes les plus simples aux formes les plus complexes. Par ordre d'apparition:
+\begin{itemize}
+	\item Le concept de séquence: notion de proximité dans un ensemble. Série temporelle, image, texte.
+	\item Réseau de convolution:
+	\begin{itemize}
+		\item Histoire de son apparition: dans l'image
+		\item Comment la convolution interagit avec la séquence
+		\item La convolution dans l'image (vue comme une séquence)
+		\item La convolution dans le texte
+		\item La convolution ailleurs
+	\end{itemize}
+	\item Réseau de neurones récurrents:
+	\begin{itemize}
+		\item Histoire de son apparition
+		\item Comment un RNN interagit avec la séquence
+		\item Variante SSM
+		\item RNN dans le texte
+		\item RNN dans les systèmes temporels (chaine de Markov)
+	\end{itemize}
+	\item Transformer:
+	\begin{itemize}
+		\item Histoire de son apparition: dans le langage
+		\item Comment le Transformer interagit avec la séquence
+		\item Transformer dans le texte (traduction, GPT, ...)
+		\item Transformer dans les systèmes temporels (chaine de Markov)
+		\item Transformer dans l'image
+		\item Transformer ailleurs (généralisation)
+	\end{itemize}
+\end{itemize}
+
+\section{Les améliorations}
+Cette section met en avant les difficultés liées à l'apprentissage automatique, entre complexité calculatoire, mémorielle et instabilité en entrainement. À cette occasion, nous montrons les propositions existantes visant à résoudre ces problèmes. Par ordre d'apparition:
+\begin{itemize}
+	\item Compréhension des architectures: Mechanistic Interpretability
+	\item Présentation des soucis de performances 
+	\item Présentation des solutions aux soucis de performances
+	\begin{itemize}
+		\item Positional Encoding
+		\item Certains mécanismes d'attention
+		\item Pre-Training
+		\item Embedding et tokenization
+	\end{itemize}
+	\item Présentation des soucis de stabilité
+	\item Présentation des solutions aux soucis de stabilité:
+	\begin{itemize}
+		\item Layer-norm
+		\item Initialisation
+		\item Structure (hyper-paramètre de manière générale)
+	\end{itemize}
+	\item Présentation des soucis d'efficacité et leurs solutions
+	\begin{itemize}
+		\item Complexité mémoire et calcul: mécanisme d'attention
+		\item Vitesse d'entrainement: MAMBA
+	\end{itemize}
+\end{itemize}
+
+\chapter{État de l'art}
+
+Ceci est l'état de l'art.
