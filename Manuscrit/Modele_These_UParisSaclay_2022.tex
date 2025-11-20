@@ -48,6 +48,14 @@
     linkcolor=black,
     urlcolor=A5}
 
+\usepackage[
+    backend=biber,
+    style=numeric,
+    natbib=true
+]{biblatex}
+
+\addbibresource{Biblio.bib}
+
 \renewcommand{\FrenchLabelItem}{\textbullet}
 
 \pagestyle{plain} % pour ne garder que les n°de page en milieu-bas et supprimer les indications de chapitre en marge haute
@@ -238,5 +246,7 @@ Titre, Affiliation   &   \\
 \include{DEPOSER ET DIFFUSER SA THESE}
 
 \include{ANNEXE LES LOGOS INSTITUTIONNELS}
+
+\printbibliography
 
 \end{document}

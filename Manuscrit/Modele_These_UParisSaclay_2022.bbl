@@ -1,0 +1,192 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{nty/global//global/global/global}
+    \entry{baillargeon_living_2014}{article}{}{}
+      \name{author}{5}{}{%
+        {{hash=56dc1370801d3400fbb5858c72e627c1}{%
+           family={Baillargeon},
+           familyi={B\bibinitperiod},
+           given={Brian},
+           giveni={B\bibinitperiod}}}%
+        {{hash=a912cc4026cd7fe650c18941d82559a9}{%
+           family={Rebelo},
+           familyi={R\bibinitperiod},
+           given={Nuno},
+           giveni={N\bibinitperiod}}}%
+        {{hash=a7cd592ef9765a582fe4a74a6806c3a3}{%
+           family={Fox},
+           familyi={F\bibinitperiod},
+           given={David\bibnamedelima D.},
+           giveni={D\bibinitperiod\bibinitdelim D\bibinitperiod}}}%
+        {{hash=29bab39046818894cc5af16e83f2f770}{%
+           family={Taylor},
+           familyi={T\bibinitperiod},
+           given={Robert\bibnamedelima L.},
+           giveni={R\bibinitperiod\bibinitdelim L\bibinitperiod}}}%
+        {{hash=fdab00413ed0a40b41409bd91b17e62a}{%
+           family={Kuhl},
+           familyi={K\bibinitperiod},
+           given={Ellen},
+           giveni={E\bibinitperiod}}}%
+      }
+      \strng{namehash}{eacea44330acc3a0e376c2d6a71db9c9}
+      \strng{fullhash}{3e384abc1bd2751d21699de66684acdc}
+      \strng{fullhashraw}{3e384abc1bd2751d21699de66684acdc}
+      \strng{bibnamehash}{eacea44330acc3a0e376c2d6a71db9c9}
+      \strng{authorbibnamehash}{eacea44330acc3a0e376c2d6a71db9c9}
+      \strng{authornamehash}{eacea44330acc3a0e376c2d6a71db9c9}
+      \strng{authorfullhash}{3e384abc1bd2751d21699de66684acdc}
+      \strng{authorfullhashraw}{3e384abc1bd2751d21699de66684acdc}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{The heart is not only our most vital, but also our most complex organ: Precisely controlled by the interplay of electrical and mechanical fields, it consists of four chambers and four valves, which act in concert to regulate its filling, ejection, and overall pump function. While numerous computational models exist to study either the electrical or the mechanical response of its individual chambers, the integrative electro-mechanical response of the whole heart remains poorly understood. Here we present a proof-of-concept simulator for a four-chamber human heart model created from computer topography and magnetic resonance images. We illustrate the governing equations of excitation-contraction coupling and discretize them using a single, unified finite element environment. To illustrate the basic features of our model, we visualize the electrical potential and the mechanical deformation across the human heart throughout its cardiac cycle. To compare our simulation against common metrics of cardiac function, we extract the pressure-volume relationship and show that it agrees well with clinical observations. Our prototype model allows us to explore and understand the key features, physics, and technologies to create an integrative, predictive model of the living human heart. Ultimately, our simulator will open opportunities to probe landscapes of clinical parameters, and guide device design and treatment planning in cardiac diseases such as stenosis, regurgitation, or prolapse of the aortic, pulmonary, tricuspid, or mitral valve.}
+      \field{issn}{0997-7538}
+      \field{journaltitle}{European journal of mechanics. A, Solids}
+      \field{shortjournal}{Eur J Mech A Solids}
+      \field{shorttitle}{The Living Heart Project}
+      \field{title}{The Living Heart Project: A robust and integrative simulator for human heart function}
+      \field{urlday}{20}
+      \field{urlmonth}{11}
+      \field{urlyear}{2025}
+      \field{volume}{48}
+      \field{year}{2014}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{38\bibrangedash 47}
+      \range{pages}{10}
+      \verb{doi}
+      \verb 10.1016/j.euromechsol.2014.04.001
+      \endverb
+      \verb{file}
+      \verb Full Text PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\JKUPJJEC\\Baillargeon et al. - 2014 - The Living Heart Project A robust and integrative simulator for human heart function.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://pmc.ncbi.nlm.nih.gov/articles/PMC4175454/
+      \endverb
+      \verb{url}
+      \verb https://pmc.ncbi.nlm.nih.gov/articles/PMC4175454/
+      \endverb
+    \endentry
+    \entry{dosovitskiy_carla_2017}{misc}{}{}
+      \name{author}{5}{}{%
+        {{hash=72308762399d6ab62bbd9391c64c7bfd}{%
+           family={Dosovitskiy},
+           familyi={D\bibinitperiod},
+           given={Alexey},
+           giveni={A\bibinitperiod}}}%
+        {{hash=f1f2a36b2020857c1c8f6c2402336e2a}{%
+           family={Ros},
+           familyi={R\bibinitperiod},
+           given={German},
+           giveni={G\bibinitperiod}}}%
+        {{hash=7057213461868d1b1bc32960a3b2bf64}{%
+           family={Codevilla},
+           familyi={C\bibinitperiod},
+           given={Felipe},
+           giveni={F\bibinitperiod}}}%
+        {{hash=024db8bb102030127d877ec526718939}{%
+           family={Lopez},
+           familyi={L\bibinitperiod},
+           given={Antonio},
+           giveni={A\bibinitperiod}}}%
+        {{hash=9025300f43a193cfed8e10e924f2a117}{%
+           family={Koltun},
+           familyi={K\bibinitperiod},
+           given={Vladlen},
+           giveni={V\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {arXiv}%
+      }
+      \strng{namehash}{d96316bc7578db680aba71d4226354c8}
+      \strng{fullhash}{00d4e7cbde09bfab8648fe4a57403d6e}
+      \strng{fullhashraw}{00d4e7cbde09bfab8648fe4a57403d6e}
+      \strng{bibnamehash}{d96316bc7578db680aba71d4226354c8}
+      \strng{authorbibnamehash}{d96316bc7578db680aba71d4226354c8}
+      \strng{authornamehash}{d96316bc7578db680aba71d4226354c8}
+      \strng{authorfullhash}{00d4e7cbde09bfab8648fe4a57403d6e}
+      \strng{authorfullhashraw}{00d4e7cbde09bfab8648fe4a57403d6e}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{We introduce {CARLA}, an open-source simulator for autonomous driving research. {CARLA} has been developed from the ground up to support development, training, and validation of autonomous urban driving systems. In addition to open-source code and protocols, {CARLA} provides open digital assets (urban layouts, buildings, vehicles) that were created for this purpose and can be used freely. The simulation platform supports flexible specification of sensor suites and environmental conditions. We use {CARLA} to study the performance of three approaches to autonomous driving: a classic modular pipeline, an end-to-end model trained via imitation learning, and an end-to-end model trained via reinforcement learning. The approaches are evaluated in controlled scenarios of increasing difficulty, and their performance is examined via metrics provided by {CARLA}, illustrating the platform's utility for autonomous driving research. The supplementary video can be viewed at https://youtu.be/Hp8Dz-Zek2E}
+      \field{day}{10}
+      \field{eprinttype}{arxiv}
+      \field{month}{11}
+      \field{number}{{arXiv}:1711.03938}
+      \field{shorttitle}{{CARLA}}
+      \field{title}{{CARLA}: An Open Urban Driving Simulator}
+      \field{urlday}{20}
+      \field{urlmonth}{11}
+      \field{urlyear}{2025}
+      \field{year}{2017}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{doi}
+      \verb 10.48550/arXiv.1711.03938
+      \endverb
+      \verb{eprint}
+      \verb 1711.03938 [cs]
+      \endverb
+      \verb{file}
+      \verb Preprint PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\YJ44FQH3\\Dosovitskiy et al. - 2017 - CARLA An Open Urban Driving Simulator.pdf:application/pdf;Snapshot:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\Y4MYWNTD\\1711.html:text/html
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/1711.03938
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/1711.03938
+      \endverb
+      \keyw{Computer Science - Artificial Intelligence,Computer Science - Computer Vision and Pattern Recognition,Computer Science - Machine Learning,Computer Science - Robotics}
+    \endentry
+    \entry{noauthor_projet_2025}{online}{}{}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Si nous créons des simulations réalistes d'organes humains, pouvons-nous révolutionner les soins médicaux ?}
+      \field{day}{23}
+      \field{langid}{french}
+      \field{month}{9}
+      \field{title}{Projet Living Heart}
+      \field{titleaddon}{Dassault Systèmes}
+      \field{urlday}{20}
+      \field{urlmonth}{11}
+      \field{urlyear}{2025}
+      \field{year}{2025}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{file}
+      \verb Snapshot:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\2MWAG24Y\\living-heart.html:text/html
+      \endverb
+      \verb{urlraw}
+      \verb https://www.3ds.com/fr/3dexperiencelab/portfolio/living-heart
+      \endverb
+      \verb{url}
+      \verb https://www.3ds.com/fr/3dexperiencelab/portfolio/living-heart
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

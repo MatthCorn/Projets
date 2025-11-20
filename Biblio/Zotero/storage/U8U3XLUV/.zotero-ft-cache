@@ -1,0 +1,108 @@
+Digital Twin: Manufacturing
+Excellence through Virtual
+Factory Replication
+A Whitepaper by Dr. Michael Grieves
+This paper introduces the concept of a “Digital Twin” as a virtual representation of what has been produced. Compare a Digital Twin to its engineering design to better understand what was produced versus what was designed, tightening the loop between design and execution.
+
+
+Page 1 of 7 Digital Twin White Paper Copyright © Michael W. Grieves, LLC 2014
+Introduction
+The concept of a virtual, digital equivalent to a physical product or the Digital Twin1 was introduced in 2003 at my University of Michigan Executive Course on Product Lifecycle Management (PLM). At the time this concept was introduced, digital representations of actual physical products were relatively new and immature. In addition, the information being collected about the physical product as it was being produced was limited, manually collected, and mostly paper-based.
+In the decade that has followed, the information technology supporting both the development and maintenance of the virtual product and the design and manufacture of the physical product has exploded.
+Virtual products are rich representations of products that are virtually indistinguishable from their physical counterparts. The rise of Manufacturing Execution Systems on the factory floor has resulted in a wealth of data collected and maintained on the production and form of physical products. In addition, this collection has progressed from being manually collected and paper based to being digital and being collected by a wide variety of physical non-destructive sensing technologies, including sensors and gauges, Coordinate Measuring Machines, lasers, vision systems, and white light scanning.
+1 I introduced the term “Digital Twin” in Virtually Perfect: Driving Innovative and Lean Products through Product Lifecycle Management (pg. 133). I attributed it to John Vickers of NASA whom I work with. We have subsequently used this term in current projects.
+In light of these advances, it is timely to explore how the Digital Twin can move from an interesting and potentially useful concept that aids in understanding the relationship between a physical product and its underlying information to a critical component of an enterprise-wide closedloop product lifecycle. These tasks will both reduce costs and foster innovation in the manufacture of quality products.2
+Digital Twin Concept Model
+The Digital Twin concept model is shown in Figure 1. It contains three main parts: a) physical products in Real Space, b) virtual products in Virtual Space, and c) the connections of data and information that ties the virtual and real products together.
+In the decade since this model was introduced, there have been tremendous increases in the amount, richness, and fidelity of information of both the physical and virtual products.
+On the virtual side, we have improved the amount of information we have available. We have added numerous behavioral characteristics so that we can not only visualize the product, but we can test it for performance capabilities.
+We have the ability to create lightweight versions of the virtual model. This means
+2 While the focus of this paper is on the manufacturing phase, the use of the Digital Twin extends throughout the product’s life to provide value to its user and information on how it actually performed to its manufacturer. This larger use is described in Virtually Perfect.
+
+
+Page 2 of 7 Digital Twin White Paper Copyright © Michael W. Grieves, LLC 2014
+that we can select the geometry, characteristics, and attributes that we require without carrying around unnecessary details. This dramatically reduces the size of the models and allows for faster processing.
+These light-weight models allow today's simulation products to visualize and simulate complex systems and systems of systems, including their physical behaviors, in real-time and with acceptable compute costs.
+These lightweight models also mean that the time and cost of communicating them electronically is substantially less. They now can be shared not only with the organization but also throughout the supplier network. This enhances collaboration in both reducing time to understand and enhancing both quality and depth of understanding of product information and changes.
+As importantly, we can simulate the manufacturing environment that creates the product, including most operations, both automated and manual, that constitute the manufacturing process. These operations include assembly, robotic welding, forming, milling, and other manufacturing floor operations.
+On the physical side, we now collect more and more information about the characteristics of the physical product. We can collect all types of physical measurements from automated quality control stations, such as Coordinate Measuring Machines (CMMs). We can collect the data from the machines that perform operations on the physical part to understand exactly what operations, at what speeds and forces, were applied. For example, we can collect the torque readings of every bolt that attaches a fuel pump to an engine in order to insure that each engine/fuel pump attachment is successfully performed.
+Extending Model Lifespans – A Matter of Unifying the Virtual and Real Worlds
+The amount and quality of information about the virtual and physical product have progressed rapidly in the last decade. The issue is that the two-way connection between real and virtual space has been lagging behind.
+Global manufacturers today either work with the physical product or with the virtual product. We have not developed the connection between the two products so that we can work with both of them simultaneously.
+The typical way we do this is to develop a fully annotated 3-D model. We then develop a manufacturing process that will realize this model with a Bill of Process (BOP) and Manufacturing Bill of Materials (MBOM). The more sophisticated and advanced manufacturers then simulate the production process digitally.
+
+
+Page 3 of 7 Digital Twin White Paper Copyright © Michael W. Grieves, LLC 2014
+However, at that stage, we then simply turn over the BOP and MBOM to manufacturing and leave the virtual models behind. In many cases currently, we even dramatically water down the usefulness of the model by producing 2-D blueprints for the factory floor.
+There are manufacturers who are bringing 3-D models to the factory floor by way of terminals stationed in the work cells. However, even here there is not real integration and connection between the virtual model and the physical product taking shape on the factory floor. The terminal model merely serves as a reference, and a human has to perform the connection between the virtual and the physical product on an ad hoc basis.
+As shown in Figure 2, linking the physical product with the virtual product could take the form of the 3-D model not only appearing on the screen but also incorporating actual dimensions from the physical product. The information of the physical product would overlay the virtual product and highlight differences that would need to be addressed.
+This simultaneous view and comparison of the physical and virtual product will reap major benefits, especially in the manufacturing phase of the product.
+Digital Twin Fulfillment Requirements
+In order to deliver the substantial benefits to be gained from this linkage between virtual and physical products, one solution is to have a Unified Repository (UR) that will link the two products together.
+Both virtual development tools and physical collection tools would populate the Unified Repository. This would enable two-way connection between the virtual and physical product.
+On the virtual tool side, design and engineering would identify characteristics, such as dimensions, tolerances, torque requirements, hardness measurements, etc., and place a unique tag in the virtual model that would serve as a data placeholder for the actual physical product. Included in the tag would be the as-designed characteristic parameter.
+When the design was released for production, these tags would be collected from the virtual product model and used to create the UR. A lightweight model with the tags and their characteristics and geometrical location would also be created.
+On the physical side, these tags would be incorporated into the MES in the Bill of Process creation at the process step where they will be captured. As the processes were completed on the factory floor, the MES would output the captured characteristic to the UR.
+The final step would be to incorporate this back into the factory simulation. This would turn the factory simulation into a factory replication application. Instead of simulating what should be happening in the factory, the application would be
+
+
+Page 4 of 7 Digital Twin White Paper Copyright © Michael W. Grieves, LLC 2014
+replicating what actually was happening at each step in the factory on each product.
+The factory replication application would be in constant communication with the UR, picking up the latest data from actual production and displaying it in the virtual factory.
+Users could see in near real-time or even real time, what actually was occurring on the factory floor and view the actual product characteristics as they were going through production cells.
+There are a significant number of use cases that can be envisioned from having such a capability.
+Digital Twin Model Use Cases
+The digital twin capability supports three of the most powerful tools in the human knowledge tool kit. These three tools are: conceptualization, comparison, and collaboration. Taken together, these attributes form the foundation for the next generation of problem solving and innovation.
+Conceptualization
+Unlike computers, humans do not process information, at least not in the sense of sequential step-by-step processing that computers do. Instead, humans look at a situation and conceptualize the problem and the context of the problem.
+Humans take in all the data about the situation there interested in. They then conceptualize the situation, seeing in their mind's eye its various aspects. While they can do this looking at tables of numbers, reports, and other symbolic information, their most powerful and highest bandwidth input device is their visual sight.
+What currently happens is that humans take visual information, reduce it to symbols of numbers and letters, and then re-conceptualize it visually. In the process, we lose a great deal of information, and we introduce inefficiencies in time.
+The capability of the digital twin lets us directly see the situation and eliminate the inefficient and counterproductive mental steps of decreasing the information and translating it from visual information to symbolic information and back to visually conceptual information.
+With the digital twin to build a common perspective, we can directly see both the physical product information and the virtual product information, simultaneously. Instead of looking at a report of factory performance and reconceptualizing how the product is moving through the individual stations, looking at digital twin simulations allows us to see the progress of the physical product as it is moving and actually see information about the characteristics of the physical product.
+Instead of looking at an array of numbers on tolerance measurements, we can look at the products lined up in the virtual factory and see the actual trend lines that indicate a problem is developing.
+Because we have tagged the products with the designed characteristics, we can select those tags and see the designed parameters and the actual parameters simultaneously.
+Comparison
+The next tool that humans use in assessing situations is the idea of a comparison. We compare unconsciously and continuously our desired result and our actual result in order to determine a difference. We then decide how to eliminate that difference.
+
+
+Page 5 of 7 Digital Twin White Paper Copyright © Michael W. Grieves, LLC 2014
+Comparison is one of most powerful intellectual tools that we possess.
+When we have the virtual product information and the physical product information completely separate, we still can do that comparison. However, it is inefficient, as we have to look at the physical product information, find the corresponding virtual product information, and then work out the differences.
+With the digital twin model, we can view the ideal characteristic, the tolerance corridor around that ideal measurement, and our actual trend line to determine for a range of products whether we are where we want to be. Tolerance corridors are the positive and negative deviations we can allow before we deem a result unacceptable.
+Depending on how we implemented this capability, we could see the differences in terms of color, with colors progressing from green, “there is no difference,” to yellow, “we are in our tolerance corridor,” to red, “we are beyond the tolerance corridor.” We can then make instantaneous decisions about the differences.
+We can do this with measurements, tensile strength, torque readings, and pretty much any characteristic where we can define the desired characteristic in some sort of a measurement, either quantitative or even qualitative. We can enable this capability for a single product or a range of products. Using the example from above as to trend lines, we could overlay the ideal trend on the actual trend lines.
+Having this capability, also allows us to do the comparisons and adjust future operations. For example, if we were seeing tolerances on the plus side of our ideal measurement, we could change parameters
+in the operations of cells further down the line to adjust them to err on the side of negative tolerances. Instead of degenerating into tolerance stacking, we could ensure tolerances were distributed around a mean.
+The last tool we have is collaboration.
+Collaboration
+The most powerful things that humans do is collaborate with each other in order to bring more intelligence, more variability of perspectives, and better problem solving and innovation to situations. The problem with conceptualization as it occurs without the digital twin model is that this conceptualization occurs only within the individual. The digital twin model allows a shared conceptualization that can be visualized in exactly the same way by an unlimited amount of individuals and by individuals who do not need to share the same location.
+With the digital twin capability, we can look at any physical product at any stage on the factory floor and overlay the virtual, product on top of it. This capability of virtual products can be extended across multiple factories. This means that individuals across the world can not only looking at the performance of their own factory, but they can be monitoring how they are doing against factories in other parts of the world. A problem that arises in one factory can be identified and controlled not only in that factory, but the solution immediately transferred and implemented in all other factories across the globe.
+In the past, factory managers had their office overlooking the factory so that they could get a feel for what was happening on the factory floor. With the digital twin, not only the factory manager, but everyone
+
+
+Page 6 of 7 Digital Twin White Paper Copyright © Michael W. Grieves, LLC 2014
+associated with factory production could have that same virtual window to not only a single factory, but to all the factories across the globe.
+Instead of simply viewing a factory simulation of what should take place in the factory, factory replication means that we can see what is actually taking place on the factory floor as parts move through the various work cells and inspection stations.
+However, as Figure 2 illustrates, it is exponentially better than simply seeing the progression and completion of products. We can also see the key design characteristics that we are most concerned about, the actual characteristics we have achieved, and the gap between the desired and actual.
+The digital twin capability with its conceptualization, comparison, and collaboration capability frees us from the physical realm where humans operate relatively inefficiently. We can now move to virtual realm where physical location is irrelevant, and humans from across the globe can have common visualization, engage in comparisons identifying the difference between what is and what should be, and collaborating together. This is extremely powerful and only occurs if we can match the physical product with the virtual product.
+Conclusion
+Over the last decade, there have been dramatic advances in the capabilities and technologies of both the data collection of the physical product and the creation and representation of the virtual product, the
+Digital Twin. The issue is that while the data information of each of these areas has increased dramatically, the connection between the two data sources has lagged behind.
+This white paper has proposed that the connection between the data about the physical product and the information contained on the virtual product be synchronized. This will open up an entire new set of use cases.
+Specifically by merging the virtual product information as to how the product is to be manufactured and the information about how the product is actually being manufactured, we can have an instantaneous and simultaneous perspective on how the manufactured product is meeting its design specification goals.
+By using this information, we can change digital factory simulation, which attempts to predict how the product is to be manufactured, into a digital factory replication, which shows how the product is actually being manufactured. We can then compare it against the design specifications. This can occur in real time or near real-time. This provides a window onto the factory floor for anyone at any time from any place.
+Focusing on the connection between the physical product and the virtual product enables us to conceptualize, compare, and collaborate. We can conceptualize visually the actual manufacturing processes. We can compare the formation of the physical product to the virtual product in order to ensure that what we are producing is what we wanted to produce. Finally we can collaborate with others in our organization and even throughout the supply chain to have up-to-the-minute knowledge of the products that we are producing.
+
+
+Page 7 of 7 Digital Twin White Paper Copyright © Michael W. Grieves, LLC 2014
+Focusing on this connection between the physical product and the virtual product will improve productivity, uniformity of production, and ensure the highest quality products.
+About Dr. Michael Grieves
+Dr. Michael Grieves is a world-renowned authority on Product Lifecycle Management (PLM). Dr. Grieves has written and lectured extensively on the topic and is a frequent keynote speaker on PLM. Dr. Grieves’ works include the seminal work on PLM, Product Lifecycle Management: Driving the Next Generation of Lean Thinking (McGraw-Hill, 2006) and Virtually Perfect: Driving Innovative and Lean Products through Product Lifecycle Management (SCP, 2010)
+Dr. Grieves consults with a number of leading international manufacturers and governmental organizations such as NASA.
+Dr. Grieves is the Co-Director of the Center for Lifecycle and Innovation Management (CLIM) at the Florida Institute of Technology and is a Research Professor in the College of Business and the College of Engineering.
+Dr. Grieves is Chairman Emeritus of Oakland University’s School of Business Board of Visitors. He has taught in the United States, China, and Europe at the university senior undergraduate, and graduate school levels and has authored and taught executive education courses. Dr. Grieves is a Professor at CIMBA University, Asolo, Italy with an appointment at the University of Iowa.
+Dr. Grieves has over forty-five years experience in the computer and data
+communications industry. He has been a senior executive at both Fortune 1000 companies and entrepreneurial organizations during his career. He founded and took public a national systems integration company and subsequently served as its audit and compensation committee chair. Dr. Grieves has substantial board experience, including serving on the board of public companies in both China and Japan.
+Dr. Grieves has a BSCE from Michigan State University and an MBA from Oakland University. He received his doctorate from the Case Western Reserve University Weatherhead School of Management.
+About the Sponsor
+Dassault Systèmes, the 3DEXPERIENCE Company, serves 190,000 customers across 140 countries, providing virtual universes for sustainable innovation. Dassault Systèmes’ DELMIA brand offers products that connect the virtual and real worlds of manufacturing. As part of DELMIA, the Apriso product portfolio including its suite of manufacturing operations management applications helps manufacturers transform their global operations to achieve and sustain operational excellence. Learn more at apriso.com, apriso.com/blog, or follow us at @Apriso.
