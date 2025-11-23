@@ -1,0 +1,546 @@
+Skip to main content
+Search
+Log in
+About
+Publish
+articles  article
+Article
+Published: 19 October 2017
+Mastering the game of Go without human knowledge
+David Silver, Julian Schrittwieser, Demis Hassabis 
+
+Nature 
+volume
+ 550, 
+pages
+354–359 (2017)Cite this article
+
+392k Accesses
+
+7148 Citations
+
+2600 Altmetric
+
+Metrics
+details
+
+Abstract
+
+A long-standing goal of artificial intelligence is an algorithm that learns, tabula rasa, superhuman proficiency in challenging domains. Recently, AlphaGo became the first program to defeat a world champion in the game of Go. The tree search in AlphaGo evaluated positions and selected moves using deep neural networks. These neural networks were trained by supervised learning from human expert moves, and by reinforcement learning from self-play. Here we introduce an algorithm based solely on reinforcement learning, without human data, guidance or domain knowledge beyond game rules. AlphaGo becomes its own teacher: a neural network is trained to predict AlphaGo’s own move selections and also the winner of AlphaGo’s games. This neural network improves the strength of the tree search, resulting in higher quality move selection and stronger self-play in the next iteration. Starting tabula rasa, our new program AlphaGo Zero achieved superhuman performance, winning 100–0 against the previously published, champion-defeating AlphaGo.
+
+This is a preview of subscription content, access via your institution
+
+Access options
+
+Access to this article via Thales RT is not available.
+
+Change institution
+
+Access Nature and 54 other Nature Portfolio journals
+
+Get Nature+, our best-value online-access subscription
+
+27,99 € / 30 days
+
+cancel any time
+
+Learn more
+
+Subscribe to this journal
+
+Receive 51 print issues and online access
+
+196,21 € per year
+
+only 3,85 € per issue
+
+Learn more
+
+Buy this article
+
+Purchase on SpringerLink
+ Instant access to full article PDF
+Buy now
+
+Prices may be subject to local taxes which are calculated during checkout
+
+Additional access options:
+ Log in
+ Learn about institutional subscriptions
+ Read our FAQs
+ Contact customer support
+Similar content being viewed by others
+Mastering Atari, Go, chess and shogi by planning with a learned model
+Article 23 December 2020
+Faster sorting algorithms discovered using deep reinforcement learning
+Article Open access 07 June 2023
+First return, then explore
+Article 24 February 2021
+References
+
+Friedman, J., Hastie, T. & Tibshirani, R. The Elements of Statistical Learning: Data Mining, Inference, and Prediction (Springer, 2009)
+
+LeCun, Y., Bengio, Y. & Hinton, G. Deep learning. Nature 521, 436–444 (2015)
+
+Article
+ 
+CAS
+ 
+ADS
+ 
+Google Scholar
+ 
+
+Krizhevsky, A., Sutskever, I. & Hinton, G. ImageNet classification with deep convolutional neural networks. In Adv. Neural Inf. Process. Syst. Vol. 25 (eds Pereira, F., Burges, C. J. C., Bottou, L. & Weinberger, K. Q. ) 1097–1105 (2012)
+
+He, K., Zhang, X., Ren, S . & Sun, J. Deep residual learning for image recognition. In Proc. 29th IEEE Conf. Comput. Vis. Pattern Recognit. 770–778 (2016)
+
+Hayes-Roth, F., Waterman, D. & Lenat, D. Building Expert Systems (Addison-Wesley, 1984)
+
+Mnih, V. et al. Human-level control through deep reinforcement learning. Nature 518, 529–533 (2015)
+
+Article
+ 
+CAS
+ 
+ADS
+ 
+Google Scholar
+ 
+
+Guo, X., Singh, S. P., Lee, H., Lewis, R. L. & Wang, X. Deep learning for real-time Atari game play using offline Monte-Carlo tree search planning. In Adv. Neural Inf. Process. Syst. Vol. 27 (eds Ghahramani, Z., Welling, M., Cortes, C., Lawrence, N. D. & Weinberger, K. Q. ) 3338–3346 (2014)
+
+Mnih, V . et al. Asynchronous methods for deep reinforcement learning. In Proc. 33rd Int. Conf. Mach. Learn. Vol. 48 (eds Balcan, M. F. & Weinberger, K. Q. ) 1928–1937 (2016)
+
+Jaderberg, M . et al. Reinforcement learning with unsupervised auxiliary tasks. In 5th Int. Conf. Learn. Representations (2017)
+
+Dosovitskiy, A. & Koltun, V. Learning to act by predicting the future. In 5th Int. Conf. Learn. Representations (2017)
+
+Man´dziuk, J. in Challenges for Computational Intelligence ( Duch, W. & Man´dziuk, J. ) 407–442 (Springer, 2007)
+
+Silver, D. et al. Mastering the game of Go with deep neural networks and tree search. Nature 529, 484–489 (2016)
+
+Article
+ 
+CAS
+ 
+ADS
+ 
+Google Scholar
+ 
+
+Coulom, R. Efficient selectivity and backup operators in Monte-Carlo tree search. In 5th Int. Conf. Computers and Games (eds Ciancarini, P. & van den Herik, H. J. ) 72–83 (2006)
+
+Kocsis, L. & Szepesvári, C. Bandit based Monte-Carlo planning. In 15th Eu. Conf. Mach. Learn. 282–293 (2006)
+
+Browne, C. et al. A survey of Monte Carlo tree search methods. IEEE Trans. Comput. Intell. AI Games 4, 1–49 (2012)
+
+Article
+ 
+Google Scholar
+ 
+
+Fukushima, K. Neocognitron: a self organizing neural network model for a mechanism of pattern recognition unaffected by shift in position. Biol. Cybern. 36, 193–202 (1980)
+
+Article
+ 
+CAS
+ 
+Google Scholar
+ 
+
+LeCun, Y. & Bengio, Y. in The Handbook of Brain Theory and Neural Networks Ch. 3 (ed. Arbib, M. ) 276–278 (MIT Press, 1995)
+
+Ioffe, S. & Szegedy, C. Batch normalization: accelerating deep network training by reducing internal covariate shift. In Proc. 32nd Int. Conf. Mach. Learn. Vol. 37 448–456 (2015)
+
+Hahnloser, R. H. R., Sarpeshkar, R., Mahowald, M. A., Douglas, R. J. & Seung, H. S. Digital selection and analogue amplification coexist in a cortex-inspired silicon circuit. Nature 405, 947–951 (2000)
+
+Article
+ 
+CAS
+ 
+ADS
+ 
+Google Scholar
+ 
+
+Howard, R. Dynamic Programming and Markov Processes (MIT Press, 1960)
+
+Sutton, R . & Barto, A. Reinforcement Learning: an Introduction (MIT Press, 1998)
+
+Bertsekas, D. P. Approximate policy iteration: a survey and some new methods. J. Control Theory Appl. 9, 310–335 (2011)
+
+Article
+ 
+MathSciNet
+ 
+Google Scholar
+ 
+
+Scherrer, B. Approximate policy iteration schemes: a comparison. In Proc. 31st Int. Conf. Mach. Learn. Vol. 32 1314–1322 (2014)
+
+Rosin, C. D. Multi-armed bandits with episode context. Ann. Math. Artif. Intell. 61, 203–230 (2011)
+
+Article
+ 
+MathSciNet
+ 
+Google Scholar
+ 
+
+Coulom, R. Whole-history rating: a Bayesian rating system for players of time-varying strength. In Int. Conf. Comput. Games (eds van den Herik, H. J., Xu, X . Ma, Z . & Winands, M. H. M. ) Vol. 5131 113–124 (Springer, 2008)
+
+Laurent, G. J., Matignon, L. & Le Fort-Piat, N. The world of independent learners is not Markovian. Int. J. Knowledge-Based Intelligent Engineering Systems 15, 55–64 (2011)
+
+Article
+ 
+Google Scholar
+ 
+
+Foerster, J. N . et al. Stabilising experience replay for deep multi-agent reinforcement learning. In Proc. 34th Int. Conf. Mach. Learn. Vol. 70 1146–1155 (2017)
+
+Heinrich, J . & Silver, D. Deep reinforcement learning from self-play in imperfect-information games. In NIPS Deep Reinforcement Learning Workshop (2016)
+
+Jouppi, N. P . et al. In-datacenter performance analysis of a Tensor Processing Unit. Proc. 44th Annu. Int. Symp. Comp. Architecture Vol. 17 1–12 (2017)
+
+Maddison, C. J., Huang, A., Sutskever, I . & Silver, D. Move evaluation in Go using deep convolutional neural networks. In 3rd Int. Conf. Learn. Representations. (2015)
+
+Clark, C . & Storkey, A. J. Training deep convolutional neural networks to play Go. In Proc. 32nd Int. Conf. Mach. Learn. Vol. 37 1766–1774 (2015)
+
+Tian, Y. & Zhu, Y. Better computer Go player with neural network and long-term prediction. In 4th Int. Conf. Learn. Representations (2016)
+
+Cazenave, T. Residual networks for computer Go. IEEE Trans. Comput. Intell. AI Games https://doi.org/10.1109/TCIAIG.2017.2681042 (2017)
+
+Huang, A. AlphaGo master online series of games. https://deepmind.com/research/AlphaGo/match-archive/master (2017)
+
+Barto, A. G. & Duff, M. Monte Carlo matrix inversion and reinforcement learning. Adv. Neural Inf. Process. Syst. 6, 687–694 (1994)
+
+Google Scholar
+ 
+
+Singh, S. P. & Sutton, R. S. Reinforcement learning with replacing eligibility traces. Mach. Learn. 22, 123–158 (1996)
+
+MATH
+ 
+Google Scholar
+ 
+
+Lagoudakis, M. G. & Parr, R. Reinforcement learning as classification: leveraging modern classifiers. In Proc. 20th Int. Conf. Mach. Learn. 424–431 (2003)
+
+Scherrer, B., Ghavamzadeh, M., Gabillon, V., Lesner, B. & Geist, M. Approximate modified policy iteration and its application to the game of Tetris. J. Mach. Learn. Res. 16, 1629–1676 (2015)
+
+MathSciNet
+ 
+MATH
+ 
+Google Scholar
+ 
+
+Littman, M. L. Markov games as a framework for multi-agent reinforcement learning. In Proc. 11th Int. Conf. Mach. Learn. 157–163 (1994)
+
+Enzenberger, M. The integration of a priori knowledge into a Go playing neural network. http://www.cgl.ucsf.edu/go/Programs/neurogo-html/neurogo.html (1996)
+
+Enzenberger, M. in Advances in Computer Games (eds Van Den Herik, H. J., Iida, H. & Heinz, E. A. ) 97–108 (2003)
+
+Sutton, R. Learning to predict by the method of temporal differences. Mach. Learn. 3, 9–44 (1988)
+
+Google Scholar
+ 
+
+Schraudolph, N. N., Dayan, P. & Sejnowski, T. J. Temporal difference learning of position evaluation in the game of Go. Adv. Neural Inf. Process. Syst. 6, 817–824 (1994)
+
+Google Scholar
+ 
+
+Silver, D., Sutton, R. & Müller, M. Temporal-difference search in computer Go. Mach. Learn. 87, 183–219 (2012)
+
+Article
+ 
+MathSciNet
+ 
+Google Scholar
+ 
+
+Silver, D. Reinforcement Learning and Simulation-Based Search in Computer Go. PhD thesis, Univ. Alberta, Edmonton, Canada (2009)
+
+Gelly, S. & Silver, D. Monte-Carlo tree search and rapid action value estimation in computer Go. Artif. Intell. 175, 1856–1875 (2011)
+
+Article
+ 
+MathSciNet
+ 
+Google Scholar
+ 
+
+Coulom, R. Computing Elo ratings of move patterns in the game of Go. Int. Comput. Games Assoc. J. 30, 198–208 (2007)
+
+Google Scholar
+ 
+
+Gelly, S., Wang, Y., Munos, R. & Teytaud, O. Modification of UCT with patterns in Monte-Carlo Go. Report No. 6062 (INRIA, 2006)
+
+Baxter, J., Tridgell, A. & Weaver, L. Learning to play chess using temporal differences. Mach. Learn. 40, 243–263 (2000)
+
+Article
+ 
+Google Scholar
+ 
+
+Veness, J., Silver, D., Blair, A. & Uther, W. Bootstrapping from game tree search. In Adv. Neural Inf. Process. Syst. 1937–1945 (2009)
+
+Lai, M. Giraffe: Using Deep Reinforcement Learning to Play Chess. MSc thesis, Imperial College London (2015)
+
+Schaeffer, J., Hlynka, M . & Jussila, V. Temporal difference learning applied to a high-performance game-playing program. In Proc. 17th Int. Jt Conf. Artif. Intell. Vol. 1 529–534 (2001)
+
+Tesauro, G. TD-gammon, a self-teaching backgammon program, achieves master-level play. Neural Comput. 6, 215–219 (1994)
+
+Article
+ 
+Google Scholar
+ 
+
+Buro, M. From simple features to sophisticated evaluation functions. In Proc. 1st Int. Conf. Comput. Games 126–145 (1999)
+
+Sheppard, B. World-championship-caliber Scrabble. Artif. Intell. 134, 241–275 (2002)
+
+Article
+ 
+Google Scholar
+ 
+
+Moravcˇík, M. et al. DeepStack: expert-level artificial intelligence in heads-up no-limit poker. Science 356, 508–513 (2017)
+
+Article
+ 
+ADS
+ 
+MathSciNet
+ 
+Google Scholar
+ 
+
+Tesauro, G & Galperin, G. On-line policy improvement using Monte-Carlo search. In Adv. Neural Inf. Process. Syst. 1068–1074 (1996)
+
+Tesauro, G. Neurogammon: a neural-network backgammon program. In Proc. Int. Jt Conf. Neural Netw. Vol. 3, 33–39 (1990)
+
+Samuel, A. L. Some studies in machine learning using the game of checkers II - recent progress. IBM J. Res. Develop. 11, 601–617 (1967)
+
+Article
+ 
+Google Scholar
+ 
+
+Kober, J., Bagnell, J. A. & Peters, J. Reinforcement learning in robotics: a survey. Int. J. Robot. Res. 32, 1238–1274 (2013)
+
+Article
+ 
+Google Scholar
+ 
+
+Zhang, W. & Dietterich, T. G. A reinforcement learning approach to job-shop scheduling. In Proc. 14th Int. Jt Conf. Artif. Intell. 1114–1120 (1995)
+
+Cazenave, T., Balbo, F. & Pinson, S. Using a Monte-Carlo approach for bus regulation. In Int. IEEE Conf. Intell. Transport. Syst. 1–6 (2009)
+
+Evans, R. & Gao, J. Deepmind AI reduces Google data centre cooling bill by 40%. https://deepmind.com/blog/deepmind-ai-reduces-google-data-centre-cooling-bill-40/ (2016)
+
+Abe, N . et al. Empirical comparison of various reinforcement learning strategies for sequential targeted marketing. In IEEE Int. Conf. Data Mining 3–10 (2002)
+
+Silver, D., Newnham, L., Barker, D., Weller, S. & McFall, J. Concurrent reinforcement learning from customer interactions. In Proc. 30th Int. Conf. Mach. Learn. Vol. 28 924–932 (2013)
+
+Tromp, J. Tromp–Taylor rules. http://tromp.github.io/go.html (1995)
+
+Müller, M. Computer Go. Artif. Intell. 134, 145–179 (2002)
+
+Article
+ 
+Google Scholar
+ 
+
+Shahriari, B., Swersky, K., Wang, Z., Adams, R. P. & de Freitas, N. Taking the human out of the loop: a review of Bayesian optimization. Proc. IEEE 104, 148–175 (2016)
+
+Article
+ 
+Google Scholar
+ 
+
+Segal, R. B. On the scalability of parallel UCT. Comput. Games 6515, 36–47 (2011)
+
+Article
+ 
+MathSciNet
+ 
+Google Scholar
+ 
+
+Download references
+
+Acknowledgements
+
+We thank A. Cain for work on the visuals; A. Barreto, G. Ostrovski, T. Ewalds, T. Schaul, J. Oh and N. Heess for reviewing the paper; and the rest of the DeepMind team for their support.
+
+Author information
+Author notes
+
+David Silver, Julian Schrittwieser and Karen Simonyan: These authors contributed equally to this work.
+
+Authors and Affiliations
+
+DeepMind, 5 New Street Square, London, EC4A 3TW, UK
+
+David Silver, Julian Schrittwieser, Karen Simonyan, Ioannis Antonoglou, Aja Huang, Arthur Guez, Thomas Hubert, Lucas Baker, Matthew Lai, Adrian Bolton, Yutian Chen, Timothy Lillicrap, Fan Hui, Laurent Sifre, George van den Driessche, Thore Graepel & Demis Hassabis
+
+Contributions
+
+D.S., J.S., K.S., I.A., A.G., L.S. and T.H. designed and implemented the reinforcement learning algorithm in AlphaGo Zero. A.H., J.S., M.L. and D.S. designed and implemented the search in AlphaGo Zero. L.B., J.S., A.H., F.H., T.H., Y.C. and D.S. designed and implemented the evaluation framework for AlphaGo Zero. D.S., A.B., F.H., A.G., T.L., T.G., L.S., G.v.d.D. and D.H. managed and advised on the project. D.S., T.G. and A.G. wrote the paper.
+
+Corresponding author
+
+Correspondence to David Silver.
+
+Ethics declarations
+Competing interests
+
+The authors declare no competing financial interests.
+
+Additional information
+
+Reviewer Information Nature thanks S. Singh and the other anonymous reviewer(s) for their contribution to the peer review of this work.
+
+Publisher's note: Springer Nature remains neutral with regard to jurisdictional claims in published maps and institutional affiliations.
+
+Extended data figures and tables
+Extended Data Figure 1 Tournament games between AlphaGo Zero (20 blocks, 3 days) versus AlphaGo Lee using 2 h time controls.
+
+One hundred moves of the first 20 games are shown; full games are provided in the Supplementary Information.
+
+Extended Data Figure 2 Frequency of occurence over time during training, for each joseki from Fig. 5a (corner sequences common in professional play that were discovered by AlphaGo Zero).
+
+The corresponding joseki are shown on the right.
+
+Extended Data Figure 3 Frequency of occurence over time during training, for each joseki from Fig. 5b (corner sequences that AlphaGo Zero favoured for at least one iteration), and one additional variation.
+
+The corresponding joseki are shown on the right.
+
+Extended Data Figure 4 AlphaGo Zero (20 blocks) self-play games.
+
+The 3-day training run was subdivided into 20 periods. The best player from each period (as selected by the evaluator) played a single game against itself, with 2 h time controls. One hundred moves are shown for each game; full games are provided in the Supplementary Information.
+
+Extended Data Figure 5 AlphaGo Zero (40 blocks) self-play games.
+
+The 40-day training run was subdivided into 20 periods. The best player from each period (as selected by the evaluator) played a single game against itself, with 2 h time controls. One hundred moves are shown for each game; full games are provided in the Supplementary Information.
+
+Extended Data Figure 6 AlphaGo Zero (40 blocks, 40 days) versus AlphaGo Master tournament games using 2 h time controls.
+
+One hundred moves of the first 20 games are shown; full games are provided in the Supplementary Information.
+
+Extended Data Table 1 Move prediction accuracy
+Full size table
+Extended Data Table 2 Game outcome prediction error
+Full size table
+Extended Data Table 3 Learning rate schedule
+Full size table
+Supplementary information
+Reporting Summary (PDF 67 kb)
+Supplementary Data
+
+This zipped file contains the game records of self-play and tournament games played by AlphaGo Zero in .sgf format. (ZIP 82 kb)
+
+PowerPoint slides
+PowerPoint slide for Fig. 1
+PowerPoint slide for Fig. 2
+PowerPoint slide for Fig. 3
+PowerPoint slide for Fig. 4
+PowerPoint slide for Fig. 5
+PowerPoint slide for Fig. 6
+Rights and permissions
+
+Reprints and permissions
+
+About this article
+Cite this article
+
+Silver, D., Schrittwieser, J., Simonyan, K. et al. Mastering the game of Go without human knowledge. Nature 550, 354–359 (2017). https://doi.org/10.1038/nature24270
+
+Download citation
+
+Received
+07 April 2017
+
+Accepted
+13 September 2017
+
+Published
+19 October 2017
+
+Issue date
+19 October 2017
+
+DOI
+https://doi.org/10.1038/nature24270
+
+Subjects
+Computational science
+Computer science
+Reward
+
+Nature (Nature)
+
+ 
+
+ISSN 1476-4687 (online)
+
+ 
+
+ISSN 0028-0836 (print)
+
+nature.com sitemap
+About Nature Portfolio
+About us
+Press releases
+Press office
+Contact us
+Discover content
+Journals A-Z
+Articles by subject
+protocols.io
+Nature Index
+Publishing policies
+Nature portfolio policies
+Open access
+Author & Researcher services
+Reprints & permissions
+Research data
+Language editing
+Scientific editing
+Nature Masterclasses
+Research Solutions
+Libraries & institutions
+Librarian service & tools
+Librarian portal
+Open research
+Recommend to library
+Advertising & partnerships
+Advertising
+Partnerships & Services
+Media kits
+Branded content
+Professional development
+Nature Awards
+Nature Careers
+Nature
+ Conferences
+Regional websites
+Nature Africa
+Nature China
+Nature India
+Nature Japan
+Nature Middle East
+Privacy Policy Use of cookies Your privacy choices/Manage cookies Legal notice Accessibility statement Terms & Conditions Your US state privacy rights
+
+© 2025 Springer Nature Limited
+
+PDF
+Help
+Do you publish research?
+If so, would you be willing to take 2 minutes to answer a few questions about your research plans for the near future?
+YesNo Thanks

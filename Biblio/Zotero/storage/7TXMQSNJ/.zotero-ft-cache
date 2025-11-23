@@ -1,0 +1,1395 @@
+Skip to main content
+Skip to article
+View PDF
+Download full issue
+Results in Engineering
+Volume 13, March 2022, 100316
+A review of physics-based machine learning in civil engineering
+Author links open overlay panel
+Shashank Reddy Vadyala a
+,
+Sai Nethra Betgeri a
+, John C. Matthews b,
+Elizabeth Matthews c
+Show more
+Share
+Cite
+https://doi.org/10.1016/j.rineng.2021.100316
+Get rights and content
+Under a Creative Commons license
+Open access
+Highlights
+•
+A detailed explanation of Physics-based machine learning.
+•
+A review of recent applications of Physics-based machine learning in Civil Engineering.
+•
+Potential research avenues in civil engineering are identified using Physics-based machine learning.
+•
+Advantages of physics-based machine learning in civil engineering.
+Abstract
+The recent development of machine learning (ML) and Deep Learning (DL) increases the opportunities in all the sectors. ML is a significant tool that can be applied across many disciplines, but its direct application to civil engineering problems can be challenging. ML for civil engineering applications that are simulated in the lab often fail in real-world tests. This is usually attributed to a data mismatch between the data used to train and test the ML model and the data it encounters in the real world, a phenomenon known as data shift. However, a physics-based ML model integrates data, partial differential equations (PDEs), and mathematical models to solve data shift problems. Physics-based ML models are trained to solve supervised learning tasks while respecting any given laws of physics described by general nonlinear equations. Physics-based ML, which takes center stage across many science disciplines, plays an important role in fluid dynamics, quantum mechanics, computational resources, and data storage. This paper reviews the history of physics-based ML and its application in civil engineering.
+Previous
+Next
+Keywords
+Physics-based machine learningMachine learningDeep neural networkCivil engineering
+1. Introduction
+ML and DL, e.g., deep neural networks (DNNs), are becoming increasingly prevalent in the scientific process, replacing traditional statistical methods and mechanistic models in various commercial applications and fields, including education [1], natural science [2,3] medical [[4], [5], [6]] engineering [[7], [8], [9]], and social science [10]. ML is also applied in civil engineering, where mechanistic models have traditionally dominated [[11], [12], [13], [14]]. Despite its wide adoption, researchers and other end users often criticize ML methods as a “black box,” meaning they are thought to take inputs and provide outputs but not yield physically interpretable information to the user [15]. As a result, some scientists have developed physics-based ML to reckon with widespread concern about the opacity of black-box models [[16], [17], [18], [19]].
+The civil engineering ML models are created directly from data by an algorithm; even researchers who design them cannot understand how variables are combined to make predictions. Even with a list of input variables, black-box predictive ML models can be such complex functions that no researchers can understand how the variables are connected to arrive at a final prediction. For example, ML models that fail to estimate structural damage are tied to processes that are not entirely understood have difficulty providing high data needs. Hence, their high data needs, difficulty providing physically consistent findings, and lack generalizability to out-of-sample scenarios [18]. Large, curated data sets with well-defined, precisely labeled categories are used to test ML and DL model [1]s. DL does well for these problems because it assumes a largely stable world. But in the real world, these categories are constantly evolving, specifically in civil engineering. Only after extensive testing on ML responses to various visual stimuli we can discover the problem.
+Physics-based numerical simulations have become indispensable in civil engineering applications, such as seismic risk mitigation, irrigation management, structural design and analysis, and structural health monitoring. Civil engineers and scientists may now utilize sophisticated models for real-world applications, with ultra-realistic simulations involving millions of degrees of freedom, thanks to the advancement of high-performance computers. However, in the civil engineering sector, such simulations are too time-consuming to be incorporated fully into an iterative design process. They are often restricted to the final validation and certification stages, while most design processes rely on simpler models. Accelerating complex simulations is an important problem to address since it would make it easier to apply numerical tools throughout the design process. The development of numerical methods for rapid simulations would also enable novel model applications such as improving construction productivity, which has yet to be fully utilized due to model complexity. Uncertainty quantification is another critical example of analysis that might be feasible if simulation costs were lowered substantially. Indeed, the physical system environment, which is generally unknown, affects the values of interest monitored in numerical simulations. In some situations, these uncertainties significantly impact simulation results, necessitating estimating probability distributions for the quantities of interest to assure the product's dependability. Neither an ML-only nor a scientific knowledge-only method can be considered sufficient for complicated scientific and technical applications. Researchers are beginning to investigate the continuum between mechanistic and ML models, synergizing scientific knowledge and data.
+There have been several reviews on ML civil engineering. However, limited studies have been conducted on physics-based ML and synthesizing a road map for guiding subsequent research to advance the proper use of physics-based ML in civil engineering applications. Furthermore, there are few works focused on the fundamental physics-based ML models in civil engineering. This study investigates a more profound connection of ML methods with physics models. Even though the notion of combining scientific principles with ML models has only recently gained traction [18], there has already been a significant amount of research done on the subject. Researchers focus on physics models, ML models, and application scenarios to solve their problems in civil engineering. This study aims to bring these exciting developments to the ML community and make them aware of the progress completed and the gaps and opportunities for advancing research in this promising direction.
+1.1. Basics of neural network and physics-based machine learning
+Neural Networks (NNs) is a ML approach for expressing a form's input-output relationship, shown in Equation (1)
+(1)
+Y=YNN=WT∅h(BTx‾)+η
+where
+x‾=[x;1],
+ y is the target (output) variable, while x is the input variable,
+YNN
+ is the predicted output variable obtained from NNs. The input variable's activation function is
+∅h
+, the transition weight matrix is U, the output weight matrix is W, and W is an unknown error owing to measurement or modeling mistakes are W. Within the weight matrices, the bias terms are defined by supplementing the input variable x with a unit value in the present notations. In Equation (1), the target variable is a linear combination of certain basic functions parametrized by B. A neural network design with depth K layers is defined in Equation (2):
+(2)
+Y≈YNN=WT∅k−1(∅k−2(...∅1(B1Tx‾)))
+where
+∅k
+ and
+Uk
+ are the element-wise nonlinear function and the weight matrix for the
+Kth
+ layer and W is the output weight matrix as shown in Fig. 1.
+Download: Download high-res image (247KB)
+Download: Download full-size image
+
+Fig. 1. A simple neural network with two hidden layers.
+
+Physics-based ML can combine the knowledge we already know, such as physics-based forward and optimization algorithms. The mechanics of training a physics-based network are like training any NNs as shown in Fig. 2. It relies on a dataset, an optimizer, and automatic differentiation [20] to compute gradients. The encoding of information, x, into measurements, y, is given by Equation (3).
+(3)
+y=ϖ(x)+ι
+where
+ϖ
+ describes the forward model process that characterizes the formation of measurements and
+ι
+ is random system noise. The image reconstruction from a set of measures, i.e., decoding, can be structured using an inverse problem formulation shown in Equation (4).
+(4)
+x∗=arg|xmin|ϖ(x)−y||2+ℸ(x)
+where x is the sought information,
+||ϖ(x)−y||2
+ is
+B(x;y)
+,
+B
+ (.) is the data consistency penalty (commonly
+ℓ2
+ distance between the measurements and the estimated measurements), and
+ℸ(.)
+ is the signal prior (e.g., sparsity, total variation). This optimization problem often requires a nonlinear and iterative solver. In a nonlinear signal prior, proximal gradient descent can efficiently solve the optimization issue [21]. When numerous constraints are imposed on the picture reconstruction, and the forward model process is linear methods such as the Alternating Direction Method of Multipliers (ADMM) [22] and Half-Quadratic Splitting (HQS) [23] can be efficient solutions. The physics-based network (Fig. 3) is created by unrolling N optimization algorithm iterations into network layers. The measurements and initialization are sent into the network, and the output is an estimate of the information after N iterations of the optimizer.
+Download: Download high-res image (229KB)
+Download: Download full-size image
+
+Fig. 2. Physics-based ML models are trained to minimize a cost function comprised of equation residual and data over space and time.
+
+Download: Download high-res image (172KB)
+Download: Download full-size image
+
+Fig. 3. N unrolled decoder iterations make up an unrolled physics-based network. A data consistency update (e.g., gradient update) and a previous update are included in each layer (e.g., proximal update). The network's inputs are the measurements, y, and initialization,
+x(0)
+ and the network's output is the final estimate
+x(N)
+,. Finally, the final estimate is put into a training loss function.
+
+2. Reduced-order models
+Computational Mechanics is a branch of research that needs significant processing power to provide correct results [24]. It nearly always uses a geometric mesh, and the coarseness of the mesh is proportional to the time it takes for a simulation to converge [24]. As a result, it has the potential to grow to such proportions that methods for reducing its order must be developed. These methods aim to create a Reduced-Order Model (ROM) that can effectively replace its heavier counterpart for tasks such as design and optimization, as well as real-time predictions, which all require the model to run many times, which is typically impossible due to a lack of adequate and available computer resources [25]. They capture the behavior of these source models so that civil engineers can quickly study a system's dominant effects using minimal computational resources. ROMs have become popular in civil engineering because engineers face market demands for shorter design cycles that produce higher-quality products and structures. ROMs can be used in civil engineering to simplify various models from full 3D simulations of systems. As a result, civil engineers can use them to optimize structure designs and create more extensive structural simulations.
+3. Proper Orthogonal Decomposition
+Partial differential equations (PDEs) are solved using the singular value decomposition (SVD) method. The SVD algorithm applied to PDEs is Proper Orthogonal Decomposition (POD) [16,17]. It's one of the most effective dimensionality reduction techniques for studying complicated spatiotemporal systems [26]. Despite its introduction a few decades ago, POD-based ROM is still state-of-the-art in model order reduction, especially when coupled with Galerkin projection [19]. The dominating spatial subspaces are extracted from a dataset using POD. Put another way, POD calculates the prevailing coherent paths in an infinite space that best describe a system's spatial evolution. Thus, the SVD or eigenvalue decomposition of a snapshot matrix is both strongly connected to POD-ROM. Fig. 4 illustrates the evolution of ROM methods.
+Download: Download high-res image (259KB)
+Download: Download full-size image
+
+Fig. 4. Evolution of the ROM methods.
+
+3.1. Reduced basis through Proper Orthogonal Decomposition
+According to Ref. [27], a popular technique to create a ROM is to compress it into a smaller area, described by a Reduced Basis set (RB). For the most part, RB techniques follow an offline-online paradigm, with the first being more computationally intensive and the second being quick enough to allow for real-time predictions. The idea is to collect data points from simulation, or any high-fidelity source, called snapshots and stored in an ensemble
+{ui}
+, and extract the information that has a broader impact on the system's dynamics, the modes, via a reduction method in the offline stage. According to Refs. [28,29] aims at finding a basis function
+(k)
+ in a Hilbert space
+H
+ possessing the structure of an inner product (·,·) that would optimally represent the field
+u
+. Supposing that solutions or high-fidelity measures of these solutions are available as {
+ui
+}, each belonging to the same space
+H
+, so that the field can be approximated in Equation (5).
+(5)
+u=∑k=1∞υ(k)φ(k)
+The Hilbert space for scalar or complex-valued functions is
+H=L2(Θ)
+, where a space vector x in the domain Θ is considered, as well as the time variable t, which has an inner product defined by
+(f,g)=∫ΘfigiΤdx
+ (T denotes conjugate transpose). As a result of the summing, variable separation would be possible, as shown in Equation (6).
+(6)
+u(x,t)=∑k=1∞υ(k)(t)φ(k)(x)
+Considering the mean
+<⋅>
+ though as “an average over several separate experiments,” e.g., in the case of a function
+f
+ with
+Nr
+ realizations
+fi
+,
+<f>=1NrΣifi
+ , the absolute value | · |, and the 2-norm || · || defined as
+||f||=(f,f)1/2
+, each normalized optimal basis
+φ
+ is sought after and shown in Equation (7).
+(7)
+.φεHmax<|(u,φ)|2>||φ||2
+It may be demonstrated to be equal to solving the eigenvalues
+ξ
+ problem using a condition on variations calculus is shown in Equation (8).
+(8)
+∫Θu(x,t)u⋇(x′,t)φ(x′)dx′=ξφ(x)
+The SVD technique converts these continuous expressions to a low-rank approximation in most cases [30]. This method is very comparable to Ref. [31] statistical methodology of Principal Component Analysis (PCA), which was evaluated lately [32]. Moreover, this technique may produce a realistic approximation by truncating the sum in Equation.4 to a finite length L, which was originally shown by Sirovich (1987) and represented as shown in Equation (9).
+(9)
+uPOD(x,t)=∑k=1Lυ(k)(t)φ(k)(x)
+Next, the online stage entails retrieving the expansion coefficients and projecting them into our uncompressed, real-life space. Again, the distinction between intrusive and nonintrusive approaches becomes apparent here. The first employs strategies tailored to the problem's formulations, whereas the latter attempts to infer the mapping statistically by treating the snapshots as a dataset.
+3.2. Intrusive reduced-order methods using the Galerkin procedure
+The Galerkin process is the traditional way to handle the second half of the POD approach to reduced-order modeling, as described and modified [33]. For example, consider the following PDEs, defined by the nonlinear operator
+N
+ (Normal distribution) and have the x and t subscripts indicating the associated derivatives shown in Equation (10).
+(10)
+ut=Nxu
+The Galerkin technique is used to find each expansion coefficient
+υ(k)
+ from the L-truncated sum in Equation (7). A system of solvable equations is generated by reinjecting the estimated
+uPOD
+ within Equation (8) and multiplying by the L POD modes
+φ
+, known as Galerkin projection. For the
+pth
+ expansion coefficient, with
+R
+ the nonlinear residuals as shown in Equation (11).
+(11)
+vt(p)=∑k=1Lφ(p)NxuPOD≈R(p)uPOD
+In [34], this POD-Galerkin method was used to Shallow Water equations such as dam failure and flood forecasts. However, since
+R
+ is a generic nonlinear operator, as indicated in these and many other publications, it is unclear how to achieve any speedup in the offline stage, i.e., solving Equation (7), Unless
+R
+ is used to make certain approximations. In addition, the reduced basis is parameter-dependent for parameter-dependent issues requiring several simulations, as is the case with uncertainty quantification problems. Therefore, the usage of many RB may be necessary, and finding a way to combine these bases to find an accurate solution is a difficult task [35,36].
+3.3. Nonintrusive reduced-order methods using Polynomial Chaos Expansion
+A modeling method must be used to make sense of this snapshot collection and create a surrogate model to retrieve the projection coefficients accurately. While traditional and easy approaches like polynomial interpolation appear promising for this job, as pointed out in Ref. [37], they struggle to produce useful results with few samples. A different take has been explored within the Polynomial Chaos Expansion (PCE) realm, proposed in Ref. [38]. Using Hermite polynomials, and more precisely, a set of multivariate orthonormal polynomials Φ, Wiener's Chaos theory allows for modeling the outputs as a stochastic process. Considering the previous expansion coefficients
+(k)(t)
+ as a stochastic process of the variable
+t
+, the PCE is shown in Equation (12).
+(12)
+v(k)(t)=∑αεCLCα(k)Φα(t)
+with
+α
+ identifying polynomials following the right criteria in a set
+CL
+ [39]. However, stability issues may arise, and a new approach using the B-Splines Bézier Elements based Method (BSBEM) to address this has been developed in Ref. [36]. Unfortunately, while it has shown excellent results, this approach can also suffer from the curse of dimensionality, a term coined half a century ago [40], that still has significant repercussions nowadays, as shown in Ref. [41]. In basic terms, it means that many well-intentioned techniques work effectively in narrow domains but have unexpected and unworkable consequences when applied to larger settings.
+3.4. Data driven methods ROMs
+Data driven methods is aiding in the design of ROMs for greater accuracy and cheaper processing costs in various ways. One way is to create an data driven based surrogate model for full-order models [42], where the data driven model may be thought of as a ROM. Two further approaches are to develop an data driven model to replicate the dimensionality reduction mapping from a full-order model to a reduced-order model [43] or to generate an data driven-based surrogate model of an already built ROM using another dimensionality reduction technique [44]. Data driven and ROMs can also be linked by using the data driven model to learn. The residual between observational data and a ROM [45]. The Integration of Physics-Based Modeling and data driven models can significantly increase ROMs' capabilities due to their typically rapid forward execution speed and ability to use data to simulate high-dimensional phenomena. The evolution of ROM is seen in Table 1.
+
+Table 1. The evolution of ROM.
+
+Year	Reference	Key Contributions
+1915	[46]	Galerkin method for solving (initial) boundary value problems
+1962	[47]	Low dimensional modeling (with 7 modes)
+1963	[48]	Low dimensional modeling (with 3 modes)
+1967	[49]	Proper orthogonal decomposition (POD)
+1987	[50]	Method of snapshots
+1988	[51]	First POD model: Dynamics of coherent structures and global eddy viscosity modeling
+1994	[52]	Linear modal eddy viscosity closure
+1995	[53]	Gappy POD
+2000	[54]	Galerkin ROM for optimal ow control problems
+2001	[55]	Numerical analysis of Galerkin ROM for parabolic problems
+2002	[56]	Balanced truncation with POD
+2003	[57]	Guidelines for modeling unresolved modes in POD {Galerkin models
+2004	[58]	Spectral viscosity closure for POD models
+2004	[59]	Empirical interpolation method (EIM)
+2005	[60]	Spectral decomposition of the Koopman operator
+2007	[61]	Reduced basis approximation.
+2007	[62]	ROM for four-dimensional variational data assimilation
+2008	[63]	Interpolation method based on the Grassmann manifold approach.
+2008	[64]	Missing point estimation
+2009	[65]	Spectral analysis of nonlinear ows
+2010	[66]	A purely nonintrusive perspective: Dynamic mode decomposition (DMD)
+2010	[67]	Discrete empirical interpolation method (DEIM)
+2013	[68]	The Gauss{Newton with approximated tensors (GNAT) method
+2013	[69]	Proof of global boundedness of nonlinear eddy viscosity closures
+2014	[70]	K-scaled eddy viscosity concept
+2015	[71]	Stabilization of POD Galerkin approximations
+2015	[72]	On bounded solutions of Galerkin models
+2016	[73]	Data-driven operator inference nonintrusive ROMs
+2016	[74]	Spectral POD
+2018	[75]	On the relationship between spectral POD, DMD, and resolvent analysis
+2018	[76]	Shifted/transported snapshot POD.
+2018	[77]	Feature-based manifold modeling
+2019	[78]	Multi-scale proper orthogonal decomposition
+2021	[79]	Cluster-based network models
+2021	[80]	The Potential of Machine Learning to Enchance Computational Fluid Dynamics
+2021	[81]	Towards extraction of orthogonal and parsimonious non-linear modes from turbulent flow
+4. Development physics-based machine learning
+Although NNs has been around for a long time, dating back to the [82] perceptron model, they had to wait for the concepts of backpropagation and automatic differentiation, coined [83,84], respectively, to have a computationally practical way of training their multilayer, less trivial counterparts. Other types of NNs, such as Recurrent Neural Networks (RNNs) [85] and Long-Short-Term Memory [86] networks, became popular, allowing for advances in sequencing data. While the universal approximation power of DNNs in the context of DL had been predicted for a long time [87], the community had to wait until the early 2010s to finally have both the computational power and practical tools to train these large networks, thanks to for new developments like [88] to mention a few, it rapidly led to advances in making sense of and building upon vast volumes of data. Physics rules are traditionally represented as well-defined PDEs with Boundary Condition (BC)/Initial Condition (IC) acting as constraints. For example, [ddd-88] developed novel ways in PDEs discovery using just data-driven methodologies [89] and anticipated that this new discipline of DL in dynamic systems like Computational Fluid Dynamics (CFD) would take off (2017) [90]. Its versatility enables various applications, such as missing CFD data recovery [91] or aerodynamic design optimization [39]. The high expense of a fine mesh was solved by using an ML technique to analyze mistakes and adjust amounts in a coarser setting [92]. [93] presented a new numerical scheme, the Volume of Fluid-Machine Learning (VOF-ML) method used in bi-material situations. In addition, research published older research of existing ML algorithms applied to environmental sciences, especially hydrology [94]. Nonetheless, having scant and noisy data at our disposal is typical in engineering, but intuitions or expert knowledge about the underlying physics. It encouraged researchers to consider how to combine the requirement for data in these approaches with system expertise, such as governing equations, first detailed in Refs. [95,96], then extended to NNs in Ref. [96] with applications on Computational Fluid Dynamics, as well as in vibrations [97]. A few of these approaches will be explained in detail in below Sections.
+4.1. Physics-informed machine learning
+Despite significant progress in simulating multiphysics problems using numerical discretization of PDEs, it is still impossible to seamlessly incorporate noisy data into existing algorithms, mesh generation is still difficult, and high-dimensional problems governed by parameterized PDEs are unsolvable. Furthermore, tackling inverse issues involving hidden physics is frequently prohibitively costly and necessitates several formulations and complex computer codes. ML has emerged as a viable option, and however, DNNs training needs large amounts of data, which is not always accessible for scientific issues. Instead, additional information acquired by enforcing physical norms may be used to train such networks. This type of physics-informed learning combines (noisy) data with mathematical models, then implemented using NNs or other kernel-based regression networks. Furthermore, customized network designs that automatically meet specific physical invariants for increased accuracy, training speed, and generalization may be conceivable.
+4.2. Encoding physics in Gaussian processes
+A Gaussian process (GP) is a set of random variables with a Gaussian distribution for a finite number. The mean (
+E)
+ and covariance functions of a GP define it entirely. The mean function m(x) and the covariance function
+k(x,x′)
+ of a real process f(x) are defined by Equation (13) and (14), respectively.
+(13)
+m(x)=E[f(x)]
+(14)
+k(x,x′)=E[f(x)−m(x))(f(x′)−m(x′))]
+An Equation defines the Gaussian process. (14).
+(15)
+f(x)∼GP(m(x),k(x,x′)
+“The Gaussian probability distribution is an extension of the Gaussian process. GP are nonparametric function estimators with a lot of power. However, when the training data are insufficient to reflect the complexity of the system (generating the data) or the test points are far distant from the training instances (extrapolation), GP might perform poorly as a data-driven method. On the other hand, physics information is stated as differential equations and is utilized to create physical models for various research and engineering applications [98]. These models are designed to represent the system's underlying mechanism (i.e., physical processes) and are not constrained by data availability: they can generate accurate predictions even without training data, [99]. For example Bayesian Optimization based on Gaussian process regression is applied to different CFD problems which can be of practical relevance like shape optimization [100]. It has a mean (here 0) and a covariance function
+k
+, for instance, the Square Exponential. It could be thought of as a very long vector containing every function value
+yi=f(xi)
+ defined as, with
+f′
+ representing the test outputs of
+x′
+, not yet observed, demonstrated by Equations (16), (17).
+(16)
+f(x)∼GP(0,k(x,x′;θ))
+(17)
+[f
+f′]∼N(0,[k(x,x;θ)	k(x,x′;θ)
+k(x′,x;θ)	k(x′,x′;θ)])
+And the covariance can be, for instance, Gaussian, shown in Equation (18).
+(18)
+k(x,x′;[α
+β]):=α2exp(−12∑d=1n(xd−xd′)2βd2)
+A)
+Example problem Setup for linear PDEs
+Let's now consider time-dependent linear PDEs, as presented in Ref. [95]. First, forward Euler gets the result using the simplest temporal discretization method shown in Equation (19).
+(19)
+ut=Lxu,xεΩ,tε[0,T]
+un=un−1+ΔtLxun−1
+and then placing a GP prior shown in Equation (20).
+(20)
+un(x)∼GP(0,ku,un−1,n−1(x,x′,θ))
+As a result, the Euler rule is captured in the following multi-output GP, Equation (21). Table 2 gives a pseudo-code of the steps in PINNs involved.
+(21)
+[un
+un−1]∼GP(0,[ku,un,n	⋯	ku,un,n−1
+⋮	⋱	⋮
+	⋯	ku,un−1,n−1])
+B)
+Example problem setup for nonlinearity PDEs
+
+Table 2. Implementing a PINNs is straightforward with modern tools.
+
+1	Train hyperparameters 
+θ
+ with initial 
+{x0,u0
+} and boundary 
+{xb1,ub1
+} data.
+2	Predict artificial data 
+{xb1,ub1
+} of the next time-step from the posterior. 24
+3	Train new hyperparameters for the time-step 2, using these artificial data 
+{x1,u1
+} and the boundary data 
+{xb2,ub2
+}.
+4	Predict new artificial data 
+{x2,u2
+} with these new hyperparameters.
+5	Repeat 3. and 4. until the final time-step.
+What if
+Lx
+ is nonlinear? For example, Burgers' equation is shown in Equation (22).
+(22)
+ut+uux=υuxxwithLx:=υuxx−uuxx
+Applying Backward Euler gives the following Equation (23).
+(23)
+un=un−1−Δtunddxun+υΔtd2dx2un
+Assuming un as a GP will not work here since the nonlinear term
+unddxun
+ will not result in a GP. The idea is to utilize the preceding step's posterior mean,
+μn−1
+ as shown in Equation (24).
+(24)
+un=un−1−Δtμnddxun+υΔtd2dx2un
+The cubic scaling of computational power with the number of training points due to matrix inversion when forecasting and the necessity to address nonlinear equations on a case-by-case basis are limitations of this technique. This has encouraged scientists to investigate DNNs with built-in nonlinearities.
+4.3. Physics-Informed Neural Networks
+Modeling physical processes described by PDEs has improved thanks to PINNs significantly. The behavior of complicated physical systems is learnt by minimizing the residual of the underlying PDEs by optimizing network settings. PINNs use basic designs to understand the behavior of complicated physical systems by adjusting network settings to reduce the residual of the underlying PDEs. As [96] presented, let's consider generic, parametrized nonlinear PDEs shown in Equation (25).
+(25)
+ut+Nxγu=0,xεΩ,tε[0,T]
+Whether we aim to solve it or identify the parameters
+γ
+, the idea of the paper is the same: approximating
+(t,x)
+ with DNNs, therefore defining the resulting PINNs network
+f(t,x)
+ is shown in Equation (26).
+(26)
+f:=ut+Nxγu
+Now, we'll derive this network using automated differentiation, a chain-rule-based approach famously utilized in typical DL settings, eliminating the requirement for numerical or symbolic differentiation in our situation. Burgers' equation, 1D with Dirichlet IC/BC, is used as a test case as shown in Equations (27), (28), (29).
+(27)
+ut+uux−(0.01/π)uux=0,xε[−1,1],tε[0,1]
+(28)
+u(0,x)=−sin(πx)
+(29)
+u(t,−1)=u(t,1)=0
+From this can define
+(t,x)
+, the PINNs is shown in Equation (30).
+(30)
+f:=ut+uux−(0.01/π)uux
+The shared parameters are learned minimizing a custom version of the commonly used Mean Squared Error loss, with
+{tui,xui,ui}i=1Nu
+ and
+{tui,xfi}i=1Nf
+ respectively the IC/BC on
+(t,x)
+ and collocations points for
+f(t,x)
+ is shown in Equation (31).
+(31)
+MSE=1NU∑i=1Nu|u(tui,xui)−ui|2+1Nf∑i=1Nf|f(tfi,xfi)|2
+Fig. 5 shows the overview of PINNs, which were created using [96]. Table 3 offers a pseudo-code.
+Download: Download high-res image (271KB)
+Download: Download full-size image
+
+Fig. 5. Overview of the PINNs.
+
+Table 3. Implementing a PINNs is straightforward with modern tools.
+
+1	Function u (t,x):
+2	
+uˆ=NN([x,t])
+
+3	Return 
+uˆ
+
+4	
+5	Function f(t,x):
+6	
+uˆ=u([x,t])
+
+7	
+uˆt=tf.gradients(uˆ,t)
+
+8	
+uˆx=tf.gradients(uˆ,x)
+
+9	
+uˆxx=tf.gradients(uˆx,t)
+
+10	
+fˆ=ut+uux−(0.01/π)uˆux
+
+11	Return 
+fˆ
+The same authors have performed further work, applying the framework to different fields, including DL of vortex-induced vibrations [97].
+4.4. The advantages and disadvantages of physics-based ML
+The ability of NNs to approximate solutions to PDEs has been a fascinating field of research. The prediction of dynamics over very long durations that surpass the training horizon over which the network was tuned to represent the solution remains a significant issue. Due to their desirable features, current ML methods, particularly DNNs, have significantly succeeded across computational science areas. First, a sequence of universal approximation theorems [[94], [95], [96]] shows that NNs can approximate any Borel measurable function on a compact set with arbitrary precision given enough hidden neurons. Given enough samples and processing resources, this strong character allows the NNs to approximate any well-defined function.
+Furthermore [101], and more recent studies [102,103] estimate the convergence rate of approximation error on an NNs with respect to its depth and width, which subsequently allow the NNs to be used in scenarios with high requirements accuracy. The PINNs is applied for solving the Navier-Stokes equation for laminar flows by solving the Falkner-Skan boundary layer results shows the excellent applicability of PINNs for laminar flows with strong pressure gradient [104]. Secondly, the development of differentiable programming and automatic differentiation enables efficient and accurate calculation of gradients of NNs functions with respect to inputs and parameters. These backpropagation algorithms allow the NNs to be efficiently optimized for specified objectives. The following characteristics of NNs have sparked interest in using them to solve PDEs. One general classification of such methods is two classes: The first focuses on directly learning the PDEs operator [105,106]. For example, in the Deep Operator Network (DeepONet), the input function can be the IC/BC and parameters of the equation mapped to the output, the PDEs solution at the target spatio-temporal coordinates. In this approach, the NNs are trained using independent simulations and must span the space of interest. Therefore, NNs training is predicated on many solutions that may be computationally expensive to obtain. Still, once trained, the network evaluation is computationally efficient [107,108]. The second class of methods adopts the NNs as a basis function to represent a single solution. The inputs to the network are generally the spatio-temporal coordinates of the PDEs, and the outputs are the solution values at the given input coordinates.
+The NNs are trained by minimizing the PDEs residuals and the mismatch in the IC/BC. Such approach dates to Ref. [109], where NNs were used to solve the Poisson equation. In later studies [110,111], the BC was imposed exactly by multiplying the NNs with certain polynomials. In Ref. [112], the PDEs are enforced by minimizing energy functionals instead of equation residuals, different from most existing methods. In Ref. [96], PINNs for forward and inverse (data assimilation) problems of time-dependent PDEs are developed. To assess all the derivatives in the differential equations and the gradients in the optimization method, PINNs use automated differentiation. Gradients in PINNs are effectively evaluated because automated differentiation consists of analytical derivatives of the activation functions frequently applied in a chain rule. The time dependent PDEs are realized by minimizing the residuals at selected points in the whole spatiotemporal domain. The cost function has another penalty term on the IC/BC if the PDEs problem is forward and a penalty term on observations for inverse data assimilation problems. However, when the underlying PDE solutions contain high-frequencies or multi-scale features, PINNs with fully connected architectures frequently fail to accomplish stable training and provide correct predictions [[113], [114], [115]]. Recently ascribed this pathological behavior to multi-scale interactions between various components in the PINNs loss function, which eventually lead to stiffness in the gradient flow dynamics, imposing severe stability requirements on the learning rate [116]. Table 4 gives Summary of requirements and possible advantages and disadvantages of physics-based ML.
+
+Table 4. Summary of requirements and possible advantages and disadvantages of physics-based ML.
+
+Physics-based ML	Requirements	Advantages	Disadvantages
+Data	Quality data	Required small amount data compared to non-physics-based ML	Hard to get quality data
+Cost function	Establish physical relation using PDEs	Physical consistency, improved generalizations, and accuracy	Complex physics PDEs
+Initialization	Synthetic data from physics models	Reduced observations required, Improved accuracy	Fixed initial state is the resulting exploration challenge
+Run time	High performance device	Very fast	–
+Architecture	Based on the complex of task	Intermediate physical variables/processes, Informed prior distributions, Easy to implement using existing packages Such as PINNs, DeepONet	–
+5. Application of physics-based ML to civil engineering
+There have been applications of physics-based ML models within the field of civil engineering. Fig. 6 provides a bar chart that shows the number of ML papers published from 2014 to early 2021, indicating overall growth in papers. This growth seems to follow the rising interest in physics-based ML, which started in 2019, introducing Physics-Informed Neural Networks (PINNs) [96].
+Download: Download high-res image (185KB)
+Download: Download full-size image
+
+Fig. 6. Papers published from 2014 to early 2021.
+
+Sensor and signal data are mainly used when applying physics-based ML in civil engineering. In contrast, other data sources are employed only based on the requirements. Therefore, researchers must select and reconstruct the algorithms and network structures to solve different civil engineering problems. ML models may learn physics due to their capacity to learn from experience: The ML model can learn how a physical system acts and generate accurate predictions given enough instances of how it behaves. As a result, it may be used in various engineering applications such as damage detection, vibration identification, 3D reconstruction, anomaly data detection, etc.
+According to the data types noted in the collected literature, the three main applications of physics-based ML methods in civil engineering are.
+•
+3D Building Information Modelling (BIM)
+•
+Structural health monitoring system
+•
+Structural design and analysis
+5.1. Building information modeling (BIM)
+BIM has been highlighted as a new and revolutionary technology for improving the building industry's performance. The BIM tools commonly used in civil engineering are Autodesk's AutoCAD Civil 3D® and Revit Structure ®. These tools optimize and validate projects before they are built and model how infrastructure operates in a 3D real-world setting. To complement 3D BIM, physics-based ML will be a useful tool for problem-solving in geotechnical engineering [117] example shown in Fig. 7. The steps carried out in physics-based ML method for 3D BIM were modeling the 3D digital terrain model from point cloud; creating the horizontal alignment, vertical profiles, and editing cross-sections; modeling the jacked tunnel; creating the roundabout; generating the 3D parametric model of the complete road and visualizing the infrastructure in the real-world context governed by PDEs. Table 5 provides a systematic organization and taxonomy of the application-centric objectives and methods of existing physics-based ML for BIM applications.
+Download: Download high-res image (474KB)
+Download: Download full-size image
+
+Fig. 7. Cloud-to-BIM-to-FEM: Structural simulation with accurate historic BIM from laser scans [118].
+
+Table 5. Table of literature classified by existing physics-based ML for BIM applications.
+
+Paper	Year	Application
+Efficient intensity measures and machine learning classification algorithms for collapse prediction informed by physics-based ground motion simulations [119]	2020	CFD, BIM
+Enhancing predictive skills in a physically consistent way: Physics Informed Machine Learning for Hydrological Processes [120]	2021	CFD, BIM
+Physics-Informed Autoencoders for Lyapunov-stable Fluid Flow Prediction [121]	2019	CFD, Turbulence modeling, BIM
+Predictions of turbulent shear flows using deep neural network [122]	2019	CFD, Turbulence modeling
+Convolutional-network modles to predict wall-bounded turbulence from wall quantities [123]	2021	CFD, Turbulence modeling
+From coarse wall measurements to turbulent velocity fields through deep learning [124]	2021	CFD, Trubulence modeling
+A Data-Driven and Physics-Based Approach to Exploring Interdependency of Interconnected Infrastructure [125]	2019	CFD, BIM
+Physics Guided Machine Learning Methods for Hydrology [126]	2020	CFD, BIM
+Modeling the dynamics of PDE systems with Physics-Constrained Deep Auto-Regressive Network [127]	2019	CFD, BIM
+A domain decomposition nonintrusive reduced order model for turbulent flows [128]	2019	CFD, BIM
+5.2. Structural health monitoring
+Structural Health Monitoring (SHM) in the civil engineering industry faces unique challenges. These challenges result in part from the dynamic work environments of construction. As a result of its better capacity to detect damage and defects in civil engineering structures, physics-based ML approaches in SHM gained much attention in recent years. Physics-based ML methods establish a high-fidelity physical model of the structure, usually by finite element analysis, and then establish a comparison metric between the model and the measured data from the real structure example shown in Fig. 8. In most cases, a vibration-based model updating approach has been chosen, where the vibration or modal data is adopted as the basis for the updating process [6].
+Download: Download high-res image (590KB)
+Download: Download full-size image
+
+Fig. 8. Vibration Analysis of Vehicle-Bridge System Based on Multi-Body Dynamics using physics-based ML model [114].
+
+The experimental modal properties of civil engineering structures (say the natural frequencies, vibration modes, and frequency response functions) may be determined by using any of the available system identification methods, such as experimental modal analysis (EMA) or operational modal analysis (OMA). Table 6 provides a systematic organization and taxonomy of the application-centric objectives and methods of existing physics-based ML for SHM applications.
+
+Table 6. Table of literature classified by existing physics-based ML for SHM applications.
+
+Paper	Year	Application
+Probabilistic physics-guided machine learning for fatigue data analysis [129]	2020	SHM
+Finite element–based machine-learning approach to detect damage in bridges under operational and environmental variations [130]	2019	SHM, CFD
+A hybrid physics-assisted machine-learning-based damage detection using Lamb wave [131]	2021	SHM
+Data-Driven and Model-Based Methods with Physics-Guided Machine Learning for Damage Identification [132]	2020	SHM
+Deep UQ: Learning deep neural network surrogate models for high dimensional uncertainty quantification [133].	2018	Uncertainty quantification, Turbulence modeling, SHM
+5.3. Structural design and analysis
+Structures designed with the internal force flow in their members can save a lot of money on materials and labor, but it's difficult and time-consuming. However, the physics-based ML methods have allowed geometry-based structural design methods to reemerge, particularly in three dimensions. The complex geometric diagrams of forces can now be constructed in milliseconds using the current digital computation, allowing structural designers and architects to explore an unexplored realm of efficient spatial structural forms in 3D. The new design strategy A physics-based ML technique that considers structural performance and construction limitations to speed up topological design example shown in Fig. 9. Table 7 provides a systematic organization and taxonomy of the application-centric objectives and methods of existing physics-based ML for structural design and analysis applications.
+Download: Download high-res image (911KB)
+Download: Download full-size image
+
+Fig. 9. The nonlinear effects of different design variables (i.e., subdivision rules) on the final structural permanence measures, using self-organizing maps for metal bridge using physics-based ML [134].
+
+Table 7. Table of literature classified by existing physics-based ML for structural design and analysis applications.
+
+Paper	Year	Application
+Machine learning assisted evaluations in structural design and construction [134]	2020	Materials science
+Utilizing physics-based input features within a machine learning model to predict wind speed forecasting error [135]	2021	Power system state estimation, Aerodynamics
+Application of Physics-Based Machine Learning in Combustion Modeling [136]	2019	CFD
+JUNIPR: a framework for unsupervised machine learning in particle physics [137]	2018	CFD
+Machine learning for metal additive manufacturing: predicting temperature and melt pool fluid dynamics using physics-informed neural networks [138]	2021	CFD
+Predicting the dissolution kinetics of silicate glasses by topology-informed machine learning [139]	2019	Materials science
+Machine learning techniques for detecting topological avatars of new physics [140]	2019	Materials science
+Physics-informed machine learning for composition–process–property design: Shape memory alloy demonstration [141]	2020	Materials science
+A novel ozone profile shape retrieval using a full-physics inverse learning machine (FP-ILM) [142]	2017	Materials science
+Machine-learning prediction of thermal transport in porous media with physics-based descriptors [143]	2020	Materials science
+Deep shape from polarization [144]	2019	Materials science
+Model order reduction assisted by deep neural networks (ROM-net) [145]	2020	Structural mechanics, Materials science
+Predicting AC Optimal Power Flows: Combined Deep Learning and Lagrangian Dual Methods [146]	2019	Electrical power systems
+Deep Fluids: A Generative Network for Parameterized Fluid Simulations [147]	2018	CFD
+Multi-Fidelity Physics-Constrained Neural Network and Its Application in Materials Modeling [148]	2019	Structural mechanics, Materials science
+HybridNet: Integrating Model-based and Data-driven Learning to Predict Evolution of Dynamical Systems [149]	2018	CFD
+A composite neural network that learns from multi-fidelity data: Application to function approximation and inverse PDE problems [150]	2020	Geosciences
+PPINN: Parareal physics-informed neural network for time-dependent PDEs [151]	2020	CFD, Structural mechanics
+A deep learning-based approach to reduced-order modeling for turbulent flow control using LSTM neural networks [43].	2018	CFD
+Physics-induced graph neural network: An application to wind-farm power estimation [152].	2019	CFD
+Physics-based convolutional neural network for fault diagnosis of rolling element bearings [153]	2019	Materials science, Structural mechanics
+Machine learning closures for model order reduction of thermal fluids [154]	2018	Heat transfer
+Physics-informed machine learning approach for reconstructing Reynolds stress modeling discrepancies based on DNS data [155]	2016	Materials science, Structural mechanics
+A reduced-order model for turbulent flows in the urban environment using machine learning [44].	2019	CFD
+A Framework for Modeling Flood Depth Using a Hybrid of Hydraulics and Machine Learning [156]	2020	CFD
+Evaluation and machine learning improvement of global hydrological model-based flood simulations [23].	2019	CFD
+Real-time power system state estimation via deep unrolled neural networks [157].	2018	Power system state estimation
+Symplectic ODE-Net: Learning Hamiltonian Dynamics with Control [158].	2019	CFD
+Physics-guided Convolutional Neural Network (PhyCNN) for Data-driven Seismic Response Modeling [159].	2019	Structural mechanics, Materials science
+5.4. Future directions
+Civil engineering design and construction, which is already a labor-intensive industry, face many challenges, including an aging workforce, increased labor costs, productivity losses, and the lack of onsite workers. All of these constraints affect industry profits. Under these circumstances, physics-based ML will inevitably be utilized to automate some civil engineering and construction processes. Data plays a crucial role in the applications of physics-based ML in civil engineering. Therefore, it is essential to establish a public data set for civil engineering. For example, a similar general-purpose dataset called ImageNet has extensively promoted research in the DL field so that a construction-related dataset could do the same for construction automation. With these kinds of public data sets, researchers can focus more on physics-based ML models.
+6. Conclusions
+As of 2000, ML technology has gradually received more attention in civil engineering and plays an increasingly important role in developing automated technologies. However, the application of even the state-of-the-art black-box ML models has often been met with limited success in civil engineering due to their large data requirements, inability to produce physically consistent results, and their lack of generalizability to out-of-sample scenarios. The main challenges are quality data acquisition and overcoming the impact of the site environment. After thoroughly researching the literature on this topic, this paper suggests that multiple teams could jointly establish an extensive and complete database with the same annotation rules to ease the dilemma of data acquisition. At present, researchers in civil engineering have primarily implemented ML as a tool for feature extraction or detection. We envision that merging ML models and physics principles will play an invaluable role in the future of scientific modeling to address the pressing environmental and physical modeling problems in civil engineering. Future research would be to develop a fully understand physics-based ML and combine them with the specific knowledge domains in civil engineering to develop dedicated physics-based ML models for civil engineering applications.
+Credit author statement
+Shashank Reddy Vadyala: Conceptualization, Methodology, Writing – original draft. Sai Nethra Betgeri: Writing- Reviewing, Editing and Supervision. Dr. John C. Matthews: Visualization, Validation. Dr. Elizabeth Matthews: Data curation.
+Declaration of competing interest
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+References
+[1]
+M. Momeny, et al.
+A noise robust convolutional neural network for image classification
+Results in Engineering, 10 (2021), Article 100225
+View PDF
+View articleView in ScopusGoogle Scholar
+[2]
+S.I. Malami, et al.
+Implementation of hybrid neuro-fuzzy and self-turning predictive model for the prediction of concrete carbonation depth: a soft computing technique
+Results in Engineering (2021), Article 100228
+View PDF
+View articleView in ScopusGoogle Scholar
+[3]
+V.D. Baloyi, L. Meyer
+The development of a mining method selection model through a detailed assessment of multi-criteria decision methods
+Results in Engineering (2020), Article 100172
+View PDF
+View articleView in ScopusGoogle Scholar
+[4]
+D. Sharma, et al.
+Deep learning applications to classify cross-topic natural language texts based on their argumentative form
+2021 2nd International Conference on Smart Electronics and Communication (ICOSEC), IEEE (2021)
+Google Scholar
+[5]
+S.R. Vadyala, S.N. Betgeri
+Predicting the Spread of COVID-19 in Delhi, India Using Deep Residual Recurrent Neural Networks
+(2021)
+arXiv preprint arXiv:2110.05477
+Google Scholar
+[6]
+S.R. Vadyala, E.A. Sherer
+Natural Language Processing Accurately Categorizes Indications, Findings and Pathology Reports from Multicenter Colonoscopy
+(2021)
+arXiv preprint arXiv:2108.11034
+Google Scholar
+[7]
+A.J. Santhosh, et al.
+Optimization of CNC turning parameters using face centred CCD approach in RSM and ANN-genetic algorithm for AISI 4340 alloy steel
+Results in Engineering, 11 (2021), Article 100251
+View PDF
+View articleView in ScopusGoogle Scholar
+[8]
+S. Inazumi, et al.
+Artificial intelligence system for supporting soil classification
+Results in Engineering, 8 (2020), Article 100188
+View PDF
+View articleView in ScopusGoogle Scholar
+[9]
+D. Chakraborty, I. Awolusi, L. Gutierrez
+An explainable machine learning model to predict and elucidate the compressive behavior of high-performance concrete
+Results in Engineering, 11 (2021), Article 100245
+View PDF
+View articleView in ScopusGoogle Scholar
+[10]
+F. Di Ciaccio, S. Troisi
+Monitoring marine environments with autonomous underwater vehicles: a bibliometric analysis
+Results in Engineering (2021), Article 100205
+View PDF
+View articleView in ScopusGoogle Scholar
+[11]
+S.R. Vadyala, et al.
+Prediction of the Number of Covid-19 Confirmed Cases Based on K-Means-Lstm
+(2020)
+arXiv preprint arXiv:2006.14752
+Google Scholar
+[12]
+S.R. Vadyala, S.N. Betgeri
+Physics-Informed Neural Network Method for Solving One-Dimensional Advection Equation Using PyTorch
+(2021)
+arXiv preprint arXiv:2103.09662
+Google Scholar
+[13]
+J.C.M. Sai Nethra Betgeri, David B. Smith
+Comparison of sewer conditions ratings with repair recommendation reports
+North American Society for Trenchless Technology (NASTT) 2021 (2021)
+https://member.nastt.org/products/product/2021-TM1-T6-01
+Google Scholar
+[14]
+B.P. V Yugandhar
+BS Nethra. Statistical software packages for research in social sciences
+Recent Research Advancements in Information Technology (2014)
+Google Scholar
+[15]
+A. McGovern, et al.
+Making the black box more transparent: understanding the physical implications of machine learning
+Bull. Am. Meteorol. Soc., 100 (11) (2019), pp. 2175-2199
+View at publisherCrossrefView in ScopusGoogle Scholar
+[16]
+M. Alber, et al.
+Integrating machine learning and multiscale modeling—perspectives, challenges, and opportunities in the biological, biomedical, and behavioral sciences
+NPJ digital medicine, 2 (1) (2019), pp. 1-11
+View at publisherCrossrefGoogle Scholar
+[17]
+N. Baker, et al.
+Workshop Report on Basic Research Needs for Scientific Machine Learning: Core Technologies for Artificial Intelligence
+USDOE Office of Science (SC), Washington, DC (United States) (2019)
+Google Scholar
+[18]
+A. Karpatne, et al.
+Theory-guided data science: a new paradigm for scientific discovery from data
+IEEE Trans. Knowl. Data Eng., 29 (10) (2017), pp. 2318-2331
+View in ScopusGoogle Scholar
+[19]
+R. Rai, C.K. Sahu
+Driven by data or derived through physics? a review of hybrid physics guided machine learning techniques with cyber-physical system (cps) focus
+IEEE Access, 8 (2020), pp. 71050-71073
+View at publisher
+CrossrefView in ScopusGoogle Scholar
+[20]
+A. Griewank, A. Walther
+Evaluating Derivatives: Principles and Techniques of Algorithmic Differentiation
+SIAM (2008)
+Google Scholar
+[21]
+N. Parikh, S. Boyd
+Proximal algorithms
+Foundations and Trends in optimization, 1 (3) (2014), pp. 127-239
+View at publisherCrossrefGoogle Scholar
+[22]
+S. Boyd, N. Parikh, E. Chu
+Distributed Optimization and Statistical Learning via the Alternating Direction Method of Multipliers
+Now Publishers Inc (2011)
+Google Scholar
+[23]
+T. Yang, et al.
+Evaluation and machine learning improvement of global hydrological model-based flood simulations
+Environ. Res. Lett., 14 (11) (2019), p. 114027
+View at publisher
+CrossrefView in ScopusGoogle Scholar
+[24]
+K. Lu, et al.
+Review for order reduction based on proper orthogonal decomposition and outlooks of applications in mechanical systems
+Mech. Syst. Signal Process., 123 (2019), pp. 264-297
+View PDF
+View articleView in ScopusGoogle Scholar
+[25]
+M.P. Mignolet, et al.
+A review of indirect/non-intrusive reduced order modeling of nonlinear geometric structures
+J. Sound Vib., 332 (10) (2013), pp. 2437-2460
+View PDF
+View articleView in ScopusGoogle Scholar
+[26]
+A. Chatterjee
+An introduction to the proper orthogonal decomposition
+Curr. Sci. (2000), pp. 808-817
+View in ScopusGoogle Scholar
+[27]
+C. Prud'Homme, et al.
+Reliable real-time solution of parametrized partial differential equations: reduced-basis output bound methods
+J. Fluid Eng., 124 (1) (2002), pp. 70-80
+View in ScopusGoogle Scholar
+[28]
+P.J. Holmes, et al.
+Low-dimensional models of coherent structures in turbulence
+Phys. Rep., 287 (4) (1997), pp. 337-384
+View PDF
+View articleView in ScopusGoogle Scholar
+[29]
+A. Sarkar, R. Ghanem
+Mid-frequency structural dynamics with parameter uncertainty
+Comput. Methods Appl. Mech. Eng., 191 (47–48) (2002), pp. 5499-5513
+View PDF
+View articleView in ScopusGoogle Scholar
+[30]
+J. Burkardt, M. Gunzburger, H.-C. Lee
+Centroidal Voronoi tessellation-based reduced-order modeling of complex systems
+SIAM J. Sci. Comput., 28 (2) (2006), pp. 459-484
+View at publisherCrossrefView in ScopusGoogle Scholar
+[31]
+K. Pearson, L.O. Lines
+Planes of closest fit to systems of points in space, london edinburgh dublin philos
+Mag. J. Sci, 2 (11) (1901), pp. 559-572
+View at publisherCrossrefGoogle Scholar
+[32]
+I.T. Jolliffe, J. Cadima
+Principal component analysis: a review and recent developments
+Phil. Trans. Math. Phys. Eng. Sci., 374 (2065) (2016), p. 20150202
+View at publisher
+CrossrefGoogle Scholar
+[33]
+M. Couplet, C. Basdevant, P. Sagaut
+Calibrated reduced-order POD-Galerkin system for fluid flow modelling
+J. Comput. Phys., 207 (1) (2005), pp. 192-220
+View PDF
+View articleView in ScopusGoogle Scholar
+[34]
+J.-M. Zokagoa, A. Soulaïmani
+Low-order modelling of shallow water equations for sensitivity analysis using proper orthogonal decomposition
+Int. J. Comput. Fluid Dynam., 26 (5) (2012), pp. 275-295
+View at publisherCrossrefView in ScopusGoogle Scholar
+[35]
+D. Amsallem, C. Farhat
+On the stability of reduced-order linearized computational fluid dynamics models based on POD and Galerkin projection: descriptor vs non-descriptor forms
+Reduced Order Methods for Modeling and Computational Reduction, Springer (2014), pp. 215-233
+View at publisherCrossrefGoogle Scholar
+[36]
+J.-M. Zokagoa, A. Soulaïmani
+A POD-based reduced-order model for uncertainty analyses in shallow water flows
+Int. J. Comput. Fluid Dynam., 32 (6–7) (2018), pp. 278-292
+View at publisherCrossrefView in ScopusGoogle Scholar
+[37]
+V. Barthelmann, E. Novak, K. Ritter
+High dimensional polynomial interpolation on sparse grids
+Adv. Comput. Math., 12 (4) (2000), pp. 273-288
+View in ScopusGoogle Scholar
+[38]
+R.G. Ghanem, P.D. Spanos
+Stochastic finite element method: response statistics
+Stochastic Finite Elements: a Spectral Approach, Springer (1991), pp. 101-119
+View at publisherCrossrefGoogle Scholar
+[39]
+X. Sun, X. Pan, J.-I. Choi
+A Non-intrusive Reduced-Order Modeling Method Using Polynomial Chaos Expansion
+(2019)
+arXiv preprint arXiv:1903.10202
+Google Scholar
+[40]
+R. Bellman
+Dynamic programming
+Science, 153 (3731) (1966), pp. 34-37
+View at publisherCrossrefView in ScopusGoogle Scholar
+[41]
+M. Verleysen, D. François
+The curse of dimensionality in data mining and time series prediction
+International Work-Conference on Artificial Neural Networks, Springer (2005)
+Google Scholar
+[42]
+G. Chen, et al.
+Support-vector-machine-based reduced-order model for limit cycle oscillation prediction of nonlinear aeroelastic system
+Math. Probl Eng., 2012 (2012), pp. 1-12, 10.1155/2012/152123
+152123
+View at publisherGoogle Scholar
+[43]
+A.T. Mohan, D.V. Gaitonde
+A Deep Learning Based Approach to Reduced Order Modeling for Turbulent Flow Control Using LSTM Neural Networks
+(2018)
+arXiv preprint arXiv:1804.09269
+Google Scholar
+[44]
+D. Xiao, et al.
+A reduced order model for turbulent flows in the urban environment using machine learning
+Build. Environ., 148 (2019), pp. 323-337
+View PDF
+View articleView in ScopusGoogle Scholar
+[45]
+Z.Y. Wan, et al.
+Data-assisted reduced-order modeling of extreme events in complex dynamical systems
+PLoS One, 13 (5) (2018), Article e0197704
+View at publisherCrossrefView in ScopusGoogle Scholar
+[46]
+B. Galerkin, W.I. Petrograd
+Series development for some cases of equilibrium of plates and beams
+Wjestnik Ingenerow Petrograd, 19 (1915), p. 897
+Google Scholar
+[47]
+B. Saltzman
+Finite amplitude free convection as an initial value problem—I
+J. Atmos. Sci., 19 (4) (1962), pp. 329-341
+Google Scholar
+[48]
+E.N. Lorenz
+Deterministic nonperiodic flow
+J. Atmos. Sci., 20 (2) (1963), pp. 130-141
+View in ScopusGoogle Scholar
+[49]
+J.L. Lumley
+The Structure of Inhomogeneous Turbulent flows Atmospheric Turbulence and Radio Wave Propagation
+(1967)
+Google Scholar
+[50]
+L. Sirovich
+Turbulence and the dynamics of coherent structures. I. Coherent structures
+Q. Appl. Math., 45 (3) (1987), pp. 561-571
+View at publisherCrossrefGoogle Scholar
+[51]
+N. Aubry, et al.
+The dynamics of coherent structures in the wall region of a turbulent boundary layer
+J. Fluid Mech., 192 (1988), pp. 115-173
+View in ScopusGoogle Scholar
+[52]
+D. Rempfer, H.F. Fasel
+Dynamics of three-dimensional coherent structures in a flat-plate boundary layer
+J. Fluid Mech., 275 (1994), pp. 257-283
+View in ScopusGoogle Scholar
+[53]
+R. Everson, L. Sirovich
+Karhunen–Loeve procedure for gappy data
+JOSA A, 12 (8) (1995), pp. 1657-1664
+View in ScopusGoogle Scholar
+[54]
+S.S. Ravindran
+A reduced‐order approach for optimal control of fluids using proper orthogonal decomposition
+Int. J. Numer. Methods Fluid., 34 (5) (2000), pp. 425-448
+View in ScopusGoogle Scholar
+[55]
+Z. Chen, S. Dai
+Adaptive Galerkin methods with error control for a dynamical ginzburg-landau model in superconductivity
+SIAM J. Numer. Anal., 38 (6) (2001), pp. 1961-1985
+View in ScopusGoogle Scholar
+[56]
+K. Willcox, J. Peraire
+Balanced model reduction via the proper orthogonal decomposition
+AIAA J., 40 (11) (2002), pp. 2323-2330
+View at publisherCrossrefView in ScopusGoogle Scholar
+[57]
+M. Couplet, P. Sagaut, C. Basdevant
+Intermodal energy transfers in a proper orthogonal decomposition–Galerkin representation of a turbulent separated flow
+J. Fluid Mech., 491 (2003), pp. 275-284
+View in ScopusGoogle Scholar
+[58]
+S. Sirisup, G.E. Karniadakis
+A spectral viscosity method for correcting the long-term behavior of POD models
+J. Comput. Phys., 194 (1) (2004), pp. 92-116
+View PDF
+View articleView in ScopusGoogle Scholar
+[59]
+M. Barrault, et al.
+An ‘empirical interpolation’method: application to efficient reduced-basis discretization of partial differential equations
+Compt. Rendus Math., 339 (9) (2004), pp. 667-672
+View PDF
+View articleCrossrefView in ScopusGoogle Scholar
+[60]
+I. Mezić
+Spectral properties of dynamical systems, model reduction and decompositions
+Nonlinear Dynam., 41 (1) (2005), pp. 309-325
+View at publisherCrossrefView in ScopusGoogle Scholar
+[61]
+G. Rozza, D.B.P. Huynh, A.T. Patera
+Reduced basis approximation and a posteriori error estimation for affinely parametrized elliptic coercive partial differential equations
+Arch. Comput. Methods Eng., 15 (3) (2007), p. 1
+Google Scholar
+[62]
+Y. Cao, et al.
+A reduced‐order approach to four‐dimensional variational data assimilation using proper orthogonal decomposition
+Int. J. Numer. Methods Fluid., 53 (10) (2007), pp. 1571-1583
+View at publisherCrossrefView in ScopusGoogle Scholar
+[63]
+D. Amsallem, C. Farhat
+Interpolation method for adapting reduced-order models and application to aeroelasticity
+AIAA J., 46 (7) (2008), pp. 1803-1813
+View at publisherCrossrefView in ScopusGoogle Scholar
+[64]
+P. Astrid, et al.
+Missing point estimation in models described by proper orthogonal decomposition
+IEEE Trans. Automat. Control, 53 (10) (2008), pp. 2237-2251
+View in ScopusGoogle Scholar
+[65]
+C.W. Rowley, et al.
+Spectral analysis of nonlinear flows
+J. Fluid Mech., 641 (2009), pp. 115-127
+View in ScopusGoogle Scholar
+[66]
+P.J. Schmid
+Dynamic mode decomposition of numerical and experimental data
+J. Fluid Mech., 656 (2010), pp. 5-28
+View in ScopusGoogle Scholar
+[67]
+S. Chaturantabut, D.C. Sorensen
+Nonlinear model reduction via discrete empirical interpolation
+SIAM J. Sci. Comput., 32 (5) (2010), pp. 2737-2764
+View at publisherCrossrefView in ScopusGoogle Scholar
+[68]
+K.T. Carlberg, et al.
+The GNAT Nonlinear Model-Reduction Method with Application to Large-Scale Turbulent Flows
+Sandia National Lab.(SNL-CA), Livermore, CA (United States) (2013)
+Google Scholar
+[69]
+L. Cordier, et al.
+Identification strategies for model-based control
+Exp. Fluid, 54 (8) (2013), pp. 1-21
+View in ScopusGoogle Scholar
+[70]
+J. Östh, et al.
+On the need for a nonlinear subscale turbulence term in POD models as exemplified for a high-Reynolds-number flow over an Ahmed body
+J. Fluid Mech., 747 (2014), pp. 518-544
+View at publisherCrossrefView in ScopusGoogle Scholar
+[71]
+F. Ballarin, et al.
+Supremizer stabilization of POD–Galerkin approximation of parametrized steady incompressible Navier–Stokes equations
+Int. J. Numer. Methods Eng., 102 (5) (2015), pp. 1136-1161
+View at publisherCrossrefView in ScopusGoogle Scholar
+[72]
+M. Schlegel, B.R. Noack
+On long-term boundedness of Galerkin models
+J. Fluid Mech., 765 (2015), pp. 325-352
+View at publisherCrossrefView in ScopusGoogle Scholar
+[73]
+B. Peherstorfer, K. Willcox
+Data-driven operator inference for nonintrusive projection-based model reduction
+Comput. Methods Appl. Mech. Eng., 306 (2016), pp. 196-215
+View PDF
+View articleView in ScopusGoogle Scholar
+[74]
+M. Sieber, C.O. Paschereit, K. Oberleithner
+Spectral proper orthogonal decomposition
+J. Fluid Mech., 792 (2016), pp. 798-828
+View at publisherCrossrefView in ScopusGoogle Scholar
+[75]
+A. Towne, O.T. Schmidt, T. Colonius
+Spectral proper orthogonal decomposition and its relationship to dynamic mode decomposition and resolvent analysis
+J. Fluid Mech., 847 (2018), pp. 821-867
+View at publisherCrossrefView in ScopusGoogle Scholar
+[76]
+J. Reiss, et al.
+The shifted proper orthogonal decomposition: a mode decomposition for multiple transport phenomena
+SIAM J. Sci. Comput., 40 (3) (2018), pp. A1322-A1344
+View at publisherCrossrefView in ScopusGoogle Scholar
+[77]
+J.-C. Loiseau, B.R. Noack, S.L. Brunton
+Sparse reduced-order modelling: sensor-based dynamics to full-state estimation
+J. Fluid Mech., 844 (2018), pp. 459-490
+View at publisherCrossrefView in ScopusGoogle Scholar
+[78]
+M. Mendez, M. Balabane, J.-M. Buchlin
+Multi-scale proper orthogonal decomposition of complex fluid flows
+J. Fluid Mech., 870 (2019), pp. 988-1036
+View at publisherCrossrefView in ScopusGoogle Scholar
+[79]
+D. Fernex, B.R. Noack, R. Semaan
+Cluster-based network modeling—from snapshots to complex dynamical systems
+Sci. Adv., 7 (25) (2021), p. eabf5006
+Google Scholar
+[80]
+R. Vinuesa, S.L. Brunton
+The Potential of Machine Learning to Enhance Computational Fluid Dynamics
+(2021)
+arXiv preprint arXiv:2110.02085
+Google Scholar
+[81]
+H. Eivazi, et al.
+Towards Extraction of Orthogonal and Parsimonious Non-linear Modes from Turbulent Flows
+(2021)
+arXiv preprint arXiv:2109.01514
+Google Scholar
+[82]
+F. Rosenblatt
+The perceptron: a probabilistic model for information storage and organization in the brain
+Psychol. Rev., 65 (6) (1958), p. 386
+View at publisherCrossrefView in ScopusGoogle Scholar
+[83]
+S. Linnainmaa
+Taylor expansion of the accumulated rounding error
+BIT Numerical Mathematics, 16 (2) (1976), pp. 146-160
+View in ScopusGoogle Scholar
+[84]
+D.E. Rumelhart, G.E. Hinton, R.J. Williams
+Learning representations by back-propagating errors
+Nature, 323 (6088) (1986), pp. 533-536
+View at publisherCrossrefView in ScopusGoogle Scholar
+[85]
+J.J. Hopfield
+Neural networks and physical systems with emergent collective computational abilities
+Proc. Natl. Acad. Sci. Unit. States Am., 79 (8) (1982), pp. 2554-2558
+View at publisherCrossrefView in ScopusGoogle Scholar
+[86]
+S. Hochreiter, J. Schmidhuber
+Long short-term memory
+Neural Comput., 9 (8) (1997), pp. 1735-1780
+View at publisherCrossrefView in ScopusGoogle Scholar
+[87]
+R. Dechter
+Learning while Searching in Constraint-Satisfaction Problems
+(1986)
+Google Scholar
+[88]
+I. Goodfellow, Y. Bengio, A. Courville
+Deep Learning
+MIT press (2016)
+Google Scholar
+[89]
+S.L. Brunton, J.L. Proctor, J.N. Kutz
+Discovering governing equations from data by sparse identification of nonlinear dynamical systems
+Proceedings of the National Academy of Sciences, vol. 113 (2016), pp. 3932-3937
+15
+View at publisherCrossrefView in ScopusGoogle Scholar
+[90]
+J.N. Kutz
+Deep learning in fluid dynamics
+J. Fluid Mech., 814 (2017), pp. 1-4
+View at publisherCrossrefView in ScopusGoogle Scholar
+[91]
+K.T. Carlberg, et al.
+Recovering missing CFD data for high-order discretizations using deep neural networks and dynamics learning
+J. Comput. Phys., 395 (2019), pp. 105-124
+View PDF
+View articleView in ScopusGoogle Scholar
+[92]
+B.N. Hanna, et al.
+Machine-learning based error prediction approach for coarse-grid Computational Fluid Dynamics (CG-CFD)
+Prog. Nucl. Energy, 118 (2020), p. 103140
+View PDF
+View articleView in ScopusGoogle Scholar
+[93]
+B. Després, H. Jourdren
+Machine Learning design of Volume of Fluid schemes for compressible flows
+J. Comput. Phys., 408 (2020), p. 109275
+View PDF
+View articleView in ScopusGoogle Scholar
+[94]
+W.W. Hsieh
+Machine Learning Methods in the Environmental Sciences: Neural Networks and Kernels
+Cambridge university press (2009)
+Google Scholar
+[95]
+M. Raissi, P. Perdikaris, G.E. Karniadakis
+Machine learning of linear differential equations using Gaussian processes
+J. Comput. Phys., 348 (2017), pp. 683-693
+View PDF
+View articleView in ScopusGoogle Scholar
+[96]
+M. Raissi, P. Perdikaris, G.E. Karniadakis
+Physics-informed neural networks: a deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations
+J. Comput. Phys., 378 (2019), pp. 686-707
+View PDF
+View articleView in ScopusGoogle Scholar
+[97]
+M. Raissi, et al.
+Deep learning of vortex-induced vibrations
+J. Fluid Mech., 861 (2019), pp. 119-137
+View at publisherCrossrefView in ScopusGoogle Scholar
+[98]
+L. Lapidus, G.F. Pinder
+Numerical Solution of Partial Differential Equations in Science and Engineering
+John Wiley & Sons (2011)
+Google Scholar
+[99]
+C.K. Williams, C.E. Rasmussen
+Gaussian Processes for Machine Learning, vol. 2, MIT press Cambridge, MA (2006)
+Google Scholar
+[100]
+Y. Morita, et al.
+Applying Bayesian Optimization with Gaussian Process Regression to Computational Fluid Dynamics Problems
+(2021)
+arXiv preprint arXiv:2101.09985
+Google Scholar
+[101]
+A.R. Barron
+Universal approximation bounds for superpositions of a sigmoidal function
+IEEE Trans. Inf. Theor., 39 (3) (1993), pp. 930-945
+View in ScopusGoogle Scholar
+[102]
+J. Lu, et al.
+Deep Network Approximation for Smooth Functions
+(2020)
+arXiv preprint arXiv:2001.03040
+Google Scholar
+[103]
+D. Yarotsky
+Optimal approximation of continuous functions by very deep ReLU networks
+Conference on Learning Theory, PMLR (2018)
+Google Scholar
+[104]
+H. Eivazi, et al.
+Physics-informed Neural Networks for Solving Reynolds-averaged Navier $\unicode {x2013} $ Stokes Equations
+(2021)
+arXiv preprint arXiv:2107.10711
+Google Scholar
+[105]
+Z. Li, et al.
+Fourier Neural Operator for Parametric Partial Differential Equations
+(2020)
+arXiv preprint arXiv:2010.08895
+Google Scholar
+[106]
+L. Lu, P. Jin, G.E. Karniadakis
+Deeponet: Learning Nonlinear Operators for Identifying Differential Equations Based on the Universal Approximation Theorem of Operators
+(2019)
+arXiv preprint arXiv:1910.03193
+Google Scholar
+[107]
+S. Cai, et al.
+DeepM&Mnet: inferring the electroconvection multiphysics fields based on operator approximation by neural networks
+J. Comput. Phys., 436 (2021), p. 110296
+View PDF
+View articleView in ScopusGoogle Scholar
+[108]
+Z. Mao, et al.
+DeepM&Mnet for Hypersonics: Predicting the Coupled Flow and Finite-Rate Chemistry behind a Normal Shock Using Neural-Network Approximation of Operators
+(2020)
+arXiv preprint arXiv:2011.03349
+Google Scholar
+[109]
+M. Dissanayake, N. Phan‐Thien
+Neural‐network‐based approximations for solving partial differential equations
+Commun. Numer. Methods Eng., 10 (3) (1994), pp. 195-201
+View at publisherCrossrefView in ScopusGoogle Scholar
+[110]
+I.E. Lagaris, A. Likas, D.I. Fotiadis
+Artificial neural networks for solving ordinary and partial differential equations
+IEEE Trans. Neural Network., 9 (5) (1998), pp. 987-1000
+View in ScopusGoogle Scholar
+[111]
+J. Berg, K. Nyström
+A unified deep artificial neural network approach to partial differential equations in complex geometries
+Neurocomputing, 317 (2018), pp. 28-41
+View PDF
+View articleView in ScopusGoogle Scholar
+[112]
+E. Weinan, B. Yu
+The deep Ritz method: a deep learning-based numerical algorithm for solving variational problems
+Communications in Mathematics and Statistics, 6 (1) (2018), pp. 1-12
+View in ScopusGoogle Scholar
+[113]
+Y. Zhu, et al.
+Physics-constrained deep learning for high-dimensional surrogate modeling and uncertainty quantification without labeled data
+J. Comput. Phys., 394 (2019), pp. 56-81
+View PDF
+View articleView in ScopusGoogle Scholar
+[114]
+O. Fuks, H.A. Tchelepi
+Limitations of physics informed machine learning for nonlinear two-phase transport in porous media
+Journal of Machine Learning for Modeling and Computing, 1 (1) (2020)
+Google Scholar
+[115]
+M. Raissi
+Deep hidden physics models: deep learning of nonlinear partial differential equations
+J. Mach. Learn. Res., 19 (1) (2018), pp. 932-955
+Google Scholar
+[116]
+S. Wang, Y. Teng, P. Perdikaris
+Understanding and Mitigating Gradient Pathologies in Physics-Informed Neural Networks
+(2020)
+arXiv preprint arXiv:2001.04536
+Google Scholar
+[117]
+I. Yitmen, et al.
+An adapted model of cognitive digital twins for building lifecycle management
+Appl. Sci., 11 (9) (2021), p. 4276
+View at publisherCrossrefView in ScopusGoogle Scholar
+[118]
+L. Barazzetti, et al.
+Cloud-to-BIM-to-FEM: structural simulation with accurate historic BIM from laser scans
+Simulat. Model. Pract. Theor., 57 (2015), pp. 71-87
+View PDF
+View articleView in ScopusGoogle Scholar
+[119]
+N. Bijelić, T. Lin, G.G. Deierlein
+Efficient intensity measures and machine learning classification algorithms for collapse prediction informed by physics-based ground motion simulations
+Earthq. Spectra (2020), pp. 1188-1207
+View at publisherCrossrefView in ScopusGoogle Scholar
+[120]
+P. Bhasme, J. Vagadiya, U. Bhatia
+Enhancing Predictive Skills in Physically-Consistent Way: Physics Informed Machine Learning for Hydrological Processes
+(2021)
+arXiv preprint arXiv:2104.11009
+Google Scholar
+[121]
+N.B. Erichson, M. Muehlebach, M.W. Mahoney
+Physics-informed Autoencoders for Lyapunov-Stable Fluid Flow Prediction
+(2019)
+arXiv preprint arXiv:1905.10866
+Google Scholar
+[122]
+P.A. Srinivasan, et al.
+Predictions of turbulent shear flows using deep neural networks
+Physical Review Fluids, 4 (5) (2019), p. 54603
+Google Scholar
+[123]
+L. Guastoni, et al.
+Convolutional-network models to predict wall-bounded turbulence from wall quantities
+J. Fluid Mech. (2021), p. 928
+Google Scholar
+[124]
+A. Guemes, et al.
+From coarse wall measurements to turbulent velocity fields through deep learning
+Phys. Fluid., 33 (7) (2021)
+Google Scholar
+[125]
+Zhou, S., et al., A data-driven and physics-based approach to exploring interdependency of interconnected infrastructure, in Computing in Civil Engineering 2019: Data, Sensing, and Analytics. 2019, American Society of Civil Engineers Reston, VA. p. 82-88.
+Google Scholar
+[126]
+A. Khandelwal, et al.
+Physics Guided Machine Learning Methods for Hydrology
+(2020)
+arXiv preprint arXiv:2012.02854
+Google Scholar
+[127]
+N. Geneva, N. Zabaras
+Modeling the dynamics of PDE systems with physics-constrained deep auto-regressive networks
+J. Comput. Phys., 403 (2020), Article 109056
+View PDF
+View articleView in ScopusGoogle Scholar
+[128]
+D. Xiao, et al.
+A domain decomposition non-intrusive reduced order model for turbulent flows
+Comput. Fluids, 182 (2019), pp. 15-27
+View PDF
+View articleView in ScopusGoogle Scholar
+[129]
+J. Chen, Y. Liu
+Probabilistic physics-guided machine learning for fatigue data analysis
+Expert Syst. Appl., 168 (2021), p. 114316
+View PDF
+View articleView in ScopusGoogle Scholar
+[130]
+E. Figueiredo, et al.
+Finite element–based machine-learning approach to detect damage in bridges under operational and environmental variations
+J. Bridge Eng., 24 (7) (2019), Article 4019061
+Google Scholar
+[131]
+A. Rai, M. Mitra
+A hybrid physics-assisted machine-learning-based damage detection using Lamb wave
+Sādhanā, 46 (2) (2021), pp. 1-11
+Google Scholar
+[132]
+Z. Zhang
+Data-Driven and Model-Based Methods with Physics-Guided Machine Learning for Damage Identification
+(2020)
+Google Scholar
+[133]
+R.K. Tripathy, I. Bilionis
+Deep UQ: learning deep neural network surrogate models for high dimensional uncertainty quantification
+J. Comput. Phys., 375 (2018), pp. 565-588
+View PDF
+View articleView in ScopusGoogle Scholar
+[134]
+H. Zheng, V. Moosavi, M. Akbarzadeh
+Machine learning assisted evaluations in structural design and construction
+Autom. ConStruct., 119 (2020), Article 103346
+View PDF
+View articleView in ScopusGoogle Scholar
+[135]
+D. Vassallo, R. Krishnamurthy, H.J. Fernando
+Utilizing physics-based input features within a machine learning model to predict wind speed forecasting error
+Wind Energy Science, 6 (1) (2021), pp. 295-309
+View at publisherCrossrefView in ScopusGoogle Scholar
+[136]
+A. Takbiri-Borujeni, M. Ayoobi
+Application of physics-based machine learning in combustion modeling
+11th US National Combustion Meeting (2019)
+Google Scholar
+[137]
+A. Andreassen, et al.
+JUNIPR: a framework for unsupervised machine learning in particle physics
+The European Physical Journal C, 79 (2) (2019), pp. 1-24
+Google Scholar
+[138]
+Q. Zhu, Z. Liu, J. Yan
+Machine learning for metal additive manufacturing: predicting temperature and melt pool fluid dynamics using physics-informed neural networks
+Comput. Mech., 67 (2) (2021), pp. 619-635
+CrossrefView in ScopusGoogle Scholar
+[139]
+H. Liu, et al.
+Predicting the dissolution kinetics of silicate glasses by topology-informed machine learning
+Npj Materials Degradation, 3 (1) (2019), pp. 1-12
+View PDF
+View articleGoogle Scholar
+[140]
+A. Bevan
+Machine learning techniques for detecting topological avatars of new physics
+Philosophical Transactions of the Royal Society A, 377 (2161) (2019), Article 20190392
+CrossrefView in ScopusGoogle Scholar
+[141]
+S. Liu, et al.
+Physics-informed machine learning for composition–process–property design: shape memory alloy demonstration
+Applied Materials Today, 22 (2021), Article 100898
+View PDF
+View articleView in ScopusGoogle Scholar
+[142]
+J. Xu, et al.
+A novel ozone profile shape retrieval using full-physics inverse learning machine (FP-ILM)
+IEEE J. Sel. Top. Appl. Earth Obs. Rem. Sens., 10 (12) (2017), pp. 5442-5457
+View in ScopusGoogle Scholar
+[143]
+H. Wei, H. Bao, X. Ruan
+Machine learning prediction of thermal transport in porous media with physics-based descriptors
+Int. J. Heat Mass Tran., 160 (2020), Article 120176
+View PDF
+View articleView in ScopusGoogle Scholar
+[144]
+Y. Ba, et al.
+Deep shape from polarization
+Computer Vision–ECCV 2020: 16th European Conference, Glasgow, UK, August 23–28, 2020, Proceedings, Part XXIV 16, Springer (2020)
+Google Scholar
+[145]
+T. Daniel, et al.
+Model order reduction assisted by deep neural networks (ROM-net)
+Advanced Modeling and Simulation in Engineering Sciences, 7 (1) (2020), pp. 1-27
+Google Scholar
+[146]
+F. Fioretto, T.W. Mak, P. Van Hentenryck
+Predicting AC optimal power flows: combining deep learning and Lagrangian dual methods
+Proceedings of the AAAI Conference on Artificial Intelligence (2020)
+Google Scholar
+[147]
+B. Kim, et al.
+Deep fluids: a generative network for parameterized fluid simulations
+Computer Graphics Forum, Wiley Online Library (2019)
+Google Scholar
+[148]
+D. Liu, Y. Wang
+Multi-fidelity physics-constrained neural network and its application in materials modeling
+J. Mech. Des., 141 (12) (2019)
+Google Scholar
+[149]
+Y. Long, X. She, S. Mukhopadhyay
+HybridNet: integrating model-based and data-driven learning to predict evolution of dynamical systems
+Conference on Robot Learning, PMLR (2018)
+Google Scholar
+[150]
+X. Meng, G.E. Karniadakis
+A composite neural network that learns from multi-fidelity data: application to function approximation and inverse PDE problems
+J. Comput. Phys., 401 (2020), p. 109020
+View PDF
+View articleView in ScopusGoogle Scholar
+[151]
+X. Meng, et al.
+PPINN: parareal physics-informed neural network for time-dependent PDEs
+Comput. Methods Appl. Mech. Eng., 370 (2020), p. 113250
+View PDF
+View articleView in ScopusGoogle Scholar
+[152]
+J. Park, J. Park
+Physics-induced graph neural network: an application to wind-farm power estimation
+Energy, 187 (2019), p. 115883
+View PDF
+View articleView in ScopusGoogle Scholar
+[153]
+M. Sadoughi, C. Hu
+Physics-based convolutional neural network for fault diagnosis of rolling element bearings
+IEEE Sensor. J., 19 (11) (2019), pp. 4181-4192
+CrossrefView in ScopusGoogle Scholar
+[154]
+O. San, R. Maulik
+Machine learning closures for model order reduction of thermal fluids
+Appl. Math. Model., 60 (2018), pp. 681-710
+View PDF
+View articleView in ScopusGoogle Scholar
+[155]
+J.-X. Wang, J.-L. Wu, H. Xiao
+Physics-informed machine learning approach for reconstructing Reynolds stress modeling discrepancies based on DNS data
+Physical Review Fluids, 2 (3) (2017), p. 34603
+Google Scholar
+[156]
+H. Hosseiny, et al.
+A framework for modeling flood depth using a hybrid of hydraulics and machine learning
+Sci. Rep., 10 (1) (2020), pp. 1-14
+CrossrefGoogle Scholar
+[157]
+L. Zhang, G. Wang, G.B. Giannakis
+Real-time power system state estimation via deep unrolled neural networks
+2018 IEEE Global Conference on Signal and Information Processing (GlobalSIP), IEEE (2018)
+Google Scholar
+[158]
+Y.D. Zhong, B. Dey, A. Chakraborty
+Symplectic Ode-Net: Learning Hamiltonian Dynamics with Control
+(2019)
+arXiv preprint arXiv:1909.12077
+Google Scholar
+[159]
+R. Zhang, Y. Liu, H. Sun
+Physics-guided convolutional neural network (PhyCNN) for data-driven seismic response modeling
+Eng. Struct., 215 (2020), Article 110704
+View PDF
+View articleView in ScopusGoogle Scholar
+Cited by (175)
+Advancing 3D bioprinting through machine learning and artificial intelligence
+2024, Bioprinting
+Show abstract
+The role of artificial intelligence and digital technologies in dam engineering: Narrative review and outlook
+2023, Engineering Applications of Artificial Intelligence
+Show abstract
+Prediction of oil and gas pipeline failures through machine learning approaches: A systematic review
+2023, Energy Reports
+Show abstract
+Intelligent damage diagnosis in bridges using vibration-based monitoring approaches and machine learning: A systematic review
+2022, Results in Engineering
+Show abstract
+Machine learning based computational approach for crack width detection of self-healing concrete
+2022, Case Studies in Construction Materials
+Show abstract
+Physics-informed deep learning method for predicting tunnelling-induced ground deformations
+2023, Acta Geotechnica
+View all citing articles on Scopus
+© 2021 Published by Elsevier B.V.
+About ScienceDirect
+Remote access
+Contact and support
+Terms and conditions
+Privacy policy
+Cookie settings
+
+All content on this site: Copyright © 2025 Elsevier B.V., its licensors, and contributors. All rights are reserved, including those for text and data mining, AI training, and similar technologies. For all open access content, the relevant licensing terms apply.

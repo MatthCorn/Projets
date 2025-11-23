@@ -1,0 +1,115 @@
+Skip to main content
+Skip to article
+Access through your organization
+Journal of Computational Physics
+Volume 378, 1 February 2019, Pages 686-707
+Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations
+Author links open overlay panel
+M. Raissi a
+, P. Perdikaris b
+, G.E. Karniadakis a
+Show more
+Share
+Cite
+https://doi.org/10.1016/j.jcp.2018.10.045
+Get rights and content
+Highlights
+•
+We put forth a deep learning framework that enables the synergistic combination of mathematical models and data.
+•
+We introduce an effective mechanism for regularizing the training of deep neural networks in small data regimes.
+•
+The proposed methods enable scientific prediction and discovery from incomplete models and incomplete data.
+Abstract
+We introduce physics-informed neural networks – neural networks that are trained to solve supervised learning tasks while respecting any given laws of physics described by general nonlinear partial differential equations. In this work, we present our developments in the context of solving two main classes of problems: data-driven solution and data-driven discovery of partial differential equations. Depending on the nature and arrangement of the available data, we devise two distinct types of algorithms, namely continuous time and discrete time models. The first type of models forms a new family of data-efficient spatio-temporal function approximators, while the latter type allows the use of arbitrarily accurate implicit Runge–Kutta time stepping schemes with unlimited number of stages. The effectiveness of the proposed framework is demonstrated through a collection of classical problems in fluids, quantum mechanics, reaction–diffusion systems, and the propagation of nonlinear shallow-water waves.
+Introduction
+With the explosive growth of available data and computing resources, recent advances in machine learning and data analytics have yielded transformative results across diverse scientific disciplines, including image recognition [1], cognitive science [2], and genomics [3]. However, more often than not, in the course of analyzing complex physical, biological or engineering systems, the cost of data acquisition is prohibitive, and we are inevitably faced with the challenge of drawing conclusions and making decisions under partial information. In this small data regime, the vast majority of state-of-the-art machine learning techniques (e.g., deep/convolutional/recurrent neural networks) are lacking robustness and fail to provide any guarantees of convergence.
+At first sight, the task of training a deep learning algorithm to accurately identify a nonlinear map from a few – potentially very high-dimensional – input and output data pairs seems at best naive. Coming to our rescue, for many cases pertaining to the modeling of physical and biological systems, there exists a vast amount of prior knowledge that is currently not being utilized in modern machine learning practice. Let it be the principled physical laws that govern the time-dependent dynamics of a system, or some empirically validated rules or other domain expertise, this prior information can act as a regularization agent that constrains the space of admissible solutions to a manageable size (e.g., in incompressible fluid dynamics problems by discarding any non realistic flow solutions that violate the conservation of mass principle). In return, encoding such structured information into a learning algorithm results in amplifying the information content of the data that the algorithm sees, enabling it to quickly steer itself towards the right solution and generalize well even when only a few training examples are available.
+The first glimpses of promise for exploiting structured prior information to construct data-efficient and physics-informed learning machines have already been showcased in the recent studies of [4], [5], [6]. There, the authors employed Gaussian process regression [7] to devise functional representations that are tailored to a given linear operator, and were able to accurately infer solutions and provide uncertainty estimates for several prototype problems in mathematical physics. Extensions to nonlinear problems were proposed in subsequent studies by Raissi et al. [8], [9] in the context of both inference and systems identification. Despite the flexibility and mathematical elegance of Gaussian processes in encoding prior information, the treatment of nonlinear problems introduces two important limitations. First, in [8], [9] the authors had to locally linearize any nonlinear terms in time, thus limiting the applicability of the proposed methods to discrete-time domains and compromising the accuracy of their predictions in strongly nonlinear regimes. Secondly, the Bayesian nature of Gaussian process regression requires certain prior assumptions that may limit the representation capacity of the model and give rise to robustness/brittleness issues, especially for nonlinear problems [10].
+Section snippets
+Problem setup
+In this work we take a different approach by employing deep neural networks and leverage their well known capability as universal function approximators [11]. In this setting, we can directly tackle nonlinear problems without the need for committing to any prior assumptions, linearization, or local time-stepping. We exploit recent developments in automatic differentiation [12] – one of the most useful but perhaps under-utilized techniques in scientific computing – to differentiate neural
+Data-driven solutions of partial differential equations
+Let us start by concentrating on the problem of computing data-driven solutions to partial differential equations (i.e., the first problem outlined above) of the general form
+ut+N[u]=0,x∈Ω,t∈[0,T],
+ where
+u(t,x)
+ denotes the latent (hidden) solution,
+N[⋅]
+ is a nonlinear differential operator, and Ω is a subset of
+RD
+. In sections 3.1 and 3.2, we put forth two distinct types of algorithms, namely continuous and discrete time models, and highlight their properties and performance through the lens of
+Data-driven discovery of partial differential equations
+In the current part of our study, we shift our attention to the problem of data-driven discovery of partial differential equations [5], [9], [14]. In sections 4.1 and 4.2, we put forth two distinct types of algorithms, namely continuous and discrete time models, and highlight their properties and performance through the lens of various canonical problems.
+Conclusions
+We have introduced physics-informed neural networks, a new class of universal function approximators that is capable of encoding any underlying physical laws that govern a given data-set, and can be described by partial differential equations. In this work, we design data-driven algorithms for inferring solutions to general nonlinear partial differential equations, and constructing computationally efficient physics-informed surrogate models. The resulting methods showcase a series of promising
+Acknowledgements
+This work received support by the DARPA EQUiPS grant N66001-15-2-4055 and the AFOSR grant FA9550-17-1-0013. P. Perdikaris would also like to acknowledge support from DOE grant DE-SC0019116.
+References (50)
+M. Raissi et al.
+Inferring solutions of differential equations using noisy multi-fidelity data
+J. Comput. Phys.
+(2017)
+M. Raissi et al.
+Machine learning of linear differential equations using Gaussian processes
+J. Comput. Phys.
+(2017)
+K. Hornik et al.
+Multilayer feedforward networks are universal approximators
+Neural Netw.
+(1989)
+C. Basdevant et al.
+Spectral and finite difference solutions of the Burgers equation
+Comput. Fluids
+(1986)
+E.J. Parish et al.
+A paradigm for data-driven predictive modeling using field inversion and machine learning
+J. Comput. Phys.
+(2016)
+M. Milano et al.
+Neural network modeling for near wall turbulent flow
+J. Comput. Phys.
+(2002)
+I.H. Sloan et al.
+When are quasi-Monte Carlo algorithms efficient for high dimensional integrals?
+J. Complex.
+(1998)
+A. Krizhevsky et al.
+Imagenet classification with deep convolutional neural networks
+B.M. Lake et al.
+Human-level concept learning through probabilistic program induction
+Science
+(2015)
+B. Alipanahi et al.
+Predicting the sequence specificities of DNA- and RNA-binding proteins by deep learning
+Nat. Biotechnol.
+(2015)
+View more references
+Cited by (11502)
+An energy approach to the solution of partial differential equations in computational mechanics via machine learning: Concepts, implementation and applications
+2020, Computer Methods in Applied Mechanics and Engineering
+Show abstract
+Physics-informed machine learning
+2021, Nature Reviews Physics
+DeepXDE: A deep learning library for solving differential equations
+2021, SIAM Review
+Hidden fluid mechanics: Learning velocity and pressure fields from flow visualizations
+2020, Science
+Machine Learning for Fluid Mechanics
+2020, Annual Review of Fluid Mechanics
+Implicit neural representations with periodic activation functions
+2020, Advances in Neural Information Processing Systems
+View all citing articles on Scopus
+View full text
+© 2018 Elsevier Inc. All rights reserved.
+About ScienceDirect
+Remote access
+Contact and support
+Terms and conditions
+Privacy policy
+Cookie settings
+
+All content on this site: Copyright © 2025 Elsevier B.V., its licensors, and contributors. All rights are reserved, including those for text and data mining, AI training, and similar technologies. For all open access content, the relevant licensing terms apply.
+
+PDF
+Help

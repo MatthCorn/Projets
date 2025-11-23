@@ -79,7 +79,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 565.5
+    "width": 316.5
   },
   "right": {
     "id": "069c2a68fbb5e32d",
@@ -154,10 +154,15 @@
             "id": "0b71fd0e1f898a2b",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "type": "markdown",
+              "state": {
+                "file": "Denoising Diffusion Probabilistic Models (2).md",
+                "mode": "source",
+                "source": false,
+                "backlinks": false
+              },
+              "icon": "lucide-file",
+              "title": "Denoising Diffusion Probabilistic Models (2)"
             }
           }
         ],
@@ -165,7 +170,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 560.5
+    "width": 515.5
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -180,6 +185,12 @@
   },
   "active": "0b71fd0e1f898a2b",
   "lastOpenFiles": [
+    "Google’s Neural Machine Translation System-- Bridging the Gap  between Human and Machine Translation (2).md",
+    "Improving Language Understanding  by Generative Pre-Training (2).md",
+    "Deep Unsupervised Learning using  Nonequilibrium Thermodynamics (2).md",
+    "DENOISING DIFFUSION IMPLICIT MODELS (2).md",
+    "Learning in Implicit Generative Models (2).md",
+    "Learning Structured Output Representation  using Deep Conditional Generative Models.md",
     "Contribution/Digital Twin.md",
     "Advancing Neural Network Performance through  Emergence-Promoting Initialization Scheme (2).md",
     "~WRL0182.tmp",
@@ -210,11 +221,6 @@
     "Taming Transformers for High-Resolution Image Synthesis (2).md",
     "Skip-Thought Vectors (2).md",
     "Sequence to Sequence Learning with Neural Networks (2).md",
-    "Contribution/Introduction.md",
-    "A Survey on Knowledge integration techniques with Artifcial Neural Networks for seq-2-seq & time series models (2).md",
-    "Boost Transformer.md",
-    "Semi-supervised Sequence Learning (2).md",
-    "Semi-supervised Multitask Learning for Sequence Labeling (3).md",
-    "Self-Attention with Relative Position Representations (4).md"
+    "Contribution/Introduction.md"
   ]
 }
