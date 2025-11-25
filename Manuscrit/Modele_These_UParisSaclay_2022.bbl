@@ -91,7 +91,7 @@
       \verb 1606.01540 [cs]
       \endverb
       \verb{file}
-      \verb Preprint PDF:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\3PUKWHXS\\Brockman et al. - 2016 - OpenAI Gym.pdf:application/pdf;Snapshot:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\W2IGBPF8\\1606.html:text/html
+      \verb Preprint PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\3PUKWHXS\\Brockman et al. - 2016 - OpenAI Gym.pdf:application/pdf;Snapshot:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\W2IGBPF8\\1606.html:text/html
       \endverb
       \verb{urlraw}
       \verb http://arxiv.org/abs/1606.01540
@@ -99,7 +99,7 @@
       \verb{url}
       \verb http://arxiv.org/abs/1606.01540
       \endverb
-      \keyw{Computer Science - Artificial Intelligence,Computer Science - Machine Learning}
+      \keyw{Computer Science - Machine Learning,Computer Science - Artificial Intelligence}
     \endentry
     \entry{demay_alphadogfight_2022}{article}{}{}
       \name{author}{4}{}{%
@@ -145,8 +145,118 @@
       \field{year}{2022}
       \field{dateera}{ce}
       \verb{file}
-      \verb PDF:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\AUGEIB5C\\DeMay et al. - 2022 - AlphaDogfight Trials Bringing Autonomy to Air Combat.pdf:application/pdf
+      \verb PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\AUGEIB5C\\DeMay et al. - 2022 - AlphaDogfight Trials Bringing Autonomy to Air Combat.pdf:application/pdf
       \endverb
+    \endentry
+    \entry{dosovitskiy_image_2021}{misc}{}{}
+      \name{author}{12}{}{%
+        {{hash=72308762399d6ab62bbd9391c64c7bfd}{%
+           family={Dosovitskiy},
+           familyi={D\bibinitperiod},
+           given={Alexey},
+           giveni={A\bibinitperiod}}}%
+        {{hash=836254958eac09b30d45dd67a75ce4fa}{%
+           family={Beyer},
+           familyi={B\bibinitperiod},
+           given={Lucas},
+           giveni={L\bibinitperiod}}}%
+        {{hash=6807e3c00242c6bf6a3179905040471b}{%
+           family={Kolesnikov},
+           familyi={K\bibinitperiod},
+           given={Alexander},
+           giveni={A\bibinitperiod}}}%
+        {{hash=b398fca6879fde89a032b8e7de2f26b5}{%
+           family={Weissenborn},
+           familyi={W\bibinitperiod},
+           given={Dirk},
+           giveni={D\bibinitperiod}}}%
+        {{hash=00b950307c7d096765bb6df00c7c5c3a}{%
+           family={Zhai},
+           familyi={Z\bibinitperiod},
+           given={Xiaohua},
+           giveni={X\bibinitperiod}}}%
+        {{hash=1a47640139e63b9b5969c969dfe95def}{%
+           family={Unterthiner},
+           familyi={U\bibinitperiod},
+           given={Thomas},
+           giveni={T\bibinitperiod}}}%
+        {{hash=965baf6fa5686a42b1564330c5e11f2f}{%
+           family={Dehghani},
+           familyi={D\bibinitperiod},
+           given={Mostafa},
+           giveni={M\bibinitperiod}}}%
+        {{hash=06829adce8713f0ace444279dcd7328f}{%
+           family={Minderer},
+           familyi={M\bibinitperiod},
+           given={Matthias},
+           giveni={M\bibinitperiod}}}%
+        {{hash=c95269b4a2e23e1e526be521c7ec6ad4}{%
+           family={Heigold},
+           familyi={H\bibinitperiod},
+           given={Georg},
+           giveni={G\bibinitperiod}}}%
+        {{hash=450963f966620925cb8fecd32f7a6ee1}{%
+           family={Gelly},
+           familyi={G\bibinitperiod},
+           given={Sylvain},
+           giveni={S\bibinitperiod}}}%
+        {{hash=831027ee0ebf22375e2a86afc1881909}{%
+           family={Uszkoreit},
+           familyi={U\bibinitperiod},
+           given={Jakob},
+           giveni={J\bibinitperiod}}}%
+        {{hash=493a532418540859dca92cf3b579de2a}{%
+           family={Houlsby},
+           familyi={H\bibinitperiod},
+           given={Neil},
+           giveni={N\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {arXiv}%
+      }
+      \strng{namehash}{d96316bc7578db680aba71d4226354c8}
+      \strng{fullhash}{b8c06eaeb698f61fc96ff3e5570552ec}
+      \strng{fullhashraw}{b8c06eaeb698f61fc96ff3e5570552ec}
+      \strng{bibnamehash}{d96316bc7578db680aba71d4226354c8}
+      \strng{authorbibnamehash}{d96316bc7578db680aba71d4226354c8}
+      \strng{authornamehash}{d96316bc7578db680aba71d4226354c8}
+      \strng{authorfullhash}{b8c06eaeb698f61fc96ff3e5570552ec}
+      \strng{authorfullhashraw}{b8c06eaeb698f61fc96ff3e5570552ec}
+      \field{extraname}{1}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{While the Transformer architecture has become the de-facto standard for natural language processing tasks, its applications to computer vision remain limited. In vision, attention is either applied in conjunction with convolutional networks, or used to replace certain components of convolutional networks while keeping their overall structure in place. We show that this reliance on {CNNs} is not necessary and a pure transformer applied directly to sequences of image patches can perform very well on image classification tasks. When pre-trained on large amounts of data and transferred to multiple mid-sized or small image recognition benchmarks ({ImageNet}, {CIFAR}-100, {VTAB}, etc.), Vision Transformer ({ViT}) attains excellent results compared to state-of-the-art convolutional networks while requiring substantially fewer computational resources to train.}
+      \field{day}{3}
+      \field{eprinttype}{arxiv}
+      \field{langid}{english}
+      \field{month}{6}
+      \field{number}{{arXiv}:2010.11929}
+      \field{shorttitle}{An Image is Worth 16x16 Words}
+      \field{title}{An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale}
+      \field{urlday}{25}
+      \field{urlmonth}{11}
+      \field{urlyear}{2025}
+      \field{year}{2021}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{doi}
+      \verb 10.48550/arXiv.2010.11929
+      \endverb
+      \verb{eprint}
+      \verb 2010.11929 [cs]
+      \endverb
+      \verb{file}
+      \verb PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\R8HUPJXX\\Dosovitskiy et al. - 2021 - An Image is Worth 16x16 Words Transformers for Image Recognition at Scale.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/2010.11929
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/2010.11929
+      \endverb
+      \keyw{Computer Science - Computer Vision and Pattern Recognition,Computer Science - Machine Learning,Computer Science - Artificial Intelligence}
     \endentry
     \entry{dosovitskiy_carla_2017}{misc}{}{}
       \name{author}{5}{}{%
@@ -187,6 +297,7 @@
       \strng{authornamehash}{d96316bc7578db680aba71d4226354c8}
       \strng{authorfullhash}{00d4e7cbde09bfab8648fe4a57403d6e}
       \strng{authorfullhashraw}{00d4e7cbde09bfab8648fe4a57403d6e}
+      \field{extraname}{2}
       \field{sortinit}{D}
       \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
       \field{labelnamesource}{author}
@@ -211,7 +322,7 @@
       \verb 1711.03938 [cs]
       \endverb
       \verb{file}
-      \verb Preprint PDF:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\YJ44FQH3\\Dosovitskiy et al. - 2017 - CARLA An Open Urban Driving Simulator.pdf:application/pdf;Snapshot:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\Y4MYWNTD\\1711.html:text/html
+      \verb Preprint PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\YJ44FQH3\\Dosovitskiy et al. - 2017 - CARLA An Open Urban Driving Simulator.pdf:application/pdf;Snapshot:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\Y4MYWNTD\\1711.html:text/html
       \endverb
       \verb{urlraw}
       \verb http://arxiv.org/abs/1711.03938
@@ -244,7 +355,94 @@
       \field{langid}{english}
       \field{title}{Principles of Object-Oriented Modeling and Simulation with Modelica}
       \verb{file}
-      \verb PDF:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\5YM7XBDZ\\Fritzson - Principles of Object-Oriented Modeling and Simulation with Modelica.pdf:application/pdf
+      \verb PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\5YM7XBDZ\\Fritzson - Principles of Object-Oriented Modeling and Simulation with Modelica.pdf:application/pdf
+      \endverb
+    \endentry
+    \entry{noauthor_generative_nodate}{online}{}{}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{labeltitlesource}{title}
+      \field{title}{Generative adversarial networks {|} Communications of the {ACM}}
+      \field{urlday}{25}
+      \field{urlmonth}{11}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{file}
+      \verb Generative adversarial networks | Communications of the ACM:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\A5734EGI\\3422622.html:text/html
+      \endverb
+      \verb{urlraw}
+      \verb https://dl.acm.org/doi/abs/10.1145/3422622
+      \endverb
+      \verb{url}
+      \verb https://dl.acm.org/doi/abs/10.1145/3422622
+      \endverb
+    \endentry
+    \entry{goodman_world_nodate}{article}{}{}
+      \name{author}{1}{}{%
+        {{hash=ab48fb2ea6bb32020b1c6f62ddb8e955}{%
+           family={Goodman},
+           familyi={G\bibinitperiod},
+           given={Edmund},
+           giveni={E\bibinitperiod}}}%
+      }
+      \strng{namehash}{ab48fb2ea6bb32020b1c6f62ddb8e955}
+      \strng{fullhash}{ab48fb2ea6bb32020b1c6f62ddb8e955}
+      \strng{fullhashraw}{ab48fb2ea6bb32020b1c6f62ddb8e955}
+      \strng{bibnamehash}{ab48fb2ea6bb32020b1c6f62ddb8e955}
+      \strng{authorbibnamehash}{ab48fb2ea6bb32020b1c6f62ddb8e955}
+      \strng{authornamehash}{ab48fb2ea6bb32020b1c6f62ddb8e955}
+      \strng{authorfullhash}{ab48fb2ea6bb32020b1c6f62ddb8e955}
+      \strng{authorfullhashraw}{ab48fb2ea6bb32020b1c6f62ddb8e955}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{langid}{english}
+      \field{title}{World Models - David Ha, Jürgen Schmidhuber}
+      \verb{file}
+      \verb PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\D38D745C\\Goodman - World Models - David Ha, Jürgen Schmidhuber.pdf:application/pdf
+      \endverb
+    \endentry
+    \entry{graves_generating_2013}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=dfca94b0427da7f9088af596e23b46c0}{%
+           family={Graves},
+           familyi={G\bibinitperiod},
+           given={Alex},
+           giveni={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{dfca94b0427da7f9088af596e23b46c0}
+      \strng{fullhash}{dfca94b0427da7f9088af596e23b46c0}
+      \strng{fullhashraw}{dfca94b0427da7f9088af596e23b46c0}
+      \strng{bibnamehash}{dfca94b0427da7f9088af596e23b46c0}
+      \strng{authorbibnamehash}{dfca94b0427da7f9088af596e23b46c0}
+      \strng{authornamehash}{dfca94b0427da7f9088af596e23b46c0}
+      \strng{authorfullhash}{dfca94b0427da7f9088af596e23b46c0}
+      \strng{authorfullhashraw}{dfca94b0427da7f9088af596e23b46c0}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{This paper shows how Long Short-term Memory recurrent neural networks can be used to generate complex sequences with long-range structure, simply by predicting one data point at a time. The approach is demonstrated for text (where the data are discrete) and online handwriting (where the data are real-valued). It is then extended to handwriting synthesis by allowing the network to condition its predictions on a text sequence. The resulting system is able to generate highly realistic cursive handwriting in a wide variety of styles.}
+      \field{day}{4}
+      \field{langid}{english}
+      \field{month}{8}
+      \field{title}{Generating Sequences With Recurrent Neural Networks}
+      \field{titleaddon}{{arXiv}.org}
+      \field{urlday}{25}
+      \field{urlmonth}{11}
+      \field{urlyear}{2025}
+      \field{year}{2013}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{file}
+      \verb Full Text PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\U8XWGWB5\\Graves - 2013 - Generating Sequences With Recurrent Neural Networks.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/1308.0850v5
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/1308.0850v5
       \endverb
     \endentry
     \entry{grieves_digital_2015}{article}{}{}
@@ -275,7 +473,117 @@
       \field{year}{2015}
       \field{dateera}{ce}
       \verb{file}
-      \verb Full Text PDF:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\CWRTICN3\\Grieves - 2015 - Digital Twin Manufacturing Excellence through Virtual Factory Replication.pdf:application/pdf
+      \verb Full Text PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\CWRTICN3\\Grieves - 2015 - Digital Twin Manufacturing Excellence through Virtual Factory Replication.pdf:application/pdf
+      \endverb
+    \endentry
+    \entry{ho_denoising_2020}{inproceedings}{}{}
+      \name{author}{3}{}{%
+        {{hash=2ac2ca10b22e4d13af1767e87495412f}{%
+           family={Ho},
+           familyi={H\bibinitperiod},
+           given={Jonathan},
+           giveni={J\bibinitperiod}}}%
+        {{hash=31ac0835ffc3ba6d612252522a6a2011}{%
+           family={Jain},
+           familyi={J\bibinitperiod},
+           given={Ajay},
+           giveni={A\bibinitperiod}}}%
+        {{hash=e28d4ee199593959d8c29980a64f1974}{%
+           family={Abbeel},
+           familyi={A\bibinitperiod},
+           given={Pieter},
+           giveni={P\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Curran Associates, Inc.}%
+      }
+      \strng{namehash}{1ef17e0fed8d834b029ebb1c6adf76b4}
+      \strng{fullhash}{1ef17e0fed8d834b029ebb1c6adf76b4}
+      \strng{fullhashraw}{1ef17e0fed8d834b029ebb1c6adf76b4}
+      \strng{bibnamehash}{1ef17e0fed8d834b029ebb1c6adf76b4}
+      \strng{authorbibnamehash}{1ef17e0fed8d834b029ebb1c6adf76b4}
+      \strng{authornamehash}{1ef17e0fed8d834b029ebb1c6adf76b4}
+      \strng{authorfullhash}{1ef17e0fed8d834b029ebb1c6adf76b4}
+      \strng{authorfullhashraw}{1ef17e0fed8d834b029ebb1c6adf76b4}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{We present high quality image synthesis results using diffusion probabilistic models, a class of latent variable models inspired by considerations from nonequilibrium thermodynamics. Our best results are obtained by training on a weighted variational bound designed according to a novel connection between diffusion probabilistic models and denoising score matching with Langevin dynamics, and our models naturally admit a progressive lossy decompression scheme that can be interpreted as a generalization of autoregressive decoding. On the unconditional {CIFAR}10 dataset, we obtain an Inception score of 9.46 and a state-of-the-art {FID} score of 3.17. On 256x256 {LSUN}, we obtain sample quality similar to {ProgressiveGAN}.}
+      \field{booktitle}{Advances in Neural Information Processing Systems}
+      \field{title}{Denoising Diffusion Probabilistic Models}
+      \field{urlday}{25}
+      \field{urlmonth}{11}
+      \field{urlyear}{2025}
+      \field{volume}{33}
+      \field{year}{2020}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{6840\bibrangedash 6851}
+      \range{pages}{12}
+      \verb{file}
+      \verb Full Text PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\LKAL593S\\Ho et al. - 2020 - Denoising Diffusion Probabilistic Models.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://proceedings.neurips.cc/paper/2020/hash/4c5bcfec8584af0d967f1ab10179ca4b-Abstract.html
+      \endverb
+      \verb{url}
+      \verb https://proceedings.neurips.cc/paper/2020/hash/4c5bcfec8584af0d967f1ab10179ca4b-Abstract.html
+      \endverb
+    \endentry
+    \entry{isola_image--image_2017}{inproceedings}{}{}
+      \name{author}{4}{}{%
+        {{hash=cae9f806bc99a5f19fadea538fc2db04}{%
+           family={Isola},
+           familyi={I\bibinitperiod},
+           given={Phillip},
+           giveni={P\bibinitperiod}}}%
+        {{hash=9fbb4b31963f07f34a13b375b4997338}{%
+           family={Zhu},
+           familyi={Z\bibinitperiod},
+           given={Jun-Yan},
+           giveni={J\bibinithyphendelim Y\bibinitperiod}}}%
+        {{hash=fbb5fac74ecd20c0f90a3884d6a93cdf}{%
+           family={Zhou},
+           familyi={Z\bibinitperiod},
+           given={Tinghui},
+           giveni={T\bibinitperiod}}}%
+        {{hash=5a663b27298722834a8cf09bb93d8c94}{%
+           family={Efros},
+           familyi={E\bibinitperiod},
+           given={Alexei\bibnamedelima A.},
+           giveni={A\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+      }
+      \strng{namehash}{dd9b478c7b76d20d978868251cf3ad35}
+      \strng{fullhash}{18664a8c078ce7dff4c499de4e40bf2f}
+      \strng{fullhashraw}{18664a8c078ce7dff4c499de4e40bf2f}
+      \strng{bibnamehash}{dd9b478c7b76d20d978868251cf3ad35}
+      \strng{authorbibnamehash}{dd9b478c7b76d20d978868251cf3ad35}
+      \strng{authornamehash}{dd9b478c7b76d20d978868251cf3ad35}
+      \strng{authorfullhash}{18664a8c078ce7dff4c499de4e40bf2f}
+      \strng{authorfullhashraw}{18664a8c078ce7dff4c499de4e40bf2f}
+      \field{sortinit}{I}
+      \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eventtitle}{Proceedings of the {IEEE} Conference on Computer Vision and Pattern Recognition}
+      \field{title}{Image-To-Image Translation With Conditional Adversarial Networks}
+      \field{urlday}{25}
+      \field{urlmonth}{11}
+      \field{urlyear}{2025}
+      \field{year}{2017}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{1125\bibrangedash 1134}
+      \range{pages}{10}
+      \verb{file}
+      \verb Full Text PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\EKM8FNSY\\Isola et al. - 2017 - Image-To-Image Translation With Conditional Adversarial Networks.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://openaccess.thecvf.com/content_cvpr_2017/html/Isola_Image-To-Image_Translation_With_CVPR_2017_paper.html
+      \endverb
+      \verb{url}
+      \verb https://openaccess.thecvf.com/content_cvpr_2017/html/Isola_Image-To-Image_Translation_With_CVPR_2017_paper.html
       \endverb
     \endentry
     \entry{kerbl_3d_2023}{article}{}{}
@@ -333,7 +641,7 @@
       \verb 10.1145/3592433
       \endverb
       \verb{file}
-      \verb Full Text PDF:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\Y8HCQA6A\\Kerbl et al. - 2023 - 3D Gaussian Splatting for Real-Time Radiance Field Rendering.pdf:application/pdf
+      \verb Full Text PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\Y8HCQA6A\\Kerbl et al. - 2023 - 3D Gaussian Splatting for Real-Time Radiance Field Rendering.pdf:application/pdf
       \endverb
       \verb{urlraw}
       \verb https://dl.acm.org/doi/10.1145/3592433
@@ -342,73 +650,63 @@
       \verb https://dl.acm.org/doi/10.1145/3592433
       \endverb
     \endentry
-    \entry{kumar_rma_2021}{misc}{}{}
-      \name{author}{4}{}{%
-        {{hash=c4665f76db9bd49e7d08a82359ed197b}{%
-           family={Kumar},
+    \entry{kingma_auto-encoding_2022}{misc}{}{}
+      \name{author}{2}{}{%
+        {{hash=b6fbd171848aad4edf3925543f1f1522}{%
+           family={Kingma},
            familyi={K\bibinitperiod},
-           given={Ashish},
-           giveni={A\bibinitperiod}}}%
-        {{hash=871ca5e6de8cc6f1b62466dd6e9a440a}{%
-           family={Fu},
-           familyi={F\bibinitperiod},
-           given={Zipeng},
-           giveni={Z\bibinitperiod}}}%
-        {{hash=09e431093c8637ade01037714cfc992c}{%
-           family={Pathak},
-           familyi={P\bibinitperiod},
-           given={Deepak},
-           giveni={D\bibinitperiod}}}%
-        {{hash=c75a5377b6dc5213831576e88ffe553c}{%
-           family={Malik},
-           familyi={M\bibinitperiod},
-           given={Jitendra},
-           giveni={J\bibinitperiod}}}%
+           given={Diederik\bibnamedelima P.},
+           giveni={D\bibinitperiod\bibinitdelim P\bibinitperiod}}}%
+        {{hash=53d2880ad8047b61cdae2c6b2803e763}{%
+           family={Welling},
+           familyi={W\bibinitperiod},
+           given={Max},
+           giveni={M\bibinitperiod}}}%
       }
       \list{publisher}{1}{%
         {arXiv}%
       }
-      \strng{namehash}{05c3981500f977ffee5ce1db1ef3a2e9}
-      \strng{fullhash}{a0c173937a48617ec52f4c65ce7589b6}
-      \strng{fullhashraw}{a0c173937a48617ec52f4c65ce7589b6}
-      \strng{bibnamehash}{05c3981500f977ffee5ce1db1ef3a2e9}
-      \strng{authorbibnamehash}{05c3981500f977ffee5ce1db1ef3a2e9}
-      \strng{authornamehash}{05c3981500f977ffee5ce1db1ef3a2e9}
-      \strng{authorfullhash}{a0c173937a48617ec52f4c65ce7589b6}
-      \strng{authorfullhashraw}{a0c173937a48617ec52f4c65ce7589b6}
+      \strng{namehash}{aabdd5db7a1ed298b1dfb6824d032c66}
+      \strng{fullhash}{aabdd5db7a1ed298b1dfb6824d032c66}
+      \strng{fullhashraw}{aabdd5db7a1ed298b1dfb6824d032c66}
+      \strng{bibnamehash}{aabdd5db7a1ed298b1dfb6824d032c66}
+      \strng{authorbibnamehash}{aabdd5db7a1ed298b1dfb6824d032c66}
+      \strng{authornamehash}{aabdd5db7a1ed298b1dfb6824d032c66}
+      \strng{authorfullhash}{aabdd5db7a1ed298b1dfb6824d032c66}
+      \strng{authorfullhashraw}{aabdd5db7a1ed298b1dfb6824d032c66}
       \field{sortinit}{K}
       \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
       \field{labelnamesource}{author}
-      \field{labeltitlesource}{shorttitle}
-      \field{abstract}{Successful real-world deployment of legged robots would require them to adapt in real-time to unseen scenarios like changing terrains, changing payloads, wear and tear. This paper presents Rapid Motor Adaptation ({RMA}) algorithm to solve this problem of real-time online adaptation in quadruped robots. {RMA} consists of two components: a base policy and an adaptation module. The combination of these components enables the robot to adapt to novel situations in fractions of a second. {RMA} is trained completely in simulation without using any domain knowledge like reference trajectories or predefined foot trajectory generators and is deployed on the A1 robot without any fine-tuning. We train {RMA} on a varied terrain generator using bioenergetics-inspired rewards and deploy it on a variety of difficult terrains including rocky, slippery, deformable surfaces in environments with grass, long vegetation, concrete, pebbles, stairs, sand, etc. {RMA} shows state-of-the-art performance across diverse real-world as well as simulation experiments. Video results at https://ashish-kmr.github.io/rma-legged-robots/}
-      \field{day}{8}
+      \field{labeltitlesource}{title}
+      \field{abstract}{How can we perform efﬁcient inference and learning in directed probabilistic models, in the presence of continuous latent variables with intractable posterior distributions, and large datasets? We introduce a stochastic variational inference and learning algorithm that scales to large datasets and, under some mild differentiability conditions, even works in the intractable case. Our contributions are two-fold. First, we show that a reparameterization of the variational lower bound yields a lower bound estimator that can be straightforwardly optimized using standard stochastic gradient methods. Second, we show that for i.i.d. datasets with continuous latent variables per datapoint, posterior inference can be made especially efﬁcient by ﬁtting an approximate inference model (also called a recognition model) to the intractable posterior using the proposed lower bound estimator. Theoretical advantages are reﬂected in experimental results.}
+      \field{day}{10}
       \field{eprinttype}{arxiv}
-      \field{month}{7}
-      \field{number}{{arXiv}:2107.04034}
-      \field{shorttitle}{{RMA}}
-      \field{title}{{RMA}: Rapid Motor Adaptation for Legged Robots}
-      \field{urlday}{21}
+      \field{langid}{english}
+      \field{month}{12}
+      \field{number}{{arXiv}:1312.6114}
+      \field{title}{Auto-Encoding Variational Bayes}
+      \field{urlday}{25}
       \field{urlmonth}{11}
       \field{urlyear}{2025}
-      \field{year}{2021}
+      \field{year}{2022}
       \field{dateera}{ce}
       \field{urldateera}{ce}
       \verb{doi}
-      \verb 10.48550/arXiv.2107.04034
+      \verb 10.48550/arXiv.1312.6114
       \endverb
       \verb{eprint}
-      \verb 2107.04034 [cs]
+      \verb 1312.6114 [stat]
       \endverb
       \verb{file}
-      \verb Preprint PDF:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\XCWTLJGN\\Kumar et al. - 2021 - RMA Rapid Motor Adaptation for Legged Robots.pdf:application/pdf;Snapshot:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\RNKEFRPE\\2107.html:text/html
+      \verb PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\TU5ZXKGD\\Kingma et Welling - 2022 - Auto-Encoding Variational Bayes.pdf:application/pdf
       \endverb
       \verb{urlraw}
-      \verb http://arxiv.org/abs/2107.04034
+      \verb http://arxiv.org/abs/1312.6114
       \endverb
       \verb{url}
-      \verb http://arxiv.org/abs/2107.04034
+      \verb http://arxiv.org/abs/1312.6114
       \endverb
-      \keyw{Computer Science - Artificial Intelligence,Computer Science - Computer Vision and Pattern Recognition,Computer Science - Machine Learning,Computer Science - Robotics}
+      \keyw{Computer Science - Machine Learning,Statistics - Machine Learning}
     \endentry
     \entry{li_fourier_2021}{misc}{}{}
       \name{author}{7}{}{%
@@ -482,7 +780,7 @@
       \verb 2010.08895 [cs]
       \endverb
       \verb{file}
-      \verb Preprint PDF:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\AYWDGHXN\\Li et al. - 2021 - Fourier Neural Operator for Parametric Partial Differential Equations.pdf:application/pdf;Snapshot:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\DFIBZS7K\\2010.html:text/html
+      \verb Preprint PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\AYWDGHXN\\Li et al. - 2021 - Fourier Neural Operator for Parametric Partial Differential Equations.pdf:application/pdf;Snapshot:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\DFIBZS7K\\2010.html:text/html
       \endverb
       \verb{urlraw}
       \verb http://arxiv.org/abs/2010.08895
@@ -491,6 +789,32 @@
       \verb http://arxiv.org/abs/2010.08895
       \endverb
       \keyw{Computer Science - Machine Learning,Mathematics - Numerical Analysis}
+    \endentry
+    \entry{merkle_hamiltonian_nodate}{article}{}{}
+      \name{author}{1}{}{%
+        {{hash=f6edaeec8674aae0a93b29fb94d45d26}{%
+           family={Merkle},
+           familyi={M\bibinitperiod},
+           given={Marius},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{f6edaeec8674aae0a93b29fb94d45d26}
+      \strng{fullhash}{f6edaeec8674aae0a93b29fb94d45d26}
+      \strng{fullhashraw}{f6edaeec8674aae0a93b29fb94d45d26}
+      \strng{bibnamehash}{f6edaeec8674aae0a93b29fb94d45d26}
+      \strng{authorbibnamehash}{f6edaeec8674aae0a93b29fb94d45d26}
+      \strng{authornamehash}{f6edaeec8674aae0a93b29fb94d45d26}
+      \strng{authorfullhash}{f6edaeec8674aae0a93b29fb94d45d26}
+      \strng{authorfullhashraw}{f6edaeec8674aae0a93b29fb94d45d26}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{langid}{english}
+      \field{title}{Hamiltonian Neural Networks}
+      \verb{file}
+      \verb PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\IMN9SAIV\\Merkle - Hamiltonian Neural Networks.pdf:application/pdf
+      \endverb
     \endentry
     \entry{mildenhall_nerf_2021}{article}{}{}
       \name{author}{6}{}{%
@@ -558,7 +882,7 @@
       \verb 10.1145/3503250
       \endverb
       \verb{file}
-      \verb Full Text PDF:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\VTKL68KD\\Mildenhall et al. - 2021 - NeRF representing scenes as neural radiance fields for view synthesis.pdf:application/pdf
+      \verb Full Text PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\VTKL68KD\\Mildenhall et al. - 2021 - NeRF representing scenes as neural radiance fields for view synthesis.pdf:application/pdf
       \endverb
       \verb{urlraw}
       \verb https://dl.acm.org/doi/10.1145/3503250
@@ -566,6 +890,63 @@
       \verb{url}
       \verb https://dl.acm.org/doi/10.1145/3503250
       \endverb
+    \endentry
+    \entry{mohamed_learning_2017}{misc}{}{}
+      \name{author}{2}{}{%
+        {{hash=b520f2e46ec8803dd4c66bf1d6059482}{%
+           family={Mohamed},
+           familyi={M\bibinitperiod},
+           given={Shakir},
+           giveni={S\bibinitperiod}}}%
+        {{hash=55c0a67ecb602e5a3063393ffee9c7fa}{%
+           family={Lakshminarayanan},
+           familyi={L\bibinitperiod},
+           given={Balaji},
+           giveni={B\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {arXiv}%
+      }
+      \strng{namehash}{770bfd89752061540ebbdaf6ec4465c0}
+      \strng{fullhash}{770bfd89752061540ebbdaf6ec4465c0}
+      \strng{fullhashraw}{770bfd89752061540ebbdaf6ec4465c0}
+      \strng{bibnamehash}{770bfd89752061540ebbdaf6ec4465c0}
+      \strng{authorbibnamehash}{770bfd89752061540ebbdaf6ec4465c0}
+      \strng{authornamehash}{770bfd89752061540ebbdaf6ec4465c0}
+      \strng{authorfullhash}{770bfd89752061540ebbdaf6ec4465c0}
+      \strng{authorfullhashraw}{770bfd89752061540ebbdaf6ec4465c0}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Generative adversarial networks ({GANs}) provide an algorithmic framework for constructing generative models with several appealing properties: they do not require a likelihood function to be specified, only a generating procedure; they provide samples that are sharp and compelling; and they allow us to harness our knowledge of building highly accurate neural network classifiers. Here, we develop our understanding of {GANs} with the aim of forming a rich view of this growing area of machine learning---to build connections to the diverse set of statistical thinking on this topic, of which much can be gained by a mutual exchange of ideas. We frame {GANs} within the wider landscape of algorithms for learning in implicit generative models--models that only specify a stochastic procedure with which to generate data--and relate these ideas to modelling problems in related fields, such as econometrics and approximate Bayesian computation. We develop likelihood-free inference methods and highlight hypothesis testing as a principle for learning in implicit generative models, using which we are able to derive the objective function used by {GANs}, and many other related objectives. The testing viewpoint directs our focus to the general problem of density ratio estimation. There are four approaches for density ratio estimation, one of which is a solution using classifiers to distinguish real from generated data. Other approaches such as divergence minimisation and moment matching have also been explored in the {GAN} literature, and we synthesise these views to form an understanding in terms of the relationships between them and the wider literature, highlighting avenues for future exploration and cross-pollination.}
+      \field{day}{27}
+      \field{eprinttype}{arxiv}
+      \field{month}{2}
+      \field{number}{{arXiv}:1610.03483}
+      \field{title}{Learning in Implicit Generative Models}
+      \field{urlday}{25}
+      \field{urlmonth}{11}
+      \field{urlyear}{2025}
+      \field{year}{2017}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{doi}
+      \verb 10.48550/arXiv.1610.03483
+      \endverb
+      \verb{eprint}
+      \verb 1610.03483 [stat]
+      \endverb
+      \verb{file}
+      \verb Preprint PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\QERTFXWJ\\Mohamed et Lakshminarayanan - 2017 - Learning in Implicit Generative Models.pdf:application/pdf;Snapshot:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\GW8XJM9V\\1610.html:text/html
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/1610.03483
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/1610.03483
+      \endverb
+      \keyw{Computer Science - Machine Learning,Statistics - Computation,Statistics - Machine Learning}
     \endentry
     \entry{muller_instant_2022}{article}{}{}
       \name{author}{4}{}{%
@@ -623,7 +1004,7 @@
       \verb 10.1145/3528223.3530127
       \endverb
       \verb{file}
-      \verb Full Text PDF:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\K75Z8UDW\\Müller et al. - 2022 - Instant neural graphics primitives with a multiresolution hash encoding.pdf:application/pdf
+      \verb Full Text PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\K75Z8UDW\\Müller et al. - 2022 - Instant neural graphics primitives with a multiresolution hash encoding.pdf:application/pdf
       \endverb
       \verb{urlraw}
       \verb https://dl.acm.org/doi/10.1145/3528223.3530127
@@ -683,7 +1064,7 @@
       \verb 10.1016/j.promfg.2017.07.198
       \endverb
       \verb{file}
-      \verb ScienceDirect Full Text PDF:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\RB436WZY\\Negri et al. - 2017 - A Review of the Roles of Digital Twin in CPS-based Production Systems.pdf:application/pdf;ScienceDirect Snapshot:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\8VY55JIW\\S2351978917304067.html:text/html
+      \verb ScienceDirect Full Text PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\RB436WZY\\Negri et al. - 2017 - A Review of the Roles of Digital Twin in CPS-based Production Systems.pdf:application/pdf;ScienceDirect Snapshot:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\8VY55JIW\\S2351978917304067.html:text/html
       \endverb
       \verb{urlraw}
       \verb https://www.sciencedirect.com/science/article/pii/S2351978917304067
@@ -751,7 +1132,7 @@
       \verb 2209.14988 [cs]
       \endverb
       \verb{file}
-      \verb Full Text PDF:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\MNJHCNN3\\Poole et al. - 2022 - DreamFusion Text-to-3D using 2D Diffusion.pdf:application/pdf;Snapshot:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\ZHD7HQCW\\2209.html:text/html
+      \verb Full Text PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\MNJHCNN3\\Poole et al. - 2022 - DreamFusion Text-to-3D using 2D Diffusion.pdf:application/pdf;Snapshot:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\ZHD7HQCW\\2209.html:text/html
       \endverb
       \verb{urlraw}
       \verb http://arxiv.org/abs/2209.14988
@@ -760,6 +1141,48 @@
       \verb http://arxiv.org/abs/2209.14988
       \endverb
       \keyw{Computer Science - Computer Vision and Pattern Recognition,Computer Science - Machine Learning,Statistics - Machine Learning}
+    \endentry
+    \entry{radford_improving_nodate}{article}{}{}
+      \name{author}{4}{}{%
+        {{hash=a812c46caad94fc8701be37871f303ba}{%
+           family={Radford},
+           familyi={R\bibinitperiod},
+           given={Alec},
+           giveni={A\bibinitperiod}}}%
+        {{hash=997c3143c2e5d593e816d2ff704fbf98}{%
+           family={Narasimhan},
+           familyi={N\bibinitperiod},
+           given={Karthik},
+           giveni={K\bibinitperiod}}}%
+        {{hash=e6f76e1a4d058df028530916774ad3a7}{%
+           family={Salimans},
+           familyi={S\bibinitperiod},
+           given={Tim},
+           giveni={T\bibinitperiod}}}%
+        {{hash=8d569d1d5b8b5a7836017a98b430f959}{%
+           family={Sutskever},
+           familyi={S\bibinitperiod},
+           given={Ilya},
+           giveni={I\bibinitperiod}}}%
+      }
+      \strng{namehash}{ca3baa5a22057195db1c71be39b4c922}
+      \strng{fullhash}{fbc85d06f02fc1534a6ba28d0d6e5c89}
+      \strng{fullhashraw}{fbc85d06f02fc1534a6ba28d0d6e5c89}
+      \strng{bibnamehash}{ca3baa5a22057195db1c71be39b4c922}
+      \strng{authorbibnamehash}{ca3baa5a22057195db1c71be39b4c922}
+      \strng{authornamehash}{ca3baa5a22057195db1c71be39b4c922}
+      \strng{authorfullhash}{fbc85d06f02fc1534a6ba28d0d6e5c89}
+      \strng{authorfullhashraw}{fbc85d06f02fc1534a6ba28d0d6e5c89}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Natural language understanding comprises a wide range of diverse tasks such as textual entailment, question answering, semantic similarity assessment, and document classiﬁcation. Although large unlabeled text corpora are abundant, labeled data for learning these speciﬁc tasks is scarce, making it challenging for discriminatively trained models to perform adequately. We demonstrate that large gains on these tasks can be realized by generative pre-training of a language model on a diverse corpus of unlabeled text, followed by discriminative ﬁne-tuning on each speciﬁc task. In contrast to previous approaches, we make use of task-aware input transformations during ﬁne-tuning to achieve effective transfer while requiring minimal changes to the model architecture. We demonstrate the effectiveness of our approach on a wide range of benchmarks for natural language understanding. Our general task-agnostic model outperforms discriminatively trained models that use architectures speciﬁcally crafted for each task, signiﬁcantly improving upon the state of the art in 9 out of the 12 tasks studied. For instance, we achieve absolute improvements of 8.9\% on commonsense reasoning (Stories Cloze Test), 5.7\% on question answering ({RACE}), and 1.5\% on textual entailment ({MultiNLI}).}
+      \field{langid}{english}
+      \field{title}{Improving Language Understanding by Generative Pre-Training}
+      \verb{file}
+      \verb PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\BIE7ZTMF\\Radford et al. - Improving Language Understanding by Generative Pre-Training.pdf:application/pdf
+      \endverb
     \endentry
     \entry{raissi_physics-informed_2019}{article}{}{}
       \name{author}{3}{}{%
@@ -812,13 +1235,207 @@
       \verb 10.1016/j.jcp.2018.10.045
       \endverb
       \verb{file}
-      \verb PDF:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\459DARMF\\Raissi et al. - 2019 - Physics-informed neural networks A deep learning framework for solving forward and inverse problems.pdf:application/pdf
+      \verb PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\459DARMF\\Raissi et al. - 2019 - Physics-informed neural networks A deep learning framework for solving forward and inverse problems.pdf:application/pdf
       \endverb
       \verb{urlraw}
       \verb https://linkinghub.elsevier.com/retrieve/pii/S0021999118307125
       \endverb
       \verb{url}
       \verb https://linkinghub.elsevier.com/retrieve/pii/S0021999118307125
+      \endverb
+    \endentry
+    \entry{razavi_generating_2019}{inproceedings}{}{}
+      \name{author}{3}{}{%
+        {{hash=9ca7515466980f5bf6d96e49e5e05993}{%
+           family={Razavi},
+           familyi={R\bibinitperiod},
+           given={Ali},
+           giveni={A\bibinitperiod}}}%
+        {{hash=705a5ed355c190be3a39e0a5134d2ae5}{%
+           family={Oord},
+           familyi={O\bibinitperiod},
+           given={Aaron},
+           giveni={A\bibinitperiod},
+           prefix={van\bibnamedelima den},
+           prefixi={v\bibinitperiod\bibinitdelim d\bibinitperiod}}}%
+        {{hash=494b568c5dc85ba8f3f409635f9c5f25}{%
+           family={Vinyals},
+           familyi={V\bibinitperiod},
+           given={Oriol},
+           giveni={O\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Curran Associates, Inc.}%
+      }
+      \strng{namehash}{753cdef1b76856af2628a8eb3b67dcc5}
+      \strng{fullhash}{753cdef1b76856af2628a8eb3b67dcc5}
+      \strng{fullhashraw}{753cdef1b76856af2628a8eb3b67dcc5}
+      \strng{bibnamehash}{753cdef1b76856af2628a8eb3b67dcc5}
+      \strng{authorbibnamehash}{753cdef1b76856af2628a8eb3b67dcc5}
+      \strng{authornamehash}{753cdef1b76856af2628a8eb3b67dcc5}
+      \strng{authorfullhash}{753cdef1b76856af2628a8eb3b67dcc5}
+      \strng{authorfullhashraw}{753cdef1b76856af2628a8eb3b67dcc5}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{We explore the use of Vector Quantized Variational {AutoEncoder} ({VQ}-{VAE}) models for large scale image generation. To this end, we scale and enhance the autoregressive priors used in {VQ}-{VAE} to generate synthetic samples of much higher coherence and fidelity than possible before. We use simple feed-forward encoder and decoder networks, making our model an attractive candidate for applications where the encoding and/or decoding speed is critical. Additionally, {VQ}-{VAE} requires sampling an autoregressive model only in the compressed latent space, which is an order of magnitude faster than sampling in the pixel space, especially for large images. We demonstrate that a multi-scale hierarchical organization of {VQ}-{VAE}, augmented with powerful priors over the latent codes, is able to generate samples with quality that rivals that of state of the art Generative Adversarial Networks on multifaceted datasets such as {ImageNet}, while not suffering from {GAN}'s known shortcomings such as mode collapse and lack of diversity.}
+      \field{booktitle}{Advances in Neural Information Processing Systems}
+      \field{title}{Generating Diverse High-Fidelity Images with {VQ}-{VAE}-2}
+      \field{urlday}{25}
+      \field{urlmonth}{11}
+      \field{urlyear}{2025}
+      \field{volume}{32}
+      \field{year}{2019}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{file}
+      \verb Full Text PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\UN242A8S\\Razavi et al. - 2019 - Generating Diverse High-Fidelity Images with VQ-VAE-2.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://proceedings.neurips.cc/paper/2019/hash/5f8e2fa1718d1bbcadf1cd9c7a54fb8c-Abstract.html
+      \endverb
+      \verb{url}
+      \verb https://proceedings.neurips.cc/paper/2019/hash/5f8e2fa1718d1bbcadf1cd9c7a54fb8c-Abstract.html
+      \endverb
+    \endentry
+    \entry{reed_generalist_2022}{online}{}{}
+      \name{author}{20}{}{%
+        {{hash=698ee61a2f3fa29734204496d2d36aef}{%
+           family={Reed},
+           familyi={R\bibinitperiod},
+           given={Scott},
+           giveni={S\bibinitperiod}}}%
+        {{hash=623b2518d730a538a3e522b46c2fcdc8}{%
+           family={Zolna},
+           familyi={Z\bibinitperiod},
+           given={Konrad},
+           giveni={K\bibinitperiod}}}%
+        {{hash=f432a700f86fcb79a7721a1f2475f36c}{%
+           family={Parisotto},
+           familyi={P\bibinitperiod},
+           given={Emilio},
+           giveni={E\bibinitperiod}}}%
+        {{hash=8006d0b2d468ff6af5b41fbd18822177}{%
+           family={Colmenarejo},
+           familyi={C\bibinitperiod},
+           given={Sergio\bibnamedelima Gomez},
+           giveni={S\bibinitperiod\bibinitdelim G\bibinitperiod}}}%
+        {{hash=7bdd145d92cfa3763c41441779b1d37d}{%
+           family={Novikov},
+           familyi={N\bibinitperiod},
+           given={Alexander},
+           giveni={A\bibinitperiod}}}%
+        {{hash=4fe722edec22e43136b8c369d4906a77}{%
+           family={Barth-Maron},
+           familyi={B\bibinithyphendelim M\bibinitperiod},
+           given={Gabriel},
+           giveni={G\bibinitperiod}}}%
+        {{hash=c9f83ecaa1eeb1943adfe77825cd8ff2}{%
+           family={Gimenez},
+           familyi={G\bibinitperiod},
+           given={Mai},
+           giveni={M\bibinitperiod}}}%
+        {{hash=22eaafdd6c3038933341b729e199e0ce}{%
+           family={Sulsky},
+           familyi={S\bibinitperiod},
+           given={Yury},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=56a21a482f349b9aa485ad72542881e1}{%
+           family={Kay},
+           familyi={K\bibinitperiod},
+           given={Jackie},
+           giveni={J\bibinitperiod}}}%
+        {{hash=d52162d1c5497f647e12128f74d58da4}{%
+           family={Springenberg},
+           familyi={S\bibinitperiod},
+           given={Jost\bibnamedelima Tobias},
+           giveni={J\bibinitperiod\bibinitdelim T\bibinitperiod}}}%
+        {{hash=21c386fa858b491a1f48be5a12bfd7e0}{%
+           family={Eccles},
+           familyi={E\bibinitperiod},
+           given={Tom},
+           giveni={T\bibinitperiod}}}%
+        {{hash=5b2c0795367c8b133d89c2f76ed4b719}{%
+           family={Bruce},
+           familyi={B\bibinitperiod},
+           given={Jake},
+           giveni={J\bibinitperiod}}}%
+        {{hash=9ca7515466980f5bf6d96e49e5e05993}{%
+           family={Razavi},
+           familyi={R\bibinitperiod},
+           given={Ali},
+           giveni={A\bibinitperiod}}}%
+        {{hash=3f89843f9eded42ffda47c52c9a4966b}{%
+           family={Edwards},
+           familyi={E\bibinitperiod},
+           given={Ashley},
+           giveni={A\bibinitperiod}}}%
+        {{hash=231312991eab5915498d6c19c2a8cd4e}{%
+           family={Heess},
+           familyi={H\bibinitperiod},
+           given={Nicolas},
+           giveni={N\bibinitperiod}}}%
+        {{hash=5759ff4990bdd8c6f85835738834874a}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Yutian},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=dc7c14ebfc2b431292d1ff4ded63d5e7}{%
+           family={Hadsell},
+           familyi={H\bibinitperiod},
+           given={Raia},
+           giveni={R\bibinitperiod}}}%
+        {{hash=494b568c5dc85ba8f3f409635f9c5f25}{%
+           family={Vinyals},
+           familyi={V\bibinitperiod},
+           given={Oriol},
+           giveni={O\bibinitperiod}}}%
+        {{hash=3723ab584df88a470da8b40417b76e0e}{%
+           family={Bordbar},
+           familyi={B\bibinitperiod},
+           given={Mahyar},
+           giveni={M\bibinitperiod}}}%
+        {{hash=cf269f9a5106a41ad53847a68a27db1c}{%
+           family={Freitas},
+           familyi={F\bibinitperiod},
+           given={Nando},
+           giveni={N\bibinitperiod},
+           prefix={de},
+           prefixi={d\bibinitperiod}}}%
+      }
+      \strng{namehash}{225dee12c579570621661f9d368fb291}
+      \strng{fullhash}{1035d1120bf3f0cb051113813490ffef}
+      \strng{fullhashraw}{1035d1120bf3f0cb051113813490ffef}
+      \strng{bibnamehash}{225dee12c579570621661f9d368fb291}
+      \strng{authorbibnamehash}{225dee12c579570621661f9d368fb291}
+      \strng{authornamehash}{225dee12c579570621661f9d368fb291}
+      \strng{authorfullhash}{1035d1120bf3f0cb051113813490ffef}
+      \strng{authorfullhashraw}{1035d1120bf3f0cb051113813490ffef}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Inspired by progress in large-scale language modeling, we apply a similar approach towards building a single generalist agent beyond the realm of text outputs. The agent, which we refer to as Gato, works as a multi-modal, multi-task, multi-embodiment generalist policy. The same network with the same weights can play Atari, caption images, chat, stack blocks with a real robot arm and much more, deciding based on its context whether to output text, joint torques, button presses, or other tokens. In this report we describe the model and the data, and document the current capabilities of Gato.}
+      \field{day}{12}
+      \field{langid}{english}
+      \field{month}{5}
+      \field{title}{A Generalist Agent}
+      \field{titleaddon}{{arXiv}.org}
+      \field{urlday}{25}
+      \field{urlmonth}{11}
+      \field{urlyear}{2025}
+      \field{year}{2022}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{file}
+      \verb Full Text PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\WFHUDG7D\\Reed et al. - 2022 - A Generalist Agent.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/2205.06175v3
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/2205.06175v3
       \endverb
     \endentry
     \entry{sanchez-gonzalez_learning_2020}{misc}{}{}
@@ -888,7 +1505,7 @@
       \verb 2002.09405 [cs]
       \endverb
       \verb{file}
-      \verb Full Text PDF:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\TDXFRGNK\\Sanchez-Gonzalez et al. - 2020 - Learning to Simulate Complex Physics with Graph Networks.pdf:application/pdf;Snapshot:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\YUU2UZZL\\2002.html:text/html
+      \verb Full Text PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\TDXFRGNK\\Sanchez-Gonzalez et al. - 2020 - Learning to Simulate Complex Physics with Graph Networks.pdf:application/pdf;Snapshot:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\YUU2UZZL\\2002.html:text/html
       \endverb
       \verb{urlraw}
       \verb http://arxiv.org/abs/2002.09405
@@ -1068,6 +1685,175 @@
       \endverb
       \keyw{Computational science,Computer science,Reward}
     \endentry
+    \entry{sohl-dickstein_deep_2015}{inproceedings}{}{}
+      \name{author}{4}{}{%
+        {{hash=529bdf392a3471f000ce33ec88c41bd5}{%
+           family={Sohl-Dickstein},
+           familyi={S\bibinithyphendelim D\bibinitperiod},
+           given={Jascha},
+           giveni={J\bibinitperiod}}}%
+        {{hash=e42d744e61977e0833217eb3bfd77f60}{%
+           family={Weiss},
+           familyi={W\bibinitperiod},
+           given={Eric},
+           giveni={E\bibinitperiod}}}%
+        {{hash=24b3062319f458bd1a60642d737d4aea}{%
+           family={Maheswaranathan},
+           familyi={M\bibinitperiod},
+           given={Niru},
+           giveni={N\bibinitperiod}}}%
+        {{hash=05b3e391388084df874ede60f2210c12}{%
+           family={Ganguli},
+           familyi={G\bibinitperiod},
+           given={Surya},
+           giveni={S\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {PMLR}%
+      }
+      \strng{namehash}{ba6e625a46287ebf30dd9d9f3c07087b}
+      \strng{fullhash}{9c08ae1a9d19a2750d4f50c36df0039b}
+      \strng{fullhashraw}{9c08ae1a9d19a2750d4f50c36df0039b}
+      \strng{bibnamehash}{ba6e625a46287ebf30dd9d9f3c07087b}
+      \strng{authorbibnamehash}{ba6e625a46287ebf30dd9d9f3c07087b}
+      \strng{authornamehash}{ba6e625a46287ebf30dd9d9f3c07087b}
+      \strng{authorfullhash}{9c08ae1a9d19a2750d4f50c36df0039b}
+      \strng{authorfullhashraw}{9c08ae1a9d19a2750d4f50c36df0039b}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{A central problem in machine learning involves modeling complex data-sets using highly flexible families of probability distributions in which learning, sampling, inference, and evaluation are still analytically or computationally tractable. Here, we develop an approach that simultaneously achieves both flexibility and tractability. The essential idea, inspired by non-equilibrium statistical physics, is to systematically and slowly destroy structure in a data distribution through an iterative forward diffusion process. We then learn a reverse diffusion process that restores structure in data, yielding a highly flexible and tractable generative model of the data. This approach allows us to rapidly learn, sample from, and evaluate probabilities in deep generative models with thousands of layers or time steps, as well as to compute conditional and posterior probabilities under the learned model. We additionally release an open source reference implementation of the algorithm.}
+      \field{booktitle}{Proceedings of the 32nd International Conference on Machine Learning}
+      \field{day}{1}
+      \field{eventtitle}{International Conference on Machine Learning}
+      \field{langid}{english}
+      \field{month}{6}
+      \field{note}{{ISSN}: 1938-7228}
+      \field{title}{Deep Unsupervised Learning using Nonequilibrium Thermodynamics}
+      \field{urlday}{25}
+      \field{urlmonth}{11}
+      \field{urlyear}{2025}
+      \field{year}{2015}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{2256\bibrangedash 2265}
+      \range{pages}{10}
+      \verb{file}
+      \verb Full Text PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\MZI7FSA2\\Sohl-Dickstein et al. - 2015 - Deep Unsupervised Learning using Nonequilibrium Thermodynamics.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://proceedings.mlr.press/v37/sohl-dickstein15.html
+      \endverb
+      \verb{url}
+      \verb https://proceedings.mlr.press/v37/sohl-dickstein15.html
+      \endverb
+    \endentry
+    \entry{sohn_learning_2015}{inproceedings}{}{}
+      \name{author}{3}{}{%
+        {{hash=bcd831d016f1c84fc5f1ac9744284515}{%
+           family={Sohn},
+           familyi={S\bibinitperiod},
+           given={Kihyuk},
+           giveni={K\bibinitperiod}}}%
+        {{hash=d09ea8631bf43468107b5ef02c5195aa}{%
+           family={Lee},
+           familyi={L\bibinitperiod},
+           given={Honglak},
+           giveni={H\bibinitperiod}}}%
+        {{hash=ba676e881344787363f4b7380db5d34d}{%
+           family={Yan},
+           familyi={Y\bibinitperiod},
+           given={Xinchen},
+           giveni={X\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Curran Associates, Inc.}%
+      }
+      \strng{namehash}{b62ac6da925cbaaf571515e404354c1b}
+      \strng{fullhash}{b62ac6da925cbaaf571515e404354c1b}
+      \strng{fullhashraw}{b62ac6da925cbaaf571515e404354c1b}
+      \strng{bibnamehash}{b62ac6da925cbaaf571515e404354c1b}
+      \strng{authorbibnamehash}{b62ac6da925cbaaf571515e404354c1b}
+      \strng{authornamehash}{b62ac6da925cbaaf571515e404354c1b}
+      \strng{authorfullhash}{b62ac6da925cbaaf571515e404354c1b}
+      \strng{authorfullhashraw}{b62ac6da925cbaaf571515e404354c1b}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Supervised deep learning has been successfully applied for many recognition problems in machine learning and computer vision. Although it can approximate a complex many-to-one function very well when large number of training data is provided, the lack of probabilistic inference of the current supervised deep learning methods makes it difficult to model a complex structured output representations. In this work, we develop a scalable deep conditional generative model for structured output variables using Gaussian latent variables. The model is trained efficiently in the framework of stochastic gradient variational Bayes, and allows a fast prediction using stochastic feed-forward inference. In addition, we provide novel strategies to build a robust structured prediction algorithms, such as recurrent prediction network architecture, input noise-injection and multi-scale prediction training methods. In experiments, we demonstrate the effectiveness of our proposed algorithm in comparison to the deterministic deep neural network counterparts in generating diverse but realistic output representations using stochastic inference. Furthermore, the proposed schemes in training methods and architecture design were complimentary, which leads to achieve strong pixel-level object segmentation and semantic labeling performance on Caltech-{UCSD} Birds 200 and the subset of Labeled Faces in the Wild dataset.}
+      \field{booktitle}{Advances in Neural Information Processing Systems}
+      \field{title}{Learning Structured Output Representation using Deep Conditional Generative Models}
+      \field{urlday}{25}
+      \field{urlmonth}{11}
+      \field{urlyear}{2025}
+      \field{volume}{28}
+      \field{year}{2015}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{file}
+      \verb Full Text PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\KAX5IB55\\Sohn et al. - 2015 - Learning Structured Output Representation using Deep Conditional Generative Models.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://proceedings.neurips.cc/paper/2015/hash/8d55a249e6baa5c06772297520da2051-Abstract.html
+      \endverb
+      \verb{url}
+      \verb https://proceedings.neurips.cc/paper/2015/hash/8d55a249e6baa5c06772297520da2051-Abstract.html
+      \endverb
+    \endentry
+    \entry{song_denoising_2020}{online}{}{}
+      \name{author}{3}{}{%
+        {{hash=78372b7167d001d4c80db2b19d6a76f3}{%
+           family={Song},
+           familyi={S\bibinitperiod},
+           given={Jiaming},
+           giveni={J\bibinitperiod}}}%
+        {{hash=58f87d1ad306023b7f8301b2b85c1584}{%
+           family={Meng},
+           familyi={M\bibinitperiod},
+           given={Chenlin},
+           giveni={C\bibinitperiod}}}%
+        {{hash=160929a7e6ceecdf3f7c9a13abd5ea35}{%
+           family={Ermon},
+           familyi={E\bibinitperiod},
+           given={Stefano},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{ebc7e264c58ec8ac9b0159b127245547}
+      \strng{fullhash}{ebc7e264c58ec8ac9b0159b127245547}
+      \strng{fullhashraw}{ebc7e264c58ec8ac9b0159b127245547}
+      \strng{bibnamehash}{ebc7e264c58ec8ac9b0159b127245547}
+      \strng{authorbibnamehash}{ebc7e264c58ec8ac9b0159b127245547}
+      \strng{authornamehash}{ebc7e264c58ec8ac9b0159b127245547}
+      \strng{authorfullhash}{ebc7e264c58ec8ac9b0159b127245547}
+      \strng{authorfullhashraw}{ebc7e264c58ec8ac9b0159b127245547}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Denoising diffusion probabilistic models ({DDPMs}) have achieved high quality image generation without adversarial training, yet they require simulating a Markov chain for many steps to produce a sample. To accelerate sampling, we present denoising diffusion implicit models ({DDIMs}), a more efficient class of iterative implicit probabilistic models with the same training procedure as {DDPMs}. In {DDPMs}, the generative process is defined as the reverse of a Markovian diffusion process. We construct a class of non-Markovian diffusion processes that lead to the same training objective, but whose reverse process can be much faster to sample from. We empirically demonstrate that {DDIMs} can produce high quality samples \$10 {\textbackslash}times\$ to \$50 {\textbackslash}times\$ faster in terms of wall-clock time compared to {DDPMs}, allow us to trade off computation for sample quality, and can perform semantically meaningful image interpolation directly in the latent space.}
+      \field{day}{6}
+      \field{langid}{english}
+      \field{month}{10}
+      \field{title}{Denoising Diffusion Implicit Models}
+      \field{titleaddon}{{arXiv}.org}
+      \field{urlday}{25}
+      \field{urlmonth}{11}
+      \field{urlyear}{2025}
+      \field{year}{2020}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{file}
+      \verb Full Text PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\2C3BVZ2X\\Song et al. - 2020 - Denoising Diffusion Implicit Models.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/2010.02502v4
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/2010.02502v4
+      \endverb
+    \endentry
     \entry{tao_digital_2019}{article}{}{}
       \name{author}{4}{}{%
         {{hash=f4149340bc388abb627321731645513a}{%
@@ -1123,7 +1909,7 @@
       \verb 10.1109/TII.2018.2873186
       \endverb
       \verb{file}
-      \verb PDF:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\35LDCSUV\\Tao et al. - 2019 - Digital Twin in Industry State-of-the-Art.pdf:application/pdf;Snapshot:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\VU482CJJ\\8477101.html:text/html
+      \verb PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\35LDCSUV\\Tao et al. - 2019 - Digital Twin in Industry State-of-the-Art.pdf:application/pdf;Snapshot:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\VU482CJJ\\8477101.html:text/html
       \endverb
       \verb{urlraw}
       \verb https://ieeexplore.ieee.org/document/8477101
@@ -1196,7 +1982,7 @@
       \verb 10.1109/IROS.2017.8202133
       \endverb
       \verb{file}
-      \verb Snapshot:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\VUYBS32D\\8202133.html:text/html;Version soumise:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\M3GNKLIU\\Tobin et al. - 2017 - Domain randomization for transferring deep neural networks from simulation to the real world.pdf:application/pdf
+      \verb Snapshot:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\VUYBS32D\\8202133.html:text/html;Version soumise:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\M3GNKLIU\\Tobin et al. - 2017 - Domain randomization for transferring deep neural networks from simulation to the real world.pdf:application/pdf
       \endverb
       \verb{urlraw}
       \verb https://ieeexplore.ieee.org/abstract/document/8202133
@@ -1204,7 +1990,85 @@
       \verb{url}
       \verb https://ieeexplore.ieee.org/abstract/document/8202133
       \endverb
-      \keyw{Adaptation models,Cameras,Data models,Robots,Solid modeling,Three-dimensional displays,Training}
+      \keyw{Data models,Adaptation models,Cameras,Robots,Solid modeling,Three-dimensional displays,Training}
+    \endentry
+    \entry{vaswani_attention_2017}{inproceedings}{}{}
+      \name{author}{8}{}{%
+        {{hash=7f28e84700536646dd6620a0db07ad09}{%
+           family={Vaswani},
+           familyi={V\bibinitperiod},
+           given={Ashish},
+           giveni={A\bibinitperiod}}}%
+        {{hash=62efade83d70f0323fe248755e6c90c5}{%
+           family={Shazeer},
+           familyi={S\bibinitperiod},
+           given={Noam},
+           giveni={N\bibinitperiod}}}%
+        {{hash=06649ebab1ea5cac0250746a19764975}{%
+           family={Parmar},
+           familyi={P\bibinitperiod},
+           given={Niki},
+           giveni={N\bibinitperiod}}}%
+        {{hash=831027ee0ebf22375e2a86afc1881909}{%
+           family={Uszkoreit},
+           familyi={U\bibinitperiod},
+           given={Jakob},
+           giveni={J\bibinitperiod}}}%
+        {{hash=2fd2982e30ebcec93ec1cf76e0d797fd}{%
+           family={Jones},
+           familyi={J\bibinitperiod},
+           given={Llion},
+           giveni={L\bibinitperiod}}}%
+        {{hash=27b07e4eacbf4ef7a1438e3badb7dd8d}{%
+           family={Gomez},
+           familyi={G\bibinitperiod},
+           given={Aidan\bibnamedelima N},
+           giveni={A\bibinitperiod\bibinitdelim N\bibinitperiod}}}%
+        {{hash=540fcd72e1fa4bbed46604f4e6cff817}{%
+           family={Kaiser},
+           familyi={K\bibinitperiod},
+           given={Ł\bibnamedelima ukasz},
+           giveni={Ł\bibinitperiod\bibinitdelim u\bibinitperiod}}}%
+        {{hash=95595a0fefb86187cbc36e551017d332}{%
+           family={Polosukhin},
+           familyi={P\bibinitperiod},
+           given={Illia},
+           giveni={I\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Curran Associates, Inc.}%
+      }
+      \strng{namehash}{ee273ab30cfb889666f8c4d806eb9ce7}
+      \strng{fullhash}{cb26e47f6b8133865271fc8483132297}
+      \strng{fullhashraw}{cb26e47f6b8133865271fc8483132297}
+      \strng{bibnamehash}{ee273ab30cfb889666f8c4d806eb9ce7}
+      \strng{authorbibnamehash}{ee273ab30cfb889666f8c4d806eb9ce7}
+      \strng{authornamehash}{ee273ab30cfb889666f8c4d806eb9ce7}
+      \strng{authorfullhash}{cb26e47f6b8133865271fc8483132297}
+      \strng{authorfullhashraw}{cb26e47f6b8133865271fc8483132297}
+      \field{sortinit}{V}
+      \field{sortinithash}{afb52128e5b4dc4b843768c0113d673b}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{The dominant sequence transduction models are based on complex recurrent orconvolutional neural networks in an encoder and decoder configuration. The best performing such models also connect the encoder and decoder through an attentionm echanisms. We propose a novel, simple network architecture based solely onan attention mechanism, dispensing with recurrence and convolutions entirely.Experiments on two machine translation tasks show these models to be superiorin quality while being more parallelizable and requiring significantly less timeto train. Our single model with 165 million parameters, achieves 27.5 {BLEU} {onEnglish}-to-German translation, improving over the existing best ensemble result by over 1 {BLEU}. On English-to-French translation, we outperform the previoussingle state-of-the-art with model by 0.7 {BLEU}, achieving a {BLEU} score of 41.1.}
+      \field{booktitle}{Advances in Neural Information Processing Systems}
+      \field{title}{Attention is All you Need}
+      \field{urlday}{25}
+      \field{urlmonth}{11}
+      \field{urlyear}{2025}
+      \field{volume}{30}
+      \field{year}{2017}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{file}
+      \verb Full Text PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\HPNS4QBV\\Vaswani et al. - 2017 - Attention is All you Need.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://proceedings.neurips.cc/paper/2017/hash/3f5ee243547dee91fbd053c1c4a845aa-Abstract.html
+      \endverb
+      \verb{url}
+      \verb https://proceedings.neurips.cc/paper/2017/hash/3f5ee243547dee91fbd053c1c4a845aa-Abstract.html
+      \endverb
     \endentry
     \entry{wang_paired_2019}{misc}{}{}
       \name{author}{4}{}{%
@@ -1265,7 +2129,7 @@
       \verb 1901.01753 [cs]
       \endverb
       \verb{file}
-      \verb Preprint PDF:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\JFIYRG9W\\Wang et al. - 2019 - Paired Open-Ended Trailblazer (POET) Endlessly Generating Increasingly Complex and Diverse Learning.pdf:application/pdf;Snapshot:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\WIZL2TNG\\1901.html:text/html
+      \verb Preprint PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\JFIYRG9W\\Wang et al. - 2019 - Paired Open-Ended Trailblazer (POET) Endlessly Generating Increasingly Complex and Diverse Learning.pdf:application/pdf;Snapshot:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\WIZL2TNG\\1901.html:text/html
       \endverb
       \verb{urlraw}
       \verb http://arxiv.org/abs/1901.01753
@@ -1325,7 +2189,69 @@
       \field{langid}{english}
       \field{title}{{ProlificDreamer}: High-Fidelity and Diverse Text-to-3D Generation with Variational Score Distillation}
       \verb{file}
-      \verb PDF:C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\U9B3N5LJ\\Wang et al. - ProlificDreamer High-Fidelity and Diverse Text-to-3D Generation with Variational Score Distillation.pdf:application/pdf
+      \verb PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\U9B3N5LJ\\Wang et al. - ProlificDreamer High-Fidelity and Diverse Text-to-3D Generation with Variational Score Distillation.pdf:application/pdf
+      \endverb
+    \endentry
+    \entry{xie_tempogan_2018}{article}{}{}
+      \name{author}{4}{}{%
+        {{hash=762df7b7d28116fd14a075e1d9c648e7}{%
+           family={Xie},
+           familyi={X\bibinitperiod},
+           given={You},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=cb6c8bd39da295f77a27e4343f249b13}{%
+           family={Franz},
+           familyi={F\bibinitperiod},
+           given={Aleksandra},
+           giveni={A\bibinitperiod}}}%
+        {{hash=6fe8ff004b4c8d8748ffd276ba7aae34}{%
+           family={Chu},
+           familyi={C\bibinitperiod},
+           given={Mengyu},
+           giveni={M\bibinitperiod}}}%
+        {{hash=2152ffa5edd9076710fb73812c1037b2}{%
+           family={Thuerey},
+           familyi={T\bibinitperiod},
+           given={Nils},
+           giveni={N\bibinitperiod}}}%
+      }
+      \strng{namehash}{6e611b79622d9dcb205c92d4232f9dc5}
+      \strng{fullhash}{45c584c885efca3bc3b36970fc7b2390}
+      \strng{fullhashraw}{45c584c885efca3bc3b36970fc7b2390}
+      \strng{bibnamehash}{6e611b79622d9dcb205c92d4232f9dc5}
+      \strng{authorbibnamehash}{6e611b79622d9dcb205c92d4232f9dc5}
+      \strng{authornamehash}{6e611b79622d9dcb205c92d4232f9dc5}
+      \strng{authorfullhash}{45c584c885efca3bc3b36970fc7b2390}
+      \strng{authorfullhashraw}{45c584c885efca3bc3b36970fc7b2390}
+      \field{sortinit}{X}
+      \field{sortinithash}{1965c258adceecf23ce3d67b05113442}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{We propose a temporally coherent generative model addressing the super-resolution problem for fluid flows. Our work represents a first approach to synthesize four-dimensional physics fields with neural networks. Based on a conditional generative adversarial network that is designed for the inference of three-dimensional volumetric data, our model generates consistent and detailed results by using a novel temporal discriminator, in addition to the commonly used spatial one. Our experiments show that the generator is able to infer more realistic high-resolution details by using additional physical quantities, such as low-resolution velocities or vorticities. Besides improvements in the training process and in the generated outputs, these inputs offer means for artistic control as well. We additionally employ a physics-aware data augmentation step, which is crucial to avoid overfitting and to reduce memory requirements. In this way, our network learns to generate adverted quantities with highly detailed, realistic, and temporally coherent features. Our method works instantaneously, using only a single time-step of low-resolution fluid data. We demonstrate the abilities of our method using a variety of complex inputs and applications in two and three dimensions.}
+      \field{day}{30}
+      \field{issn}{0730-0301}
+      \field{journaltitle}{{ACM} Trans. Graph.}
+      \field{month}{7}
+      \field{number}{4}
+      \field{shorttitle}{{tempoGAN}}
+      \field{title}{{tempoGAN}: a temporally coherent, volumetric {GAN} for super-resolution fluid flow}
+      \field{urlday}{25}
+      \field{urlmonth}{11}
+      \field{urlyear}{2025}
+      \field{volume}{37}
+      \field{year}{2018}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{95:1\bibrangedash 95:15}
+      \range{pages}{-1}
+      \verb{doi}
+      \verb 10.1145/3197517.3201304
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.1145/3197517.3201304
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.1145/3197517.3201304
       \endverb
     \endentry
   \enddatalist

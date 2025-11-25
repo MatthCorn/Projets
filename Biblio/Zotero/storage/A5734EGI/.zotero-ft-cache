@@ -1,0 +1,340 @@
+skip to main content
+ Sign in
+RESEARCH-ARTICLE
+OPEN ACCESS
+Generative adversarial networks
+Authors: Ian Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing XuAuthors Info & Claims
+Communications of the ACM, Volume 63, Issue 11
+Pages 139 - 144
+https://doi.org/10.1145/3422622
+Published: 22 October 2020 Publication History
+11,628
+citation
+141,529
+Downloads
+All formats
+PDF
+Communications of the ACM
+Volume 63, Issue 11
+Previous
+Next
+Abstract
+References
+Cited By
+Index Terms
+Recommendations
+Comments
+Information & Contributors
+Bibliometrics & Citations
+View Options
+References
+35
+Figures
+Tables
+Media
+Share
+Abstract
+Generative adversarial networks are a kind of artificial intelligence algorithm designed to solve the generative modeling problem. The goal of a generative model is to study a collection of training examples and learn the probability distribution that generated them. Generative Adversarial Networks (GANs) are then able to generate more examples from the estimated probability distribution. Generative models based on deep learning are common, but GANs are among the most successful generative models (especially in terms of their ability to generate realistic high-resolution images). GANs have been successfully applied to a wide variety of tasks (mostly in research settings) but continue to present unique challenges and research opportunities because they are based on game theory while most other approaches to generative modeling are based on optimization.
+Formats available
+
+You can view the full content in the following formats:
+
+PDF
+References
+[1]
+Arjovsky, M., Chintala, S., Bottou, L. Wasserstein gan. arXiv preprint arXiv:1701.07875 (2017).
+Google Scholar
+[2]
+Arora, S., Ge, R., Liang, Y., Ma, T., Zhang, Y. Generalization and equilibrium in generative adversarial nets (gans). arXiv preprint arXiv:1703.00573 (2017).
+Digital Library
+Google Scholar
+[3]
+Beaulieu-Jones, B.K., Wu, Z.S., Williams, C., Greene, C.S. Privacy-preserving generative deep neural networks support clinical data sharing. bioRxiv (2017), 159756.
+Google Scholar
+[4]
+Bengio, Y., Thibodeau-Laufer, E., Alain, G., Yosinski, J. Deep generative stochastic networks trainable by backprop. In ICML'2014 (2014).
+Google Scholar
+Show all references
+Cited By
+View all
+Yu HLiu WWang YLiu BTao DZeng DChen H(2026)Joint subgraph independence for graph out-of-distribution generalizationPattern Recognition10.1016/j.patcog.2025.112551172(112551)Online publication date: Apr-2026
+https://doi.org/10.1016/j.patcog.2025.112551
+Shao ZYuan YMa LZhu X(2026)CurvNet: Latent contour representation and iterative data engine for curvature angle estimationPattern Recognition10.1016/j.patcog.2025.112546172(112546)Online publication date: Apr-2026
+https://doi.org/10.1016/j.patcog.2025.112546
+de Rodrigo ISanchez-Cuadrado ABoal JLopez-Lopez A(2026)The MERIT dataset: Modelling and efficiently rendering interpretable transcriptsPattern Recognition10.1016/j.patcog.2025.112502172(112502)Online publication date: Apr-2026
+https://doi.org/10.1016/j.patcog.2025.112502
+Show More Cited By
+Index Terms
+Generative adversarial networks
+
+Computing methodologies
+
+Artificial intelligence
+
+Computer vision
+
+Computer vision problems
+
+Image segmentation
+
+Computer vision representations
+
+Machine learning
+
+Machine learning approaches
+
+Neural networks
+
+Recommendations
+Evolutionary Generative Adversarial Networks
+Read More
+CapsuleGAN: Generative Adversarial Capsule Network
+Computer Vision – ECCV 2018 Workshops
+Read More
+Auto-encoder generative adversarial networks
+Read More
+Comments
+Information & Contributors
+Information
+Contributors
+Information
+Published In
+Communications of the ACM
+ 
+Volume 63, Issue 11
+November 2020142 pages
+ISSN:
+0001-0782
+EISSN:
+1557-7317
+DOI:
+10.1145/3431460
+Editor:Andrew A. Chien
+Issue’s Table of Contents
+Copyright © 2020 ACM.
+Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the full citation on the first page. Copyrights for components of this work owned by others than the author(s) must be honored. Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires prior specific permission and/or a fee. Request permissions from Permissions@acm.org.
+Publisher
+
+Association for Computing Machinery
+
+New York, NY, United States
+
+Publication History
+Published: 22 October 2020
+Published in CACM Volume 63, Issue 11
+Permissions
+Request permissions for this article.
+Request permissions
+Check for updates
+Qualifiers
+Research-Article
+Research
+Refereed
+Bibliometrics & Citations
+Bibliometrics
+Citations11628
+Bibliometrics
+Article Metrics
+11,628
+Total Citations
+View Citations
+141,529
+Total Downloads
+Downloads (Last 12 months)
+31,430
+Downloads (Last 6 weeks)
+2,784
+Reflects downloads up to 22 Nov 2025
+Other Metrics
+View Author Metrics
+View Options
+View options
+PDF
+
+View or Download as a PDF file.
+
+PDF
+eReader
+
+View online with eReader.
+
+eReader
+Digital Edition
+
+View this article in digital edition.
+
+Digital Edition
+Magazine Site
+
+View this article on the magazine site (external)
+
+Magazine Site
+Figures
+Tables
+Media
+Share
+Share
+Share this Publication link
+
+https://dl.acm.org/doi/abs/10.1145/3422622
+
+Copy Link
+Share on social media
+X
+LinkedIn
+Reddit
+Facebook
+email
+References
+References
+[1]
+Arjovsky, M., Chintala, S., Bottou, L. Wasserstein gan. arXiv preprint arXiv:1701.07875 (2017).
+Google Scholar
+[2]
+Arora, S., Ge, R., Liang, Y., Ma, T., Zhang, Y. Generalization and equilibrium in generative adversarial nets (gans). arXiv preprint arXiv:1703.00573 (2017).
+Digital Library
+Google Scholar
+[3]
+Beaulieu-Jones, B.K., Wu, Z.S., Williams, C., Greene, C.S. Privacy-preserving generative deep neural networks support clinical data sharing. bioRxiv (2017), 159756.
+Google Scholar
+[4]
+Bengio, Y., Thibodeau-Laufer, E., Alain, G., Yosinski, J. Deep generative stochastic networks trainable by backprop. In ICML'2014 (2014).
+Google Scholar
+[5]
+Brundage, M., Avin, S., Clark, J., Toner, H., Eckersley, P., Garfinkel, B., Dafoe, A., Scharre, P., Zeitzoff, T., Filar, B., Anderson, H., Roff, H., Allen, G.C., Steinhardt, J., Flynn, C., hÉigeartaigh, S.Ó., Beard, S., Belfield, H., Farquhar, S., Lyle, C., Crootof, R., Evans, O., Page, M., Bryson, J., Yampolskiy, R., Amodei, D. The Malicious Use of Artificial Intelligence: Forecasting, Prevention, and Mitigation. ArXiv e-prints (Feb. 2018).
+Google Scholar
+[6]
+Danihelka, I., Lakshminarayanan, B., Uria, B., Wierstra, D., Dayan, P. Comparison of maximum likelihood and GAN-based training of real nvps. arXiv preprint arXiv:1705.05263 (2017).
+Google Scholar
+[7]
+de Oliveira, L., Paganini, M., Nachman, B. Learning particle physics by example: location-aware generative adversarial networks for physics synthesis. Computing and Software for Big Science 1 1(2017), 4.
+Google Scholar
+[8]
+Deng, J., Dong, W., Socher, R., Li, L.-J., Li, K., Fei-Fei, L. ImageNet: A Large-Scale Hierarchical Image Database. In CVPR09 (2009).
+Crossref
+Google Scholar
+[9]
+Fedus, W., Goodfellow, I., Dai, A.M. MaskGAN: Better text generation via filling in the _____. In International Conference on Learning Representations (2018).
+Google Scholar
+[10]
+Fedus, W., Rosca, M., Lakshminarayanan, B., Dai, A.M., Mohamed, S., Goodfellow, I. Many paths to equilibrium: GANs do not need to decrease a divergence at every step. In International Conference on Learning Representations (2018).
+Google Scholar
+[11]
+Frey, B.J. Graphical Models for Machine Learning and Digital Communication. MIT Press, Boston, 1998.
+Digital Library
+Google Scholar
+[12]
+Ganin, Y., Lempitsky, V. Unsupervised domain adaptation by backpropagation. In International Conference on Machine Learning (2015), 1180--1189.
+Google Scholar
+[13]
+Goodfellow, I., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair, S., Courville, A., Bengio, Y. Generative adversarial nets. Z. Ghahramani, M. Welling, C. Cortes, N.D. Lawrence, K.Q. Weinberger, eds. Advances in Neural Information Processing Systems 27, Curran Associates, Inc., Boston, 2014, 2672--2680.
+Google Scholar
+[14]
+Karras, T., Aila, T., Laine, S., Lehtinen, J. Progressive growing of GANs for improved quality, stability, and variation. CoRR, abs/1710.10196 (2017).
+Google Scholar
+[15]
+Kingma, D.P., Welling, M. Auto-encoding variational bayes. In Proceedings of the International Conference on Learning Representations (ICLR) (2014).
+Google Scholar
+[16]
+Li, Y., Swersky, K., Zemel, R.S. Generative moment matching networks. CoRR, abs/1502.02761 (2015).
+Google Scholar
+[17]
+Liu, M.-Y., Tuzel, O. Coupled generative adversarial networks. D.D. Lee, M. Sugiyama, U.V. Luxburg, I. Guyon, R. Garnett, eds. Advances in Neural Information Processing Systems 29, Curran Associates, Inc., Boston, 2016, 469--477.
+Google Scholar
+[18]
+Lucic, M., Kurach, K., Michalski, M., Gelly, S., Bousquet, O. Are GANs created equal? a large-scale study. arXiv preprint arXiv:1711.10337 (2017).
+Digital Library
+Google Scholar
+[19]
+Mathieu, M., Couprie, C., LeCun, Y. Deep multi-scale video prediction beyond mean square error. arXiv preprint arXiv:1511.05440 (2015).
+Google Scholar
+[20]
+Mescheder, L., Nowozin, S., Geiger, A. Adversarial variational bayes: Unifying variational autoencoders and generative adversarial networks. arXiv preprint arXiv:1701.04722 (2017).
+Google Scholar
+[21]
+Mescheder, L., Nowozin, S., Geiger, A. The numerics of gans. In Advances in Neural Information Processing Systems (2017), 1823--1833.
+Google Scholar
+[22]
+Metz, L., Poole, B., Pfau, D., Sohl-Dickstein, J. Unrolled generative adversarial networks. arXiv preprint arXiv:1611.02163 (2016).
+Google Scholar
+[23]
+Mirza, M., Osindero, S. Conditional generative adversarial nets. arXiv preprint arXiv:1411.1784 (2014).
+Google Scholar
+[24]
+Nagarajan, V., Kolter, J.Z. Gradient descent GAN optimization is locally stable. I. Guyon, U.V. Luxburg, S. Bengio, H. Wallach, R. Fergus, S. Vishwanathan, R. Garnett, eds. Advances in Neural Information Processing Systems 30, Curran Associates, Inc., Boston, 2017, 5585--5595.
+Google Scholar
+[25]
+Odena, A., Olah, C., Shlens, J. Conditional image synthesis with auxiliary classifier gans. arXiv preprint arXiv:1610.09585 (2016).
+Digital Library
+Google Scholar
+[26]
+Oord, A. v. d., Li, Y., Babuschkin, I., Simonyan, K., Vinyals, O., Kavukcuoglu, K., Driessche, G. v. d., Lockhart, E., Cobo, L.C., Stimberg, F., et al. Parallel wavenet: Fast high-fidelity speech synthesis. arXiv preprint arXiv:1711.10433 (2017).
+Google Scholar
+[27]
+Radford, A., Metz, L., Chintala, S. Unsupervised representation learning with deep convolutional generative adversarial networks. arXiv preprint arXiv:1511.06434 (2015).
+Google Scholar
+[28]
+Ratliff, L.J., Burden, and S.A., Sastry, S.S. Characterization and computation of local nash equilibria in continuous games. In Communication, Control, and Computing (Allerton), 2013 51st Annual Allerton Conference on. IEEE, (2013), 917--924.
+Crossref
+Google Scholar
+[29]
+Salimans, T., Goodfellow, I., Zaremba, W., Cheung, V., Radford, A., Chen, X. Improved techniques for training gans. In Advances in Neural Information Processing Systems (2016), 2234--2242.
+Digital Library
+Google Scholar
+[30]
+Shrivastava, A., Pfister, T., Tuzel, O., Susskind, J., Wang, W., Webb, R. Learning from simulated and unsupervised images through adversarial training.
+Google Scholar
+[31]
+Theis, L., van den Oord, A., Bethge, M. A note on the evaluation of generative models. arXiv:1511.01844 (Nov 2015).
+Google Scholar
+[32]
+Unterthiner, T., Nessler, B., Klambauer, G., Heusel, M., Ramsauer, H., Hochreiter, S. Coulomb GANs: Provably optimal Nash equilibria via potential fields. arXiv preprint arXiv:1708.08819 (2017).
+Google Scholar
+[33]
+Wu, Y., Burda, Y., Salakhutdinov, R., Grosse, R. On the quantitative analysis of decoder-based generative models. arXiv preprint arXiv:1611.04273 (2016).
+Google Scholar
+[34]
+Yeh, R., Chen, C., Lim, T.Y., Hasegawa-Johnson, M., Do, M.N. Semantic image inpainting with perceptual and contextual losses. arXiv preprint arXiv:1607.07539 (2016).
+Google Scholar
+[35]
+Zhu, J.-Y., Park, T., Isola, P., Efros, A.A. Unpaired image-to-image translation using cycle-consistent adversarial networks. arXiv preprint arXiv:1703.10593 (2017).
+Google Scholar
+Download PDF
+View Issue’s Table of Contents
+Footer
+Categories
+Journals
+Magazines
+Books
+Proceedings
+SIGs
+Conferences
+Collections
+People
+About
+About ACM Digital Library
+ACM Digital Library Board
+Subscription Information
+Author Guidelines
+Using ACM Digital Library
+All Holdings within the ACM Digital Library
+ACM Computing Classification System
+Accessibility Statement
+Join
+Join ACM
+Join SIGs
+Subscribe to Publications
+Institutions and Libraries
+Connect
+Contact us via email
+ACM on Facebook
+ACM DL on X
+ACM on Linkedin
+Send Feedback
+Submit a Bug Report
+The ACM Digital Library is published by the Association for Computing Machinery. Copyright © 2025 ACM, Inc.
+Terms of UsagePrivacy PolicyCode of Ethics
+PDF
+Help
+Feedback
+Powered by
