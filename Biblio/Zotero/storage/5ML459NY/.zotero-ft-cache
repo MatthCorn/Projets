@@ -1,0 +1,78 @@
+Pour améliorer votre expérience, nous (et nos partenaires) stockons et/ou accédons à des informations sur votre terminal (cookie ou équivalent) avec votre accord pour tous nos sites et applications, sur vos terminaux connectés.
+
+Notre site Web peut utiliser ces cookies pour :
+
+ Mesurer l'audience de la publicité sur notre site, sans profilage
+ Afficher des publicités personnalisées basées sur votre navigation et votre profil
+ Personnaliser notre contenu éditorial en fonction de votre navigation
+ Vous permettre de partager du contenu sur les réseaux sociaux ou les plateformes présents sur notre site Internet
+
+Politique de confidentialité
+Gérer les préférences
+Accepter tout
+Tout rejeter
+Skip to Main Content
+Subscribe
+Donate
+Cart
+Conferences >2005 IEEE Computer Society Co...
+Histograms of oriented gradients for human detection
+Publisher: IEEE
+Cite This
+N. Dalal; B. Triggs
+20559
+Cites in
+Papers
+506
+Cites in
+Patents
+114026
+Full
+Text Views
+Abstract
+Authors
+Figures
+References
+Citations
+Keywords
+Metrics
+Footnotes
+1 Introduction
+
+Detecting humans in images is a challenging task owing to their variable appearance and the wide range of poses that they can adopt. The first need is a robust feature set that allows the human form to be discriminated cleanly, even in cluttered backgrounds under difficult illumination. We study the issue of feature sets for human detection, showing that locally normalized Histogram of Oriented Gradient (HOG) descriptors provide excellent performance relative to other existing feature sets including wavelets [17], [22]. The proposed descriptors are reminiscent of edge orientation histograms [4], [5], SIFT descriptors [12] and shape contexts [1], but they are computed on a dense grid of uniformly spaced cells” and they use overlapping local contrast normalizations for improved performance. We make a detailed study of the effects of various implementation choices on detector performance, taking “pedestrian detection” (the detection of mostly visible people in more or less upright poses) as a test case. For simplicity and speed, we use linear SVM as a baseline classifier throughout the study. The new detectors give essentially perfect results on the MIT pedestrian test set [18], [17], so we have created a more challenging set containing over 1800 pedestrian images with a large range of poses and backgrounds. Ongoing work suggests that our feature set performs equally well for other shape-based object classes.
+
+Sign in to Continue Reading
+More Like This
+Human posture recognition based on projection histogram and Support Vector Machine
+
+2018 9th International Symposium on Signal, Image, Video and Communications (ISIVC)
+
+Published: 2018
+
+Robust Fall Detection Using Human Shape and Multi-class Support Vector Machine
+
+2008 Sixth Indian Conference on Computer Vision, Graphics & Image Processing
+
+Published: 2008
+
+Show More
+IEEE Personal Account
+CHANGE USERNAME/PASSWORD
+Purchase Details
+PAYMENT OPTIONS
+VIEW PURCHASED DOCUMENTS
+Profile Information
+COMMUNICATIONS PREFERENCES
+PROFESSION AND EDUCATION
+TECHNICAL INTERESTS
+Need Help?
+US & CANADA: +1 800 678 4333
+WORLDWIDE: +1 732 981 0060
+CONTACT & SUPPORT
+Follow
+
+About IEEE Xplore | Contact Us | Help | Accessibility | Terms of Use | Nondiscrimination Policy | IEEE Ethics Reporting | Sitemap | IEEE Privacy Policy
+
+A public charity, IEEE is the world's largest technical professional organization dedicated to advancing technology for the benefit of humanity.
+
+© Copyright 2025 IEEE - All rights reserved, including rights for text and data mining and training of artificial intelligence and similar technologies.

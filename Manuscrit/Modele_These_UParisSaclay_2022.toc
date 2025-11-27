@@ -24,37 +24,43 @@
 \contentsline {subsection}{\numberline {4.2.1}L'approche probabiliste explicite : Les VAE (2013)}{16}{subsection.4.2.1}%
 \contentsline {subsection}{\numberline {4.2.2}La révolution antagoniste : Les GAN (2014)}{17}{subsection.4.2.2}%
 \contentsline {subsection}{\numberline {4.2.3}La génération par raffinement : Les Modèles de Diffusion (2020)}{17}{subsection.4.2.3}%
-\contentsline {subsection}{\numberline {4.2.4}Le paradigme séquentiel et l'Autorégression (2017-Présent)}{18}{subsection.4.2.4}%
+\contentsline {subsection}{\numberline {4.2.4}Le paradigme séquentiel et l'Autorégression}{18}{subsection.4.2.4}%
 \contentsline {subsection}{\numberline {4.2.5}Rapport à la problématique}{18}{subsection.4.2.5}%
-\contentsline {chapter}{\numberline {5}AVERTISSEMENT}{19}{chapter.5}%
-\contentsline {chapter}{\numberline {6}COMPOSITION GÉNÉRALE, CHARTE GRAPHIQUE}{21}{chapter.6}%
-\contentsline {section}{\numberline {6.1}COMPOSITION DU DOCUMENT}{21}{section.6.1}%
-\contentsline {section}{\numberline {6.2}QUELS LOGOS FAIRE FIGURER ?}{21}{section.6.2}%
-\contentsline {section}{\numberline {6.3}POLICES DE CARACTÈRES ET COULEURS}{21}{section.6.3}%
-\contentsline {chapter}{\numberline {7}INFORMATIONS GÉNÉRALES SUR LA PAGE DE COUVERTURE}{23}{chapter.7}%
-\contentsline {section}{\numberline {7.1}TITRE DE LA THÈSE ET LANGUE(S)}{23}{section.7.1}%
-\contentsline {section}{\numberline {7.2}SPÉCIALITÉ DE DOCTORAT}{23}{section.7.2}%
-\contentsline {section}{\numberline {7.3}UNITÉ DE RECHERCHE}{24}{section.7.3}%
-\contentsline {section}{\numberline {7.4}LE RÉFÉRENT}{24}{section.7.4}%
-\contentsline {section}{\numberline {7.5}GRADUATE SCHOOL}{25}{section.7.5}%
-\contentsline {section}{\numberline {7.6}ÉCOLE DOCTORALE}{25}{section.7.6}%
-\contentsline {section}{\numberline {7.7}LIEU ET DATE DE SOUTENANCE}{26}{section.7.7}%
-\contentsline {chapter}{\numberline {8}CIVILITÉ, FÉMINISATION DES TITRES ET FONCTIONS}{27}{chapter.8}%
-\contentsline {chapter}{\numberline {9}PRÉSENTATION DE LA DIRECTION DE LA THÈSE OU DE L’ÉQUIPE D’ENCADREMENT}{29}{chapter.9}%
-\contentsline {chapter}{\numberline {10}COMPOSITION DU JURY }{31}{chapter.10}%
-\contentsline {section}{\numberline {10.1}A QUOI SERVENT CES INFORMATIONS ?}{31}{section.10.1}%
-\contentsline {section}{\numberline {10.2}LÉGITIMITÉ ACADÉMIQUE}{31}{section.10.2}%
-\contentsline {section}{\numberline {10.3}INDÉPENDANCE}{32}{section.10.3}%
-\contentsline {section}{\numberline {10.4}FONCTION DANS LE JURY ET ORDRE DE CITATION}{33}{section.10.4}%
-\contentsline {subsection}{\numberline {10.4.1}Ordre de citation}{33}{subsection.10.4.1}%
-\contentsline {subsection}{\numberline {10.4.2}Les rapporteurs}{33}{subsection.10.4.2}%
-\contentsline {chapter}{\numberline {11}BIEN CITER SES SOURCES}{35}{chapter.11}%
-\contentsline {section}{\numberline {11.1}S'INFORMER SUR LE PLAGIAT}{35}{section.11.1}%
-\contentsline {section}{\numberline {11.2}LES IMAGES}{35}{section.11.2}%
-\contentsline {section}{\numberline {11.3}ARTICLES JOINTS A LA THÈSE}{35}{section.11.3}%
-\contentsline {chapter}{\numberline {12}DÉPOSER ET DIFFUSER SA THÈSE}{37}{chapter.12}%
-\contentsline {section}{\numberline {12.1}LES RESSOURCES A CONSULTER}{37}{section.12.1}%
-\contentsline {section}{\numberline {12.2}LES DÉMARCHES}{37}{section.12.2}%
-\contentsline {chapter}{\numberline {13}ANNEXE : LES LOGOS INSTITUTIONNELS}{39}{chapter.13}%
-\contentsline {section}{\numberline {13.1}LE LOGO DE L’UNIVERSITÉ PARIS-SACLAY}{39}{section.13.1}%
-\contentsline {section}{\numberline {13.2}LOGOS, NUMÉROS D’ACCRÉDITATION ET DÉNOMINATIONS DES ÉCOLES DOCTORALES}{39}{section.13.2}%
+\contentsline {section}{\numberline {4.3}Méthode traitement de séquence}{18}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Réseaux de convolution}{18}{subsection.4.3.1}%
+\contentsline {subsubsection}{Genèse et prédominance dans l'imagerie}{19}{subsubsection*.9}%
+\contentsline {subsubsection}{La convolution dans l'image : Une séquence spatiale 2D}{19}{subsubsection*.10}%
+\contentsline {subsubsection}{La convolution dans les séquences 1D (Texte, Audio, Séries Temporelles)}{19}{subsubsection*.11}%
+\contentsline {subsubsection}{Généralisation : La convolution au-delà des grilles euclidiennes}{20}{subsubsection*.12}%
+\contentsline {chapter}{\numberline {5}AVERTISSEMENT}{21}{chapter.5}%
+\contentsline {chapter}{\numberline {6}COMPOSITION GÉNÉRALE, CHARTE GRAPHIQUE}{23}{chapter.6}%
+\contentsline {section}{\numberline {6.1}COMPOSITION DU DOCUMENT}{23}{section.6.1}%
+\contentsline {section}{\numberline {6.2}QUELS LOGOS FAIRE FIGURER ?}{23}{section.6.2}%
+\contentsline {section}{\numberline {6.3}POLICES DE CARACTÈRES ET COULEURS}{23}{section.6.3}%
+\contentsline {chapter}{\numberline {7}INFORMATIONS GÉNÉRALES SUR LA PAGE DE COUVERTURE}{25}{chapter.7}%
+\contentsline {section}{\numberline {7.1}TITRE DE LA THÈSE ET LANGUE(S)}{25}{section.7.1}%
+\contentsline {section}{\numberline {7.2}SPÉCIALITÉ DE DOCTORAT}{25}{section.7.2}%
+\contentsline {section}{\numberline {7.3}UNITÉ DE RECHERCHE}{26}{section.7.3}%
+\contentsline {section}{\numberline {7.4}LE RÉFÉRENT}{26}{section.7.4}%
+\contentsline {section}{\numberline {7.5}GRADUATE SCHOOL}{27}{section.7.5}%
+\contentsline {section}{\numberline {7.6}ÉCOLE DOCTORALE}{27}{section.7.6}%
+\contentsline {section}{\numberline {7.7}LIEU ET DATE DE SOUTENANCE}{28}{section.7.7}%
+\contentsline {chapter}{\numberline {8}CIVILITÉ, FÉMINISATION DES TITRES ET FONCTIONS}{29}{chapter.8}%
+\contentsline {chapter}{\numberline {9}PRÉSENTATION DE LA DIRECTION DE LA THÈSE OU DE L’ÉQUIPE D’ENCADREMENT}{31}{chapter.9}%
+\contentsline {chapter}{\numberline {10}COMPOSITION DU JURY }{33}{chapter.10}%
+\contentsline {section}{\numberline {10.1}A QUOI SERVENT CES INFORMATIONS ?}{33}{section.10.1}%
+\contentsline {section}{\numberline {10.2}LÉGITIMITÉ ACADÉMIQUE}{33}{section.10.2}%
+\contentsline {section}{\numberline {10.3}INDÉPENDANCE}{34}{section.10.3}%
+\contentsline {section}{\numberline {10.4}FONCTION DANS LE JURY ET ORDRE DE CITATION}{35}{section.10.4}%
+\contentsline {subsection}{\numberline {10.4.1}Ordre de citation}{35}{subsection.10.4.1}%
+\contentsline {subsection}{\numberline {10.4.2}Les rapporteurs}{35}{subsection.10.4.2}%
+\contentsline {chapter}{\numberline {11}BIEN CITER SES SOURCES}{37}{chapter.11}%
+\contentsline {section}{\numberline {11.1}S'INFORMER SUR LE PLAGIAT}{37}{section.11.1}%
+\contentsline {section}{\numberline {11.2}LES IMAGES}{37}{section.11.2}%
+\contentsline {section}{\numberline {11.3}ARTICLES JOINTS A LA THÈSE}{37}{section.11.3}%
+\contentsline {chapter}{\numberline {12}DÉPOSER ET DIFFUSER SA THÈSE}{39}{chapter.12}%
+\contentsline {section}{\numberline {12.1}LES RESSOURCES A CONSULTER}{39}{section.12.1}%
+\contentsline {section}{\numberline {12.2}LES DÉMARCHES}{39}{section.12.2}%
+\contentsline {chapter}{\numberline {13}ANNEXE : LES LOGOS INSTITUTIONNELS}{41}{chapter.13}%
+\contentsline {section}{\numberline {13.1}LE LOGO DE L’UNIVERSITÉ PARIS-SACLAY}{41}{section.13.1}%
+\contentsline {section}{\numberline {13.2}LOGOS, NUMÉROS D’ACCRÉDITATION ET DÉNOMINATIONS DES ÉCOLES DOCTORALES}{41}{section.13.2}%
