@@ -1,0 +1,783 @@
+rspa.royalsocietypublishing.org
+Research
+Cite this article: Vlachas PR, Byeon W,
+Wan ZY, Sapsis TP, Koumoutsakos P. 2018
+Data-driven forecasting of high-dimensional
+chaotic systems with long short-term memory
+networks. Proc. R. Soc. A 474: 20170844.
+http://dx.doi.org/10.1098/rspa.2017.0844
+Received: 8 December 2017
+Accepted: 25 April 2018
+Subject Areas:
+mechanical engineering, computational
+physics, artificial intelligence
+Keywords:
+data-driven forecasting, long short-term
+memory, Gaussian processes, T21 barotropic
+climate model, Lorenz 96
+Author for correspondence:
+Petros Koumoutsakos
+e-mail: petros@ethz.ch
+Electronic supplementary material is available
+online at https://dx.doi.org/10.6084/m9.
+figshare.c.4094249.
+Data-driven forecasting of high-dimensional chaotic systems with long short-term memory networks
+Pantelis R. Vlachas1, Wonmin Byeon1, Zhong Y. Wan2,
+Themistoklis P. Sapsis2 and Petros Koumoutsakos1
+1Chair of Computational Science, ETH Zurich, Clausiusstrasse 33,
+Zurich, CH-8092, Switzerland
+2Department of Mechanical Engineering, Massachusetts Institute of
+Technology, 77 Massachusetts Avenue, Cambridge, MA 02139, USA
+TPS, 0000-0003-0302-0691; PRV, 0000-0002-3311-2100
+We introduce a data-driven forecasting method for high-dimensional chaotic systems using long shortterm memory (LSTM) recurrent neural networks. The proposed LSTM neural networks perform inference of high-dimensional dynamical systems in their reduced order space and are shown to be an effective set of nonlinear approximators of their attractor. We demonstrate the forecasting performance of the LSTM and compare it with Gaussian processes (GPs) in time series obtained from the Lorenz 96 system, the Kuramoto–Sivashinsky equation and a prototype climate model. The LSTM networks outperform the GPs in short-term forecasting accuracy in all applications considered. A hybrid architecture, extending the LSTM with a mean stochastic model (MSM–LSTM), is proposed to ensure convergence to the invariant measure. This novel hybrid method is fully data-driven and extends the forecasting capabilities of LSTM networks.
+1. Introduction
+Natural systems, ranging from climate and ocean circulation to organisms and cells, involve complex dynamics extending over multiple spatio-temporal scales. Centuries-old efforts to comprehend and forecast the dynamics of such systems have spurred developments in large-scale simulations, dimensionality reduction techniques and a multitude of forecasting methods. The goals of understanding and prediction have been
+2018 The Author(s) Published by the Royal Society. All rights reserved.
+Downloaded from https://royalsocietypublishing.org/ on 27 November 2025
+
+
+2
+rspa.royalsocietypublishing.org Proc. R. Soc. A 474: 20170844
+...................................................
+complementing each other but have been hindered by the high dimensionality and chaotic behaviour of these systems. In recent years, we observe a convergence of these approaches due to advances in computing power, algorithmic innovations and the ample availability of data. A major beneficiary of this convergence are data-driven dimensionality reduction methods [1–7], model identification procedures [8–15] and forecasting techniques [16–30] that aim to provide precise short-term predictions while capturing the long-term statistics of these systems. Successful forecasting methods address the highly nonlinear energy transfer mechanisms between modes not captured effectively by the dimensionality reduction methods. The pioneering technique of analogue forecasting proposed in [31] inspired a widespread research in non-parametric prediction approaches. Two dynamical system states are called analogues if they resemble one another on the basis of a specific criterion. This class of methods uses a training set of historical observations of the system. The system evolution is predicted using the evolution of the closest analogue from the training set corrected by an error term. This approach has led to promising results in practice [32] but the selection of the resemblance criterion to pick the optimal analogue is far from straightforward. Moreover, the geometrical association between the current state and the training set is not exploited. More recently [33], analogue forecasting is performed using a weighted combination of data-points based on a localized kernel that quantifies the similarity of the new point and the weighted combination. This technique exploits the local geometry instead of selecting a single optimal analogue. Similar kernel-based methods, [34] use diffusion maps to globally parametrize a low-dimensional manifold capturing the slower time scales. Moreover, non-trivial interpolation schemes are investigated in order to encode the system dynamics in this reduced order space as well as map them to the full space (lifting). Although the geometrical structure of the data is taken into account, the solution of an eigen-system with a size proportional to the training data is required, rendering the approach computationally expensive. In addition, the inherent uncertainty due to sparse observations in certain regions of the attractor introduces prediction errors which cannot be modelled in a deterministic context. In [35], a method based on Gaussian process regression (GPR) [36] was proposed for prediction and uncertainty quantification in the reduced order space. The technique is based on a training set that sparsely samples the attractor. Stochastic predictions exploit the geometrical relationship between the current state and the training set, assuming a Gaussian prior over the modelled latent variables. A key advantage of GPR is that uncertainty bounds can be analytically derived from the hyper-parameters of the framework. Moreover, in [35] a mean stochastic model (MSM) is used for under-sampled regions of the attractor to ensure accurate modelling of the steady state in the long-term regime. However, the resulting inference and training have a quadratic cost in terms of the number of data samples O(N2). Some of the earlier approaches to capture the evolution of time series in chaotic systems using recurrent neural networks (RNNs) were developed during the inception of the long short-term memory networks (LSTM) [37]. However, to the best of our knowledge, these methods have been used only on low-dimensional chaotic systems [38]. Similarly, other machine learning techniques based on multi-layer perceptrons (MLP) [39], echo state networks (ESNs) [40,41] or radial basis functions [42,43] have been successful, albeit only for low-order dynamical systems. Recent work in [44,45] demonstrated promising results of ESNs for high-dimensional chaotic systems. In this paper, we propose LSTM-based methods that exploit information of the recent history of the reduced order state to predict the high-dimensional dynamics. Time-series data are used to train the model while no knowledge of the underlying system equations is required. Inspired by Taken’s theorem [46] an embedding space is constructed using time-delayed versions of the reduced order variable. The proposed method tries to identify an approximate forecasting rule globally for the reduced order space. In contrast with GPR [35], the method has a deterministic output while its training cost scales linearly with the number of training samples and it exhibits an O(1) inference computational cost. Moreover, following [35], LSTM is combined with a MSM, to cope with attractor regions that are not captured in the training set. In attractor regions, under-represented in the training set, the MSM is used to guarantee convergence to the invariant measure and avoid an exponential growth of the prediction error. The effectiveness
+Downloaded from https://royalsocietypublishing.org/ on 27 November 2025
+
+
+3
+rspa.royalsocietypublishing.org Proc. R. Soc. A 474: 20170844
+...................................................
+of the proposed hybrid method in accurate short-term prediction and capturing the long-term behaviour is shown in the Lorenz 96 system and the Kuramoto–Sivashinsky (K-S) system. Finally, the method is also tested on predictions of a prototypical climate model. The structure of the paper is as follows: In §2, we explain how the LSTM can be employed for modelling and prediction of a reference dynamical system and a blended LSTM–MSM technique is introduced. In §3, three other state-of-the-art methods, GPR, MSM and the hybrid GPR-MSM scheme are presented and two comparison metrics are defined. The proposed LSTM technique and its LSTM–MSM extension are benchmarked against GPR and GPR–MSM in three complex chaotic systems in §4. In §5, we discuss the computational complexity of training and inference in LSTM. Finally, §6 offers a summary and discusses future research directions.
+2. Long short-term memory recurrent neural networks
+The LSTM was introduced in order to regularize the training of RNNs [37]. RNNs contain loops that allow information to be passed between consecutive temporal steps (figure 1a) and can be expressed as
+ht = σh(Whiit + Whhht−1 + bh) (2.1)
+and
+ot = σo(Wohht + bo) = f w(it, ht−1), (2.2)
+where it ∈ Rdi , ot ∈ Rdo and ht ∈ Rdh are the input, the output and the hidden state of the RNN at time step t. The weight matrices are Whi ∈ Rdh×di (input-to-hidden), Whh ∈ Rdh×dh (hidden
+to-hidden), Woh ∈ Rdo×dh (hidden-to-output), bh and bo. Moreover, σh and σo are the hidden and output activation functions, while bh ∈ Rdh and bo ∈ Rdo are the respective biases. Temporal dependencies are captured by the hidden-to-hidden weight matrix Whh, which couples two consecutive hidden states together. A schematic of the RNN architecture is given in figure 1. In many practical applications, RNNs suffer from the vanishing (or exploding) gradient problem and have failed to capture long-term dependencies [47,48]. Today the RNNs owe their renaissance largely to the LSTM, that copes effectively with the aforementioned problem using gates. The LSTM has been successfully applied in sequence modelling [49], speech recognition [50], hand-writing recognition [51] and language translation [52]. The equations of the LSTM are
+gft = σf (Wf [ht−1, it] + bf ) git = σi(Wi[ht−1, it] + bi),
+C ̃ t = tanh(WC[ht−1, it] + bC) Ct = gftCt−1 + git  ̃Ct
+and gto = σh(Wh[ht−1, it] + bh) ht = gto tanh(Ct),
+⎫⎪⎪⎬
+⎪⎪⎭
+(2.3)
+where gft, git, gto ∈ Rdh×(dh+di) are the gate signals (forget, input and output gates), it ∈ Rdi is the
+input, ht ∈ Rdh is the hidden state, Ct ∈ Rdh is the cell state, while Wf , Wi, WC, Wh ∈ Rdh×(dh+di) are weight matrices and bf , bi, bC, bh ∈ Rdh are biases. The activation functions σf , σi and σh are sigmoids. For a more detailed explanation on the LSTM architecture refer to [37]. In the following, we refer to the LSTM hidden and cell states (ht and Ct) jointly as LSTM states. The dimension of these states is called the number of hidden units h = dh and it controls the capability of the cell to encode history information. In practice, we want the output to have a specific dimension do. For this reason, a fully connected final layer without activation function Woh ∈ Rdo×h is added
+ot = Wohht = f w(it, ht−1, Ct−1), (2.4)
+where all parameters (weights and biases) are encoded in w = {Wf, Wi, WC, Wh, bf, bi, bC, bh} and f w is the LSTM cell function that maps the previous LSTM States ht−1, Ct−1 and current input it
+Downloaded from https://royalsocietypublishing.org/ on 27 November 2025
+
+
+4
+rspa.royalsocietypublishing.org Proc. R. Soc. A 474: 20170844
+...................................................
+it
+ht
+ot
+D
+Whi
+Woh
+Whh
+it−d+1 it−d+2 it−1 it
+ht−d+1 ht−d+2 ht−1 ht
+ot−d+1 ot−d+2 ot−1 ot
+Whi Whi Whi Whi
+Woh Woh Woh Woh
+Whh Whh Whh
+ht−d
+(a) (b)
+Figure 1. (a) A recurrent neural network cell, where D denotes a delay. The hidden cell state ht depends on the input it and its previous value ht−1. The output ot depends on the hidden state. The weight matrices are parameters of the cell. (b) A recurrent neural network unfolded in time (unfolding the delay). The same weights are used at each time step to compute the output ot that depends on the current input it and short-term history (recursively) encoded in ht−1.
+to the output. By unfolding the LSTM d time-steps in the past and ignoring dependencies longer that d we get
+ot = f w(zt, ht−1, Ct−1) = F w(zt, zt−1, . . . , zt−d+1
+} {{ }
+zt:t−d+1
+,0
+ht−d, 0
+Ct−d), (2.5)
+where Fw represents the iterative application of f w and computation of the LSTM states for d time steps. For a more detailed explanation of the formula for Fw, and a figure of the neural network architecture refer to the appendix. In this work, we consider the reduced order problem where the state of a dynamical system is projected in the reduced order space. The system is considered to be autonomous, while z ̇t = dzt/dt is the system state derivative at time step t. Following [38], the LSTM is trained using time series data from the system in the reduced order space D = {z1:T, z ̇1:T} to predict the reduced state derivative  ̇zt from a short history of the reduced order state {zt, zt−1, . . . , zt−d+1} consisting of d past temporally consecutive states. In this work, we approximated the derivative from the original time series using first-order forward differences. The loss that has to be minimized is defined as
+L(D, w) = 1
+T−d+1
+T ∑
+t=d
+‖ F w(zt:t−d+1)
+} {{ }
+ot
+− ̇zt‖2. (2.6)
+The short-term history for the states before zd is not available, that is why in total we have T − d + 1 training samples from a time series with T samples. During training the weights of the LSTM
+are optimized according to w = argmin w
+L(D, w). The parameter d is denoted as truncation layer
+and time dependencies longer than d are not explicitly captured in the loss function. Training of this model is performed using Back-propagation through time, truncated at layer d and mini-batch optimization with the Adam method [53] with an adaptive learning rate (initial learning rate η = 0.0001). The LSTM weights are initialized using the method of Xavier [54]. Training is stopped when convergence of the training error is detected or the maximum of 1000 epochs is reached. During training the loss of the model is evaluated on a separate validation dataset to avoid overfitting. The training procedure is explained in detail in the appendix. An important issue is how to select the hidden state dimension h and how to initialize the LSTM states ht−d, Ct−d at the truncation layer d. A small h reduces the expressive capabilities of the LSTM and deteriorates inference performance. On the other hand, a big h is more sensitive to overfitting and the computational cost of training rises. For this reason, h has to be tuned depending on the observed training behaviour. In this work, we performed a grid search and selected the optimal h for each application. For the truncation layer d, there are two alternatives, namely stateless and stateful LSTM. In stateless LSTM, the LSTM states at layer
+Downloaded from https://royalsocietypublishing.org/ on 27 November 2025
+
+
+5
+rspa.royalsocietypublishing.org Proc. R. Soc. A 474: 20170844
+...................................................
+z1
+true z2
+true
+zd
+true
+zd
+true
+z3
+true zd+1
+pred
+zd+2
+pred
+zd+1
+pred
+zd+1
+pred
+z2d–1
+pred
+z2d
+pred
+zd+1
+true
+zd−1
+true
+zd
+true
+z2d
+pred
+ ̇
+zd+2
+pred
+ ̇
+zd+1
+pred
+ ̇
+zd
+pred
+ ̇
+zd+2
+pred LSTM LSTM
+h2, C2 hd, Cd
+h1, C1
+h0, C0
+LSTM LSTM
+Figure 2. Iterative prediction using the trained LSTM model. A short-term history of the system, i.e. ztrue
+1 , . . . , ztrue
+d , is assumed
+to be known. Initial LSTM states are h0, C0. The trained LSTM is used predict the derivative z ̇pred
+d = F w(ztrue
+d:1 , h0, C0). The state
+prediction zpred
+d+1 is obtained by integrating this derivative. This value is used for the next prediction in an iterative fashion. After d time-steps only predicted values are fed in the input. In stateless LSTM, h and C are initialized to zero before every prediction. (Online version in colour.)
+d are initialized to zero as in equation (2.5). As a consequence, the LSTM can only capture dependencies up to d previous time steps. In the second variant, the stateful LSTM, the state is always propagated for p time steps in the future and then reinitialized to zero, to help the LSTM capture longer dependencies. In this work, the systems considered exhibit chaotic behaviour and the dependencies are inherently short term, as the states in two time steps that differ significantly can be considered statistically independent. For this reason, the short temporal dependencies can be captured without propagating the hidden state for a long horizon. As a consequence, we consider only the stateless variant p = 0. We also applied stateful LSTM without any significant improvement so we omit the results for brevity. The trained LSTM model can be used to iteratively predict the system dynamics as illustrated in figure 2. This is a solely data-driven approach and no explicit information regarding the form of the underlying equations is required.
+(a) Mean stochastic model and hybrid LSTM–MSM
+The MSM is a powerful data-driven method used to quantify uncertainty and perform forecasts in turbulent systems with high intrinsic attractor dimensionality [35,55]. It is parametrized a priori to capture global statistical information of the attractor by design, while its computationally complexity is very low compared to LSTM or GPR. The concept behind MSM is to model each component of the state zi independently with an Ornstein–Uhlenbeck (OU) process that captures the energy spectrum and the damping time scales of the statistical equilibrium. The process takes the following form:
+dzi = cizi dz + ξi dWi, (2.7)
+where ci, ξi are parameters fitted to the centred training data and Wi is a Wiener process. In the statistical steady state, the mean, energy and damping time scale of the process are given by
+μi = E[zi] = 0, Ei = E[zi(zi)∗] = − ξ 2
+2ci
+and Ti = − 1
+ci
+, (2.8)
+where (zi)∗ denotes the complex conjugate of zi. To fit the model parameters ci, ξi, we directly
+estimate the variance E[zi(zi)∗] from the time series training data and the decorrelation time using
+Ti = 1
+E[zi(zi)∗]
+∫∞
+0
+E[zi(t)(zi(t + τ ))∗] dτ . (2.9)
+Downloaded from https://royalsocietypublishing.org/ on 27 November 2025
+
+
+6
+rspa.royalsocietypublishing.org Proc. R. Soc. A 474: 20170844
+...................................................
+After computing these two quantities, we replace in (2.8) and solve with respect to ci and ξi. As the MSM is modelled a priori to mimic the global statistical behaviour of the attractor, forecasts made with MSM can never escape. This is not the case with LSTM and GPR, as prediction errors accumulate and iterative forecasts escape the attractor due to the chaotic dynamics, although short-term predictions are accurate. This problem has been addressed with respect to GPR in [35]. To cope effectively with this problem, we introduce a hybrid LSTM–MSM technique that prevents forecasts from diverging from the attractor. The state-dependent decision rule for forecasting in LSTM–MSM is given by
+ ̇zt =
+{
+( ̇zt)LSTM, if ptrain(zt) = ∏ ptrain
+i (zit) > δ,
+( ̇zt)MSM, otherwise, (2.10)
+where ptrain(zt) is an approximation of the probability density function of the training dataset and δ ≈ 0.01 a constant threshold tuned based on ptrain(zt). We approximate ptrain(zt) using a mixture of Gaussian kernels. This hybrid architecture exploits the advantages of LSTM and MSM. In case, there is a high probability that the state zi lies close to the training dataset (interpolation) the LSTM having memorized the local dynamics is used to perform inference. This ensures accurate LSTM short-term predictions. On the other hand, close to the boundaries the attractor is only sparsely sampled ptrain(zi) < δ and errors from LSTM predictions would lead to divergence. In this case, MSM guarantees that forecasting trajectories remain close to the attractor, and that we converge to the statistical invariant measure in the long term.
+3. Benchmark and performance measures
+The performance of the proposed LSTM-based prediction mechanism is benchmarked against the following state-of-the-art methods:
+— MSM — GPR — mixed model (GPR–MSM)
+To guarantee that the prediction performance is independent of the initial condition selected, for all applications and all performance measures considered the average value of each measure for a number of different initial conditions sampled independently and uniformly from the attractor is reported. The ground truth trajectory is obtained by integrating the discretized reference equation starting from each initial condition, and projecting the states to the reduced order space. The reference equation and the projection method are of course application dependent. From each initial condition, we generate an empirical Gaussian ensemble of dimension Nen around the initial condition with a small variance σen. This noise represents the uncertainty in the knowledge of the initial system state. We forecast the evolution of the ensemble by iteratively predicting the derivatives and integrating (deterministically for each ensemble member for the LSTM, stochastically for GPR) and we keep track of the mean. We select an ensemble size Nen = 50, which is the usual choice in environmental science, e.g. weather prediction and short-term climate prediction [56]. The ground truth trajectory at each time instant z is then compared with the predicted ensemble mean  ̃z. As a comparison measure we use the root mean square error (RMSE) defined
+as RMSE(zk) =
+√
+1/V ∑V
+i=1(zik −  ̃zi
+k)2, where index k denotes the kth component of the reduced order state z, i is the initial condition, and V is the total number of initial conditions. The RMSE is computed at each time instant for each component k of the reduced order state, resulting in error curves that describe the evolution of error with time. Moreover, we use the standard deviation σ of the attractor samples in each dimension as a relative comparison measure. Assuming that the attractor consists of samples {z1, z2, . . . , zN}, with zj ∈ Rdi , the attractor standard deviation in
+Downloaded from https://royalsocietypublishing.org/ on 27 November 2025
+
+
+7
+rspa.royalsocietypublishing.org Proc. R. Soc. A 474: 20170844
+...................................................
+dimension i ∈ {1, . . . , di} is defined as σi = √E[(zi −  ̄zi)2]), where  ̄zi is the mean of the samples in this dimension. If the prediction error is bigger than this standard deviation, then a trivial mean predictor performs better. Moreover, we use the mean anomaly correlation coefficient (ACC) [57] over V initial conditions to quantify the pattern correlation of the predicted trajectories with the ground-truth. The ACC is defined as
+ACC = 1
+V
+V ∑
+i=1
+∑rdim
+k=1 wk(zik − z ̄k)( ̃zi
+k −  ̄zk)
+√∑rdim
+k=1 wk(zik −  ̄zk)2 ∑rdim
+k=1 wk( ̃zi
+k −  ̄zk)2
+, (3.1)
+where k refers to the mode number, i refers to the initial condition, wk are mode weights selected according to the energies of the modes after dimensionality reduction and  ̄zk is the time average of the respective mode, considered as reference. This score ranges from −1.0 to 1.0. If the forecast is perfect, the score equals to 1.0. The ACC coefficient is a widely used forecasting accuracy score in the meteorological community [58].
+4. Applications
+In this section, the effectiveness of the proposed method is demonstrated with respect to three chaotic dynamical systems, exhibiting different levels of chaos, from weakly chaotic to fully turbulent, i.e. the Lorenz 96 system, the K-S equation and a prototypical barotropic climate model.
+(a) The Lorenz 96 system
+In [59], a model of the large-scale behaviour of the mid-latitude atmosphere is introduced. This model describes the time evolution of the components Xj for j ∈ {0, 1, . . . , J − 1} of a spatially discretized (over a single latitude circle) atmospheric variable. In the following, we refer to this model as the Lorenz 96. The Lorenz 96 is usually used ([35,58] and references therein) as a toy problem to benchmark methods for weather prediction. The system of differential equations that governs the Lorenz 96 is defined as
+dXj
+dt = (Xj+1 − Xj−2)Xj−1 − Xj + F, (4.1)
+for j ∈ {0, 1, . . . , J − 1}, where by definition X−1 = XJ, X−2 = XJ−1. In our analysis J = 40. The righthand side of (4.1) consists of a nonlinear adjective term (Xj+1 − Xj−2)Xj−1 − Xj, a linear advection (dissipative) term −Xj and a positive external forcing term F. The discrete energy of the system remains constant throughout time and the Lorenz 96 states Xj remain bounded. By increasing the external forcing parameter F the behaviour that the system exhibits changes from periodic F < 1 to weakly chaotic (F = 4) to end up in fully turbulent regimes (F = 16). These regimes can be observed in figure 3. Following [35,56], we apply a shifting and scaling to standardize the Lorenz 96 states Xj. The
+discrete or Dirichlet energy is given by E = 1
+2
+∑J
+j=1 Xj2. In order for the scaled Lorenz 96 states to have zero mean and unit energy we transform them using
+X ̃ j = Xj − X ̄
+√Ep
+, d ̃t =
+√
+Ep dt and Ep = 1
+2T
+J− ∑1
+j=0
+∫ T0+T
+T0
+(Xj − X ̄ )2 dt, (4.2)
+where Ep is the average energy fluctuation. In this way, the scaled energy is E ̃ = 1
+2
+∑J−1
+j=0 X ̃ j2 = 1
+and the scaled variables have zero mean X ̄ ̃ = (1/J) ∑J−1
+j=0 X ̃ j = 0, with X ̄ the mean state. The scaled
+Lorenz 96 states X ̃ j obey the following differential equation:
+dX ̃ j
+d ̃t = F − X ̄
+Ep
++ (X ̃ j+1 − X ̃ j−2)X ̄ − X ̃ j
+√Ep
++ (X ̃ j+1 − X ̃ j−2)X ̃ j−1. (4.3)
+Downloaded from https://royalsocietypublishing.org/ on 27 November 2025
+
+
+8
+rspa.royalsocietypublishing.org Proc. R. Soc. A 474: 20170844
+...................................................
+20 40 x
+20 40 x
+20 40 x
+0
+2.5
+5.0
+7.5
+10.0
+12.5
+15.0
+17.5
+20.0
+0
+2.5
+5.0
+7.5
+10.0
+12.5
+15.0
+17.5
+20.0
+0
+2.5
+5.0
+7.5
+10.0
+12.5
+15.0
+17.5
+20.0
+t
+F = 4 F = 8 F = 16
+−15 −10 −5 0 5 10 15 20
+Figure 3. Lorenz 96 contour plots for different forcing regimes F. Chaoticity rises with bigger values of F.
+0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 wavenumber k
+0
+0.002
+0.004
+0.006
+0.008
+0.010
+0.012
+0.014
+0.016
+energy Ek
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 number of most energetic modes used
+0
+20
+40
+60
+80
+100
+cumulative energy %
+F=4 F= 8
+F = 16 90% of the total energy
+Figure 4. Energy spectrum Ek and cumulative energy with respect to the number of most energetic modes used for different forcing regimes of Lorenz 96 system. As the forcing increases, more chaoticity is introduced to the system. (Online version in colour.)
+(i) Dimensionality reduction: discrete Fourier transform
+Firstly, the discrete Fourier transform (DFT) is applied to the energy standardized Lorenz 96 states X ̃ j. The Fourier coefficients Xˆ k ∈ C and the inverse DFT to recover the Lorenz 96 states are given by
+Xˆ k = 1
+J
+J− ∑1
+j=0
+X ̃ j e−2πikj/J and X ̃ j =
+J− ∑1
+k=0
+Xˆ k e2πikj/J. (4.4)
+After applying the DFT to the Lorenz 96 states we end up with a symmetric energy spectrum that can be uniquely characterized by J/2 + 1 (J is considered to be an even number) coefficients Xˆ k
+for k ∈ K = {0, 1, . . . , J/2}. In our case J = 40, thus we end up with |K| = 21 complex coefficients Xˆ k ∈ C. These coefficients are referred to as the Fourier modes or simply modes. The Fourier energy of
+each mode is defined as Ek = Var(Xˆ k) = E[(Xˆ k( ̃t) − X ̄ˆ k)(Xˆ k( ̃t) − X ̄ˆ k)∗]. The energy spectrum of the Lorenz 96 system is plotted in figure 4 for different values of the forcing term F. We take into account only the rdim = 6 modes corresponding to the highest energies and the rest of the modes are truncated. For the different forcing regimes F = 4, 8, 16,
+Downloaded from https://royalsocietypublishing.org/ on 27 November 2025
+
+
+9
+rspa.royalsocietypublishing.org Proc. R. Soc. A 474: 20170844
+...................................................
+the six most energetic modes correspond to approximately 89%, 52% and 43.8% of the total energy, respectively. The space where the reduced variables live in is referred to as the reduced order phase space and the most energetic modes are notated as Xˆ r
+k for k ∈ {1, . . . , rdim}. As shown in [60], the most energetic modes are not necessarily the ones that capture better the dynamics of the model. Including more modes, or designing a criterion to identify the most important modes in the reduced order space may boost prediction accuracy. However, in this work, we are not interested in an optimal reduced space representation, but rather in the effectiveness of a prediction model given this space. The truncated modes are ignored for now. Nevertheless, their effect can be modelled stochastically as in [35]. As each Fourier mode Xˆ r
+k is a complex number, it consists of a real part and an imaginary part. By stacking these real and imaginary parts of the rdim truncated modes we end up with the 2 rdim dimensional reduced model state
+X ≡ [Re(Xˆ r1), . . . , Re(Xˆ rrdim ), Im(Xˆ r1), . . . , Im(Xˆ rrdim )]T. (4.5)
+Assuming that Xt
+j for j ∈ {0, 1, . . . , J − 1} are the Lorenz 96 states at time instant t, the mapping Xt
+j,
+∀j → X is unique and the reduced model state of the Lorenz 96 has a specific vector value.
+(ii) Training and prediction in Lorenz 96
+The reduced Lorenz 96 system states Xt are considered as the true reference states zt. The LSTM is trained to forecast the derivative of the reduced order state  ̇zt as elaborated in §2. We use a stateless LSTM with h = 20 hidden units and the back-propagation truncation horizon set to d = 10. To obtain training data for the LSTM, we integrate the Lorenz 96 system state, e.g. (4.1) starting from an initial condition X0
+j for j ∈ {0, 1, . . . , J − 1} using a Runge–Kutta fourth-order method with
+a time step dt = 0.01 up to T = 51. In this way, a time series Xt
+j , t ∈ {0, 1, . . .} is constructed. We
+obtain the reduced order state time series Xt, t ∈ {0, 1, . . .}, using the DFT mapping |Xj
+t ∀ j → Xt.
+From this time series, we discard the first 104 initial time steps as initial transients, ending up with a time series with Ntrain = 50 000 samples. A similar but independent process is repeated for the validation set.
+(iii) Results
+The trained LSTM models are used for prediction based on the iterative procedure explained in §2. In this section, we demonstrate the forecasting capabilities of LSTM and compare it with GPs. One hundred different initial conditions uniformly sampled from the attractor are simulated. For each initial condition, an ensemble with size Nen = 50 is considered by perturbing it with a normal noise with variance σen = 0.0001.
+In figure 5a–c, we report the mean RMSE prediction error of the most energetic mode Xˆ r1 ∈ C,
+scaled with √Ep for the forcing regimes F ∈ {6, 8, 16} for the first N = 10 time steps (T = 0.1). In the RMSE, the complex norm ‖v‖2 = vv∗ is taken into account. The 10% of the standard deviation of the attractor is also plotted for reference (10%σ ). As F increases, the system becomes more chaotic and difficult to predict. As a consequence, the number of prediction steps that remain under the 10%σ threshold are decreased. The LSTM models extend this predictability horizon for all forcing regimes compared to GPR and MSM. However, when LSTM is combined with MSM the short-term prediction performance is compromised. Nevertheless, hybrid LSTM–MSM models outperform GPR methods in short-term prediction accuracy. In figure 5d–f, the RMSE error for T = 2 is plotted. The standard deviation from the attractor σ is plotted for reference. We can observe that both GPR and LSTM diverge, while MSM and blended schemes remain close to the attractor in the long term as expected. In figure 5g–i, the mean ACC over 1000 initial conditions is given. The predictability threshold of 0.6 is also plotted. After crossing this critical threshold, the methods do not predict better than a trivial mean predictor. For F = 4, GPR methods show inferior performance compared to LSTM approaches as analysed previously in the RMSE comparison. However, for F = 8 LSTM models
+Downloaded from https://royalsocietypublishing.org/ on 27 November 2025
+
+
+10
+rspa.royalsocietypublishing.org Proc. R. Soc. A 474: 20170844
+...................................................
+0
+0
+0.05
+0.10 10%s 10%s 10%s
+F = 4, wavenumber k = 7 F = 8, wavenumber k = 8 F = 16, wavenumber k = 8
+F = 4, wavenumber k = 7
+F = 4 F = 8 F = 16
+F = 8, wavenumber k = 8 F = 16, wavenumber k = 8
+0.02 0.04 0.06 time t
+012 time t
+012 time t
+012 time t
+0 0.5 1.0 time t
+0 0.5 1.0 time t
+0
+–0.5
+0
+ACC
+1.0
+0.5
+–0.5
+0
+ACC
+1.0
+0.5
+0
+ACC
+1.0
+0.5
+0.5 1.0 time t
+0.08 0.10 0 0.02 0.04 0.06 time t
+0.08 0.10 0 0.02 0.04 0.06 time t
+0.08 0.10
+RMSE (÷EpXˆ7)
+0
+0.5
+1.0
+2.0
+1.5
+RMSE (÷EpXˆ7)
+0
+0.5
+1.0
+1.5
+RMSE (÷EpXˆ8)
+0
+1
+2
+RMSE (÷EpXˆ8)
+0
+0.05
+0.10
+0.15
+RMSE (÷EpXˆ8)
+0
+0.050
+0.025
+0.075
+0.100
+RMSE (÷EpXˆ8)
+(e) ( f )
+(a) (b) (c)
+(d )
+(g) (h) (i)
+10%sattractor sattractor ACC = 0.6 threshold
+MSM GPR GPR-MSM
+LSTM
+LSTM-MSM
+Figure 5. (a–c) Short-term RMSE evolution of the most energetic mode for forcing regimes F = 4, 8, 16, respectively, of the Lorenz 96 system. (d–f ) Long-term RMSE evolution. (g–i) Evolution of the ACC coefficient (in all plots average over 1000 initial conditions is reported). (Online version in colour.)
+do not predict better than the mean after T ≈ 0.35, while GPR shows better performance. In turn, when blended with MSM the compromise in the performance for GPR–MSM is much bigger compared to LSTM–MSM. The LSTM–MSM scheme shows slightly superior performance than GPR–MSM during the entire relevant time period (ACC> 0.6). For the fully turbulent regime F = 16, LSTM shows comparable performance with both GPR and MSM and all methods converge as chaoticity rises, since the intrinsic dimensionality of the system attractor increases and the system becomes inherently unpredictable. In figure 6, the evolution of the mean RMSE over 1000 initial conditions of the wavenumbers k = 8, 9, 10, 11 of the Lorenz 96 with forcing F = 8 is plotted. In contrast with GPR, the RMSE error of LSTM is much lower in the moderate and low energy wavenumbers k = 9, 10, 11 compared to the most energetic mode k = 8. This difference among modes is not observed in GPR. This can be attributed to the highly nonlinear energy transfer mechanisms between these lower energy modes as opposed to the Gaussian and locally linear energy transfers of the most energetic mode. As illustrated before, the hybrid LSTM–MSM architecture effectively combines the accurate short-term prediction performance of LSTM with the long-term stability of MSM. The ratio of ensemble members modelled by LSTM in the hybrid scheme is plotted with respect to time in figure 7a. Starting from the initial ensemble of size 50, as the LSTM forecast might deviate from the attractor, the MSM is used to forecast in the hybrid scheme. As a consequence, the ratio of ensemble members modelled by LSTM decreases with time. In parallel with the GPR results presented in [35] and plotted in figure 7b, the slope of this ratio curve increases with F up to time t ≈ 1.5. However, the LSTM ratio decreases slower compared to GPR.
+Downloaded from https://royalsocietypublishing.org/ on 27 November 2025
+
+
+11
+rspa.royalsocietypublishing.org Proc. R. Soc. A 474: 20170844
+...................................................
+F = 8, wavenumber k = 8 F = 8, wavenumber k = 9
+F = 8, wavenumber k = 10 F = 8, wavenumber k = 11
+0 0.02 0.04 0.06 time t
+0.08 0.10 0 0.02 0.04 0.06 time t
+0.08 0.10
+0 0.02 0.04 0.06 time t
+0.08 0.10 0 0.02 0.04 0.06 time t
+0.08 0.10
+0
+0.050
+0.025
+0.075
+0.100
+RMSE (÷EpXˆ 8)
+0
+0.050
+0.025
+0.075
+0.100
+RMSE (÷EpXˆ 10)
+0
+0.050
+0.025
+0.075
+0.100
+RMSE (÷EpXˆ 11)
+0
+0.050
+0.025
+0.075
+0.100
+RMSE (÷EpXˆ9)
+(a) (b)
+(c) (d)
+10%s 10%s
+10%s
+10%s
+10%sattractor MSM GPR
+GPR-MSM LSTM LSTM-MSM
+Figure 6. RMSE prediction error evolution of four energetic modes for the Lorenz 96 system with forcing F = 8. (a) Most energetic mode k = 8, (b) low-energy mode k = 9, (c) low-energy mode k = 10 and (d) low-energy mode k = 11 (in all plots average over 1000 initial conditions reported). (Online version in colour.)
+100
+LSTM dynamics (%)
+80
+60
+40
+20
+100
+F=4 F=8 F = 16
+GPR dynamics (%)
+80
+60
+40
+20
+024 time
+024 time
+(a) (b)
+Figure 7. (a) Ratio of the ensemble members evaluated using the LSTM model over time for different Lorenz 96 forcing regimes in the hybrid LSTM–MSM method and (b) the same for GPR in the hybrid GPR–MSM method (average over 500 initial conditions). (Online version in colour.)
+(b) Kuramoto–Sivashinsky equation
+The K-S system is extensively used in many scientific fields to model a multitude of chaotic physical phenomena. It was first derived by Kuramoto [61,62] as a turbulence model of the phase gradient of a slowly varying amplitude in a reaction–diffusion type medium with negative viscosity coefficient. Later, Sivashinsky [63] studied the spontaneous instabilities of the plane front of a laminar flame ending up with the K-S equation, while in [64] the K-S equation is found to describe the surface behaviour of viscous liquid in a vertical flow.
+Downloaded from https://royalsocietypublishing.org/ on 27 November 2025
+
+
+12
+rspa.royalsocietypublishing.org Proc. R. Soc. A 474: 20170844
+...................................................
+0 4 8 12 16 x
+0
+25
+50
+75
+100
+t
+v = 1/10
+0 4 8 12 16 x
+0
+20
+40
+60
+80
+100
+t
+v = 1/16
+0 4 8 12 16 x
+0
+20
+40
+60
+80
+100
+t
+v = 1/36
+−20 −15 −10 −5 0 5 10 15 20
+1 10 102 no. modes used
+20 modes
+1/v = 36
+1/v = 16
+1/v = 10
+0
+20
+40
+60
+80
+100
+cumulative energy in %
+(a) (b)
+Figure 8. (a) Contour plots of the solution u(x, t) of the Kuramoto–Sivashinsky system for different values of ν in steady state. Chaoticity rises with smaller values of ν. (b) Cumulative energy as a function of the number of the PCA modes for different values of ν. (Online version in colour.)
+For our study, we restrict ourselves to the one-dimensional K-S equation with boundary and initial conditions given by
+∂u
+∂t = −ν ∂4u
+∂x4 − ∂2u
+∂x2 − u ∂u
+∂x ,
+u(0, t) = u(L, t) = ∂u
+∂x
+∣∣∣∣x=0
+= ∂u
+∂x
+∣∣∣∣x=L
+=0
+and u(x, 0) = u0(x),
+⎫⎪⎪⎪⎪⎪⎪⎬
+⎪⎪⎪⎪⎪⎪⎭
+(4.6)
+where u(x, t) is the modelled quantity of interest depending on a spatial variable x ∈ [0, L] and time t ∈ [0, ∞). The negative viscosity is modelled by the parameter ν > 0. We impose Dirichlet and second-type boundary conditions to guarantee ergodicity [65]. To spatially discretize (4.6) we use a grid size x with D = L/ x + 1 the number of nodes. Further, we denote with ui = u(i x) the value of u at node i ∈ {0, . . . , D − 1}. Discretization using a second-order differences scheme yields
+dui
+dt = −ν ui−2 − 4ui−1 + 6ui − 4ui+1 + ui+2
+x4 − ui+1 − 2ui + ui−1
+x2 − ui2+1 − ui2−1
+4 x . (4.7)
+Further, we impose u0 = uD−1 = 0 and add ghost nodes u−1 = u1, uD = uD−2 to account for the Dirichlet and second-order boundary conditions. In our analysis, the number of nodes is D = 513. The Kuramoto–Sivashinsky equation exhibits different levels of chaos depending
+on the bifurcation parameter  ̃L = L/2π √ν [66]. Higher values of  ̃L lead to more chaotic systems in terms of higher Lyapunov exponents [35]. In our analysis, the spatial variable bound is held constant to L = 16 and chaoticity level is controlled through the negative viscosity ν, where a smaller value leads to a system with a higher level of chaos (figure 8a). In our study, we consider two values, namely ν = 1/10 and ν = 1/16 to benchmark the prediction skills of the proposed method. The discretized equation (4.7) is integrated with a time interval dt = 0.02 up to T = 11 000. The data points up to T = 1000 are discarded as initial transients. Half of the remaining data (N = 250 000 samples) are used for training and the other half for validation.
+(i) Dimensionality reduction: singular value decomposition
+The dimensionality of the problem is reduced using singular value decomposition (SVD). By subtracting the temporal mean u and stacking the data, we end up with the data matrix
+Downloaded from https://royalsocietypublishing.org/ on 27 November 2025
+
+
+13
+rspa.royalsocietypublishing.org Proc. R. Soc. A 474: 20170844
+...................................................
+50 v = 1/10 v = 1/16
+RMSE (a1)
+40
+30
+20
+10
+0
+60
+50
+40
+30
+20
+10
+0
+ACC
+1.0
+–0.2
+0 2 3 4 0 0.5 1.0 1.5 time t time t
+1
+0 1 2 3 4 0 0.5 1.0 1.5
+0.2
+0.6
+1.0
+–0.2
+0.2
+0.6
+(a) (b)
+(c) (d)
+sattractor MSM GPR GPR-MSM LSTM LSTM-MSM
+ACC = 0.6 threshold
+Figure 9. (a,b) RMSE evolution of the most energetic mode of the K-S equation with 1/ν = 10 and 1/ν = 16. (c), (d) ACC evolution of the most energetic mode of the K-S equation with 1/ν = 10 and 1/ν = 16 (in all plots, average value over 1000 initial conditions is reported). (Online version in colour.)
+U ∈ RN×513, where N is the number of data samples (N = 500 000 in our case). Performing SVD on U leads to U = MΣVT, M ∈ RN×N, Σ ∈ RN×513 and V ∈ R513×513, (4.8)
+with Σ diagonal, with descending diagonal elements. The right singular vectors corresponding to the rdim largest singular values are the first columns of V = [Vr, V−r]. Stacking these singular
+vectors yields Vr ∈ R513×rdim . Assuming that ut ∈ R513 is a vector of the discretized values of u(x, t) in time t, in order to get a reduced order representation c ≡ [c1, . . . , crdim ]T corresponding to the rdim components with the highest energies (singular values) we multiply
+c = VrTu, c ∈ Rrdim . (4.9)
+The percentage of cumulative energy w.r.t. to the number of PCA modes considered is plotted in figure 8b. In our study, we pick rdim = 20 (out of 513) most energetic modes, as they explain approximately 90% of the total energy.
+(ii) Results
+We train stateless LSTM models with h = 100 and d = 50. For testing, starting from 1000 initial conditions uniformly sampled from the attractor, we generate a Gaussian ensemble of dimension Nen = 50 centred around the initial condition in the original space with standard deviation of σ = 0.1. This ensemble is propagated using the LSTM prediction models, and GPR, MSM and GPR–MSM models trained as in [35]. The RMSE between the predicted ensemble mean and the ground-truth is plotted in figure 9a,b for different values of the parameter ν. All methods reach the invariant measure much faster for 1/ν = 16 compared to the less chaotic regime 1/ν = 10 (note the different integration times T = 4 for 1/ν = 10, while T = 1.5 for 1/ν = 16). In both chaotic regimes 1/ν = 10 and 1/ν = 16, the reduced order LSTM outperforms all other methods in the short term before escaping the attractor. However, in the long term, LSTM
+Downloaded from https://royalsocietypublishing.org/ on 27 November 2025
+
+
+14
+rspa.royalsocietypublishing.org Proc. R. Soc. A 474: 20170844
+...................................................
+does not stabilize and will eventually diverge faster than GPR (figure 9b). Blending LSTM with MSM alleviates the problem and both accurate short-term predictions and long-term stability is attained. Moreover, the hybrid LSTM–MSM has better forecasting capabilities compared to GPR. The need for blending LSTM with MSM in the KS equation is less imperative as the system is less chaotic than the Lorenz 96 and LSTM methods diverge much slower, while they sufficiently capture the complex nonlinear dynamics. As the intrinsic dimensionality of the attractor rises LSTM diverges faster. The mean ACC (3.1) is plotted with respect to time in figure 9c,d for ν = 10 and 16, respectively. The evolution of the ACC justifies the aforementioned analysis. The mean ACC of the trajectory predicted with LSTM remains above the predictability threshold of 0.6 for a highest time duration compared to other methods. This predictability horizon is approximately 2.5 for ν = 1
+10 and 0.6 for
+ν= 1
+16 , since the chaoticity of the system rises and accurate predictions become more challenging. For a plot of the time evolution of the ratio of the ensemble members that are modelled with LSTM dynamics in the hybrid LSTM–MSM refer to the appendix.
+(c) A barotropic climate model
+In this section, we examine a standard barotropic climate model [67] originating from a realistic winter circulation. The model equations are given by
+∂ζ
+∂t = −J (ψ, ζ + f + h) + k1ζ + k2δ3ζ + ζ ∗, (4.10)
+where ψ is the stream function, ζ = δψ the relative vorticity, f the Coriolis parameter, ζ ∗ a constant vorticity forcing, while k1 and k2 are the Ekman damping and the scale-selective damping coefficient. J is the Jacobi operator given by
+J (a, b) =
+( ∂a ∂λ
+∂B
+∂μ − ∂a
+∂μ
+∂B ∂λ
+)
+, (4.11)
+where μ and λ denote the sine of the geographical latitude and longitude, respectively. The equation of the barotropic model (4.10) is non-dimensionalized using the radius of the Earth as unit length and the inverse of the Earth angular velocity as time unit. The non-dimensional orography h is related to the real northern hemisphere orography h′ by h = 2sin(φ0)A0h′/H, where
+phi0 is a fixed amplitude of 45◦ N, A0 is a factor expressing the surface wind strength blowing across the orography, and H a scale height [67]. The stream-function ψ is expanded into a spherical harmonics series and truncated at wavenumber 21, while modes with an even total wavenumber are excluded, avoiding currents across the equator and ending up with a hemispheric model with 231 degrees of freedom. The training data are obtained by integrating the equation (4.10) for 105 days after an initial spin-up period of 1000 days, using a fourth-order Adams-Bashforth integration scheme with a 45-min time step in accordance with [35], with k1 = 15 days, while k2 is selected such that wavenumber 21 is damped at a time scale of 3 days. In this way, we end up with a time series ζt with 104 samples. The spherical surface is discretized into a D = 64 × 32 mesh with equally spaces latitude and longitude. From the gathered data, 90% is used for training and 10% for validation. The mean and variance of the statistical steady state are shown in figure 10a,b. The dimensionality of the barotropic climate model truncated at wavenumber 21 is 231. To reduce it, we identify empirical orthogonal functions (EOFs) φi, i ∈ {1, . . . , 231} that form an orthogonal basis of the reduced order space. The details of the method are described in the appendix. EOF analysis has been used to identify individual realistic climatic modes such as the Arctic oscillation (AO), the Pacific/North America (PNA) and the Tropical/Northern Hemisphere (TNH) pattern known as teleconnections [68,69]. Accurate prediction of these modes is of high practical importance as they feature realistic climate patterns. After projecting the state of the barotropic model to the EOFs, we take into account only the rdim coefficients corresponding to
+the most energetic EOFs that form the reduced order state y∗. In our study, the dimensionality of
+Downloaded from https://royalsocietypublishing.org/ on 27 November 2025
+
+
+15
+rspa.royalsocietypublishing.org Proc. R. Soc. A 474: 20170844
+...................................................
+120°W
+60°W
+0°
+60°E
+120°E
+180° W
+45°N
+mean
+–0.05
+–0.04
+–0.03
+–0.02
+–0.01
+0
+0.01
+120°W
+60°W
+0°
+60°E
+120°E
+180° W
+45°N
+variance
+0
+1
+2
+3
+4
+5
+6
+7
+×10–5
+1 40 80 120 160 231 no. modes used
+0
+20
+40
+60
+80
+100
+cumulative energy in %
+(a) (b) (c)
+Figure 10. (a) Mean of the Barotropic model at statistical steady state. (b) Variance of the Barotropic model at statistical steady state. (c) Percentage of energy explained with respect to the modelled modes. (Online version in colour.)
+the reduced space is rdim = 30, as φ30 contains only 3.65% of the energy of φ1, while the 30 most energetic modes contain approximately 82% of the total energy, as depicted in figure 10c.
+(i) Training and prediction
+The reduced order state that we want to predict using the LSTM are the 30 components of y. A stateless LSTM with h = 140 hidden units is considered, while the truncated back-propagation horizon is set to d = 10. The prototypical system is less chaotic than the K-S equation and the Lorenz 96, which enables us to use more hidden units. The reason is that as chaoticity is decreased trajectories sampled from the attractor as training and validation dataset become more interconnected and the task is inherently easier and less prone to overfitting. In the extreme case of a periodic system, the information would be identical. Five hundred points are randomly and uniformly picked from the attractor as initial conditions for testing. A Gaussian ensemble with a small variance (σen = 0.001) along each dimension is formed and marched using the reduced-order GPR, MSM, mixed GPR–MSM and LSTM methods.
+(ii) Results
+The RMSE error of the four most energetic reduced order space variables yi for i ∈ {1, . . . , 4} is plotted in figure 11. The LSTM takes 400–500 h to reach the attractor, while GPR based methods generally take 300–400 h. By contrast, the MSM reaches the attractor already after 1 h. This implies that the LSTM can better capture the nonlinear dynamics compared to GPR. Note that the barotropic model is much less chaotic than the Lorenz 96 system with F = 16, where all methods show comparable prediction performance. Blended LSTM models with MSM are omitted here, as LSTM models only reach the attractor standard deviation towards the end of the simulated time and MSM–LSTM shows identical performance.
+5. A comment on computational cost of prediction
+The computational cost of making a single prediction can be quantified by the number of operations (multiplications and additions) needed. In GPR-based approaches the computational cost is of order O(N2), where N is the number of samples used in training. For GPR methods illustrated in the previous section N ≈ 2500. The GPR models the global dynamics by uniformly sampling the attractor and ‘carries’ this training dataset at each time instant to identify the geometric relation between the input and the training dataset (modelled with a covariance matrix metric) and make (exact or approximate) probabilistic inference on the output. By contrast, LSTM adjusts its parameters to reproduce the local dynamics. As a consequence, the inference computational complexity does not depend on the number of samples used for training. The inference complexity is roughly O(di · d · h + d · h2), where di is the dimension of
+Downloaded from https://royalsocietypublishing.org/ on 27 November 2025
+
+
+16
+rspa.royalsocietypublishing.org Proc. R. Soc. A 474: 20170844
+...................................................
+0.05
+RMSE (y1)
+RMSE (y2)
+0
+0.01
+0.02
+0.03
+0.04
+0.05
+0
+0.01
+0.02
+0.03
+0.04
+0.05
+RMSE (y3)
+RMSE (y4)
+0
+0 300 400 500 time (h)
+sattractor MSM GPR GPR-MSM LSTM
+time (h)
+100 200 0 100 200 300 400 500
+0 100 200 300 400 500 0 100 200 300 400 500
+0.01
+0.02
+0.03
+0.04
+0.05
+0
+0.01
+0.02
+0.03
+0.04
+(a) (b)
+(c) (d)
+Figure 11. RMSE evolution of the four most energetic EOFs for the Barotropic climate model, average over 500 initial conditions reported. (a) Most energetic EOF, (b) second most energetic EOF, (c) third most energetic EOF and (d) fourth most energetic EOF. (Online version in colour.)
+each input, d is the number of inputs and h is the number of hidden units. This complexity is significantly smaller than GPR, which can be translated to faster prediction. However, it is logical that the LSTM is more prone to diverge from the attractor, as there is no guarantee that the infrequent training samples near the attractor limits where memorized. This remark explains the faster divergence of LSTM in the more turbulent regimes considered in §4.
+6. Conclusion
+We propose a data-driven method, based on LSTM networks, for modelling and prediction in the reduced space of chaotic dynamical systems. The LSTM uses the short-term history of the reduced order variable to predict the state derivative and uses it for one-step prediction. The network is trained on time-series data and it requires no prior knowledge of the underlying governing equations. Using the trained network, long-term predictions are made by iteratively predicting one step forward. The features of the proposed technique are showcased through comparisons with GPR and MSM on benchmarked cases. Three applications are considered, the Lorenz 96 system, the K-S equation and a barotropic climate model. The chaoticity of these systems ranges from weakly chaotic to fully turbulent, ensuring a complete simulation study. Comparison measures include the RMSE and ACC between the predicted trajectories and trajectories of the real dynamics. In all cases, the proposed approach performs better, in short-term predictions, as the LSTM is more efficient in capturing the local dynamics and complex interactions between the modes. However, the prediction error accumulates as we iteratively perform predictions and similar to GPR does not converge to the invariant measure. Furthermore, in the cases of increased chaoticity the LSTM diverges faster than GPR. This may be attributed to the absence of certain attractor regions in the training data, insufficient training and propagation of the exponentially increasing
+Downloaded from https://royalsocietypublishing.org/ on 27 November 2025
+
+
+17
+rspa.royalsocietypublishing.org Proc. R. Soc. A 474: 20170844
+...................................................
+prediction error. To mitigate this effect, LSTM is also combined with MSM, following ideas presented in [35], in order to guarantee convergence to the invariant measure. Blending LSTM or GPR with MSM leads to a deterioration in the short-term prediction performance but the steady-state statistical behaviour is captured. The hybrid LSTM–MSM exhibits a slightly superior performance than GPR–MSM in all systems considered in this study. In the K-S equation, LSTM can capture better the local dynamics compared to Lorenz 96 due to the lower intrinsic attractor dimensionality. LSTM is more accurate than GPR in the short term, but especially in the chaotic regime 1/ν = 16 forecasts of LSTM fly away from the attractor faster. LSTM–MSM counters this effect and long-term forecasts converge to the invariant measure at the expense of a compromise in the short-term forecasting accuracy. The higher short-term forecasting accuracy of LSTM can be attributed to the fact that it is a nonlinear approximator and can also capture correlations between modes in the reduced space. By contrast, GPR is a locally linear approximator modelling each mode independently in the output, assuming Gaussian correlations between modes in the input. LSTM and GPR show comparable forecasting accuracy in the barotropic model, as the intrinsic dimensionality is significantly smaller than K-S and Lorenz 96 and both methods can effectively capture the dynamics. Future directions include modelling the lower energy modes and interpolation errors using a stochastic component in the LSTM to improve the forecasting accuracy. Another possible research direction is to model the attractor in the reduced space using a mixture of LSTM models, one model for each region. The LSTM proposed in this work models the attractor globally. However, different attractor regions may exhibit very different dynamic behaviours, which cannot be simultaneously modelled using only one network. Moreover, these local models can be combined with a closure scheme compensating for truncation and modelling errors. This local modelling approach may further improve prediction performance.
+Data accessibility. The code and data used in this work are available at the link: https://polybox.ethz.ch/index. php/s/keH7PftvLmbkYU1. The password is rspa_paper. The TensorFlow library and python3 were used for the implementation of LSTM architectures while Matlab was used for Gaussian Processes. These packages need to be installed in order to run the codes. Authors’ contributions. P.R.V. conceived the idea of the blended LSTM–MSM scheme, implemented the neural network architectures and the simulations, interpreted the computational results, and wrote the manuscript. W.B. supervised the work and contributed to the implementation of the LSTM. Z.Y.W. implemented the GPR and made contributions to the manuscript. P.K. had the original idea of the LSTM scheme and contributed to the manuscript. P.K. and T.P.S. contributed to the interpretation of the results and offered consultation. All the authors gave their final approval for publication. Competing interests. We declare we have no competing interests. Funding. T.P.S. and Z.Y.W. have been supported by an Air Force Office of Scientific Research grant no. FA955016-1-0231, an Office of Naval Research grant N00014-15-1-2381 and an Army Research Office grant no. 66710-EG-YIP. P.K. and P.R.V. gratefully acknowledge support from the European Research Council (ERC) Advanced Investigator Award (no. 341117). Acknowledgements. We thank the two anonymous reviewers whose insightful comments helped us to enhance the manuscript.
+References
+1. Rowley CW. 2005 Model reduction for fluids, using balanced proper orthogonal decomposition. Int. J. Bifurcation Chaos 15, 997–1013. (doi:10.1142/S0218127405012429) 2. Williams MO, Kevrekidis IG, Rowley CW. 2015 A data-driven approximation of the Koopman operator: extending dynamic mode decomposition. J. Nonlinear Sci. 25, 1307–1346. (doi:10.1007/s00332-015-9258-5) 3. Tu JH, Rowley CW, Luchtenburg DM, Brunton SL, Kutz JN. 2014 On dynamic mode decomposition: theory and applications. J. Comput. Dyn. 1, 391–421. (doi:10.3934/jcd.2014. 1.391) 4. Kutz JN, Fu X, Brunton SL. 2016 Multiresolution dynamic mode decomposition. SIAM. J. Appl. Dyn. Syst. 15, 713–735. (doi:10.1137/15M1023543)
+Downloaded from https://royalsocietypublishing.org/ on 27 November 2025
+
+
+18
+rspa.royalsocietypublishing.org Proc. R. Soc. A 474: 20170844
+...................................................
+5. Arbabi H, Mezic I. 2017 Ergodic theory, dynamic mode decomposition and computation of spectral properties of the Koopman operator. SIAM. J. Appl. Dyn. Syst. 16, 2096–2126. (doi:10.1137/17M1125236) 6. Kerschen G, Golinval JC, Vakakis AF, Bergman LA. 2005 The method of proper orthogonal decomposition for dynamical characterization and order reduction of mechanical systems: an overview. Nonlinear. Dyn. 41, 147–169. (doi:10.1007/s11071-005-2803-2) 7. Sapsis TP, Majda AJ. 2013 Statistically accurate low-order models for uncertainty quantification in turbulent dynamical systems. Proc. Natl Acad. Sci. USA 110, 13 705–13 710. (doi:10.1073/pnas.1313065110) 8. Krischer K, Rico-Martínez R, Kevrekidis IG, Rotermund HH, Ertl G, Hudson JL. 1992 Model identification of a spatiotemporally varying catalytic reaction. AIChE J. 39, 89–98. (doi:10.1002/aic.690390110) 9. Milano M, Koumoutsakos P. 2002 Neural network modeling for near wall turbulent flow. J. Comput. Phys. 182, 1–26. (doi:10.1006/jcph.2002.7146) 10. Brunton SL, Proctor JL, Kutz JN. 2016 Discovering governing equations from data by sparse identification of nonlinear dynamical systems. Proc. Natl Acad. Sci. USA 113, 3932–3937. (doi:10.1073/pnas.1517384113)
+11. Duriez T, Brunton SL, Noack BR. 2016 Machine learning control: taming nonlinear dynamics and turbulence. Berlin, Germany: Springer. 12. Majda AJ, Lee Y. 2014 Conceptual dynamical models for turbulence. Proc. Natl Acad. Sci. USA 111, 6548–6553. (doi:10.1073/pnas.1404914111) 13. Schaeffer H. 2017 Learning partial differential equations via data discovery and sparse optimization. Proc. R. Soc. A 473, 20160446. (doi:10.1098/rspa.2016.0446) 14. Farazmand M, Sapsis TP. 2016 Dynamical indicators for the prediction of bursting phenomena in high-dimensional systems. Phys. Rev. E 94, 032212. (doi:10.1103/PhysRevE.94.032212) 15. Bongard J, Lipson H. 2007 Automated reverse engineering of nonlinear dynamical systems. Proc. Natl Acad. Sci. USA 104, 9943–9948. (doi:10.1073/pnas.0609476104) 16. Einicke GA, White LB. 1999 Robust extended Kalman filtering. IEEE Trans. Signal Process. 47, 2596–2599. (doi:10.1109/78.782219) 17. Julier SJ, Uhlmann JK. 1997 A new extension of the Kalman filter to nonlinear systems. Proc. SPIE 3068, 182–193. (doi:10.1117/12.280797) 18. Lee Y, Majda AJ. 2016 State estimation and prediction using clustered particle filters. Proc. Natl Acad. Sci. USA 113, 14 609–14 614. (doi:10.1073/pnas.1617398113) 19. Comeau D, Zhao Z, Giannakis D, Majda AJ. 2017 Data-driven prediction strategies for low-frequency patterns of North Pacific climate variability. Clim. Dyn. 48, 1855–1872. (doi:10.1007/s00382-016-3177-5) 20. Tatsis K, Dertimanis V, Abdallah I, Chatzi E. 2017 A substructure approach for fatigue assessment on wind turbine support structures using output-only measurements. Procedia Engineering 199, 1044–1049. (doi:10.1016/j.proeng.2017.09.285) 21. Quade M, Abel M, Shafi K, Niven RK, Noack BR. 2016 Prediction of dynamical systems by symbolic regression. Phys. Rev. E. 94, 012214. (doi:10.1103/PhysRevE.94.012214) 22. Mirmomeni M, Lucas C, Moshiri B, Araabi NB. 2010 Introducing adaptive neurofuzzy modeling with online learning method for prediction of time-varying solar and geomagnetic activity indices. Expert Syst. Appl. 37, 8267–8277. (doi:10.1016/j.eswa.2010.05.059) 23. Gholipour A, Lucas C, Araabi NB, Mirmomeni M, Shafiee M. 2007 Extracting the main patterns of natural time series for long-term neurofuzzy prediction. Neural Comput. Appl. 16, 383–393. (doi:10.1007/s00521-006-0062-x) 24. Mirmomeni M, Lucas C, Araabi NB, Moshiri B, Bidar MR. 2011 Recursive spectral analysis of natural time series based on eigenvector matrix perturbation for online applications. IET Signal Process. 5, 512–526. (doi:10.1049/iet-spr.2009.0278) 25. Mirmomeni M, Lucas C, Araabi NB, Moshiri B, Bidar MR. 2011 Online multi-step ahead prediction of time-varying solar and geomagnetic activity indices via adaptive neurofuzzy modeling and recursive spectral analysis. Sol. Phys. 272, 189–213. (doi:10.1007/ s11207-011-9810-x) 26. Marques CAF, Ferreira JA, Rocha A, Castanheira JM, Melo-Goncalves P, Vaz N, Dias JM. 2006 Singular spectrum analysis and forecasting of hydrological time series. Phys. Chem. Earth, Parts A/B/C 31, 1172–1179. (doi:10.1016/j.pce.2006.02.061) 27. Abdollahzade M, Miranian A, Hassani H, Iranmanesh H. 2015 A new hybrid enhanced local linear neuro-fuzzy model based on the optimized singular spectrum analysis and its
+Downloaded from https://royalsocietypublishing.org/ on 27 November 2025
+
+
+19
+rspa.royalsocietypublishing.org Proc. R. Soc. A 474: 20170844
+...................................................
+application for nonlinear and chaotic time series forecasting. Inf. Sci. (Ny) 295, 107–125. (doi:10.1016/j.ins.2014.09.002) 28. Ye L, Liu P. 2011 Combined model based on EMD-SVM for short-term wind power prediction. Commun. Nonlinear Science Numer. Simul. 31, 102–108.
+29. Cousins W, Sapsis TP. 2014 Quantification and prediction of extreme events in a onedimensional nonlinear dispersive wave model. Phys. D 280–281, 48–58. (doi:10.1016/ j.physd.2014.04.012) 30. Cousins W, Sapsis TP. 2016 Reduced order precursors of rare events in unidirectional nonlinear water waves. J. Fluid Mech. 790, 368–388. (doi:10.1017/jfm.2016.13. 368) 31. Lorenz EN. 1969 Atmospheric predictability as revealed by naturally occurring analogues. J. Atmos. Sci. 26, 636–646. (doi:10.1175/1520-0469(1969)26<636:APARBN>2.0.CO;2) 32. Xavier PK, Goswami BN. 2007 An analog method for real-time forecasting of summer monsoon subseasonal variability. Mon. Weather Rev. 135, 4149–4160. (doi:10.1175/2007 MWR1854.1) 33. Zhao Z, Giannakis D. 2016 Analog forecasting with dynamics-adapted kernels. Nonlinearity 29, 2888–2939. (doi:10.1088/0951-7715/29/9/2888) 34. Chiavazzo E, Gear CW, Dsilva CJ, Rabin N, Kevrekidis IG. 2014 Reduced models in chemical kinetics via nonlinear data-mining. Processes 2, 112–140. (doi:10.3390/pr2010112) 35. Wan ZY, Sapsis TP. 2017 Reduced-space Gaussian Process Regression for data-driven probabilistic forecast of chaotic dynamical systems. Phys. D: Nonlinear Phenom. 345, 45–55. (doi:10.1016/j.physd.2016.12.005) 36. Rasmussen CE, Williams CKI. 2006 Gaussian processes for machine learning. Cambridge, MA: The MIT Press. 37. Hochreiter S, Schmidhuber J. 1997 Long short-term memory. Neural. Comput. 9, 1735–1780. (doi:10.1162/neco.1997.9.8.1735) 38. Gers FA, Eck D, Schmidhuber J. 2001 Applying LSTM to time series predictable through timewindow approaches. In Proc. Int. Conf. on Artificial Neural Networks, ICANN’01 Vienna, 2125 August (eds G Dorffner, H Bischof, K Hornik), pp. 669–676. Lecture Notes in Computer Science, vol. 2130. New York, NY: Springer. 39. Rico-Martínez R, Krischer K, Kevrekidis IG, Kube MC, Hudson JL. 1992 Discrete- versus continuous-time nonlinear signal processing of Cu electrodissolution data. Chem. Eng. Commun. 118, 25–48. (doi:10.1080/00986449208936084) 40. Jaeger M, Haas H. 2004 Harnessing nonlinearity: predicting chaotic systems and saving energy in wireless communication. Science 304, 78–80. (doi:10.1126/science.1091277) 41. Chatzis SP, Demiris Y. 2011 Echo state Gaussian process. IEEE Trans. Neural Netw. 22, 14351445. (doi:10.1109/TNN.2011.2162109) 42. Broomhead DS, Lowe D. 1988 Multivariable functional interpolation and adaptive networks. Complex Syst. 2, 321–355. (doi:10.4236/jbise.2013.65A003) 43. Kim KB, Park JB, Choi YH, Chen G. 2000 Control of chaotic dynamical systems using radial basis function network approximators. Inf. Sci. 130, 165–183. (doi:10.1016/S0020-0255(00) 00074-8) 44. Pathak J, Hunt BR, Girvan M, Lu Z, Ott E. 2018 Model-free prediction of large spatiotemporally chaotic systems from data: a reservoir computing approach. Phys. Rev. Lett. 120, 024102. (doi:10.1103/PhysRevLett.120.024102) 45. Pathak J, Lu Z, Hunt BR, Girvan M, Ott E. 2017 Using machine learning to replicate chaotic attractors and calculate Lyapunov exponents from data. Chaos. 27, 121102. (doi:10.1063/ 1.5010300) 46. Takens F. 1981 Detecting strange attractors in turbulence. In Dynamical Systems and Turbulence, Warwick, UK, 1980, pp. 366–381. Lecture Notes in Mathematics, vol. 898. Berlin, Germany: Springer. 47. Hochreiter J. 1991 Untersuchungen zu dynamischen neuronalen Netzen. Master thesis, Institut fur Informatik, Technische Universitat, Munchen. 48. Bengio Y, Simard P, Frasconi P. 1994 Long short-term memory. IEEE Trans. Neural Netw. 5, 157–166. (doi:10.1109/72.279181) 49. Wierstra D, Schmidhuber J, Gomez FJ. 2005 Evolino: hybrid neuroevolution/optimal linear search for sequence learning. Proc. 19th IJCAI, 853–858. 50. Graves A, Mohamed AR, Hinton G. 2013 Speech recognition with deep recurrent neural networks. In Proc. Acoustic, Speech and Signal Processing, ICASSP, Vancouver, Canada, 26–31 May, pp. 6645–6649. Piscataway, NJ: IEEE.
+Downloaded from https://royalsocietypublishing.org/ on 27 November 2025
+
+
+20
+rspa.royalsocietypublishing.org Proc. R. Soc. A 474: 20170844
+...................................................
+51. Graves A, Fernández S, Liwicki M, Bunke H, Schmidhuber J. 2007 Unconstrained online handwriting recognition with recurrent neural networks. In Proc. 20th NIPS, Vancouver, Canada, 3–6 December, pp. 577–584. Curran Associates.
+52. Wu Y, Schuster M, Chen Z, Le QV, Norouzi M, Macherey W, Krikun M, Cao Y, Gao Q. 2016 Google’s neural machine translation system: bridging the gap between human and machine translation. (http://arxiv.org/abs/1609.08144) 53. Kingma DP, Ba J. 2017 Adam: a method for stochastic optimization. (http://arxiv.org/abs/ 1412.6980) 54. Glorot X, Bengio Y. 2010 Understanding the difficulty of training deep feedforward neural networks. Proc. 13th AISTATS 114, 249–256. 55. Majda A, Harlim J. 2012 Filtering complex turbulent systems. Cambridge, UK: Cambridge University Press.
+56. Majda A, Abramov RV, Grote MJ. 2005 Information theory and stochastics for multiscale nonlinear systems. Centre de Recherches Mathematiques Monograph Series, vol. 25. Providence, RI: American Mathematical Society. 57. Allgaier NA, Harris KD, Danforth CM. 2012 Empirical correction of a toy climate model. Phys. Rev. E 85, 026201. (doi:10.1103/PhysRevE.85.026201) 58. Basnarkov L, Kocarev L. 2012 Forecast improvement in Lorenz96 system. Nonlinear Process. Geophys. 19, 569–575. (doi:10.5194/npg-19-569-2012) 59. Lorenz NE. 1996 Predictability: a problem partly solved. In Proc. Seminar held at ECMWF on Predictability. Reading, UK, 4–8 September, pp. 1–18.
+60. Crommelin DT, Majda AJ. 2004 Strategies for model reduction: comparing different optimal bases. J. Atmos. Sci. 61, 2206–2217. (doi:10.1175/1520-0469(2004)061<2206:SFMRCD> 2.0.CO;2) 61. Kuramoto Y, Tsuzuki T. 1976 Persistent propagation of concentration waves in dissipative media far from thermal equilibrium. Prog. Theor. Phys. 55, 356–369. (doi:10.1143/PTP.55.356) 62. Kuramoto Y. 1978 Diffusion-induced chaos in reaction systems. Prog. Theor. Phys. Suppl. 64, 346–367. (doi:10.1143/PTPS.64.346) 63. Sivashinsky G. 1977 Nonlinear analysis of hydrodynamic instability in laminar flamesI. Derivation of basic equations. Acta. Astronaut. 4, 1177–1206. (doi:10.1016/0094-5765(77) 90096-0) 64. Sivashinsky G, Michelson DM. 1980 On irregular wavy flow of a liquid film down a vertical plane. Prog. Theor. Phys. 63, 2112–2114. (doi:10.1143/PTP.63.2112) 65. Blonigan PJ, Wang Q. 2014 Least squares shadowing sensitivity analysis of a modified Kuramoto-Sivashinsky equation. Chaos Solitons Fractals 64, 16–25. (doi:10.1016/j.chaos.2014. 03.005) 66. Kevrekidis IG, Nicolaenko B, Scovel JC. 1990 Back in the saddle again: a computer assisted study of the kuramoto-sivashinsky equation. SIAM J. Appl. Math. 50, 760–790. (doi:10.1137/0150045) 67. Selten FM. 1995 An efficient description of the dynamics of barotropic flow. J. Atmos. Sci. 52, 915–936. (doi:10.1175/1520-0469(1995)052<0915:AEDOTD>2.0.CO;2) 68. Thompson DWJ, Wallace JM. 2000 Annular modes in the extratropical circulation: Part I: Month-to-month variability. J. Clim. 13, 1000–1016. (doi:10.1175/1520-0442(2000)013<1000: AMITEC>2.0.CO;2) 69. Mo KC, Livezey RE. 1986 Tropical-extratropical geopotential height teleconnections during the northern hemisphere winter. Mon. Weather Rev. 114, 2488–2512. (doi:10.1175/15200493(1986)114%3C2488:TEGHTD%3E2.0.CO;2)
+Downloaded from https://royalsocietypublishing.org/ on 27 November 2025

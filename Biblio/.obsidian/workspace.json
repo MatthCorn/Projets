@@ -21,8 +21,34 @@
               "icon": "lucide-file",
               "title": "Advancing Neural Network Performance through  Emergence-Promoting Initialization Scheme (2)"
             }
+          },
+          {
+            "id": "f01e8808b6567051",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
+            }
+          },
+          {
+            "id": "7afbab766a3ed3af",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Pointer Networks (3).md",
+                "mode": "source",
+                "source": false,
+                "backlinks": false
+              },
+              "icon": "lucide-file",
+              "title": "Pointer Networks (3)"
+            }
           }
-        ]
+        ],
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -154,15 +180,10 @@
             "id": "0b71fd0e1f898a2b",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Are Pre-trained Convolutions Better than Pre-trained Transformers (4).md",
-                "mode": "source",
-                "source": false,
-                "backlinks": false
-              },
-              "icon": "lucide-file",
-              "title": "Are Pre-trained Convolutions Better than Pre-trained Transformers (4)"
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
             }
           }
         ],
@@ -170,7 +191,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 515.5
+    "width": 432.5
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -183,21 +204,32 @@
       "graph:Open graph view": false
     }
   },
-  "active": "0b71fd0e1f898a2b",
+  "active": "7afbab766a3ed3af",
   "lastOpenFiles": [
-    "Zotero/storage/RDERHZGK/Goodfellow et al. - 2020 - Generative adversarial networks.pdf",
-    "Zotero/storage/RDERHZGK",
-    "Zotero/storage/tmp-8iFq44/Goodfellow et al. - 2020 - Generative adversarial networks.pdf",
-    "Zotero/storage/tmp-8iFq44",
-    "Zotero/storage/6DHH6PMG/Ha et Schmidhuber - 2018 - World models.pdf",
-    "Zotero/storage/6DHH6PMG",
-    "Zotero/storage/tmp-9KpxzI/Ha et Schmidhuber - 2018 - World models.pdf",
-    "Zotero/storage/tmp-9KpxzI",
-    "Zotero/storage/TIIKWQR6/Razavi et al. - 2019 - Generating diverse high-fidelity images with vq-vae-2.pdf",
-    "Zotero/storage/TIIKWQR6",
-    "Zotero/storage/tmp-uUdjl3/Razavi et al. - 2019 - Generating diverse high-fidelity images with vq-vae-2.pdf",
-    "Denoising Diffusion Probabilistic Models (2).md",
+    "Transformers in Time Series-- A Survey (2).md",
+    "NEURAL MACHINE TRANSLATION  BY JOINTLY LEARNING TO ALIGN AND TRANSLATE (3).md",
+    "Attention Is All You Need (5).md",
+    "RETHINKING POSITIONAL ENCODING IN  LANGUAGE PRE-TRAINING (2).md",
+    "Zotero/storage/U8A5287S/Oore et al. - 2020 - This time with feeling learning expressive musical performance.pdf",
+    "Zotero/storage/U8A5287S",
+    "Zotero/storage/tmp-XObTUc/Oore et al. - 2020 - This time with feeling learning expressive musical performance.pdf",
+    "Zotero/storage/tmp-XObTUc",
+    "Zotero/storage/TZSBKYQ4/Vlachas et al. - 2018 - Data-driven forecasting of high-dimensional chaotic systems with long short-term memory networks.pdf",
+    "Zotero/storage/TZSBKYQ4",
+    "Zotero/storage/tmp-nsLxb6/Vlachas et al. - 2018 - Data-driven forecasting of high-dimensional chaotic systems with long short-term memory networks.pdf",
+    "Zotero/storage/tmp-nsLxb6",
+    "Zotero/storage/GLZV5QX6/Choi et al. - 2016 - Doctor ai Predicting clinical events via recurrent neural networks.pdf",
+    "Zotero/storage/GLZV5QX6",
+    "RNN.md",
+    "Mamba-- Linear-Time Sequence Modeling with Selective State Spaces (4).md",
     "Google’s Neural Machine Translation System-- Bridging the Gap  between Human and Machine Translation (2).md",
+    "Generating Sequences With  Recurrent Neural Networks (5).md",
+    "Long Short-Term Memory Recurrent Neural Network Architectures  for Large Scale Acoustic Modeling (4).md",
+    "A Comprehensive Survey of Continual Learning--  Theory, Method and Application (4).md",
+    "Sequence to Sequence Learning with Neural Networks (2).md",
+    "Empirical Evaluation of  Gated Recurrent Neural Networks  on Sequence Modeling (4).md",
+    "Are Pre-trained Convolutions Better than Pre-trained Transformers (4).md",
+    "Denoising Diffusion Probabilistic Models (2).md",
     "Improving Language Understanding  by Generative Pre-Training (2).md",
     "Deep Unsupervised Learning using  Nonequilibrium Thermodynamics (2).md",
     "DENOISING DIFFUSION IMPLICIT MODELS (2).md",
@@ -209,18 +241,7 @@
     "Lecture Notes on  High-Dimensional Data (3).md",
     "Point Transformer (5).md",
     "ROFORMER-- ENHANCED TRANSFORMER WITH ROTARY  POSITION EMBEDDING (5).md",
-    "RETHINKING POSITIONAL ENCODING IN  LANGUAGE PRE-TRAINING (2).md",
-    "Mamba-- Linear-Time Sequence Modeling with Selective State Spaces (4).md",
     "A What-and-Where Fusion Neural Network for  Recognition and Tracking of Multiple Radar Emitters (2).md",
-    "A review of surrogate models and their application to  groundwater modeling (2).md",
-    "Understanding the Difficulty of Training Transformers (3).md",
-    "Transformers without Tears-- Improving the Normalization of Self-Attention (2).md",
-    "Transformer Networks for Trajectory Forecasting (1).md",
-    "Transformers in Time Series-- A Survey (2).md",
-    "ATTENTION, LEARN TO SOLVE ROUTING PROBLEMS! (2).md",
-    "A Survey on Curriculum Learning (3).md",
-    "Training Tips for the Transformer Model (3).md",
-    "Taming Transformers for High-Resolution Image Synthesis (2).md",
-    "Skip-Thought Vectors (2).md"
+    "A review of surrogate models and their application to  groundwater modeling (2).md"
   ]
 }
