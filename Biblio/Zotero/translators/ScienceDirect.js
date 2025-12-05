@@ -1,15 +1,15 @@
 {
 	"translatorID": "b6d0a7a-d076-48ae-b2f0-b6de28b194e",
+	"translatorType": 4,
 	"label": "ScienceDirect",
 	"creator": "Michael Berkowitz and Aurimas Vinckevicius",
 	"target": "^https?://[^/]*science-?direct\\.com[^/]*/((science/)?(article/|(journal|bookseries|book|handbook)/\\d)|search[?/]|journal/[^/]+/vol)",
 	"minVersion": "3.0",
-	"maxVersion": "",
+	"maxVersion": null,
 	"priority": 100,
 	"inRepository": true,
-	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2024-10-03 14:17:12"
+	"lastUpdated": "2025-12-02 18:10:00"
 }
 
 function detectWeb(doc, url) {
@@ -153,7 +153,9 @@ async function getPDFLink(doc) {
 	// enough to get us through even without those parameters.
 	pdfURL = attr(doc, 'link[rel="canonical"]', 'href');
 	if (pdfURL) {
-		pdfURL = pdfURL + '/pdfft?download=true';
+		pdfURL += '/pdfft?download=true';
+		// TEMP: Remove erroneous port from canonical link
+		pdfURL = pdfURL.replace(':5037', '');
 		Zotero.debug("Trying to construct PDF URL from canonical link: " + pdfURL);
 		return pdfURL;
 	}

@@ -33,51 +33,53 @@
 \contentsline {paragraph}{Universalité de la modélisation séquentielle}{20}{paragraph*.11}%
 \contentsline {subsection}{\numberline {4.3.2}Réseaux de convolution}{20}{subsection.4.3.2}%
 \contentsline {paragraph}{Genèse et prédominance dans l'imagerie}{20}{paragraph*.12}%
-\contentsline {paragraph}{La convolution dans l'image : Une séquence spatiale 2D}{21}{paragraph*.13}%
-\contentsline {paragraph}{La convolution dans les séquences 1D (Texte, Audio, Séries Temporelles)}{21}{paragraph*.14}%
-\contentsline {paragraph}{Généralisation : La convolution au-delà des grilles euclidiennes}{22}{paragraph*.15}%
-\contentsline {subsection}{\numberline {4.3.3}Réseaux de neurones récurrents et Espaces d'Etats (RNN et SSM)}{22}{subsection.4.3.3}%
-\contentsline {paragraph}{Genèse et mécanismes d'interaction : De la boucle simple aux portes logiques}{22}{paragraph*.16}%
-\contentsline {paragraph}{Renouveau architectural : Les Modèles d'Espaces d'Etats (SSM)}{23}{paragraph*.17}%
-\contentsline {paragraph}{Application au texte : L'ère du Sequence-to-Sequence et de la Traduction}{23}{paragraph*.18}%
-\contentsline {paragraph}{Application aux systèmes temporels, physiques et créatifs}{23}{paragraph*.19}%
-\contentsline {subsection}{\numberline {4.3.4}Transformer}{24}{subsection.4.3.4}%
-\contentsline {paragraph}{Histoire : De l'alignement au "Pointer Network" et à l'Attention pure}{24}{paragraph*.20}%
-\contentsline {paragraph}{Mécanisme d'interaction et complexité}{25}{paragraph*.21}%
-\contentsline {paragraph}{Le Transformer dans le texte : La divergence des architectures}{25}{paragraph*.22}%
-\contentsline {paragraph}{Le Transformer dans les systèmes temporels : Promesses et controverses}{25}{paragraph*.23}%
-\contentsline {paragraph}{Le Transformer dans l'image : Patchs et hiérarchie}{26}{paragraph*.24}%
-\contentsline {paragraph}{Généralisation : Physique et Prise de décision}{26}{paragraph*.25}%
-\contentsline {subsection}{\numberline {4.3.5}Ancrage dans la problématique}{26}{subsection.4.3.5}%
-\contentsline {chapter}{\numberline {5}AVERTISSEMENT}{29}{chapter.5}%
-\contentsline {chapter}{\numberline {6}COMPOSITION GÉNÉRALE, CHARTE GRAPHIQUE}{31}{chapter.6}%
-\contentsline {section}{\numberline {6.1}COMPOSITION DU DOCUMENT}{31}{section.6.1}%
-\contentsline {section}{\numberline {6.2}QUELS LOGOS FAIRE FIGURER ?}{31}{section.6.2}%
-\contentsline {section}{\numberline {6.3}POLICES DE CARACTÈRES ET COULEURS}{31}{section.6.3}%
-\contentsline {chapter}{\numberline {7}INFORMATIONS GÉNÉRALES SUR LA PAGE DE COUVERTURE}{33}{chapter.7}%
-\contentsline {section}{\numberline {7.1}TITRE DE LA THÈSE ET LANGUE(S)}{33}{section.7.1}%
-\contentsline {section}{\numberline {7.2}SPÉCIALITÉ DE DOCTORAT}{33}{section.7.2}%
-\contentsline {section}{\numberline {7.3}UNITÉ DE RECHERCHE}{34}{section.7.3}%
-\contentsline {section}{\numberline {7.4}LE RÉFÉRENT}{34}{section.7.4}%
-\contentsline {section}{\numberline {7.5}GRADUATE SCHOOL}{35}{section.7.5}%
-\contentsline {section}{\numberline {7.6}ÉCOLE DOCTORALE}{35}{section.7.6}%
-\contentsline {section}{\numberline {7.7}LIEU ET DATE DE SOUTENANCE}{36}{section.7.7}%
-\contentsline {chapter}{\numberline {8}CIVILITÉ, FÉMINISATION DES TITRES ET FONCTIONS}{37}{chapter.8}%
-\contentsline {chapter}{\numberline {9}PRÉSENTATION DE LA DIRECTION DE LA THÈSE OU DE L’ÉQUIPE D’ENCADREMENT}{39}{chapter.9}%
-\contentsline {chapter}{\numberline {10}COMPOSITION DU JURY }{41}{chapter.10}%
-\contentsline {section}{\numberline {10.1}A QUOI SERVENT CES INFORMATIONS ?}{41}{section.10.1}%
-\contentsline {section}{\numberline {10.2}LÉGITIMITÉ ACADÉMIQUE}{41}{section.10.2}%
-\contentsline {section}{\numberline {10.3}INDÉPENDANCE}{42}{section.10.3}%
-\contentsline {section}{\numberline {10.4}FONCTION DANS LE JURY ET ORDRE DE CITATION}{43}{section.10.4}%
-\contentsline {subsection}{\numberline {10.4.1}Ordre de citation}{43}{subsection.10.4.1}%
-\contentsline {subsection}{\numberline {10.4.2}Les rapporteurs}{43}{subsection.10.4.2}%
-\contentsline {chapter}{\numberline {11}BIEN CITER SES SOURCES}{45}{chapter.11}%
-\contentsline {section}{\numberline {11.1}S'INFORMER SUR LE PLAGIAT}{45}{section.11.1}%
-\contentsline {section}{\numberline {11.2}LES IMAGES}{45}{section.11.2}%
-\contentsline {section}{\numberline {11.3}ARTICLES JOINTS A LA THÈSE}{45}{section.11.3}%
-\contentsline {chapter}{\numberline {12}DÉPOSER ET DIFFUSER SA THÈSE}{47}{chapter.12}%
-\contentsline {section}{\numberline {12.1}LES RESSOURCES A CONSULTER}{47}{section.12.1}%
-\contentsline {section}{\numberline {12.2}LES DÉMARCHES}{47}{section.12.2}%
-\contentsline {chapter}{\numberline {13}ANNEXE : LES LOGOS INSTITUTIONNELS}{49}{chapter.13}%
-\contentsline {section}{\numberline {13.1}LE LOGO DE L’UNIVERSITÉ PARIS-SACLAY}{49}{section.13.1}%
-\contentsline {section}{\numberline {13.2}LOGOS, NUMÉROS D’ACCRÉDITATION ET DÉNOMINATIONS DES ÉCOLES DOCTORALES}{49}{section.13.2}%
+\contentsline {paragraph}{Mécanisme d'interaction : Filtrage local et expansion hiérarchique}{21}{paragraph*.13}%
+\contentsline {paragraph}{La convolution dans l'image : Une séquence spatiale 2D}{23}{paragraph*.16}%
+\contentsline {paragraph}{La convolution dans les séquences 1D (Texte, Audio, Séries Temporelles)}{23}{paragraph*.17}%
+\contentsline {paragraph}{Généralisation : La convolution au-delà des grilles euclidiennes}{24}{paragraph*.18}%
+\contentsline {subsection}{\numberline {4.3.3}Réseaux de neurones récurrents et Espaces d'Etats (RNN et SSM)}{25}{subsection.4.3.3}%
+\contentsline {paragraph}{Genèse et mécanismes d'interaction : De la boucle simple aux portes logiques}{25}{paragraph*.19}%
+\contentsline {paragraph}{Mécanisme d'interaction : Récurrence et Mémoire d'État}{25}{paragraph*.20}%
+\contentsline {paragraph}{Renouveau architectural : Les Modèles d'Espaces d'Etats (SSM)}{27}{paragraph*.23}%
+\contentsline {paragraph}{Application au texte : L'ère du Sequence-to-Sequence et de la Traduction}{27}{paragraph*.24}%
+\contentsline {paragraph}{Application aux systèmes temporels, physiques et créatifs}{28}{paragraph*.25}%
+\contentsline {subsection}{\numberline {4.3.4}Transformer}{28}{subsection.4.3.4}%
+\contentsline {paragraph}{Histoire : De l'alignement au "Pointer Network" et à l'Attention pure}{28}{paragraph*.26}%
+\contentsline {paragraph}{Mécanisme d'interaction et complexité}{29}{paragraph*.27}%
+\contentsline {paragraph}{Le Transformer dans le texte : La divergence des architectures}{33}{paragraph*.33}%
+\contentsline {paragraph}{Le Transformer dans les systèmes temporels : Promesses et controverses}{34}{paragraph*.34}%
+\contentsline {paragraph}{Le Transformer dans l'image : Patchs et hiérarchie}{35}{paragraph*.35}%
+\contentsline {paragraph}{Généralisation : Physique et Prise de décision}{35}{paragraph*.36}%
+\contentsline {subsection}{\numberline {4.3.5}Ancrage dans la problématique}{35}{subsection.4.3.5}%
+\contentsline {chapter}{\numberline {5}AVERTISSEMENT}{37}{chapter.5}%
+\contentsline {chapter}{\numberline {6}COMPOSITION GÉNÉRALE, CHARTE GRAPHIQUE}{39}{chapter.6}%
+\contentsline {section}{\numberline {6.1}COMPOSITION DU DOCUMENT}{39}{section.6.1}%
+\contentsline {section}{\numberline {6.2}QUELS LOGOS FAIRE FIGURER ?}{39}{section.6.2}%
+\contentsline {section}{\numberline {6.3}POLICES DE CARACTÈRES ET COULEURS}{39}{section.6.3}%
+\contentsline {chapter}{\numberline {7}INFORMATIONS GÉNÉRALES SUR LA PAGE DE COUVERTURE}{41}{chapter.7}%
+\contentsline {section}{\numberline {7.1}TITRE DE LA THÈSE ET LANGUE(S)}{41}{section.7.1}%
+\contentsline {section}{\numberline {7.2}SPÉCIALITÉ DE DOCTORAT}{41}{section.7.2}%
+\contentsline {section}{\numberline {7.3}UNITÉ DE RECHERCHE}{42}{section.7.3}%
+\contentsline {section}{\numberline {7.4}LE RÉFÉRENT}{42}{section.7.4}%
+\contentsline {section}{\numberline {7.5}GRADUATE SCHOOL}{43}{section.7.5}%
+\contentsline {section}{\numberline {7.6}ÉCOLE DOCTORALE}{43}{section.7.6}%
+\contentsline {section}{\numberline {7.7}LIEU ET DATE DE SOUTENANCE}{44}{section.7.7}%
+\contentsline {chapter}{\numberline {8}CIVILITÉ, FÉMINISATION DES TITRES ET FONCTIONS}{45}{chapter.8}%
+\contentsline {chapter}{\numberline {9}PRÉSENTATION DE LA DIRECTION DE LA THÈSE OU DE L’ÉQUIPE D’ENCADREMENT}{47}{chapter.9}%
+\contentsline {chapter}{\numberline {10}COMPOSITION DU JURY }{49}{chapter.10}%
+\contentsline {section}{\numberline {10.1}A QUOI SERVENT CES INFORMATIONS ?}{49}{section.10.1}%
+\contentsline {section}{\numberline {10.2}LÉGITIMITÉ ACADÉMIQUE}{49}{section.10.2}%
+\contentsline {section}{\numberline {10.3}INDÉPENDANCE}{50}{section.10.3}%
+\contentsline {section}{\numberline {10.4}FONCTION DANS LE JURY ET ORDRE DE CITATION}{51}{section.10.4}%
+\contentsline {subsection}{\numberline {10.4.1}Ordre de citation}{51}{subsection.10.4.1}%
+\contentsline {subsection}{\numberline {10.4.2}Les rapporteurs}{51}{subsection.10.4.2}%
+\contentsline {chapter}{\numberline {11}BIEN CITER SES SOURCES}{53}{chapter.11}%
+\contentsline {section}{\numberline {11.1}S'INFORMER SUR LE PLAGIAT}{53}{section.11.1}%
+\contentsline {section}{\numberline {11.2}LES IMAGES}{53}{section.11.2}%
+\contentsline {section}{\numberline {11.3}ARTICLES JOINTS A LA THÈSE}{53}{section.11.3}%
+\contentsline {chapter}{\numberline {12}DÉPOSER ET DIFFUSER SA THÈSE}{55}{chapter.12}%
+\contentsline {section}{\numberline {12.1}LES RESSOURCES A CONSULTER}{55}{section.12.1}%
+\contentsline {section}{\numberline {12.2}LES DÉMARCHES}{55}{section.12.2}%
+\contentsline {chapter}{\numberline {13}ANNEXE : LES LOGOS INSTITUTIONNELS}{57}{chapter.13}%
+\contentsline {section}{\numberline {13.1}LE LOGO DE L’UNIVERSITÉ PARIS-SACLAY}{57}{section.13.1}%
+\contentsline {section}{\numberline {13.2}LOGOS, NUMÉROS D’ACCRÉDITATION ET DÉNOMINATIONS DES ÉCOLES DOCTORALES}{57}{section.13.2}%

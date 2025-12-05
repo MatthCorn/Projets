@@ -208,9 +208,54 @@ Bien que les données séquentielles soient intuitivement associées à une dime
 \paragraph{Genèse et prédominance dans l'imagerie}
 L'histoire des réseaux de convolution est indissociable de la vision par ordinateur et de la volonté de s'affranchir des descripteurs manuels  (SIFT \cite{lowe_distinctive_2004}, SURF \cite{bay_surf_2006} et HOG \cite{dalal_histograms_2005}). Inspirée par les travaux biologiques sur le cortex visuel, le premier modèle \cite{lecun_gradient-based_2002} a introduit les concepts fondateurs de champ récepteur local et de partage des poids pour la reconnaissance de caractères manuscrits. Cependant, c'est l'avènement d'AlexNet \cite{krizhevsky_imagenet_2012} qui a marqué le véritable point d'inflexion en démontrant la supériorité de l'apprentissage profond sur GPU pour l'extraction de caractéristiques. Cette percée a ouvert la voie à des architectures plus profondes et plus efficientes. Par exemple, l'architecture GoogLeNet \cite{szegedy_going_2015} factorise les convolutions pour réduire le coût de calcul tout en augmentant la largeur du réseau, permettant de traiter des motifs à différentes échelles simultanément.
 
+
+\paragraph{Mécanisme d'interaction : Filtrage local et expansion hiérarchique}
+L'interaction fondamentale d'un réseau de convolution avec une séquence repose sur l'application répétée d'un opérateur de filtrage caractérisé par un noyau $w$ de support fini. Contrairement à une couche dense qui apprendrait un poids spécifique pour chaque élément de la séquence globale, la convolution impose une contrainte de partage des poids qui nécessite que les données soient structurées dans un espace métrique régulier. En effet, l'opération présuppose l'existence d'une fonction $p(\cdot)$ permettant d'associer à chaque élément $x$ sa position sur une grille sous-jacente, qu'elle soit unidimensionnelle pour des données temporelles ou multidimensionnelle pour des données spatiales.\\
+
+Mathématiquement, le noyau $w$ est défini sur un support $\mathcal{V}$ centré à l'origine. Ainsi, le noyau définit pour tout élément cible $x_t$ un voisinage d'interaction $\mathcal{V}_t$, correspondant à la translation du support $\mathcal{V}$ en la position $p(x_t)$. L'opération de convolution consiste alors à calculer une somme pondérée des éléments appartenant à ce voisinage, où les poids sont déterminés exclusivement par la position relative entre les éléments et le centre. La sortie $h_t$ (avant activation) s'exprime par l'équation :
+$$h_t = \sum_{x_j \in \mathcal{V}_t} w_{\Delta(x_j, x_t)} \cdot x_j + b$$
+Dans cette expression, $\Delta(x_j, x_t) = p(x_j) - p(x_t)$ représente le vecteur de position relative du voisin $x_j$ par rapport au centre $x_t$, $b$ est un biais. Une conséquence directe de la structure en grille des données est que ce vecteur de différence correspond systématiquement à un n-uplet d'entiers ($n$ étant la dimension de la grille). Cette propriété discrète est fondamentale pour l'implémentation neuronale : elle implique que la fonction $w$ n'a pas besoin d'être modélisée comme une fonction continue, mais se réduit à un ensemble fini de paramètres scalaires (les poids du filtre) qu'il suffit d'apprendre pour chaque décalage entier possible dans le support. Cette formulation garantit l'invariance par translation, assurant que le même motif de poids est appliqué uniformément sur toute la structure. Par ailleurs, l'application de ce voisinage aux bornes d'une grille finie nécessite une gestion des effets de bord, typiquement résolue par l'ajout de valeurs nulles (zero-padding) en périphérie afin de conserver la dimension de la séquence traitée.\\
+
+Ce mécanisme permet l'extraction robuste de motifs locaux, mais la compréhension de la structure globale de la séquence émerge de la composition hiérarchique de ces opérations. L'illustration \ref{convolution base} permet de visualiser comment l'empilement de couches induit une expansion mathématique du champ récepteur. Considérons une première couche définie par un filtre $w$ de taille 3. Pour un instant $t$, ce filtre induit un voisinage immédiat. L'équation locale est, en notant $\phi$ la fonction d'activation :
+\begin{equation*}
+\begin{split}
+	h^{(1)}_t &= w_{1}x_{t-1} + w_{2}x_{t} + w_{3}x_{t+1} \\
+	x^{(1)}_t &= \phi(h^{(1)}_t)
+\end{split}
+\end{equation*}
+La sortie $x^{(1)}_t$ est une fonction des entrées $x_{t-1}$ à $x_{t+1}$.
+Lorsqu'une seconde couche définie par un filtre $v$ de même support est appliquée sur cette représentation intermédiaire, elle opère selon le même principe d'invariance en translation :
+\begin{equation*}
+\begin{split}
+	h^{(2)}_t & = v_{1}x^{(1)}_{t-1} + v_{2}x^{(1)}_{t} + v_{3}x^{(1)}_{t+1} \\
+	x^{(2)}_t &= \phi(h^{(2)}_t)
+\end{split}
+\end{equation*}
+La sortie $x^{(2)}_t$ est une fonction des entrées $x_{t-2}$ à $x_{t+2}$. Ainsi, par simple composition algébrique, l'horizon d'interaction s'est étendu de 3 éléments (couche 1) à 5 éléments (couche 2). La profondeur du réseau agit donc comme un multiplicateur mécanique de l'horizon d'interaction, permettant de reconstruire des dépendances causales à longue portée à partir de règles de construction strictement locales et invariantes.\\
+
+\begin{figure}
+\begin{center} 
+\includegraphics[scale=0.25]{BasicConvolution.png}
+\end{center}
+\caption{Illustration d'une convolution 1D standard et de l'expansion hiérarchique du champ récepteur}
+\label{convolution base}
+\end{figure}
+
+Au-delà de l'expansion de l'horizon d'interaction, la géométrie du support de convolution détermine la nature causale ou non du traitement, une caractéristique nécessaire pour la modélisation de systèmes dynamiques. La partie gauche de la figure \ref{convolution comparaison} la configuration standard, dite convolution centrée. Pour calculer un élément de sortie $y_4$ à l'instant $t=4$, le champ récepteur effectif (cône violet) agrège les informations d'un voisinage symétrique de l'entrée $x$, de $x_2$ à $x_6$. Cette approche est naturelle pour l'analyse de données statiques (comme une image) ou le traitement de séquences complètes a posteriori, mais n'est pas adapté à la modélisation d'un système dynamique. Par exemple dans le cas de filtrage en ligne, le système ne peut physiquement pas accéder aux mesures futures pour débruiter les données du présent. Pour adapter l'architecture à ces contraintes temporelles strictes, on recourt à la convolution causale. Cette variante consiste à décaler le support du filtre de manière à ce que le voisinage d'interaction au temps $t$ ne contienne aucun indice supérieur à $t$. L'exemple illustré sur la partie droite de la figure \ref{convolution comparaison} assure que le cône d'influence de la sortie $y_5$ est alors strictement orienté vers le passé ($x_1$ à $x_5$). Dans cette configuration, le réseau conserve sa capacité d'extraction de motifs et de parallélisation, mais adopte une topologie d'interaction compatible avec la physique, simulant le comportement d'un système causal sans recourir à la mémoire récurrente.
+
+\begin{figure}
+\begin{center} 
+\includegraphics[scale=0.45]{ComparaisonConvolution.png}
+\end{center}
+\caption{Impact de la topologie du support de convolution sur la causalité temporelle : approche centrée (gauche) et approche causale (droite)}
+\label{convolution comparaison}
+\end{figure}
+
+
 \paragraph{La convolution dans l'image : Une séquence spatiale 2D}
 Dans le contexte de l'image, la séquence est bidimensionnelle et le CNN y opère une extraction hiérarchique. Les premières couches détectent des primitives simples comme des bords ou des textures, qui sont ensuite combinées pour former des motifs sémantiques complexes. Cette capacité d'abstraction a été poussée à son paroxysme par l'architecture VGG \cite{simonyan_very_2015}, qui a standardisé l'usage de filtres de très petite taille ($3\times3$) empilés en grande profondeur. Les auteurs ont démontré qu'une séquence de petites convolutions est plus efficace pour capturer des non-linéarités complexes qu'une seule grande convolution. Cependant, l'augmentation de la profondeur a engendré des problèmes de disparition du gradient, résolus avec ResNet \cite{he_deep_2016}. L'introduction de connexions résiduelles a permis d'entraîner des réseaux dépassant la centaine de couches, essentiels pour capturer les dépendances à très longue portée dans des images haute résolution.
 Pour les tâches de "traduction" d'image vers image, cruciales en simulation (par exemple, passer d'une carte de densité à un champ de pression), il est impératif de ne pas perdre l'information spatiale lors de la compression. L'architecture U-Net \cite{navab_u-net_2015}, initialement pour la segmentation biomédicale combine un chemin de contraction et un chemin d'expansion reliés par des connexions latérales (skip connections). Cette structure permet de générer une sortie de même résolution que l'entrée en fusionnant le contexte sémantique global et les détails locaux. Cette architecture est aujourd'hui une référence pour les modèles de substitution en physique. D'autres variantes comme DenseNet \cite{iandola_densenet_2014} ont poussé cette logique plus loin en connectant chaque couche à toutes les suivantes pour maximiser le flux d'information, bien que cela se fasse au prix d'une consommation mémoire accrue.
+
 
 \paragraph{La convolution dans les séquences 1D (Texte, Audio, Séries Temporelles)}
 Bien que souvent associés à l'image, les CNN se sont révélés extrêmement performants pour traiter des séquences unidimensionnelles, surpassant parfois les réseaux récurrents grâce à leur capacité de parallélisation. Dans le traitement du signal audio, l'architecture WaveNet \cite{van_den_oord_wavenet_2016} a marqué une rupture en utilisant des convolutions causales dilatées. Ce mécanisme permet au champ récepteur du réseau de croître exponentiellement avec la profondeur sans augmenter le nombre de paramètres, capturant ainsi des dépendances temporelles sur des milliers de pas de temps, ce qui est impossible pour un RNN standard \textcolor{red}{REF}.
@@ -228,6 +273,41 @@ Si les réseaux de convolution abordent la séquence par une fenêtre glissante 
 
 \paragraph{Genèse et mécanismes d'interaction : De la boucle simple aux portes logiques}
 L'histoire de cette approche débute avec les RNN classiques \cite{elman_finding_1990} qui introduisent une boucle de rétroaction permettant au réseau de maintenir une trace du contexte temporel. Cependant, bien que ces réseaux parviennent à générer des séquences continues complexes comme de l'écriture manuscrite, ils souffrent d'une instabilité critique lors de l'entraînement : le problème de la disparition ou de l'explosion du gradient \cite{graves_generating_2014}. Sur de longues séquences, le signal d'erreur se dilue, empêchant l'apprentissage des causes lointaines d'un événement. Pour y remédier, le LSTM (Long Short-Term Memory) \cite{hochreiter_long_1997} propose des "cellules" mémoires protégées par des portes logiques, et peut choisir de retenir ou d'effacer une information sur des milliers de pas de temps. Cette capacité a été affinée par l'introduction du GRU \cite{cho_properties_2014}, \cite{chung_empirical_2014}, une variante plus économe.
+
+
+\paragraph{Mécanisme d'interaction : Récurrence et Mémoire d'État}
+L'interaction fondamentale des architectures récurrentes (RNN) et des modèles d'espaces d'états (SSM) avec la séquence repose sur un principe de persistance de l'information, radicalement différent de la localité spatiale des convolutions. Au lieu d'agréger un voisinage statique, ces modèles introduisent une variable latente dynamique, l'état caché $h_t$, qui agit comme une mémoire compressée de l'historique causal. L'opération centrale n'est plus un filtrage, mais une mise à jour récursive : à chaque pas de temps, l'état courant est recalculé en fonction de l'état précédent et de la nouvelle observation. Mathématiquement, pour une séquence d'entrée $x$, cette dynamique s'exprime par une équation de transition d'état générique :
+$$h_t = f(h_{t-1}, x_t; \theta)$$
+où $f$ est une fonction paramétrée par $\theta$ (matrices de poids dans un RNN, matrices d'état dans un SSM). Cette formulation implique que $h_t$ ne dépend pas seulement de l'entrée locale $x_t$, mais indirectement de toute la trajectoire passée $\{x_0, \dots, x_t\}$ accumulée dans $h_{t-1}$.
+En pratique, cette dynamique de mise à jour est régie par un ensemble de paramètres apprenables qui sont partagés sur toute la longueur de la séquence, garantissant l'invariance temporelle du traitement. Ces paramètres se composent d'une matrice $W_{ih}$ (Input-to-Hidden) qui projette l'entrée courante dans l'espace latent, d'une matrice $W_{hh}$ (Hidden-to-Hidden) qui contrôle l'évolution de la mémoire interne, et d'un vecteur de biais $b$. En notant $\phi$ la fonction d'activation non-linéaire, l'équation de récurrence s'écrit pour notre exemple : \\
+$$h_{t+1} = \phi(W_{ih}x_t + W_{hh}h_t + b)$$
+
+L'illustration \ref{RNN base} permet de visualiser la propagation de la dépendance temporelle à travers le réseau. Le flux d'information, matérialisé par les flèches horizontales, transporte l'état caché d'un pas de temps à l'autre, agissant comme une mémoire cumulative. Ainsi, le calcul de l'état caché $h_3$ (représenté par le carré vert) intègre non seulement l'information de l'entrée courante, mais également celle de l'état caché précédent. Par récurrence, cette mémoire transporte déjà les traces des observations passées ($x_1, x_2$), créant un lien causal ininterrompu.
+\begin{equation*}
+\begin{split}
+	h_3 & = \phi(W_{2}x_2 + W_{1}h_2) \\
+	&= \phi(W_{2}x_2 + W_{1}\phi(W_{2}x_1 + W_{1}h_1))
+\end{split}
+\end{equation*}
+Cette formulation met en évidence la différence fondamentale avec la convolution : alors que le champ récepteur d'un CNN s'élargit progressivement par empilement de couches, ici le cône d'influence (zone violette) s'étend horizontalement vers le passé de manière théoriquement infinie, capturant la totalité de l'historique causal disponible.\\
+
+\begin{figure}
+\begin{center} 
+\includegraphics[scale=0.35]{BasicRNN.png}
+\end{center}
+\caption{Mécanisme fondamental de la récurrence et propagation de l'état mémoire}
+\label{RNN base}
+\end{figure}
+
+La persistance de l'état caché offre une flexibilité architecturale concernant la topologie des entrées-sorties et permet de découpler la lecture de l'écriture selon deux paradigmes distincts. Le mode "Flux à Flux" (ou Many-to-Many synchronisé), illustré à gauche dans la figure \ref{RNN comparaison}, aligne la production de la sortie sur la réception de l'entrée. À chaque pas de temps $t$, l'état caché $h_t$ est utilisé immédiatement pour prédire une sortie $y_t$. Cette configuration, où la causalité est stricte et le délai minimal, est caractéristique des systèmes de filtrage en ligne ou de contrôle, où la réaction doit être instantanée. Le second mode, correspondant au paradigme "Séquence vers Séquence" (Seq2Seq), à droite dans la figure \ref{RNN comparaison}, nécessite d'opérer en deux phases distinctes. La phase d'encodage représenté en violet, ingurgite toutes les informations et les condenses dans l'état caché $h_5$. La phase de décodage récupère ce contexte pour générer la séquence de sortie. Ce mécanisme permet de transformer une séquence en une autre de longueur différente et de modéliser des dépendances non-monotones, mais impose que toute l'information pertinente soit compressée dans un goulot d'étranglement. C'est cette distinction topologique, plus que la nature des données, qui différencie fondamentalement l'usage des RNN pour le suivi de signal (mode flux) de leur usage pour la traduction (mode Seq2Seq).
+
+\begin{figure}
+\begin{center} 
+\includegraphics[scale=0.4]{ComparaisonRNN.png}
+\end{center}
+\caption{Topologies d'application des architectures récurrentes : traitement de flux (gauche) et traduction globale (droite)}
+\label{RNN comparaison}
+\end{figure}
 
 \paragraph{Renouveau architectural : Les Modèles d'Espaces d'Etats (SSM)}
 Malgré leur robustesse, les LSTM conservent une limitation structurelle majeure : leur traitement séquentiel interdit la parallélisation sur GPU. C'est pour lever ce verrou qu'une nouvelle classe de modèles a émergé : les State Space Models (SSM). Ces modèles puisent leur origine théorique dans le papier HiPPO \cite{gu_hippo_2020}, qui formalise mathématiquement comment compresser optimalement une histoire continue dans un vecteur de taille fixe via des projections polynomiales orthogonales. Cette base a permis de développer S4 (Structured State Space sequence model) \cite{gu_efficiently_2022}, capable de modéliser des dépendances sur plus de 10 000 pas de temps en résolvant une équation différentielle continue discrétisée.
@@ -250,8 +330,74 @@ Une seconde étape conceptuelle fut franchie avec les Pointer Networks \cite{vin
 La rupture définitive survient avec l'article Attention Is All You Need \cite{vaswani_attention_2017}. Les auteurs ont démontré que la récurrence, jugée jusqu'alors indispensable pour encoder l'ordre séquentiel, était en réalité superflue et limitante pour la parallélisation. En ne conservant que le mécanisme d'attention (devenu Self-Attention), ils ont permis un traitement parallèle massif des séquences, réduisant la distance de propagation de l'information entre deux mots quelconques à une constante $O(1)$, contre $O(N)$ pour un RNN.
 
 \paragraph{Mécanisme d'interaction et complexité}
-Au cœur du Transformer réside l'attention par produit scalaire (Scaled Dot-Product Attention). Contrairement à la convolution qui applique un filtre fixe localement, l'attention est dynamique et globale : chaque élément de la séquence interagit avec tous les autres. Chaque jeton est projeté en trois vecteurs : une Requête ($Q$), une Clé ($K$) et une Valeur ($V$). Le réseau calcule une matrice de similarité entre toutes les paires $Q$ et $K$, déterminant ainsi le poids avec lequel chaque élément doit "écouter" les autres pour construire sa propre représentation contextuelle.
-Cependant, cette interaction "tout-vers-tout" induit une limitation intrinsèque majeure : la complexité calculatoire et mémorielle est quadratique $O(N^2)$ par rapport à la longueur de la séquence $N$. Cela rend le modèle prohibitif pour les très longues séquences (au-delà de quelques milliers de tokens) sans artifices d'optimisation. De plus, l'opération d'attention étant invariante par permutation (elle traite la séquence comme un ensemble, un "sac de mots"), le Transformer est nativement amnésique à l'ordre des éléments. Il nécessite donc l'injection explicite d'informations de position (Positional Encodings), soit absolues (sinusoïdales), soit relatives, pour reconstruire la topologie temporelle ou spatiale de la donnée.
+Contrairement aux architectures précédentes qui traitent la séquence par voisinage spatial ou récursivité temporelle, le Transformer repose sur un mécanisme d'interaction directe et globale : l'attention. Ce processus permet à chaque élément de la séquence de construire sa propre représentation en agrégeant l'information de tous les autres éléments, pondérée par leur pertinence contextuelle. Cette interaction est formalisée par le mécanisme "Query-Key-Value". Pour chaque élément d'entrée $x_i$, trois vecteurs sont générés par projection linéaire via des matrices de poids apprenables $W^Q, W^K, W^V$ : une Requête $q_i = x_i W^Q$, une Clé $k_i = x_i W^K$ et une Valeur $v_i = x_i W^V$.\\
+
+Le cœur du calcul réside dans la mesure de compatibilité entre ces vecteurs, appelé score d'attention. Pour construire une nouvelle représentation d'un élément $x_i$ dans son contexte (c'est-à-dire le reste de la séquence), la requête associé $q_i$ est comparée aux clés de chaque élément de la séquence $(k_j)_j$, formant une séquence de score d'attention $(a_{j})_j$. Cette comparaison s'effectue souvent par un produit scalaire, mis à l'échelle par la racine de la dimension des clés $d_att$ pour stabiliser les gradients. Le score d'attention brute $a_{j}$ est généralement donné par:
+$$a_{j} = \frac{\langle q_i, k_j \rangle}{\sqrt{d_{att}}} $$
+Ces scores bruts sont ensuite convertis en une distribution de probabilité $(p_j)_j$ par l'application d'une fonction Softmax :
+$$p_{j} = \text{softmax}((a_k)_k)_j = \frac{\exp(a_{j})}{\sum_{k} \exp(a_{k})}$$
+La nouvelle représentation de $x_i$, notée $y_i$, est calculée comme une somme des vecteurs de Valeur $(v_j)_j$ pondérés par les poids d'attention $(p_j)_j$ :
+$$y_i = \sum_{j} p_{j} v_j$$
+Il est intéressant de noter que l'opération d'attention est invariante par permutation (elle traite la séquence comme un ensemble, un "sac de mots"). Il est donc nécessaire d'injecter explicitement d'informations de position (Positional Encodings) a priori dans la séquence $(x_i)_i$ pour reconstruire la topologie temporelle ou spatiale de la donnée si elle n'y est pas présent initialement.\\
+
+L'illustration \ref{self attention} détaille le processus du calcul de la représentation contextuelle d'un élément cible $x_4$ (représenté en vert). Comme expliqué à l'instant, les éléments de la séquence sont projetés dans l'espace des requêtes, clés et valeurs, les scores d'attention sont calculés puis la pondération d'attention en est déduite et la nouvelle représentation de $x_4$ que nous notons $y_4$, est calculée en effectuant une somme des valeurs pondérées par les poids d'attention :
+\begin{align*}
+	q_4 &= x_4 W^Q, & k_j &= x_k W^K, & v_i &= x_i W^V \\
+	a_j &= \frac{\langle q_4, k_j \rangle}{\sqrt{d_{att}}}, & p_j &= \frac{\exp(a_{j})}{\sum_{k} \exp(a_{k})}, & y_4 &= \sum_{j} p_{j} v_j
+\end{align*}
+Ainsi, le vecteur résultant $y_4$ est une synthèse dynamique du contenu de la séquence.\\
+
+\begin{figure}
+\begin{center} 
+\includegraphics[scale=0.4]{self_attention.png}
+\end{center}
+\caption{Illustration du mécanisme d'Auto-Attention par produit scalaire}
+\label{self attention}
+\end{figure}
+
+Le mécanisme canonique d'auto-attention se décline en deux variantes fondamentales pour répondre à des contraintes structurelles spécifiques : le respect de la causalité temporelle et l'intégration d'informations exogènes. La première variante, l'Attention Masquée (Masked Self-Attention), est indispensable aux tâches de génération séquentielle ou de simulation, où la prédiction de l'état présent ne doit physiquement pas dépendre du futur. Cette causalité est induite par une modification de la matrice des scores d'attention avant l'étape de normalisation : en forçant vers $-\infty$ les scores associés aux indices futurs, on garantit que la fonction Softmax leur attribue une probabilité strictement nulle. La partie gauche de la figure \ref{other attention} illustre ce mécanisme : lors du calcul de la représentation pour la position 4 (carré vert), l'accès aux positions ultérieures 5 et 6 est bloqué par le masque. Le vecteur de sortie $y_4$ est ainsi construit exclusivement par l'agrégation des valeurs passées et présentes ($v_1$ à $v_4$), préservant l'intégrité causale du flux de données.
+
+La seconde variante, l'Attention Croisée (Cross-Attention), permet le transfert d'information entre deux séquences distinctes, une opération centrale pour les tâches de traduction ou de reconstruction conditionnelle. Cette architecture repose sur une distribution asymétrique des rôles : la séquence source (qui détient l'information) projette les Clés ($K$) et les Valeurs ($V$), tandis que la séquence cible (qui cherche à s'enrichir ou se construire) émet les Requêtes ($Q$). La partie droite de la figure \ref{other attention} détaille cette interaction : la séquence du bas représente le flux cible, dont le troisième élément émet une requête $q_3$. Celle-ci est comparée à l'ensemble des clés $k$ issues de la séquence source (au milieu), permettant de pondérer les valeurs $v_1$ à $v_6$ correspondantes. Le vecteur résultant est donc une injection dynamique du contexte source pertinent au sein de la trajectoire cible, pilotée par les besoins de cette dernière.\\
+
+\begin{figure}
+\begin{center} 
+\includegraphics[scale=0.4]{other_attention.png}
+\end{center}
+\caption{Adaptations du mécanisme d'attention : restriction causale (gauche) et interaction inter-séquences (droite)}
+\label{other attention}
+\end{figure}
+
+L'expressivité du Transformer repose sur la parallélisation du mécanisme d'attention unitaire et son intégration dans différents blocs. Pour capturer des relations de natures variées (syntaxiques, sémantiques, ou causales par exemple) à différentes échelles, le modèle utilise l'Attention Multi-Têtes (Multi-Head Attention). Au lieu de calculer une unique matrice d'attention sur la dimension totale du modèle $d_{model}$, l'entrée est projetée linéairement $h$ fois dans des sous-espaces de dimension réduite $d_{att} = d_{model}/h$. Chaque "tête" calcule sa propre attention indépendamment, permettant au réseau de se focaliser simultanément sur différents aspects de la séquence. Les sorties de ces $h$ têtes sont ensuite concaténées et reprojetées par une matrice linéaire finale $W^O$ pour restaurer la dimension originale. Mathématiquement, cela permet de recombiner les informations extraites de chaque sous-espace pour former une représentation unifiée.\\
+
+La illustration \ref{encoder transformer} présente l'architecture de l'Encodeur, dédiée à l'analyse et à la construction d'une représentation contextuelle robuste de la séquence d'entrée. Elle est constituée d'un empilement de $N$ blocs identiques. Chaque bloc s'articule autour de deux sous-modules fonctionnels : l'Attention Multi-Têtes, qui capture les interactions globales entre les différentes positions, et un réseau de neurones dense (Feed-Forward Network - FFN) appliqué indépendamment à chaque position pour traiter les caractéristiques. Pour permettre de la profondeur au réseau, chaque sous-module est systématiquement encapsulé par une connexion résiduelle - qui additionne l'entrée du module à sa sortie pour préserver le flux de gradient - suivie d'une normalisation de couche (Layer Norm) assurant stabilité et une bonne propagation du gradient dans toutes les couches. Enfin, l'architecture étant invariante par permutation, l'ajout dès l'entrée d'un Encodage Positionnel est indispensable pour injecter la topologie temporelle ou spatiale dans les représentations vectorielles.\\
+
+\begin{figure}
+\begin{center} 
+\includegraphics[scale=0.4]{enc_transformer.png}
+\end{center}
+\caption{Architecture du bloc Encodeur du Transformer}
+\label{encoder transformer}
+\end{figure}
+
+L'illustration \ref{decoder transformer} détaille l'architecture du Décodeur, conçue pour la génération autorégressive. Bien qu'elle hérite de la structure modulaire stratifiée de l'encodeur, elle s'en distingue par l'intégration dans chaque bloc de mécanismes spécifiques dédiés à la prédiction. Le premier module est une Attention Multi-Têtes Masquée (Masked Self-Attention). Ce composant permet aux éléments de la séquence cible d'assimiler exclusivement les informations des états antérieurs, garantissant le respect de la causalité temporelle nécessaire à la génération. Le décodeur se singularise ensuite par l'insertion d'un troisième sous-module, intercalé avant le FFN : l'Attention Croisée (Cross-Attention). Ce module est l'interface de conditionnement du modèle ; il incorpore à la séquence cible (qui fournit les requêtes $Q$) l'information contextuelle extraite d'une source externe (l'encodeur, qui fournit les clés $K$ et les valeurs $V$). Chacun de ces trois sous-modules (Masked Self-Attention, Cross-Attention, FFN) est soumis au même schéma de stabilisation par connexion résiduelle et normalisation que l'encodeur, assurant une cohérence dynamique à travers tout le réseau.\\
+
+\begin{figure}
+\begin{center} 
+\includegraphics[scale=0.4]{dec_transformer.png}
+\end{center}
+\caption{Architecture du bloc Décodeur de Transformer}
+\label{decoder transformer}
+\end{figure}
+
+Dans une configuration complète de type "Séquence vers Séquence" (Seq2Seq), telle que celle utilisée pour la traduction automatique ou la simulation physique, la sortie de la pile d'encodeurs est connectée à l'entrée source de la pile de décodeurs. Cette architecture bipartite, illustrée figure \ref{full transformer}, permet de transformer une séquence d'entrée complexe (scénario tactique, signal bruité) en une représentation latente continue. À partir de cet espace, le décodeur reconstruit pas à pas la séquence de sortie cible (signal reconstruit), agissant ainsi comme un traducteur universel capable de modéliser des fonctions de transfert hautement non-linéaires entre des signaux de natures variées.
+
+\begin{figure}
+\begin{center} 
+\includegraphics[scale=0.4]{full_transformer.png}
+\end{center}
+\caption{Architecture Transformer complète pour le paradigme Séquence-vers-Séquence}
+\label{full transformer}
+\end{figure}
 
 \paragraph{Le Transformer dans le texte : La divergence des architectures}
 Dans le traitement du langage naturel (NLP), le Transformer a provoqué une véritable explosion cambrienne des modèles, se scindant en trois familles distinctes.
