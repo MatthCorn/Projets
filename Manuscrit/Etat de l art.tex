@@ -342,7 +342,7 @@ Il est intéressant de noter que l'opération d'attention est invariante par per
 
 L'illustration \ref{self attention} détaille le processus du calcul de la représentation contextuelle d'un élément cible $x_4$ (représenté en vert). Comme expliqué à l'instant, les éléments de la séquence sont projetés dans l'espace des requêtes, clés et valeurs, les scores d'attention sont calculés puis la pondération d'attention en est déduite et la nouvelle représentation de $x_4$ que nous notons $y_4$, est calculée en effectuant une somme des valeurs pondérées par les poids d'attention :
 \begin{align*}
-	q_4 &= x_4 W^Q, & k_j &= x_k W^K, & v_i &= x_i W^V \\
+	q_4 &= x_4 W^Q, & k_j &= x_j W^K, & v_i &= x_i W^V \\
 	a_j &= \frac{\langle q_4, k_j \rangle}{\sqrt{d_{att}}}, & p_j &= \frac{\exp(a_{j})}{\sum_{k} \exp(a_{k})}, & y_4 &= \sum_{j} p_{j} v_j
 \end{align*}
 Ainsi, le vecteur résultant $y_4$ est une synthèse dynamique du contenu de la séquence.\\

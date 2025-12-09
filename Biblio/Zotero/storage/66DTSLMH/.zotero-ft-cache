@@ -1,0 +1,200 @@
+4314 IEEE TRANSACTIONS ON SIGNAL PROCESSING, VOL. 57, NO. 11, NOVEMBER 2009
+A Robust Chinese Remainder Theorem With
+Its Applications in Frequency Estimation
+From Undersampled Waveforms
+Xiaowei Li, Hong Liang, and Xiang-Gen Xia, Fellow, IEEE
+Abstract—The Chinese remainder theorem (CRT) allows to reconstruct a large integer from its remainders modulo several moduli. In this paper, we propose a robust reconstruction algorithm called robust CRT when the remainders have errors. We show that, using the proposed robust CRT, the reconstruction error is upper bounded by the maximal remainder error range named remainder error bound, if the remainder error bound is less than one quarter of the greatest common divisor (gcd) of all the moduli. We then apply the robust CRT to estimate frequencies when the signal waveforms are undersampled multiple times. It shows that with the robust CRT, the sampling frequencies can be significantly reduced.
+Index Terms—Chinese remainder theorem (CRT), frequency estimation, robust CRT, sensor networks, undersampling.
+I. INTRODUCTION
+T
+HE Chinese remainder theorem (CRT) allows to reconstruct a large integer from its remainders modulo a set of moduli. When all the moduli are co-prime, CRT has a simple single formula, which is well-known not robust, i.e., small errors from any remainders may cause a large reconstruction error. This is perhaps why CRT has applications in cryptography but not desired in some other applications, such as frequency estimation from undersampled waveforms with its applications, for example, phase unwrapping in radar signal processing [1], [6]–[10] and sensor networks [5]. In terms of reconstruction of large integers from remainders, it is not restricted to co-prime moduli. The unique reconstruction is possible if and only if the large integers are less than the least common multiple (lcm) of all the moduli. A type of robust CRT has been recently proposed in [2] when the large integers to determine are of some special forms, which was motivated from a robust phase unwrapping algorithm also proposed in [2] with applications in radar imaging
+Manuscript received October 28, 2008; revised May 12, 2009. First published June 10, 2009; current version published October 14, 2009. This work was supported in part by the Air Force Office of Scientific Research (AFOSR) under Grant FA9550-08-1-0219 and a DEPSCoR Grant W911NF-07-1-0422 through ARO. X. Li and X.-G. Xia are with the Department of Electrical and Computer Engineering, University of Delaware, Newark, DE 19716 USA (e-mail: xwli@ee. udel.edu; xxia@ee.udel.edu). H. Liang is with the Department of Electrical and Computer Engineering, University of Delaware, Newark, DE 19716 USA. She is also with the College of Marine, Northwestern Polytechnical University, Xi’an, 710072, China (e-mail: liang@ee.udel.edu). Color versions of one or more of the figures in this paper are available online at http://ieeexplore.ieee.org. Digital Object Identifier 10.1109/TSP.2009.2025079
+of moving targets [1], [6], [7]. Their fast implementations are recently reported in [3] and [4]. Motivated from the robust phase unwrapping algorithm and the special form of the robust CRT obtained in [2], we propose a general robust CRT, i.e., robust reconstruction of general large integers from their remainders with errors, which often occurs in practical applications. Note that this general robust CRT is different from the preliminary one in [2] that is only limited to special integers with the form of for some integer while are fixed integers as indicated in Section III in [2]. In this paper, we show that, using the newly proposed robust CRT, the reconstruction error is upper bounded by the maximal remainder error range named remainder error bound, if the remainder error bound is less than one quarter of the greatest common divisor (gcd) of all the moduli , i.e., , where is the number of moduli used. Note that this robust CRT is different from the existing CRT with errors in for example [5], [13] where sufficiently many moduli are used so that only a few of the remainders have errors does not affect the unique reconstruction, i.e., if there are only a few remainder errors, then they can be corrected and the reconstruction is accurate. This robust CRT is also different from the one in [14], whose correctness is probabilistic over a sufficiently large number of prime moduli, where all remainders contaminated by a small additive noise bounded in the Lee norm (even with wraparound errors) may be corrected [14]. In contrast, in our proposed robust CRT, the reconstruction may not be accurate but with an error deterministically in the same range of the remainder errors and every remainder may be erroneous, where all remainders are assumed non-negative. After saying so, although its correctness is probabilistic, the algorithm in [14] may tolerate much larger errors in the remainders than our proposed algorithm does when the gcd of the moduli is small. (The algorithm in [14] can tolerate errors with magnitudes approaching probabilistically whereas the proposed algorithm in this paper tolerates errors with non-negative amplitudes approaching deterministically.) We then apply the robust CRT to estimate frequencies when the signal waveforms are undersampled multiple times. It shows that with the robust CRT, the sampling frequencies can be significantly reduced, and/or the number of samples can be significantly reduced. The remaining of this paper is organized as follows. In Section II, we first briefly describe the problem and then present the robust CRT. In Section III, we present fast imple
+1053-587X/$26.00 © 2009 IEEE
+Authorized licensed use limited to: UNIVERSITY OF DELAWARE LIBRARY. Downloaded on October 16, 2009 at 16:22 from IEEE Xplore. Restrictions apply.
+
+
+LI et al.: A ROBUST CHINESE REMAINDER THEOREM 4315
+mentation and efficient algorithms. In Section IV, we present an application of the robust CRT in frequency estimation from multiple undersampled waveforms. We also present some simulation results.
+II. ROBUST CHINESE REMAINDER THEOREM
+Let us first see the problem. Let be a positive integer, be the moduli, and be the remainders of , i.e.,
+(1)
+where and is an unknown integer, for . It is not hard to see that can be uniquely reconstructed from its remainders if and only if . If all the moduli are co-prime, then CRT has a simple formula [11], [12]. The problem we are interested in this paper is how to robustly reconstruct when the remainders have errors:
+(2)
+where is the maximal error level, called remainder error bound. We now want to reconstruct from these erroneous remainders and the known moduli . With these erroneous remainders, (1) becomes
+(3)
+where are unknown and denote the errors of the remainders. From (2), . The basic idea for our robust CRT is to accurately determine the unknown integers in (3) which are the folding integers that may cause large errors in the reconstructions if they are erroneous. Motivated from the robust phase unwrapping algorithm in [2], we propose the following robust CRT. Let denote the gcd of all the moduli . Then
+(4)
+and all , , are co-prime, i.e., the gcd of any pair and for is 1. For , let
+(5)
+where and . Since , we have . For each with , define
+(6)
+and let denote the set of all the first components of the pairs in set , i.e.,
+for some (7)
+and define
+(8)
+Then, we have the following result.
+Theorem 1: If all , , are pair-wisely co-prime
+(9) and
+(10)
+then, set defined above contains only element , i.e., , and furthermore if , then for , where , , are the true solutions in (3). Its proof is similar to the proof of Theorem 1 in [2], which, for the completeness, can be found in Appendix I. Note that Although the proof is similar to the one in [2], the result in the above Theorem 1 is much more general than the one in [2] as explained in Introduction. In [2], has to be a special form of multiples of the product while in Theorem 1 is arbitrary. When the folding integers in (3) are accurately solved, the unknown parameter can be estimated as
+(11)
+where stands for the rounding integer (rounding to the closest integer) and the estimate error is thus upper bounded by
+(12)
+when the condition (10) holds. The above estimate error of is due to the remainder errors that has the maximal level . One can clearly see that this reconstruction is robust and thus called robust CRT. Note that, in the above robust CRT, the integer is arbitrary as long as it falls in the range , while the robust CRT obtained in [2] requires that has to have the form of for some integer in the range . From Theorem 1, one can see that when all moduli are co-prime, i.e., , the remainder error bound is forced to be 0 in (10). This means that the above reconstruction may not guarantee a robust solution that is not conflict with the well-known knowledge that the traditional CRT is not robust. One can also see that the above robust CRT is based on the sets defined in (6) that need many 2 dimensional (2-D) searches of and in the 2-D range for . When are large, become large and therefore the 2-D searches may have a high computational complexity. In next section, we simplify the searching and also propose a 1-D searching algorithm. Another remark is that from (12), one can clearly see that when the remainders are error-free, i.e., , the reconstruction is then accurate, i.e., . In this case, different from the methods in [11], [12], the above result provides an alternative way to determine integer from its remainders and moduli that are not co-prime. Furthermore, the fast algorithms presented in next section still applies in this error-free case, and thus provide fast algorithms for the reconstruction from error-free remainders and non-co-prime moduli.
+Authorized licensed use limited to: UNIVERSITY OF DELAWARE LIBRARY. Downloaded on October 16, 2009 at 16:22 from IEEE Xplore. Restrictions apply.
+
+
+4316 IEEE TRANSACTIONS ON SIGNAL PROCESSING, VOL. 57, NO. 11, NOVEMBER 2009
+III. FAST ALGORITHMS
+The order of the many 2-D searches of and in the 2-D range for in (6) is about . This order was reduced significantly in [3] where the following result was obtained. Theorem 2: [3] Let
+(13)
+and be defined in (14) at the bottom of the page. Then, we have for . Clearly, Theorem 2 applies to the problem in Section II. From Theorem 2, one can see that the number of searches to obtain is only in the order of , i.e., the size of set . Next, we propose a different fast algorithm to find the folding integers similar to [4]. Instead of finding the whole set , we find only one element in for each with and then use some properties to determine . We show that one only needs the order of number of searches for the new algorithm. To do so, we first present some properties listed in the following lemmas, whose proofs are similar to those in [4]. Lemma 1: Assume that all the conditions in Theorem 1 hold, i.e., (9) and (10) hold. Let , , be the true solutions in (3). Then, if and only if and for some integer and for .
+Its proof is the same as the proof of Lemma 1 in [4]. Lemma 2: Under the conditions in Theorem 1, let
+(15)
+Then, for any element , there exists an integer such that
+Its proof is the same as the proof of Lemma 2 in [4]. Lemma 3: Let . If one component of , or , is fixed, then, the other one, or is uniquely determined. The following proof is an improvement of the proof of Lemma 3 in [4].
+Proof: For with , we claim
+(16)
+This claim (16) is proved in Appendix II. We first consider the case when is fixed. In this case, from (16) its corresponding in must satisfy
+(17)
+where the right-hand side interval length is for and therefore this interval contains only one integer, i.e., is unique and determined by (17). We next consider the case when is fixed. In this case, from (16) its corresponding in satisfies
+(18)
+where the right-hand side interval length is 1, and thus this open interval contains only one integer as well, i.e., is unique and determined by (18). From the above proof of Lemma 3, one can see that the lower bound (16) plays the key role for the determination. In fact, it can be further improved as follows. For , let with , i.e., is the remainder of modulo . Since and are co-prime, we have
+(19)
+Corollary 1: For with , if , then
+(20)
+This corollary, i.e., inequality (20), is proved in Appendix III. Lemmas 1-3 tell us that the two dimensional searching for is not necessary and instead we only need to search one of possible and and the other then uniquely follows, i.e., we only need to do one dimensional searching. With the above three lemmas, a fast algorithm to determine the folding integers can be described by the following steps.
+if ,
+otherwise
+(14)
+Authorized licensed use limited to: UNIVERSITY OF DELAWARE LIBRARY. Downloaded on October 16, 2009 at 16:22 from IEEE Xplore. Restrictions apply.
+
+
+LI et al.: A ROBUST CHINESE REMAINDER THEOREM 4317
+We first want to find one element for each with . Based on Lemma 2, we can find an element in that belongs to and therefore, we only need to search over set . We first search all integers from 0 to . From the proof of Lemma 3, when is fixed, its corresponding in is determined by (17) and denoted by . Then, this pair is evaluated by the criterion in (6), and its minimum is searched among all from 0 to . We next search all integers from 0 to . Also from the above proof of Lemma 3, we know that when is fixed, its corresponding in is determined by (18) and denoted as . Then, similarly the pair is evaluated under (6), and its minimum is searched among all from 0 to . We then find the minimum of these two minimums and let denote the element that minimizes the function in (6) over . From Lemma 2, . Note that the total number of the searches in this case is . After we have found an element for each with , we next show how to determine the folding integers for . By Lemma 1, we know that and have the same remainder, say , for , i.e.,
+(21)
+Thus, from we obtain the remainder of modulo for each with . This gives remainders of modulo for . Therefore, can be determined by these remainders by using the conventional CRT [11], [12] if that is ensured by Theorem 1. Thus, we have
+(22)
+where is determined from
+(23)
+When folding integer is determined as above, we can obtain other folding integers for as follows. For each with , from Lemma 1, we have
+(24)
+Thus, we have
+(25)
+When all the folding integers for are determined, the unknown integer can be estimated as before in (11) with an estimate error upper bound (12). We now compare the total numbers of searches needed for solving for with for the above three different methods. The total number of searches for region for in (6) is
+(26)
+which is in the order of . The total number of searches for the region for in (13) and (14) is
+(27)
+which is in the order of . The total number of searches for the above 1-D searching algorithm is
+(28)
+which is in the order of . As an example, let us consider the case when and three moduli are , , , and . Thus, in this case, we have , , and . The total number of searches in (26) is ; the total number of searches in (27) is ; and the total number of searches in (28) is only that is far less than the other two 2-D searching algorithms. This complexity reduction becomes even more significant when the parameters get larger.
+IV. APPLICATION IN FREQUENCY ESTIMATION FROM UNDERSAMPLED WAVEFORMS
+CRT can be naturally applied to frequency estimation when a signal waveform is undersampled multiple times as discussed in [5], such as in sensor network applications. Let be an unknown frequency we are interested in a signal and it may be high. An analog signal is
+(29)
+where is a non-zero constant and is an additive noise, and is a received signal. For , let Hz be the sampling frequencies and sampled signals are
+(30)
+and thus, the samples in seconds, an observation time duration, are
+(31) For the above single frequency signal, the -point DFT of each of the above sampled signals may provide an estimation of the frequency . However, if the sampling frequency is smaller than the unknown frequency , , i.e., undersampling, then the -point DFT only provides a folded frequency or remainder of mod : mod , and this remainder may be erroneous when the additive noise is significant and/or the observation time duration is short. Now the question is how to estimate the true frequency from these erroneous remainders, which is precisely the robust CRT problem discussed in this paper and our proposed robust CRT may provide a robust solution for this problem. Note that in practice, there might be wraparound effects for the residues (that has been considered by some other methods as in [14]), leading to the fact that the condition in (10) does not always hold. Under this circumstance, the upper bound of the frequency estimation result in (12) cannot always be guaranteed. However, although our error estimate result may not hold occasionally when the residue errors do not satisfy the proposed
+Authorized licensed use limited to: UNIVERSITY OF DELAWARE LIBRARY. Downloaded on October 16, 2009 at 16:22 from IEEE Xplore. Restrictions apply.
+
+
+4318 IEEE TRANSACTIONS ON SIGNAL PROCESSING, VOL. 57, NO. 11, NOVEMBER 2009
+Fig. 1. Estimation errors and bound using the robust CRT for integers.
+conditions, the estimation algorithm still applies as shown later in our simulations where more practical additive noises (rather than direct remainder errors) are considered. We next show some simulation results to illustrate the robust CRT performance. We first evaluate the proposed robust CRT algorithm for integers. Let us first consider the case when , , , . In this case, according to Theorem 1, the maximal range of determinable is 16 830 from (9) and the maximal error level is upper bounded by from (10). In this simulation, the unknown integer is chosen uniformly at random from the interval [0, 16 830). We consider the maximal remainder error levels , 1, 2, 3, 4, and 16 000 trials for each of them. The mean error between the estimated and the true is plotted by the solid line marked with , and the estimation error upper bound (12) is plotted by the solid line marked with in Fig. 1. Clearly, one can see that the reconstruction errors of from the erroneous remainders are small compared to the range of . For the application in frequency estimation, we set two sampling frequencies and , where three possibilities of are considered: 400, 800, 1000. According to Theorem 1, these three different give three different remainder error bounds 100, 200, 250, respectively, with that our robust CRT applies. Fig. 2 shows the mean relative error between the true and its reconstruction using the robust CRT for three 400, 800, 1000, respectively, where the x axis is the signal-to-noise ratio (SNR) in (29) and the observation time duration is 1 s, and 120 000 trials for each SNR are implemented. In this figure, is taken integers randomly and uniformly distributed in the range for each . The additive noise in this simulation is AWGN. The sampling rates are about 15 times less than the signal frequency. In addition, we simulate the probability of detection, , to illustrate the estimation accuracy, where we say that the frequency is correctly detected if the estimated frequency is within 0.1% range, i.e., 120 Hz. In this simulation, we set 120 kHz and clearly this frequency falls in the range (9) where the smallest of the three in terms of is 122 400 Hz, in Theorem 1. Fig. 3 shows the
+Fig. 2. Estimation error comparison in terms of different , signal duration is 1 s.
+Fig. 3. Comparison of the probability of detection in terms of different , signal duration is 1 s.
+Fig. 4. Comparison of the probability of detection in terms of different , signal duration is 0.05 s.
+three versus SNR curves for 400, 800, 1000, respectively, where the observation time is 1 second. Fig. 4 shows the three versus SNR curves for 400, 800, 1000, respectively, where the observation time is 0.05 s, and in this case, if the number of samples is less than the DFT size, i.e., , then zeros are padded to the end of the samples. In these two figures, 10 000 trials are implemented. One can see that the difference between Fig. 3 and Fig. 4 is basically an SNR shift due to the zero paddings.
+Authorized licensed use limited to: UNIVERSITY OF DELAWARE LIBRARY. Downloaded on October 16, 2009 at 16:22 from IEEE Xplore. Restrictions apply.
+
+
+LI et al.: A ROBUST CHINESE REMAINDER THEOREM 4319
+Fig. 5. Estimation error comparison in terms of different , but similar sampling rates and the same number, 6000, of samples.
+In the last simulation, we simulate the mean error curves similar to the ones in Fig. 2 but for the three curves, the sampling rates are similar and the numbers of the sampling points used are the same and all are 6000 samples. The DFT sizes are and if they are larger than 6000, zeros are padded at the ends as before. The two sampling rates for the cases when , , and are 7200 Hz and 7600 Hz, 7200 Hz and 8000 Hz, and 7000 Hz and 8000 Hz, respectively. The mean error curves are shown in Fig. 5. From this figure, one can see that while other parameters are similar, the larger is, the better the estimation error is, i.e., the better the performance is, which confirms our theory.
+V. CONCLUSION
+In this paper, we proposed a robust Chinese remainder theorem (robust CRT) that can robustly reconstruct a large integer from its smaller erroneous remainders modulo several moduli. Our robust CRT says that the reconstructed integer is within an error range that is the same as the error range of the remainder errors as long as the remainder error range is less than one quarter of the greatest common divisor (gcd) of all the moduli and the true integer to determine is less than the least common multiple (lcm) of all the moduli. We also proposed one fast 2-D implementation and another different fast 1-D search algorithm. We then applied the robust CRT to frequency estimation in multiple undersampled waveforms. We finally presented some simple simulations to illustrate the theory. We believe that the robust CRT proposed in this paper will have applications far beyond the frequency estimation from undersampled waveforms. As a remark, this paper only considers single integer and single frequency determination. Multiple integers and multiple frequencies robust determination would be certainly interesting as a future research problem, where, for example, iterative estimations might be applicable. Note that multiple integers and multiple frequencies determination has been studied in [5] where only a few remainders/sets have errors and the reconstruction is accurate. Another interesting future research problem is how to deal with the wraparound effects as mentioned earlier in this paper.
+APPENDIX I PROOF OF THEOREM 1
+Proof: If the conditions in Theorem 1 are satisfied, it is not hard to see that the true solution in (3) falls in the range for . Thus, for any pair for , we have
+(32)
+Let for , and replace by in both sides of (32) and we then have
+(33)
+Therefore, according to (2) and (10), we have
+(34)
+Dividing in both sides of (34), we have
+(35)
+Since , , , and are all integers, (35) implies
+(36)
+Since and are co-prime for , we have
+(37)
+for integer with . Replacing (37) into (32), we obtain
+(38)
+which implies for . This proves . We next show . Property (37) also implies
+for integers with (39)
+If , then for , and therefore, according to the definition of in (6) and (39), we have for some integer with for . This implies that is divisible by all for , and thus is a multiple of the product of , , i.e., a multiple of . Since , we can conclude . This proves that . In the meantime, implies in (39), i.e., for . Hence, Theorem 1 is proved.
+APPENDIX II PROOF OF (16)
+Proof: If , we then have the following four cases. Case A. If , then we have the following two subcases. Subcase i. If , from the assumption
+Authorized licensed use limited to: UNIVERSITY OF DELAWARE LIBRARY. Downloaded on October 16, 2009 at 16:22 from IEEE Xplore. Restrictions apply.
+
+
+4320 IEEE TRANSACTIONS ON SIGNAL PROCESSING, VOL. 57, NO. 11, NOVEMBER 2009
+we have
+(40)
+which leads to . Thus, from in (19), i.e., , we have
+(41)
+Also, . Therefore, (41) contradicts with the definition of . Subcase ii. If , we have
+(42)
+and . This contradicts with the definition of . Case B. If , we have the following two subcases. Subcase i. If , from the assumption
+we have
+(43)
+which leads to . Then, similar to Subcase i in the previous Case A, we have
+(44)
+and . Therefore, (44) contradicts with the definition of . Subcase ii. If , we have
+(45)
+and . This means that . From Lemma 1, for some integer , i.e., for some integer , which is impossible. Case C. If , we then have the following two subcases. Subcase i. If , from the assumption
+we have
+Since is an integer, we thus have . Similar to Subcase i in Case A,
+(46)
+Also, . Thus, and . This contradicts with the definition of .
+Subcase ii. If , we have
+(47)
+and . This contradicts with the definition of . Case D. If , we have the following two subcases. Subcase i. If , from the assumption
+we have
+Since is an integer, we thus have . Similar to Subcase i in Case C,
+(48)
+and it contradicts with the definition of .
+Authorized licensed use limited to: UNIVERSITY OF DELAWARE LIBRARY. Downloaded on October 16, 2009 at 16:22 from IEEE Xplore. Restrictions apply.
+
+
+LI et al.: A ROBUST CHINESE REMAINDER THEOREM 4321
+Subcase ii. If , we have
+(49)
+and . This implies . From Lemma 1, for some integer , i.e., for some integer , which is impossible. By summarizing the above four cases, (16) is proved. APPENDIX III PROOF OF (20)
+Proof: If , then we have the following two cases. Case A. If , we then have the following two subcases.
+Subcase i. If , i.e., , then, from , we have
+(50)
+and . We next show , i.e., . This is true, since otherwise
+which contradicts with the assumption of the above Case A. Thus, (50) contradicts with the definition of .
+Subcase ii. If , i.e., , we have
+(51)
+Also, and , where is because . This proves . In the meantime, . We next show , i.e., . From (16), we have . Thus,
+which implies , where is because . Thus, and (51) contradicts with the definition of .
+Case B. If , we then have the following two subcases. Subcase i. If , i.e., , we have
+(52)
+and . We now show
+i.e., . This is true, since from (16), , and thus we have
+which means , where is because . Also, it is clear that . Therefore, (52) contradicts with the definition of . Subcase ii. If , i.e., , we have
+(53)
+where the reason why the last inequality holds is the same as that in (52). We also have . We next show , i.e., . If , we then have
+which contradicts with the assumption of Case B. Thus, . Therefore, (53) contradicts with the definition of . By summarizing all the above cases, (20) is proved.
+REFERENCES
+[1] G. Wang, X.-G. Xia, V. C. Chen, and R. L. Fiedler, “Detection, location, and imaging of fast moving targets using multifrequency antenna array SAR,” IEEE Trans. Aerosp. Electron. Syst., vol. 40, no. 1, pp. 345–355, Jan. 2004. [2] X.-G. Xia and G. Wang, “Phase unwrapping and a robust Chinese remainder theorem,” IEEE Signal Process. Lett., vol. 14, no. 4, pp. 247–250, Apr. 2007.
+Authorized licensed use limited to: UNIVERSITY OF DELAWARE LIBRARY. Downloaded on October 16, 2009 at 16:22 from IEEE Xplore. Restrictions apply.
+
+
+4322 IEEE TRANSACTIONS ON SIGNAL PROCESSING, VOL. 57, NO. 11, NOVEMBER 2009
+[3] G. Li, J. Xu, Y.-N. Peng, and X.-G. Xia, “An efficient implementation of robust phase-unwrapping algorithm,” IEEE Signal Process. Lett., vol. 14, pp. 393–396, Jun. 2007. [4] X. Li and X.-G. Xia, “A fast robust Chinese remainder theorem based phase unwrapping algorithm,” IEEE Signal Process. Lett., vol. 15, pp. 665–668, Oct. 2008. [5] X.-G. Xia and K. Liu, “A generalized Chinese remainder theorem for residue sets with errors and its application in frequency determination from multiple sensors with low sampling rates,” IEEE Signal Process. Lett., vol. 12, pp. 768–771, Nov. 2005. [6] G. Li, J. Xu, Y.-N. Peng, and X.-G. Xia, “Moving target location and imaging using dual-speed velocity SAR,” IET Radar Sonar Navig., vol. 1, no. 2, pp. 158–163, 2007. [7] G. Li, J. Xu, Y.-N. Peng, and X.-G. Xia, “Location and imaging of moving targets using non-uniform linear antenna array SAR,” IEEE Trans. Aerosp. Electron. Syst., vol. 43, no. 3, pp. 1214–1220, Jul. 2007. [8] W. Xu, E. C. Chang, L. K. Kwoh, H. Lim, and W. C. A. Heng, “Phase unwrapping of SAR interferogram with multi-frequency or multi-baseline,” in Proc. IGARSS, 1994, pp. 730–732. [9] D. P. Jorgensen, T. R. Shepherd, and A. S. Goldstein, “A dual-pulse repetition frequency scheme for mitigating velocity ambiguities of the NOAA P-3 airborne Doppler radar,” J. Atmos. Ocean. Technol., vol. 17, no. 5, pp. 585–594, May 2000. [10] M. Ruegg, E. Meier, and D Nuesch, “Capabilities of dual-frequency millimeter wave SAR with monopulse processing for ground moving target indication,” IEEE Trans. Geosci. Remote Sens., vol. 45, no. 3, pp. 539–553, Mar. 2007. [11] J. H. Mcclellan and C. M. Rader, Number Theory in Digital Signal Processing. Englewood Cliffs, NJ: Prentice-Hall, 1979. [12] C. Ding, D. Pei, and A. Salomaa, Chinese Remainder Theorem: Applications in Computing, Coding, Cryptography. Singapore: World Scientific, 1999. [13] O. Goldreich, D. Ron, and M. Sudan, “Chinese remaindering with errors,” IEEE Trans. Inf. Theory, vol. 46, no. 7, pp. 1330–1338, Jul. 2000. [14] I. E. Shparlinski and R. Steinfeld, “Noisy Chinese remaindering in the Lee norm,” J. Complex., vol. 20, pp. 423–437, 2004.
+Xiaowei Li was born in Hubei, China. He received the B.S. degree from Wuhan University, Wuhan, China, in 2004, and the M.S. degree in electrical engineering from Institute of Electronics, Chinese Academy of Sciences, Beijing, China, in 2007. He is currently working towards the Ph.D. degree in electrical engineering at the Department of Electrical and Computer Engineering, University of Delaware, Newark, DE. His current research interests lie in the area of signal and image processing, including target detection, sensor array signal processing in radar system, and SAR imaging of maneuvering targets.
+Hong Liang received the M.S. degree and the Ph.D. degree in signal and information processing from Northwestern Polytechnical University (NPU), Xi’an, China, in 1995 and 2004, respectively. Currently, she is an Associate Professor at NPU. In 2008, she was with the Department of Electrical and Computer Engineering, University of Delaware, Newark, as a Visiting Professor. Her main research interests include signal detection, parameter estimation, and adaptive signal processing.
+Xiang-Gen Xia (M’97–S’00–F’09) received the B.S. degree in mathematics from Nanjing Normal University, Nanjing, China, and the M.S. degree in mathematics from Nankai University, Tianjin, China, and the Ph.D. degree in electrical engineering from the University of Southern California, Los Angeles, in 1983, 1986, and 1992, respectively. He was a Senior/Research Staff Member at Hughes Research Laboratories, Malibu, California, during 1995–1996. In September 1996, he joined the Department of Electrical and Computer Engineering, University of Delaware, Newark, Delaware, where he is the Charles Black Evans Professor. He was a Visiting Professor at the Chinese University of Hong Kong during 2002–2003, where he is an Adjunct Professor. Before 1995, he held visiting positions in a few institutions. His current research interests include space-time coding, MIMO and OFDM systems, digital signal processing, and SAR and ISAR imaging. He has over 185 refereed journal articles published and accepted and seven U.S. patents awarded and is the author of the book Modulated Coding for Intersymbol Interference Channels (New York: Marcel Dekker, 2000). Dr. Xia received the National Science Foundation (NSF) Faculty Early Career Development (CAREER) Program Award in 1997, the Office of Naval Research (ONR) Young Investigator Award in 1998, and the Outstanding Overseas Young Investigator Award from the National Nature Science Foundation of China in 2001. He also received the Outstanding Junior Faculty Award of the Engineering School of the University of Delaware in 2001. He is currently an Associate Editor of the IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS, the IEEE TRANSACTIONS ON SIGNAL PROCESSING, the Signal Processing (EURASIP), and the Journal of Communications and Networks (JCN). He was a Guest Editor of Space-Time Coding and Its Applications in the EURASIP Journal of Applied Signal Processing in 2002. He served as an Associate Editor of the IEEE TRANSACTIONS ON SIGNAL PROCESSING during 1996 to 2003, the IEEE TRANSACTIONS ON MOBILE COMPUTING during 2001 to 2004, IEEE TRANSACTIONS ON VEHICULAR TECHNOLOGY during 2005 to 2008, the IEEE SIGNAL PROCESSING LETTERS during 2003 to 2007, and the EURASIP Journal of Applied Signal Processing during 2001 to 2004. He served as a Member of the Signal Processing for Communications Committee from 2000 to 2005 and is currently a Member of the Sensor Array and Multichannel (SAM) Technical Committee (from 2004) in the IEEE Signal Processing Society. He has served as IEEE Sensors Council Representative of IEEE Signal Processing Society since 2002 and served as the Representative of IEEE Signal Processing Society to the Steering Committee for IEEE TRANSACTIONS ON MOBILE COMPUTING during 2005 to 2006. He is Technical Program Chair of the Signal Processing Symposium, the IEEE GLOBECOM 2007 in Washington DC, and the General Co-Chair of the International Conference of Acoustics, Speech and Signal Processing (ICASSP) 2005 in Philadelphia, PA.
+Authorized licensed use limited to: UNIVERSITY OF DELAWARE LIBRARY. Downloaded on October 16, 2009 at 16:22 from IEEE Xplore. Restrictions apply.
