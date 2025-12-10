@@ -1,94 +1,106 @@
 \babel@toc {french}{}\relax 
-\contentsline {chapter}{\numberline {1}Introduction}{5}{chapter.1}%
-\contentsline {chapter}{\numberline {2}Problématique (plan)}{7}{chapter.2}%
-\contentsline {chapter}{\numberline {3}Problématique}{9}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Introduction}{9}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Description de l'intégration du capteur ESM et son fonctionnement}{9}{section.3.2}%
-\contentsline {subsection}{\numberline {3.2.1}Contexte opérationnel : La maîtrise du spectre électromagnétique}{9}{subsection.3.2.1}%
-\contentsline {subsection}{\numberline {3.2.2}Chaîne de traitement de l'information}{9}{subsection.3.2.2}%
-\contentsline {subsection}{\numberline {3.2.3}Traitements du capteur}{10}{subsection.3.2.3}%
-\contentsline {section}{\numberline {3.3}Description de l'environnement numérique}{11}{section.3.3}%
-\contentsline {subsection}{\numberline {3.3.1}Pourquoi un environnement numérique}{11}{subsection.3.3.1}%
-\contentsline {subsection}{\numberline {3.3.2}Fonctionnement de l'environnement}{11}{subsection.3.3.2}%
-\contentsline {chapter}{\numberline {4}État de l'art : PLAN (à supprimer après rédaction)}{13}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Introduction}{13}{section.4.1}%
-\contentsline {section}{\numberline {4.2}IA générative}{13}{section.4.2}%
-\contentsline {section}{\numberline {4.3}Méthodes pour le traitement de séquence}{13}{section.4.3}%
-\contentsline {section}{\numberline {4.4}Les améliorations}{14}{section.4.4}%
-\contentsline {chapter}{\numberline {5}État de l'art}{15}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Introduction}{15}{section.5.1}%
-\contentsline {subsection}{\numberline {5.1.1}Cadre Conceptuel : Environnement Virtuel et Jumeau Numérique}{15}{subsection.5.1.1}%
-\contentsline {subsection}{\numberline {5.1.2}Injection 1 : constitution géométrique et visuelle de l'environnement}{16}{subsection.5.1.2}%
-\contentsline {subsubsection}{Modélisation : reconstruction neurale et représentations implicites}{17}{subsubsection*.2}%
-\contentsline {subsubsection}{Génération: synthèse d'actifs par diffusion}{17}{subsubsection*.3}%
-\contentsline {subsection}{\numberline {5.1.3}Injection 2 : représentation des phénomènes physiques}{17}{subsection.5.1.3}%
-\contentsline {subsubsection}{Apprentissage par Observation (Data-Driven)}{18}{subsubsection*.4}%
-\contentsline {subsubsection}{Apprentissage contraint par les Équations (Physics-Informed)}{18}{subsubsection*.5}%
-\contentsline {subsubsection}{Apprentissage structuré par la Physique (Inductive Bias)}{18}{subsubsection*.6}%
-\contentsline {subsection}{\numberline {5.1.4}Injection 3 : interaction et adaptation décisionnelle}{19}{subsection.5.1.4}%
-\contentsline {subsubsection}{L'environnement peuplé d'agents apprenants (IA comme Acteur)}{19}{subsubsection*.7}%
-\contentsline {subsubsection}{L'environnement comme générateur de curriculum (IA comme Superviseur)}{19}{subsubsection*.8}%
-\contentsline {subsection}{\numberline {5.1.5}Ancrage dans la problématique}{19}{subsection.5.1.5}%
-\contentsline {section}{\numberline {5.2}IA générative}{20}{section.5.2}%
-\contentsline {subsection}{\numberline {5.2.1}L'approche probabiliste explicite : Les VAE (2013)}{21}{subsection.5.2.1}%
-\contentsline {subsection}{\numberline {5.2.2}La révolution antagoniste : Les GAN (2014)}{21}{subsection.5.2.2}%
-\contentsline {subsection}{\numberline {5.2.3}La génération par raffinement : Les Modèles de Diffusion (2020)}{22}{subsection.5.2.3}%
-\contentsline {subsection}{\numberline {5.2.4}Le paradigme séquentiel et l'Autorégression}{22}{subsection.5.2.4}%
-\contentsline {subsection}{\numberline {5.2.5}Ancrage dans la problématique}{23}{subsection.5.2.5}%
-\contentsline {section}{\numberline {5.3}Méthode traitement de séquence}{23}{section.5.3}%
-\contentsline {subsection}{\numberline {5.3.1}Le concept de séquence : De l'ensemble à la structure ordonnée}{23}{subsection.5.3.1}%
-\contentsline {subsubsection}{séquence temporelle et la causalité}{24}{subsubsection*.9}%
-\contentsline {subsubsection}{La séquence spatiale et la contiguïté}{24}{subsubsection*.10}%
-\contentsline {subsubsection}{Universalité de la modélisation séquentielle}{24}{subsubsection*.11}%
-\contentsline {subsection}{\numberline {5.3.2}Réseaux de convolution}{24}{subsection.5.3.2}%
-\contentsline {subsubsection}{Genèse et prédominance dans l'imagerie}{25}{subsubsection*.12}%
-\contentsline {subsubsection}{Mécanisme d'interaction : Filtrage local et expansion hiérarchique}{25}{subsubsection*.13}%
-\contentsline {subsubsection}{La convolution dans l'image : Une séquence spatiale 2D}{27}{subsubsection*.16}%
-\contentsline {subsubsection}{La convolution dans les séquences 1D (Texte, Audio, Séries Temporelles)}{28}{subsubsection*.17}%
-\contentsline {subsubsection}{Généralisation : La convolution au-delà des grilles euclidiennes}{28}{subsubsection*.18}%
-\contentsline {subsection}{\numberline {5.3.3}Réseaux de neurones récurrents et Espaces d'Etats (RNN et SSM)}{29}{subsection.5.3.3}%
-\contentsline {subsubsection}{Genèse et mécanismes d'interaction : De la boucle simple aux portes logiques}{29}{subsubsection*.19}%
-\contentsline {subsubsection}{Mécanisme d'interaction : Récurrence et Mémoire d'État}{29}{subsubsection*.20}%
-\contentsline {subsubsection}{Renouveau architectural : Les Modèles d'Espaces d'Etats (SSM)}{31}{subsubsection*.23}%
-\contentsline {subsubsection}{Application au texte : L'ère du Sequence-to-Sequence et de la Traduction}{32}{subsubsection*.24}%
-\contentsline {subsubsection}{Application aux systèmes temporels, physiques et créatifs}{32}{subsubsection*.25}%
-\contentsline {subsection}{\numberline {5.3.4}Transformer}{32}{subsection.5.3.4}%
-\contentsline {subsubsection}{Histoire : De l'alignement au "Pointer Network" et à l'Attention pure}{33}{subsubsection*.26}%
-\contentsline {subsubsection}{Mécanisme d'interaction et complexité}{33}{subsubsection*.27}%
-\contentsline {subsubsection}{Le Transformer dans le texte : La divergence des architectures}{37}{subsubsection*.33}%
-\contentsline {subsubsection}{Le Transformer dans les systèmes temporels : Promesses et controverses}{39}{subsubsection*.34}%
-\contentsline {subsubsection}{Le Transformer dans l'image : Patchs et hiérarchie}{39}{subsubsection*.35}%
-\contentsline {subsubsection}{Généralisation : Physique et Prise de décision}{40}{subsubsection*.36}%
-\contentsline {subsection}{\numberline {5.3.5}Ancrage dans la problématique}{40}{subsection.5.3.5}%
-\contentsline {chapter}{\numberline {6}AVERTISSEMENT}{43}{chapter.6}%
-\contentsline {chapter}{\numberline {7}COMPOSITION GÉNÉRALE, CHARTE GRAPHIQUE}{45}{chapter.7}%
-\contentsline {section}{\numberline {7.1}COMPOSITION DU DOCUMENT}{45}{section.7.1}%
-\contentsline {section}{\numberline {7.2}QUELS LOGOS FAIRE FIGURER ?}{45}{section.7.2}%
-\contentsline {section}{\numberline {7.3}POLICES DE CARACTÈRES ET COULEURS}{45}{section.7.3}%
-\contentsline {chapter}{\numberline {8}INFORMATIONS GÉNÉRALES SUR LA PAGE DE COUVERTURE}{47}{chapter.8}%
-\contentsline {section}{\numberline {8.1}TITRE DE LA THÈSE ET LANGUE(S)}{47}{section.8.1}%
-\contentsline {section}{\numberline {8.2}SPÉCIALITÉ DE DOCTORAT}{47}{section.8.2}%
-\contentsline {section}{\numberline {8.3}UNITÉ DE RECHERCHE}{48}{section.8.3}%
-\contentsline {section}{\numberline {8.4}LE RÉFÉRENT}{48}{section.8.4}%
-\contentsline {section}{\numberline {8.5}GRADUATE SCHOOL}{49}{section.8.5}%
-\contentsline {section}{\numberline {8.6}ÉCOLE DOCTORALE}{49}{section.8.6}%
-\contentsline {section}{\numberline {8.7}LIEU ET DATE DE SOUTENANCE}{50}{section.8.7}%
-\contentsline {chapter}{\numberline {9}CIVILITÉ, FÉMINISATION DES TITRES ET FONCTIONS}{51}{chapter.9}%
-\contentsline {chapter}{\numberline {10}PRÉSENTATION DE LA DIRECTION DE LA THÈSE OU DE L’ÉQUIPE D’ENCADREMENT}{53}{chapter.10}%
-\contentsline {chapter}{\numberline {11}COMPOSITION DU JURY }{55}{chapter.11}%
-\contentsline {section}{\numberline {11.1}A QUOI SERVENT CES INFORMATIONS ?}{55}{section.11.1}%
-\contentsline {section}{\numberline {11.2}LÉGITIMITÉ ACADÉMIQUE}{55}{section.11.2}%
-\contentsline {section}{\numberline {11.3}INDÉPENDANCE}{56}{section.11.3}%
-\contentsline {section}{\numberline {11.4}FONCTION DANS LE JURY ET ORDRE DE CITATION}{57}{section.11.4}%
-\contentsline {subsection}{\numberline {11.4.1}Ordre de citation}{57}{subsection.11.4.1}%
-\contentsline {subsection}{\numberline {11.4.2}Les rapporteurs}{57}{subsection.11.4.2}%
-\contentsline {chapter}{\numberline {12}BIEN CITER SES SOURCES}{59}{chapter.12}%
-\contentsline {section}{\numberline {12.1}S'INFORMER SUR LE PLAGIAT}{59}{section.12.1}%
-\contentsline {section}{\numberline {12.2}LES IMAGES}{59}{section.12.2}%
-\contentsline {section}{\numberline {12.3}ARTICLES JOINTS A LA THÈSE}{59}{section.12.3}%
-\contentsline {chapter}{\numberline {13}DÉPOSER ET DIFFUSER SA THÈSE}{61}{chapter.13}%
-\contentsline {section}{\numberline {13.1}LES RESSOURCES A CONSULTER}{61}{section.13.1}%
-\contentsline {section}{\numberline {13.2}LES DÉMARCHES}{61}{section.13.2}%
-\contentsline {chapter}{\numberline {14}ANNEXE : LES LOGOS INSTITUTIONNELS}{63}{chapter.14}%
-\contentsline {section}{\numberline {14.1}LE LOGO DE L’UNIVERSITÉ PARIS-SACLAY}{63}{section.14.1}%
-\contentsline {section}{\numberline {14.2}LOGOS, NUMÉROS D’ACCRÉDITATION ET DÉNOMINATIONS DES ÉCOLES DOCTORALES}{63}{section.14.2}%
+\contentsline {chapter}{\numberline {1}Introduction}{7}{chapter.1}%
+\contentsline {chapter}{\numberline {2}Problématique (plan)}{9}{chapter.2}%
+\contentsline {chapter}{\numberline {3}Problématique}{11}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Introduction}{11}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Description de l'intégration du capteur ESM et son fonctionnement}{11}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Contexte opérationnel : La maîtrise du spectre électromagnétique}{11}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Chaîne de traitement de l'information}{11}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}Architecture et fonctionnement du capteur}{12}{subsection.3.2.3}%
+\contentsline {section}{\numberline {3.3}Description de l'environnement numérique}{13}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Motivations}{13}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Architecture et fonctionnement de l'environnement numérique}{14}{subsection.3.3.2}%
+\contentsline {section}{\numberline {3.4}Toujours trop lent}{15}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}L'impératif de temps réel et le coût de la simulation}{15}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Localisation du goulot d'étranglement}{16}{subsection.3.4.2}%
+\contentsline {section}{\numberline {3.5}Un problème pas beaucoup trop simple}{16}{section.3.5}%
+\contentsline {section}{\numberline {3.6}Identification du goulot d'étranglement et limites opérationnelles}{16}{section.3.6}%
+\contentsline {subsection}{\numberline {3.6.1}L'impératif de temps réel et le coût de la simulation}{16}{subsection.3.6.1}%
+\contentsline {subsection}{\numberline {3.6.2}Analyse de la complexité et localisation du verrou}{17}{subsection.3.6.2}%
+\contentsline {section}{\numberline {3.7}Formalisation et complexité du problème d'apprentissage}{17}{section.3.7}%
+\contentsline {subsection}{\numberline {3.7.1}Nature des données et définition de la tâche}{17}{subsection.3.7.1}%
+\contentsline {subsection}{\numberline {3.7.2}Une double problématique : Traitement de séquence et Génération}{18}{subsection.3.7.2}%
+\contentsline {subsection}{\numberline {3.7.3}Nature des données et définition formelle de la tâche}{18}{subsection.3.7.3}%
+\contentsline {subsection}{\numberline {3.7.4}Une double problématique : Traitement de séquence et Génération}{19}{subsection.3.7.4}%
+\contentsline {chapter}{\numberline {4}État de l'art : PLAN (à supprimer après rédaction)}{21}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Introduction}{21}{section.4.1}%
+\contentsline {section}{\numberline {4.2}IA générative}{21}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Méthodes pour le traitement de séquence}{21}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Les améliorations}{22}{section.4.4}%
+\contentsline {chapter}{\numberline {5}État de l'art}{23}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Introduction}{23}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}Cadre Conceptuel : Environnement Virtuel et Jumeau Numérique}{23}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}Injection 1 : constitution géométrique et visuelle de l'environnement}{24}{subsection.5.1.2}%
+\contentsline {subsubsection}{Modélisation : reconstruction neurale et représentations implicites}{25}{subsubsection*.2}%
+\contentsline {subsubsection}{Génération: synthèse d'actifs par diffusion}{25}{subsubsection*.3}%
+\contentsline {subsection}{\numberline {5.1.3}Injection 2 : représentation des phénomènes physiques}{25}{subsection.5.1.3}%
+\contentsline {subsubsection}{Apprentissage par Observation (Data-Driven)}{26}{subsubsection*.4}%
+\contentsline {subsubsection}{Apprentissage contraint par les Équations (Physics-Informed)}{26}{subsubsection*.5}%
+\contentsline {subsubsection}{Apprentissage structuré par la Physique (Inductive Bias)}{26}{subsubsection*.6}%
+\contentsline {subsection}{\numberline {5.1.4}Injection 3 : interaction et adaptation décisionnelle}{27}{subsection.5.1.4}%
+\contentsline {subsubsection}{L'environnement peuplé d'agents apprenants (IA comme Acteur)}{27}{subsubsection*.7}%
+\contentsline {subsubsection}{L'environnement comme générateur de curriculum (IA comme Superviseur)}{27}{subsubsection*.8}%
+\contentsline {subsection}{\numberline {5.1.5}Ancrage dans la problématique}{27}{subsection.5.1.5}%
+\contentsline {section}{\numberline {5.2}IA générative}{28}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}L'approche probabiliste explicite : Les VAE (2013)}{29}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}La révolution antagoniste : Les GAN (2014)}{29}{subsection.5.2.2}%
+\contentsline {subsection}{\numberline {5.2.3}La génération par raffinement : Les Modèles de Diffusion (2020)}{30}{subsection.5.2.3}%
+\contentsline {subsection}{\numberline {5.2.4}Le paradigme séquentiel et l'Autorégression}{30}{subsection.5.2.4}%
+\contentsline {subsection}{\numberline {5.2.5}Ancrage dans la problématique}{31}{subsection.5.2.5}%
+\contentsline {section}{\numberline {5.3}Méthode traitement de séquence}{31}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}Le concept de séquence : De l'ensemble à la structure ordonnée}{31}{subsection.5.3.1}%
+\contentsline {subsubsection}{séquence temporelle et la causalité}{32}{subsubsection*.9}%
+\contentsline {subsubsection}{La séquence spatiale et la contiguïté}{32}{subsubsection*.10}%
+\contentsline {subsubsection}{Universalité de la modélisation séquentielle}{32}{subsubsection*.11}%
+\contentsline {subsection}{\numberline {5.3.2}Réseaux de convolution}{32}{subsection.5.3.2}%
+\contentsline {subsubsection}{Genèse et prédominance dans l'imagerie}{33}{subsubsection*.12}%
+\contentsline {subsubsection}{Mécanisme d'interaction : Filtrage local et expansion hiérarchique}{33}{subsubsection*.13}%
+\contentsline {subsubsection}{La convolution dans l'image : Une séquence spatiale 2D}{35}{subsubsection*.16}%
+\contentsline {subsubsection}{La convolution dans les séquences 1D (Texte, Audio, Séries Temporelles)}{36}{subsubsection*.17}%
+\contentsline {subsubsection}{Généralisation : La convolution au-delà des grilles euclidiennes}{36}{subsubsection*.18}%
+\contentsline {subsection}{\numberline {5.3.3}Réseaux de neurones récurrents et Espaces d'Etats (RNN et SSM)}{37}{subsection.5.3.3}%
+\contentsline {subsubsection}{Genèse et mécanismes d'interaction : De la boucle simple aux portes logiques}{37}{subsubsection*.19}%
+\contentsline {subsubsection}{Mécanisme d'interaction : Récurrence et Mémoire d'État}{37}{subsubsection*.20}%
+\contentsline {subsubsection}{Renouveau architectural : Les Modèles d'Espaces d'Etats (SSM)}{39}{subsubsection*.23}%
+\contentsline {subsubsection}{Application au texte : L'ère du Sequence-to-Sequence et de la Traduction}{40}{subsubsection*.24}%
+\contentsline {subsubsection}{Application aux systèmes temporels, physiques et créatifs}{40}{subsubsection*.25}%
+\contentsline {subsection}{\numberline {5.3.4}Transformer}{40}{subsection.5.3.4}%
+\contentsline {subsubsection}{Histoire : De l'alignement au "Pointer Network" et à l'Attention pure}{41}{subsubsection*.26}%
+\contentsline {subsubsection}{Mécanisme d'interaction et complexité}{41}{subsubsection*.27}%
+\contentsline {subsubsection}{Le Transformer dans le texte : La divergence des architectures}{45}{subsubsection*.33}%
+\contentsline {subsubsection}{Le Transformer dans les systèmes temporels : Promesses et controverses}{47}{subsubsection*.34}%
+\contentsline {subsubsection}{Le Transformer dans l'image : Patchs et hiérarchie}{47}{subsubsection*.35}%
+\contentsline {subsubsection}{Généralisation : Physique et Prise de décision}{48}{subsubsection*.36}%
+\contentsline {subsection}{\numberline {5.3.5}Ancrage dans la problématique}{48}{subsection.5.3.5}%
+\contentsline {chapter}{\numberline {6}AVERTISSEMENT}{51}{chapter.6}%
+\contentsline {chapter}{\numberline {7}COMPOSITION GÉNÉRALE, CHARTE GRAPHIQUE}{53}{chapter.7}%
+\contentsline {section}{\numberline {7.1}COMPOSITION DU DOCUMENT}{53}{section.7.1}%
+\contentsline {section}{\numberline {7.2}QUELS LOGOS FAIRE FIGURER ?}{53}{section.7.2}%
+\contentsline {section}{\numberline {7.3}POLICES DE CARACTÈRES ET COULEURS}{53}{section.7.3}%
+\contentsline {chapter}{\numberline {8}INFORMATIONS GÉNÉRALES SUR LA PAGE DE COUVERTURE}{55}{chapter.8}%
+\contentsline {section}{\numberline {8.1}TITRE DE LA THÈSE ET LANGUE(S)}{55}{section.8.1}%
+\contentsline {section}{\numberline {8.2}SPÉCIALITÉ DE DOCTORAT}{55}{section.8.2}%
+\contentsline {section}{\numberline {8.3}UNITÉ DE RECHERCHE}{56}{section.8.3}%
+\contentsline {section}{\numberline {8.4}LE RÉFÉRENT}{56}{section.8.4}%
+\contentsline {section}{\numberline {8.5}GRADUATE SCHOOL}{57}{section.8.5}%
+\contentsline {section}{\numberline {8.6}ÉCOLE DOCTORALE}{57}{section.8.6}%
+\contentsline {section}{\numberline {8.7}LIEU ET DATE DE SOUTENANCE}{58}{section.8.7}%
+\contentsline {chapter}{\numberline {9}CIVILITÉ, FÉMINISATION DES TITRES ET FONCTIONS}{59}{chapter.9}%
+\contentsline {chapter}{\numberline {10}PRÉSENTATION DE LA DIRECTION DE LA THÈSE OU DE L’ÉQUIPE D’ENCADREMENT}{61}{chapter.10}%
+\contentsline {chapter}{\numberline {11}COMPOSITION DU JURY }{63}{chapter.11}%
+\contentsline {section}{\numberline {11.1}A QUOI SERVENT CES INFORMATIONS ?}{63}{section.11.1}%
+\contentsline {section}{\numberline {11.2}LÉGITIMITÉ ACADÉMIQUE}{63}{section.11.2}%
+\contentsline {section}{\numberline {11.3}INDÉPENDANCE}{64}{section.11.3}%
+\contentsline {section}{\numberline {11.4}FONCTION DANS LE JURY ET ORDRE DE CITATION}{65}{section.11.4}%
+\contentsline {subsection}{\numberline {11.4.1}Ordre de citation}{65}{subsection.11.4.1}%
+\contentsline {subsection}{\numberline {11.4.2}Les rapporteurs}{65}{subsection.11.4.2}%
+\contentsline {chapter}{\numberline {12}BIEN CITER SES SOURCES}{67}{chapter.12}%
+\contentsline {section}{\numberline {12.1}S'INFORMER SUR LE PLAGIAT}{67}{section.12.1}%
+\contentsline {section}{\numberline {12.2}LES IMAGES}{67}{section.12.2}%
+\contentsline {section}{\numberline {12.3}ARTICLES JOINTS A LA THÈSE}{67}{section.12.3}%
+\contentsline {chapter}{\numberline {13}DÉPOSER ET DIFFUSER SA THÈSE}{69}{chapter.13}%
+\contentsline {section}{\numberline {13.1}LES RESSOURCES A CONSULTER}{69}{section.13.1}%
+\contentsline {section}{\numberline {13.2}LES DÉMARCHES}{69}{section.13.2}%
+\contentsline {chapter}{\numberline {14}ANNEXE : LES LOGOS INSTITUTIONNELS}{71}{chapter.14}%
+\contentsline {section}{\numberline {14.1}LE LOGO DE L’UNIVERSITÉ PARIS-SACLAY}{71}{section.14.1}%
+\contentsline {section}{\numberline {14.2}LOGOS, NUMÉROS D’ACCRÉDITATION ET DÉNOMINATIONS DES ÉCOLES DOCTORALES}{71}{section.14.2}%
