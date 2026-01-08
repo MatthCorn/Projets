@@ -42,6 +42,7 @@
 \usepackage{array}
 \usepackage{geometry}
 \usepackage{titlesec}
+\setcounter{secnumdepth}{3}
 \usepackage{hyperref}
 \hypersetup{ % paramétrage couleur des liens hypertextes, toujours garder colorlinks=true
     colorlinks=true,
@@ -213,6 +214,12 @@ Titre, Affiliation   &   \\
 %\titlespacing{\section}{1.5pc}{4ex plus .1ex minus .2ex}{.8pc}
 
 \titleformat{\subsection}[hang]{\bfseries\small}{\thesubsection\ .}{1pt}
+{\vspace{0.1ex}
+}
+[\vspace{0.1ex}]
+%\titlespacing{\subsection}{3pc}{2ex plus .1ex minus .2ex}{.1pc}
+
+\titleformat{\subsubsection}[hang]{\bfseries\small}{\thesubsubsection\ .}{1pt}
 {\vspace{0.1ex}
 }
 [\vspace{0.1ex}]

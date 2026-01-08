@@ -1,155 +1,0 @@
-World Models
-David Ha, Jürgen Schmidhuber
-Edmund Goodman November 20, 2024
-
-
-How do we experience the world?
-Figure 1: Art by Scott McClouda.
-aMcCloud and Martin, Understanding comics: The invisible art.
-• Humans build spatial and temporal models of the environment we experience • Sometimes actions occur so fast we work instinctively from these models • Predicting rather than processing
-• Can we build neural networks which operate similarly?
-Edmund Goodman | World Models (David Ha, Jürgen Schmidhuber) 1/12
-
-
-Existing work
-1990: RNN model-controllers (right)a 2012: AlexNet and deep neural networksb 2013: Variational auto-encodersc 2018: World modelsd
-aSchmidhuber, Making the world differentiable: on using self supervised
-fully recurrent neural networks for dynamic reinforcement learning and
-planning in non-stationary environments, Figure 2.
-bKrizhevsky, Sutskever, and Hinton, “ImageNet Classification with Deep
-Convolutional Neural Networks”.
-cKingma and Welling, Auto-Encoding Variational Bayes.
-dHa and Schmidhuber, World Models. Figure 2: A controller with internal RNN model of the world.
-Edmund Goodman | World Models (David Ha, Jürgen Schmidhuber) 2/12
-
-
-Key question and contributions
-“Can agents learn inside of their own dreams?”1
-• Combine existing approaches (model-controller RNNs, DNNs, variational auto-encoders) into state-of-the-art generative models for game environments
-• Show that agents can be trained through the lens of their own generative models (their dreams)
-1Ha and Schmidhuber, World Models.
-Edmund Goodman | World Models (David Ha, Jürgen Schmidhuber) 3/12
-
-
-Components
-Figure 3: A diagram of a variational auto-encodera.
-aEugenioTL, Variational Autoencoder structure.
-Figure 4: A diagram of an RNN with a mixture density network output layera.
-aHa and Schmidhuber, World Models, Figure 6.
-Edmund Goodman | World Models (David Ha, Jürgen Schmidhuber) 4/12
-
-
-Architecture
-Figure 5: Flow diagram of the agent modela
-aHa and Schmidhuber, World Models, Figure 8.
-• Three components to model V: Learns to represent spatial component of the environment as latent representation z M: Learns to predict temporal component of the environment C: Learns to maximise reward from world model only
-• V + M are the world model – large, but can be trained unsupervised from environment
-• C adds agency – small (single-layer), takes features from world model as input
-Edmund Goodman | World Models (David Ha, Jürgen Schmidhuber) 5/12
-
-
-Training cars to race
-Figure 6: A photoa of CarRacing-v0 from OpenAI’s gymb
-aHa and Schmidhuber, World Models, Figure 11.
-bCar Racing - Gym Documentation.
-1. Collect 10,000 rollouts from a random policy 2. Train VAE (V) to encode frames into z ∈ R32. 3. Train MDN-RNN (M) to model P(zt+1|at, zt, ht). 4. Define Controller (C) as at = Wc [zt ht] + bc.
-5. Use CMA-ESa to solve for a Wc and bc that maximizes the expected cumulative reward
-aLoshchilov and Hutter, CMA-ES for Hyperparameter Optimization of Deep Neural
-Networks.
-Edmund Goodman | World Models (David Ha, Jürgen Schmidhuber) 6/12
-
-
-Winning races
-Figure 7: CarRacing-v0 scores achieved using various methods2.
-• Spatial only (V + C) model is fairly effective, albeit with unstable driving • Full world (V + M + C) model is best-in-class, “attacking” sharp corners
-2Ha and Schmidhuber, World Models, Table 1.
-Edmund Goodman | World Models (David Ha, Jürgen Schmidhuber) 7/12
-
-
-Do agents dream of electric cars?
-Figure 8: Car racing observation and reconstruction from autoencoder – interactive demo available: https://worldmodels.github.io/
-• With the trained MDN-RNN, we can predict the next state zt+1 from zt and the action • What if we used this prediction instead of an empirical observation?
-Edmund Goodman | World Models (David Ha, Jürgen Schmidhuber) 8/12
-
-
-Learning from dreams
-Figure 9: Flow diagram of the agent modela.
-aHa and Schmidhuber, World Models, Figure 8.
-C RNN (M)
-MDN
-z ~ P(z | h) z
-h
-action
-VAE
-decoder
-Figure 10: Modified agent model, “learning inside a dream”.
-Edmund Goodman | World Models (David Ha, Jürgen Schmidhuber) 9/12
-
-
-VizDoom experiment
-Figure 11: Screenshot of the “VizDoom: Take Cover” environmenta.
-aHa and Schmidhuber, World Models, Figure 14.
-• Similar setup to the Car Racing experiment, but this time all learning is done in dreams
-• This works! Agents can learn inside their own dreams, with this learnt policy being effective in the actual environment • There are a few issues: • Model doesn’t perfectly represent environment, so agent can “cheat”, resolved by leveraging temperature • Complex environments are hard to search comprehensively, resolved by iteratively training
-Edmund Goodman | World Models (David Ha, Jürgen Schmidhuber) 10/12
-
-
-Impact
-• Influential in the ongoing development of foundation models • “The first work that proposes to learn a compressed spatial and temporal representation of the environment in an unsupervised manner using a simple Variational Autoencoder”3.
-• Resulted in the “Dreamer” series of papers by Google DeepMind: 1. Dreamer solves long-horizon tasks using latent imagination of reinforcement learning4 2. DreamerV2 then uses this approach to successfully play Atari games5 3. DreamerV3 further extends this approach to generally solve tasks without human input6
-3Zhou et al., A Comprehensive Survey on Pretrained Foundation Models, Appendix E.
-4Hafner, Lillicrap, Ba, et al., Dream to Control.
-5Hafner, Lillicrap, Norouzi, et al., Mastering Atari with Discrete World Models.
-6Hafner, Pasukonis, et al., Mastering Diverse Domains through World Models.
-Edmund Goodman | World Models (David Ha, Jürgen Schmidhuber) 11/12
-
-
-Criticism and future work
-Strengths:
-+ Proposes architecture which outperforms existing work on competitive benchmarks + Demonstrates that training in dreams learns effective policies
-Weaknesses:
-− Motivations for training in dreams only mentioned briefly – demonstrations of how it facilitates training without expensive simulation would be helpful − Reward function separated from spatial/temporal feature extraction, causing unnecessary artefacts − Approach is “instinctive” – no mechanism for planning far ahead
-Future work:
-⇒ Including reward function in spatial and temporal models ⇒ Hierarchical models to support planning and strategy
-Edmund Goodman | World Models (David Ha, Jürgen Schmidhuber) 12/12
-
-
-World Models
-David Ha, Jürgen Schmidhuber
-Edmund Goodman November 20, 2024
-
-
-References i
-[1] Car Racing - Gym Documentation. URL:
-https://www.gymlibrary.dev/environments/box2d/car_racing/ (visited on 11/19/2024).
-[2] EugenioTL. Variational Autoencoder structure. July 2021. URL:
-https://commons.wikimedia.org/wiki/File:VAE_Basic.png#/media/File: VAE_Basic.png (visited on 11/20/2024).
-[3] David Ha and Jürgen Schmidhuber. World Models. arXiv:1803.10122. May 2018. DOI:
-10.48550/arXiv.1803.10122. URL: http://arxiv.org/abs/1803.10122 (visited on 11/17/2024).
-Edmund Goodman | World Models (David Ha, Jürgen Schmidhuber)
-
-
-References ii
-[4] Danijar Hafner, Timothy Lillicrap, Jimmy Ba, and Mohammad Norouzi. Dream to Control: Learning Behaviors by Latent Imagination. arXiv:1912.01603. Mar. 2020. DOI:
-10.48550/arXiv.1912.01603. URL: http://arxiv.org/abs/1912.01603 (visited on 11/20/2024).
-[5] Danijar Hafner, Timothy Lillicrap, Mohammad Norouzi, and Jimmy Ba. Mastering Atari with Discrete World Models. arXiv:2010.02193. Feb. 2022. DOI:
-10.48550/arXiv.2010.02193. URL: http://arxiv.org/abs/2010.02193 (visited on 11/20/2024).
-[6] Danijar Hafner, Jurgis Pasukonis, Jimmy Ba, and Timothy Lillicrap. Mastering Diverse Domains through World Models. arXiv:2301.04104. Apr. 2024. DOI:
-10.48550/arXiv.2301.04104. URL: http://arxiv.org/abs/2301.04104 (visited on 11/20/2024).
-Edmund Goodman | World Models (David Ha, Jürgen Schmidhuber)
-
-
-References iii
-[7] Diederik P. Kingma and Max Welling. Auto-Encoding Variational Bayes. arXiv:1312.6114. Dec. 2022. DOI: 10.48550/arXiv.1312.6114. URL: http://arxiv.org/abs/1312.6114 (visited on 11/19/2024).
-[8] Alex Krizhevsky, Ilya Sutskever, and Geoffrey E Hinton. “ImageNet Classification with Deep Convolutional Neural Networks”. In: Advances in Neural Information Processing Systems. Vol. 25. Curran Associates, Inc., 2012. URL: https://papers.nips.cc/paper_
-files/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html (visited on 11/12/2024).
-[9] Ilya Loshchilov and Frank Hutter. CMA-ES for Hyperparameter Optimization of Deep Neural Networks. arXiv:1604.07269. Apr. 2016. DOI: 10.48550/arXiv.1604.07269. URL: http://arxiv.org/abs/1604.07269 (visited on 11/19/2024).
-[10] Scott McCloud and Mark Martin. Understanding comics: The invisible art. Vol. 106. Kitchen sink press Northampton, MA, 1993.
-Edmund Goodman | World Models (David Ha, Jürgen Schmidhuber)
-
-
-References iv
-[11] Jürgen Schmidhuber. Making the world differentiable: on using self supervised fully recurrent neural networks for dynamic reinforcement learning and planning in non-stationary environments. Vol. 126. Inst. für Informatik, 1990.
-[12] Ce Zhou, Qian Li, Chen Li, Jun Yu, Yixin Liu, Guangjing Wang, Kai Zhang, Cheng Ji, Qiben Yan, Lifang He, Hao Peng, Jianxin Li, Jia Wu, Ziwei Liu, Pengtao Xie, Caiming Xiong, Jian Pei, Philip S. Yu, and Lichao Sun. A Comprehensive Survey on
-Pretrained Foundation Models: A History from BERT to ChatGPT. arXiv:2302.09419. May 2023. DOI: 10.48550/arXiv.2302.09419. URL: http://arxiv.org/abs/2302.09419 (visited on 11/20/2024).
-Edmund Goodman | World Models (David Ha, Jürgen Schmidhuber)

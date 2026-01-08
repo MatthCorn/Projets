@@ -1,15 +1,15 @@
 {
 	"translatorID": "4a3820a3-a7bd-44a1-8711-acf7b57d2c37",
+	"translatorType": 4,
 	"label": "Web of Science Nextgen",
 	"creator": "Abe Jellinek",
 	"target": "^https://(www\\.webofscience\\.com|webofscience\\.clarivate\\.cn)/",
 	"minVersion": "3.0",
-	"maxVersion": "",
+	"maxVersion": null,
 	"priority": 100,
 	"inRepository": true,
-	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-08-18 17:12:57"
+	"lastUpdated": "2026-01-05 17:50:00"
 }
 
 /*
@@ -74,7 +74,7 @@ async function getSearchResultsLazy(doc, url) {
 	let [, qid, sortBy] = url.match(SEARCH_RE);
 	Z.debug('Export params:');
 	Z.debug({ qid, sortBy });
-	let markFrom = parseInt(text(doc, 'app-records-list > app-record .mat-checkbox-label'));
+	let markFrom = parseInt(text(doc, 'app-records-list > app-record .mdc-label'));
 	if (isNaN(markFrom)) {
 		markFrom = 1;
 	}
