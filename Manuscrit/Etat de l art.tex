@@ -327,103 +327,6 @@ Au-delà du texte, les RNN se sont imposés comme l'outil naturel pour la modél
 Dans l'industrie, cette robustesse est exploitée pour la prévision probabiliste avec DeepAR \cite{salinas_deepar_2020}, utilisé par Amazon pour sa chaîne logistique. Ce modèle apprend une distribution de probabilité future à chaque pas de temps, permettant de quantifier l'incertitude via des simulations de Monte Carlo. Enfin, la capacité "générative constructive" des RNN a été pionnière dans la création artistique. Le modèle Performance RNN \cite{oore_this_2020}, développé par Google Magenta, a montré qu'un LSTM pouvait générer des performances de piano expressives (avec nuances de vélocité et de timing) en traitant la musique non pas comme une partition rigide, mais comme une séquence temporelle continue d'événements, prouvant que les RNN peuvent capturer des structures hiérarchiques globales (phrasé musical) tout en gérant des détails micro-temporels.
 
 
-\subsection{Transformer}
-Si les réseaux récurrents ont introduit la mémoire et les réseaux convolutionnels la localité, l'architecture Transformer a proposé un changement de paradigme radical en postulant que l'interaction entre les éléments d'une séquence doit être modélisée par une relation directe de contenu à contenu, et non par une contrainte de proximité spatiale ou temporelle. Cette architecture, devenue l'épine dorsale de l'IA générative moderne, repose sur le mécanisme d'attention.
-
-\subsubsection{Histoire : De l'alignement au "Pointer Network" et à l'Attention pure}
-L'émergence du Transformer est le fruit d'une lente maturation visant à résoudre le goulot d'étranglement des architectures Encodeur-Décodeur récurrentes (RNN) \textcolor{red}{REF}. Dans le paradigme Seq2Seq classique \cite{sutskever_sequence_2014}, toute l'information de la phrase source devait être compressée dans un unique vecteur de contexte de taille fixe, entraînant une perte d'information critique sur les longues séquences. Une première solution \cite{bahdanau_neural_2014} introduit un mécanisme d'attention additive permettant au décodeur de "chercher" (search) et d'aligner (align) les parties pertinentes de la phrase source à chaque étape de la génération. Ici, l'attention n'était encore qu'un module auxiliaire greffé sur des RNN.
-Une seconde étape conceptuelle fut franchie avec les Pointer Networks \cite{vinyals_pointer_2015} où le réseau de neurones peut apprendre à résoudre des problèmes combinatoires (comme l'enveloppe convexe) en utilisant l'attention comme un pointeur pour sélectionner des éléments de l'entrée comme sortie, plutôt que de générer des symboles abstraits. Cela a ancré l'idée que le mécanisme de sélection basé sur le contenu ("Content-based addressing") était suffisamment puissant pour structurer la sortie.
-La rupture définitive survient avec l'article Attention Is All You Need \cite{vaswani_attention_2017}. Les auteurs ont démontré que la récurrence, jugée jusqu'alors indispensable pour encoder l'ordre séquentiel, était en réalité superflue et limitante pour la parallélisation. En ne conservant que le mécanisme d'attention (devenu Self-Attention), ils ont permis un traitement parallèle massif des séquences, réduisant la distance de propagation de l'information entre deux mots quelconques à une constante $O(1)$, contre $O(N)$ pour un RNN.
-
-\subsubsection{Mécanisme d'interaction et complexité}
-Contrairement aux architectures précédentes qui traitent la séquence par voisinage spatial ou récursivité temporelle, le Transformer repose sur un mécanisme d'interaction directe et globale : l'attention. Ce processus permet à chaque élément de la séquence de construire sa propre représentation en agrégeant l'information de tous les autres éléments, pondérée par leur pertinence contextuelle. Cette interaction est formalisée par le mécanisme "Query-Key-Value". Pour chaque élément d'entrée $x_i$, trois vecteurs sont générés par projection linéaire via des matrices de poids apprenables $W^Q, W^K, W^V$ : une Requête $q_i = x_i W^Q$, une Clé $k_i = x_i W^K$ et une Valeur $v_i = x_i W^V$.\\
-
-Le cœur du calcul réside dans la mesure de compatibilité entre ces vecteurs, appelé score d'attention. Pour construire une nouvelle représentation d'un élément $x_i$ dans son contexte (c'est-à-dire le reste de la séquence), la requête associé $q_i$ est comparée aux clés de chaque élément de la séquence $(k_j)_j$, formant une séquence de score d'attention $(a_{i,j})_j$. Cette comparaison s'effectue souvent par un produit scalaire, mis à l'échelle par la racine de la dimension des clés $d_{att}$ pour stabiliser les gradients. Le score d'attention brute $a_{i,j}$ est généralement donné par:
-$$a_{i,j} = \frac{\langle q_i, k_j \rangle}{\sqrt{d_{att}}} $$
-Ces scores bruts sont ensuite convertis en une distribution de probabilité $(p_{i,j})_j$ par l'application d'une fonction Softmax :
-$$p_{i,j} = \text{softmax}((a_{i,k})_k)_j = \frac{\exp(a_{i,j})}{\sum_{k} \exp(a_{i,k})}$$
-La nouvelle représentation de $x_i$, notée $y_i$, est calculée comme une somme des vecteurs de Valeur $(v_j)_j$ pondérés par les poids d'attention $(p_{i,j})_j$ :
-$$y_i = \sum_{j} p_{i,j} v_j$$
-Il est intéressant de noter que l'opération d'attention est invariante par permutation (elle traite la séquence comme un ensemble, un "sac de mots"). Il est donc nécessaire d'injecter explicitement d'informations de position (Positional Encodings) a priori dans la séquence $(x_i)_i$ pour reconstruire la topologie temporelle ou spatiale de la donnée si elle n'y est pas présent initialement.\\
-
-L'illustration \ref{self attention} détaille le processus du calcul de la représentation contextuelle d'un élément cible $x_4$ (représenté en vert). Comme expliqué à l'instant, les éléments de la séquence sont projetés dans l'espace des requêtes, clés et valeurs, les scores d'attention sont calculés puis la pondération d'attention en est déduite et la nouvelle représentation de $x_4$ que nous notons $y_4$, est calculée en effectuant une somme des valeurs pondérées par les poids d'attention :
-\begin{align*}
-	q_4 &= x_4 W^Q, & k_j &= x_j W^K, & v_i &= x_i W^V \\
-	a_{4,j} &= \frac{\langle q_4, k_j \rangle}{\sqrt{d_{att}}}, & p_{4,j} &= \frac{\exp(a_{4,j})}{\sum_{k} \exp(a_{4,k})}, & y_4 &= \sum_{j} p_{4,j} v_j
-\end{align*}
-Ainsi, le vecteur résultant $y_4$ est une synthèse dynamique du contenu de la séquence.\\
-
-\begin{figure}
-\begin{center} 
-\includegraphics[scale=0.4]{self_attention.png}
-\end{center}
-\caption{Illustration du mécanisme d'Auto-Attention par produit scalaire}
-\label{self attention}
-\end{figure}
-
-Le mécanisme canonique d'auto-attention se décline en deux variantes fondamentales pour répondre à des contraintes structurelles spécifiques : le respect de la causalité temporelle et l'intégration d'informations exogènes. La première variante, l'Attention Masquée (Masked Self-Attention), est indispensable aux tâches de génération séquentielle ou de simulation, où la prédiction de l'état présent ne doit physiquement pas dépendre du futur. Cette causalité est induite par une modification de la matrice des scores d'attention avant l'étape de normalisation : en forçant vers $-\infty$ les scores associés aux indices futurs, on garantit que la fonction Softmax leur attribue une probabilité strictement nulle. La partie gauche de la figure \ref{other attention} illustre ce mécanisme : lors du calcul de la représentation pour la position 4 (carré vert), l'accès aux positions ultérieures 5 et 6 est bloqué par le masque. Le vecteur de sortie $y_4$ est ainsi construit exclusivement par l'agrégation des valeurs passées et présentes ($v_1$ à $v_4$), préservant l'intégrité causale du flux de données.
-
-La seconde variante, l'Attention Croisée (Cross-Attention), permet le transfert d'information entre deux séquences distinctes, une opération centrale pour les tâches de traduction ou de reconstruction conditionnelle. Cette architecture repose sur une distribution asymétrique des rôles : la séquence source (qui détient l'information) projette les Clés ($K$) et les Valeurs ($V$), tandis que la séquence cible (qui cherche à s'enrichir ou se construire) émet les Requêtes ($Q$). La partie droite de la figure \ref{other attention} détaille cette interaction : la séquence du bas représente le flux cible, dont le troisième élément émet une requête $q_3$. Celle-ci est comparée à l'ensemble des clés $k$ issues de la séquence source (au milieu), permettant de pondérer les valeurs $v_1$ à $v_6$ correspondantes. Le vecteur résultant est donc une injection dynamique du contexte source pertinent au sein de la trajectoire cible, pilotée par les besoins de cette dernière.\\
-
-\begin{figure}
-\begin{center} 
-\includegraphics[scale=0.4]{other_attention.png}
-\end{center}
-\caption{Adaptations du mécanisme d'attention : restriction causale (gauche) et interaction inter-séquences (droite)}
-\label{other attention}
-\end{figure}
-
-L'expressivité du Transformer repose sur la parallélisation du mécanisme d'attention unitaire et son intégration dans différents blocs. Pour capturer des relations de natures variées (syntaxiques, sémantiques, ou causales par exemple) à différentes échelles, le modèle utilise l'Attention Multi-Têtes (Multi-Head Attention). Au lieu de calculer une unique matrice d'attention sur la dimension totale du modèle $d_{model}$, l'entrée est projetée linéairement $h$ fois dans des sous-espaces de dimension réduite $d_{att} = d_{model}/h$. Chaque "tête" calcule sa propre attention indépendamment, permettant au réseau de se focaliser simultanément sur différents aspects de la séquence. Les sorties de ces $h$ têtes sont ensuite concaténées et reprojetées par une matrice linéaire finale $W^O$ pour restaurer la dimension originale. Mathématiquement, cela permet de recombiner les informations extraites de chaque sous-espace pour former une représentation unifiée.\\
-
-La illustration \ref{encoder transformer} présente l'architecture de l'Encodeur, dédiée à l'analyse et à la construction d'une représentation contextuelle robuste de la séquence d'entrée. Elle est constituée d'un empilement de $N$ blocs identiques. Chaque bloc s'articule autour de deux sous-modules fonctionnels : l'Attention Multi-Têtes, qui capture les interactions globales entre les différentes positions, et un réseau de neurones dense (Feed-Forward Network - FFN) appliqué indépendamment à chaque position pour traiter les caractéristiques. Pour permettre de la profondeur au réseau, chaque sous-module est systématiquement encapsulé par une connexion résiduelle - qui additionne l'entrée du module à sa sortie pour préserver le flux de gradient - suivie d'une normalisation de couche (Layer Norm) assurant stabilité et une bonne propagation du gradient dans toutes les couches. Enfin, l'architecture étant invariante par permutation, l'ajout dès l'entrée d'un Encodage Positionnel est indispensable pour injecter la topologie temporelle ou spatiale dans les représentations vectorielles.\\
-
-\begin{figure}
-\begin{center} 
-\includegraphics[scale=0.4]{enc_transformer.png}
-\end{center}
-\caption{Architecture du bloc Encodeur du Transformer}
-\label{encoder transformer}
-\end{figure}
-
-L'illustration \ref{decoder transformer} détaille l'architecture du Décodeur, conçue pour la génération autorégressive. Bien qu'elle hérite de la structure modulaire stratifiée de l'encodeur, elle s'en distingue par l'intégration dans chaque bloc de mécanismes spécifiques dédiés à la prédiction. Le premier module est une Attention Multi-Têtes Masquée (Masked Self-Attention). Ce composant permet aux éléments de la séquence cible d'assimiler exclusivement les informations des états antérieurs, garantissant le respect de la causalité temporelle nécessaire à la génération. Le décodeur se singularise ensuite par l'insertion d'un troisième sous-module, intercalé avant le FFN : l'Attention Croisée (Cross-Attention). Ce module est l'interface de conditionnement du modèle ; il incorpore à la séquence cible (qui fournit les requêtes $Q$) l'information contextuelle extraite d'une source externe (l'encodeur, qui fournit les clés $K$ et les valeurs $V$). Chacun de ces trois sous-modules (Masked Self-Attention, Cross-Attention, FFN) est soumis au même schéma de stabilisation par connexion résiduelle et normalisation que l'encodeur, assurant une cohérence dynamique à travers tout le réseau.\\
-
-\begin{figure}
-\begin{center} 
-\includegraphics[scale=0.4]{dec_transformer.png}
-\end{center}
-\caption{Architecture du bloc Décodeur de Transformer}
-\label{decoder transformer}
-\end{figure}
-
-Dans une configuration complète de type "Séquence vers Séquence" (Seq2Seq), telle que celle utilisée pour la traduction automatique ou la simulation physique, la sortie de la pile d'encodeurs est connectée à l'entrée source de la pile de décodeurs. Cette architecture bipartite, illustrée figure \ref{full transformer}, permet de transformer une séquence d'entrée complexe (scénario tactique, signal bruité) en une représentation latente continue. À partir de cet espace, le décodeur reconstruit pas à pas la séquence de sortie cible (signal reconstruit), agissant ainsi comme un traducteur universel capable de modéliser des fonctions de transfert hautement non-linéaires entre des signaux de natures variées.
-
-\begin{figure}
-\begin{center} 
-\includegraphics[scale=0.4]{full_transformer.png}
-\end{center}
-\caption{Architecture Transformer complète pour le paradigme Séquence-vers-Séquence}
-\label{full transformer}
-\end{figure}
-
-\subsubsection{Le Transformer dans le texte : La divergence des architectures}
-Dans le traitement du langage naturel (NLP), le Transformer a provoqué une véritable explosion cambrienne des modèles, se scindant en trois familles distinctes.
-La première, celle des Encodeurs, est incarnée par BERT \cite{devlin_bert_2019}. Utilisant une attention bidirectionnelle, ces modèles excellent dans la compréhension et la classification, car chaque mot a accès au contexte passé et futur simultanément.
-La seconde, celle des Décodeurs, est dominée par la lignée GPT \cite{radford_improving_2018}, \cite{brown_language_2020}. Ici, l'attention est causale (masquée vers le futur), optimisée pour la génération autorégressive. C'est cette branche qui a mis en évidence les "lois d'échelle" (Scaling Laws), montrant que la performance de prédiction du prochain token suit une loi de puissance en fonction du nombre de paramètres et de données, ouvrant la voie aux gros modèles de langage (Large Language Model - LLM) actuels.
-La troisième famille, Encodeur-Décodeur, reste fidèle à l'architecture originale \cite{vaswani_attention_2017} pour les tâches de traduction ou de résumé. Le modèle T5 \cite{raffel_exploring_2020} a poussé ce paradigme à son extrême en reformulant toute tâche NLP (y compris la classification) comme un problème de génération de texte-vers-texte.
-
-\subsubsection{Le Transformer dans les systèmes temporels : Promesses et controverses}
-L'application des Transformers aux séries temporelles continues (consommation énergétique, trafic, météo) a fait l'objet de recherches intenses \cite{wen_transformers_2023}. L'attrait principal réside dans la capacité théorique de l'attention à capturer des corrélations à très long terme et des saisonnalités complexes que les RNN peinent à retenir.
-Des architectures spécifiques ont été proposées pour briser la complexité quadratique. Informer  \cite{zhou_informer_2021} introduit une attention "ProbSparse" pour sélectionner uniquement les interactions dominantes, réduisant la complexité à $O(N \log N)$. Autoformer \cite{wu_autoformer_2021} va plus loin en remplaçant le produit scalaire par une auto-corrélation pour mieux capturer les périodicités.
-Cependant, l'efficacité réelle des Transformers sur des signaux continus est contestée. Une étude \cite{zeng_are_2023} assure qu'un simple modèle linéaire bien calibré (DLinear) surpassait souvent des Transformers complexes sur les benchmarks standards. La raison invoquée est que l'attention, conçue pour la sémantique discrète, tend à sur-interpréter le bruit dans les signaux continus et perd l'information d'ordre temporel cruciale, malgré les encodages positionnels. Néanmoins, des approches récentes comme PatchTST \cite{nie_time_2023}, qui segmentent le signal en patchs (comme en vision) avant d'appliquer l'attention, semblent redonner l'avantage aux Transformers en traitant des dynamiques locales plutôt que des points isolés.
-
-\subsubsection{Le Transformer dans l'image : Patchs et hiérarchie}
-L'hégémonie des CNN en vision a été remise en cause par le Vision Transformer (ViT) \cite{dosovitskiy_image_2020}. En découpant l'image en une séquence de patchs carrés traités comme des mots, ViT a prouvé qu'un Transformer pur, sans biais inductif de convolution, pouvait atteindre l'état de l'art, à condition d'être pré-entraîné sur des volumes de données massifs (JFT-300M, \cite{sun_revisiting_2017}).
-Pour pallier le coût quadratique sur les images haute résolution et le manque de localité, l'architecture Swin Transformer \cite{liu_swin_2021} a réintroduit une structure hiérarchique similaire aux CNN. En calculant l'attention uniquement à l'intérieur de fenêtres locales glissantes (Shifted Windows), Swin combine la modélisation globale des Transformers avec l'efficacité locale des convolutions, devenant le standard actuel pour la segmentation et la détection d'objets.
-
-\subsubsection{Généralisation : Physique et Prise de décision}
-La capacité du Transformer à modéliser des graphes d'interaction arbitraires en fait un outil puissant pour la physique et la biologie. L'exemple le plus spectaculaire est AlphaFold 2 \cite{jumper_highly_2021}, qui a résolu le problème du repliement des protéines. Son module central, l'Evoformer, est une variante du Transformer qui traite la protéine comme un graphe dynamique, mettant à jour itérativement la représentation de la séquence d'acides aminés et la matrice de distances 3D par des mécanismes d'attention triangulaire.
-Enfin, dans le domaine du contrôle et de la simulation, le Decision Transformer \cite{chen_decision_2021} a reformulé l'apprentissage par renforcement comme un problème de modélisation de séquence. Au lieu d'estimer des fonctions de valeur ou des gradients de politique, ce modèle prédit simplement l'action suivante conditionnée par les états passés et la récompense désirée (le "Return-to-go"). Cette approche "générative" du contrôle permet d'appliquer les techniques de pré-entraînement des LLM à la robotique ou à la navigation d'agents autonomes, unifiant ainsi perception, prédiction physique et prise de décision sous une même architecture.
-
 \subsection{L'architecture Transformer}
 Si les réseaux récurrents ont introduit la mémoire et les réseaux convolutionnels la localité, l'architecture Transformer a proposé un changement de paradigme radical en postulant que l'interaction entre les éléments d'une séquence doit être modélisée par une relation directe de contenu à contenu, et non par une contrainte de proximité spatiale ou temporelle. Cette architecture, devenue l'épine dorsale de l'IA générative moderne, repose sur le mécanisme d'attention \cite{vaswani_attention_2017}.
 
@@ -474,16 +377,7 @@ L'architecture du Décodeur, présentée en figure \ref{decoder transformer}, ad
 \label{decoder transformer}
 \end{figure}
 
-\subsubsection{Micro-architecture : Le mécanisme d'Attention et ses variantes}
-Au cœur de ces blocs macroscopiques réside le véritable moteur de l'interaction : le mécanisme d'Attention. Contrairement aux architectures précédentes qui traitent la séquence par voisinage spatial ou récursivité temporelle, le Transformer repose sur un mécanisme d'interaction directe et globale. Ce processus permet à chaque élément de la séquence de construire sa propre représentation en agrégeant l'information de tous les autres éléments, pondérée par leur pertinence contextuelle. Cette interaction est formalisée par le mécanisme "Query-Key-Value". Pour chaque élément d'entrée $x_i$, trois vecteurs sont générés par projection linéaire via des matrices de poids apprenables $W^Q, W^K, W^V$ : une Requête $q_i = x_i W^Q$, une Clé $k_i = x_i W^K$ et une Valeur $v_i = x_i W^V$.\\
-
-Le cœur du calcul réside dans la mesure de compatibilité entre ces vecteurs, appelé score d'attention. Pour construire une nouvelle représentation d'un élément $x_i$ dans son contexte (c'est-à-dire le reste de la séquence), la requête associé $q_i$ est comparée aux clés de chaque élément de la séquence $(k_j)_j$, formant une séquence de score d'attention $(a_{i,j})_j$. Cette comparaison s'effectue souvent par un produit scalaire, mis à l'échelle par la racine de la dimension des clés $d_{att}$ pour stabiliser les gradients. Le score d'attention brute $a_{i,j}$ est généralement donné par:
-$$a_{i,j} = \frac{\langle q_i, k_j \rangle}{\sqrt{d_{att}}} $$
-Ces scores bruts sont ensuite convertis en une distribution de probabilité $(p_{i,j})_j$ par l'application d'une fonction Softmax :
-$$p_{i,j} = \text{softmax}((a_{i,k})_k)_j = \frac{\exp(a_{i,j})}{\sum_{k} \exp(a_{i,k})}$$
-La nouvelle représentation de $x_i$, notée $y_i$, est calculée comme une somme des vecteurs de Valeur $(v_j)_j$ pondérés par les poids d'attention $(p_{i,j})_j$ :
-$$y_i = \sum_{j} p_{i,j} v_j$$
-Il est intéressant de noter que l'opération d'attention est invariante par permutation (elle traite la séquence comme un ensemble, un "sac de mots"). Il est donc nécessaire d'injecter explicitement d'informations de position (Positional Encodings) a priori dans la séquence $(x_i)_i$ pour reconstruire la topologie temporelle ou spatiale de la donnée si elle n'y est pas présent initialement.\\
+\subsubsection{Micro-architecture : reste à intégrer ces illustrations}
 
 L'illustration \ref{self attention} détaille le processus du calcul de la représentation contextuelle d'un élément cible $x_4$ (représenté en vert). Comme expliqué à l'instant, les éléments de la séquence sont projetés dans l'espace des requêtes, clés et valeurs, les scores d'attention sont calculés puis la pondération d'attention en est déduite et la nouvelle représentation de $x_4$ que nous notons $y_4$, est calculée en effectuant une somme des valeurs pondérées par les poids d'attention :
 \begin{align*}
@@ -500,9 +394,9 @@ Ainsi, le vecteur résultant $y_4$ est une synthèse dynamique du contenu de la 
 \label{self attention}
 \end{figure}
 
-Le mécanisme canonique d'auto-attention se décline en deux variantes fondamentales pour répondre à des contraintes structurelles spécifiques : le respect de la causalité temporelle et l'intégration d'informations exogènes. La première variante, l'Attention Masquée (Masked Self-Attention), est indispensable aux tâches de génération séquentielle ou de simulation, où la prédiction de l'état présent ne doit physiquement pas dépendre du futur. Cette causalité est induite par une modification de la matrice des scores d'attention avant l'étape de normalisation : en forçant vers $-\infty$ les scores associés aux indices futurs, on garantit que la fonction Softmax leur attribue une probabilité strictement nulle. La partie gauche de la figure \ref{other attention} illustre ce mécanisme : lors du calcul de la représentation pour la position 4 (carré vert), l'accès aux positions ultérieures 5 et 6 est bloqué par le masque. Le vecteur de sortie $y_4$ est ainsi construit exclusivement par l'agrégation des valeurs passées et présentes ($v_1$ à $v_4$), préservant l'intégrité causale du flux de données.
+La partie gauche de la figure \ref{other attention} illustre l'attention masqué : lors du calcul de la représentation pour la position 4 (carré vert), l'accès aux positions ultérieures 5 et 6 est bloqué par le masque. Le vecteur de sortie $y_4$ est ainsi construit exclusivement par l'agrégation des valeurs passées et présentes ($v_1$ à $v_4$), préservant l'intégrité causale du flux de données.
 
-La seconde variante, l'Attention Croisée (Cross-Attention), permet le transfert d'information entre deux séquences distinctes, une opération centrale pour les tâches de traduction ou de reconstruction conditionnelle. Cette architecture repose sur une distribution asymétrique des rôles : la séquence source (qui détient l'information) projette les Clés ($K$) et les Valeurs ($V$), tandis que la séquence cible (qui cherche à s'enrichir ou se construire) émet les Requêtes ($Q$). La partie droite de la figure \ref{other attention} détaille cette interaction : la séquence du bas représente le flux cible, dont le troisième élément émet une requête $q_3$. Celle-ci est comparée à l'ensemble des clés $k$ issues de la séquence source (au milieu), permettant de pondérer les valeurs $v_1$ à $v_6$ correspondantes. Le vecteur résultant est donc une injection dynamique du contexte source pertinent au sein de la trajectoire cible, pilotée par les besoins de cette dernière.\\
+La partie droite de la figure \ref{other attention} détaille l'attention croisée: la séquence du bas représente le flux cible, dont le troisième élément émet une requête $q_3$. Celle-ci est comparée à l'ensemble des clés $k$ issues de la séquence source (au milieu), permettant de pondérer les valeurs $v_1$ à $v_6$ correspondantes. Le vecteur résultant est donc une injection dynamique du contexte source pertinent au sein de la trajectoire cible, pilotée par les besoins de cette dernière.\\
 
 \begin{figure}
 \begin{center} 
@@ -512,17 +406,88 @@ La seconde variante, l'Attention Croisée (Cross-Attention), permet le transfert
 \label{other attention}
 \end{figure}
 
-L'expressivité du Transformer repose sur la parallélisation du mécanisme d'attention unitaire et son intégration dans différents blocs. Pour capturer des relations de natures variées (syntaxiques, sémantiques, ou causales par exemple) à différentes échelles, le modèle utilise l'Attention Multi-Têtes (Multi-Head Attention). Au lieu de calculer une unique matrice d'attention sur la dimension totale du modèle $d_{model}$, l'entrée est projetée linéairement $h$ fois dans des sous-espaces de dimension réduite $d_{att} = d_{model}/h$. Chaque "tête" calcule sa propre attention indépendamment, permettant au réseau de se focaliser simultanément sur différents aspects de la séquence. Les sorties de ces $h$ têtes sont ensuite concaténées et reprojetées par une matrice linéaire finale $W^O$ pour restaurer la dimension originale. Mathématiquement, cela permet de recombiner les informations extraites de chaque sous-espace pour former une représentation unifiée.\\
+
+\subsubsection{Micro-architecture : Le mécanisme d'Attention et ses variantes}
+Au cœur de ces blocs macroscopiques réside le véritable moteur de l'interaction : le mécanisme d'Attention. Contrairement aux architectures précédentes qui traitent la séquence par voisinage spatial ou récursivité temporelle, le Transformer repose sur un mécanisme d'interaction directe et globale. Il est basé sur un principe de recherche d’information entre une séquence de requête $\mathcal{Q} = (q_i)_{i \in \mathbf{I}}$ et un séquence valeur $\mathcal{V} = (v_j)_{j \in \mathbb{J}}$ caractérisée par une séquence de clé $\mathcal{K} = (k_j)_{j \in \mathbb{J}}$. Les ensembles d'indiciations de ces séquences $\mathbb{I}$ et $\mathbb{J}$ ne sont pas nécessairement identiques. On notera aussi par commodité $\mathcal{KV} = ((k_j, v_j))_{j \in \mathbb{J}}$.\\
+
+En pratique, n’importe quelle séquence $(x_i)_{i \in \mathbb{X}}$, indicé par $\mathbb{X}$, peut être projetée dans un espace de représentation de requêtes $\mathcal{Q} = (Q(x_i))_{i \in \mathbb{X}}$, ou/et les espaces de représentation de clés et valeurs $\mathcal{K} = (K(x_i))_{i \in \mathbb{X}}$ et $\mathcal{V} = (V(x_i))_{i \in \mathbb{X}}$.
+Pour toute requête donnée $q \in \mathcal{Q}$ et toute clé candidate $k \in \mathcal{K}$, le score d'attention défini par le produit scalaire normalisé mesure la pertinence de l'association :
+\begin{equation}
+a(q, k) = \frac{<q,k>}{\sqrt{d_{att}}}
+\label{attentionscore}
+\end{equation}
+
+À requête $q$ fixée, la séquence de score d'attention $(a(q,k))_{k \in \mathcal{K}}$ est transformée par une fonction \textit{softmax} créant une pondération normalisée :
+\begin{equation}
+w(q,k, \mathcal{K}) = \frac{\exp(a(q, k))}{\sum_{k’ \in \mathcal{K}}\exp(a(q,k’))}
+\label{pondatt}
+\end{equation}
+L'opérateur d'attention, noté $\mathsf{A}$, agrège alors l'information en calculant la somme des valeurs $\mathcal{V}$ pondérées par ces poids :
+\begin{equation}
+\mathsf{A}(q, \mathcal{KV}) = \sum_{(k, v) \in \mathcal{KV}} w(q,k, \mathcal{K}) v
+\label{attentionoperator}
+\end{equation}
+
+Cette formulation mathématique traduit le concept intuitif : pour un couple $(k,v) \in \mathcal{KV}$, plus le score $a(q,k)$ est élevé, plus la contribution de la valeur $v$ est grande dans la représentation contextuelle de la requête $\mathsf{A}(q, \mathcal{KV})$.\\
+
+Le facteur déterminant pour l'expressivité du modèle est l'aspect multi-tête : au lieu d’avoir un triplet de fonctions de projection $Q,K,V$ nous disposons de $h$ triplets $(Q_l,K_l,V_l)_{1 \le l \le h}$. Cette diversité permet la capture d'une plus grande variété d'interaction en projetant les séquences dans $h$ espaces de comparaisons différents.
+N'importe quelle séquence traitée $(x_i)_{i \in \mathbb{X}}$, sera alors projetée simultanément dans $h$ espaces de représentation de requêtes
+\begin{equation}
+\mathcal{Q}_l =(Q_l(x_i))_{i \in \mathbb{X}}, \:\: 1 \le l \le h
+\label{queryeq}
+\end{equation}
+et/ou dans $h$ espaces de représentation des clés et valeurs
+\begin{equation}
+\mathcal{K}_l = (K_l(x_i))_{i \in \mathbb{X}},\:\: \mathcal{V}_l  = (V_l(x_i))_{i \in \mathbb{X}},\:\: 1 \le l \le h
+\end{equation}
+
+En pratique, on dispose donc de $h$ triplets de séquences $(\mathcal{Q}_l,\mathcal{K}_l,\mathcal{V}_l)_{1 \le l \le h}$.
+Le calcul de chaque tête d'attention est réalisé en appliquant, pour $l$ variant de $1$ à $h$, l'opérateur d'attention \ref{attentionoperator} aux séquences $\mathcal{Q}_l$, $\mathcal{K}_l$ et $\mathcal{V}_l$.
+$$ \mathsf{A}(q, \mathcal{KV}_l) = \sum_{(k, v) \in \mathcal{KV}_l} \frac{\exp(a(q, k))}{\sum_{k’ \in \mathcal{K}_l}\exp(a(q,k’))} v $$
+
+Enfin, les sorties des $h$ têtes sont concaténées (opérateur $\oplus$) pour former un vecteur de dimension $h \times d_{att}$. Ce vecteur est reprojeté par une fonction $O$, définissant ainsi l'opérateur d'attention multi-tête ($\mathsf{MHA}$ – Multi-Head Attention) applicable à tout élément $x$ de la séquence formant les requêtes \ref{queryeq}.
+\begin{equation}
+\mathsf{MHA}(x) = O( A(Q_1(x), \mathcal{KV}_1) \oplus A(Q_2(x), \mathcal{KV}_2) \oplus \dots \oplus A(Q_h(x), \mathcal{KV}_h))
+\label{MHAeq}
+\end{equation}
+\: \\
+
+Cette formulation générique connaît plusieurs variantes fondamentales qui se distinguent par la nature des interactions qu'elles sont sensées capturer.\\
+
+Premièrement, lorsque l'objectif est d'enrichir une séquence cible $(x_i)_{i \in \mathbb{I}}$ par le contexte d'une séquence source distincte $(y_j)_{j \in \mathbb{J}}$, on assigne les rôles de manière asymétrique. Pour toute tête $l \in \{1, \dots, h\}$, l'ensemble des requêtes est généré par la cible, soit $\mathcal{Q}_l = \{Q_l(x_i)\}_{i \in \mathbb{I}}$, tandis que l'ensemble des paires clé-valeur est généré par la source, soit $\mathcal{KV}_l = \{(K_l(y_j), V_l(y_j))\}_{j \in \mathbb{J}}$. La sortie est calculé en appliquant directement l'opération $\mathsf{MHA}$ \ref{MHAeq} à ces séquences de requêtes, clés et valeur, définissant ainsi l'opérateur d'attention croisée multi-tête ($\mathsf{MHCA}$ - Multi-Head Cross-Attention).\\
+
+Deuxièmement, lorsque l'objectif est d'enrichir une séquence $(x_i)_{i \in \mathbb{I}}$ par son propre contexte, la même séquence est utilisée pour tous les rôles. Pour toute tête $l$, on définit $\mathcal{Q}_l = \{Q_l(x_i)\}_{i \in \mathbb{I}}$ et $\mathcal{KV}_l = \{(K_l(x_i), V_l(x_i))\}_{i \in \mathbb{I}}$. L'application de l'opérateur $\mathsf{MHA}$ \ref{MHAeq} à ces séquences de requêtes, clés et valeurs définit alors l'opérateur d'auto-attention multi-tête ($\mathsf{MHSA}$ - Multi-Head Self-Attention).\\
+
+Enfin, la génération autorégressive impose un respect strict de la causalité. Dans l'objectif est d'enrichir une séquence $(x_i)_{i \in \mathbb{I}}$ par son propre contexte de manière causale, les rôles sont encore assignés de manière symétrique, mais le calcul du score d’attention est modifié.
+Soient $x_i$ et $x_j$ deux éléments de la séquence, générant respectivement une requête $q_i$ et une clé $k_j$ dans la tête $l$. Le score d'attention est redéfini ainsi:
+\begin{align}
+a(q_i, k_j) = &\frac{\langle q_i, k_j \rangle}{\sqrt{d_{att}}} &\text{si } j \le i \\
+& -\infty &\text{si } j > i
+\label{maskedattention}
+\end{align}
+\: \\
+
+Cette condition assure que pour tout $j > i$, le poids $w$ associé est nul, empêchant toute fuite d'information du futur vers le passé.
+L'attention masquée \ref{maskedattention} est réinjecté dans le calcul de pondération \ref{pondatt} et l'agrégation suit ensuite la mécanique standard jusqu'à l'équation \ref{MHAeq}, définissant ainsi l'opérateur d'auto-attention masquée multi-tête ($\mathsf{MMHSA}$ - Masked-Multi-Head Self-Attention).
 
 \subsubsection{Le Transformer dans le texte : La divergence des architectures}
-Dans le traitement du langage naturel (NLP), le Transformer a provoqué une véritable explosion cambrienne des modèles, se scindant en trois familles distinctes. La première, celle des Encodeurs, est incarnée par BERT \cite{devlin_bert_2019}. Utilisant une attention bidirectionnelle, ces modèles excellent dans la compréhension et la classification. La seconde, celle des Décodeurs, est dominée par la lignée GPT \cite{radford_improving_2018}, \cite{brown_language_2020}. Ici, l'attention est causale (masquée vers le futur), optimisée pour la génération autorégressive. C'est cette branche qui a mis en évidence les "lois d'échelle" (Scaling Laws), montrant que la performance de prédiction du prochain token suit une loi de puissance en fonction du nombre de paramètres et de données. La troisième famille, Encodeur-Décodeur, reste fidèle à l'architecture originale \cite{vaswani_attention_2017} pour les tâches de traduction. Le modèle T5 \cite{raffel_exploring_2020} a poussé ce paradigme à son extrême en reformulant toute tâche NLP (y compris la classification) comme un problème de génération de texte-vers-texte.
-\subsubsection{Le Transformer dans les systèmes temporels : Promesses et controverses}
-L'application des Transformers aux séries temporelles continues a fait l'objet de recherches intenses \cite{wen_transformers_2023}. L'attrait principal réside dans la capacité théorique de l'attention à capturer des corrélations à très long terme que les RNN peinent à retenir. Des architectures spécifiques ont été proposées pour briser la complexité quadratique. Informer \cite{zhou_informer_2021} introduit une attention "ProbSparse" pour sélectionner uniquement les interactions dominantes ($O(N \log N)$). Autoformer \cite{wu_autoformer_2021} va plus loin en remplaçant le produit scalaire par une auto-corrélation. Cependant, l'efficacité réelle des Transformers sur des signaux continus est contestée. Une étude \cite{zeng_are_2023} assure qu'un simple modèle linéaire bien calibré (DLinear) surpasse souvent des Transformers complexes, car l'attention tend à sur-interpréter le bruit dans les signaux continus. Néanmoins, des approches récentes comme PatchTST \cite{nie_time_2023}, qui segmentent le signal en patchs avant d'appliquer l'attention, semblent redonner l'avantage aux Transformers en traitant des dynamiques locales plutôt que des points isolés.
-\subsubsection{Le Transformer dans l'image : Patchs et hiérarchie}
-L'hégémonie des CNN en vision a été remise en cause par le Vision Transformer (ViT) \cite{dosovitskiy_image_2020}. En découpant l'image en une séquence de patchs carrés traités comme des mots, ViT a prouvé qu'un Transformer pur pouvait atteindre l'état de l'art, à condition d'être pré-entraîné sur des volumes de données massifs. Pour pallier le coût quadratique sur les images haute résolution et le manque de localité, l'architecture Swin Transformer \cite{liu_swin_2021} a réintroduit une structure hiérarchique similaire aux CNN. En calculant l'attention uniquement à l'intérieur de fenêtres locales glissantes (Shifted Windows), Swin combine la modélisation globale des Transformers avec l'efficacité locale des convolutions.
-\subsubsection{Généralisation : Physique et Prise de décision}
-La capacité du Transformer à modéliser des graphes d'interaction arbitraires en fait un outil puissant pour la physique et la biologie. L'exemple le plus spectaculaire est AlphaFold 2 \cite{jumper_highly_2021}, qui a résolu le problème du repliement des protéines. Son module central, l'Evoformer, est une variante du Transformer qui traite la protéine comme un graphe dynamique, mettant à jour itérativement la représentation par des mécanismes d'attention triangulaire. Enfin, dans le domaine du contrôle, le Decision Transformer \cite{chen_decision_2021} a reformulé l'apprentissage par renforcement comme un problème de modélisation de séquence. Au lieu d'estimer des fonctions de valeur, ce modèle prédit l'action suivante conditionnée par les états passés et la récompense désirée (le "Return-to-go"), unifiant ainsi perception, prédiction physique et prise de décision sous une même architecture.
+Dans le traitement du langage naturel (NLP), le Transformer a provoqué une véritable explosion cambrienne des modèles, se scindant en trois familles distinctes.
+La première, celle des Encodeurs, est incarnée par BERT \cite{devlin_bert_2019}. Utilisant une attention bidirectionnelle, ces modèles excellent dans la compréhension et la classification, car chaque mot a accès au contexte passé et futur simultanément.
+La seconde, celle des Décodeurs, est dominée par la lignée GPT \cite{radford_improving_2018}, \cite{brown_language_2020}. Ici, l'attention est causale (masquée vers le futur), optimisée pour la génération autorégressive. C'est cette branche qui a mis en évidence les "lois d'échelle" (Scaling Laws), montrant que la performance de prédiction du prochain token suit une loi de puissance en fonction du nombre de paramètres et de données, ouvrant la voie aux gros modèles de langage (Large Language Model - LLM) actuels.
+La troisième famille, Encodeur-Décodeur, reste fidèle à l'architecture originale \cite{vaswani_attention_2017} pour les tâches de traduction ou de résumé. Le modèle T5 \cite{raffel_exploring_2020} a poussé ce paradigme à son extrême en reformulant toute tâche NLP (y compris la classification) comme un problème de génération de texte-vers-texte.
 
+\subsubsection{Le Transformer dans les systèmes temporels : Promesses et controverses}
+L'application des Transformers aux séries temporelles continues (consommation énergétique, trafic, météo) a fait l'objet de recherches intenses \cite{wen_transformers_2023}. L'attrait principal réside dans la capacité théorique de l'attention à capturer des corrélations à très long terme et des saisonnalités complexes que les RNN peinent à retenir.
+Des architectures spécifiques ont été proposées pour briser la complexité quadratique. Informer  \cite{zhou_informer_2021} introduit une attention "ProbSparse" pour sélectionner uniquement les interactions dominantes, réduisant la complexité à $O(N \log N)$. Autoformer \cite{wu_autoformer_2021} va plus loin en remplaçant le produit scalaire par une auto-corrélation pour mieux capturer les périodicités.
+Cependant, l'efficacité réelle des Transformers sur des signaux continus est contestée. Une étude \cite{zeng_are_2023} assure qu'un simple modèle linéaire bien calibré (DLinear) surpassait souvent des Transformers complexes sur les benchmarks standards. La raison invoquée est que l'attention, conçue pour la sémantique discrète, tend à sur-interpréter le bruit dans les signaux continus et perd l'information d'ordre temporel cruciale, malgré les encodages positionnels. Néanmoins, des approches récentes comme PatchTST \cite{nie_time_2023}, qui segmentent le signal en patchs (comme en vision) avant d'appliquer l'attention, semblent redonner l'avantage aux Transformers en traitant des dynamiques locales plutôt que des points isolés.
+
+\subsubsection{Le Transformer dans l'image : Patchs et hiérarchie}
+L'hégémonie des CNN en vision a été remise en cause par le Vision Transformer (ViT) \cite{dosovitskiy_image_2020}. En découpant l'image en une séquence de patchs carrés traités comme des mots, ViT a prouvé qu'un Transformer pur, sans biais inductif de convolution, pouvait atteindre l'état de l'art, à condition d'être pré-entraîné sur des volumes de données massifs (JFT-300M, \cite{sun_revisiting_2017}).
+Pour pallier le coût quadratique sur les images haute résolution et le manque de localité, l'architecture Swin Transformer \cite{liu_swin_2021} a réintroduit une structure hiérarchique similaire aux CNN. En calculant l'attention uniquement à l'intérieur de fenêtres locales glissantes (Shifted Windows), Swin combine la modélisation globale des Transformers avec l'efficacité locale des convolutions, devenant le standard actuel pour la segmentation et la détection d'objets.
+
+\subsubsection{Généralisation : Physique et Prise de décision}
+La capacité du Transformer à modéliser des graphes d'interaction arbitraires en fait un outil puissant pour la physique et la biologie. L'exemple le plus spectaculaire est AlphaFold 2 \cite{jumper_highly_2021}, qui a résolu le problème du repliement des protéines. Son module central, l'Evoformer, est une variante du Transformer qui traite la protéine comme un graphe dynamique, mettant à jour itérativement la représentation de la séquence d'acides aminés et la matrice de distances 3D par des mécanismes d'attention triangulaire.
+Enfin, dans le domaine du contrôle et de la simulation, le Decision Transformer \cite{chen_decision_2021} a reformulé l'apprentissage par renforcement comme un problème de modélisation de séquence. Au lieu d'estimer des fonctions de valeur ou des gradients de politique, ce modèle prédit simplement l'action suivante conditionnée par les états passés et la récompense désirée (le "Return-to-go"). Cette approche "générative" du contrôle permet d'appliquer les techniques de pré-entraînement des LLM à la robotique ou à la navigation d'agents autonomes, unifiant ainsi perception, prédiction physique et prise de décision sous une même architecture.
 
 
 \subsection{Ancrage dans la problématique}
