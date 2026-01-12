@@ -4829,6 +4829,54 @@
       \verb https://proceedings.neurips.cc/paper_files/paper/2015/hash/29921001f2f04bd3baee84a12e98098f-Abstract.html
       \endverb
     \endentry
+    \entry{ba_layer_2016}{article}{}{}
+      \name{author}{3}{}{%
+        {{hash=750bb29ebaf655e36626e464041edb6d}{%
+           family={Ba},
+           familyi={B\bibinitperiod},
+           given={Jimmy\bibnamedelima Lei},
+           giveni={J\bibinitperiod\bibinitdelim L\bibinitperiod}}}%
+        {{hash=9ce51427604561924b91aa544c9c1b2a}{%
+           family={Kiros},
+           familyi={K\bibinitperiod},
+           given={Jamie\bibnamedelima Ryan},
+           giveni={J\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+        {{hash=813bd95fe553e6079cd53a567b238287}{%
+           family={Hinton},
+           familyi={H\bibinitperiod},
+           given={Geoffrey\bibnamedelima E.},
+           giveni={G\bibinitperiod\bibinitdelim E\bibinitperiod}}}%
+      }
+      \strng{namehash}{059348b2d0b3fe9a67209502c14057d1}
+      \strng{fullhash}{059348b2d0b3fe9a67209502c14057d1}
+      \strng{fullhashraw}{059348b2d0b3fe9a67209502c14057d1}
+      \strng{bibnamehash}{059348b2d0b3fe9a67209502c14057d1}
+      \strng{authorbibnamehash}{059348b2d0b3fe9a67209502c14057d1}
+      \strng{authornamehash}{059348b2d0b3fe9a67209502c14057d1}
+      \strng{authorfullhash}{059348b2d0b3fe9a67209502c14057d1}
+      \strng{authorfullhashraw}{059348b2d0b3fe9a67209502c14057d1}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{{arXiv} preprint {arXiv}:1607.06450}
+      \field{title}{Layer normalization}
+      \field{urlday}{8}
+      \field{urlmonth}{1}
+      \field{urlyear}{2026}
+      \field{year}{2016}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{file}
+      \verb Available Version (via Google Scholar):C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\JQWGR5FA\\Ba et al. - 2016 - Layer normalization.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/1607.06450
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/1607.06450
+      \endverb
+    \endentry
     \entry{devlin_bert_2019}{inproceedings}{}{}
       \name{author}{4}{}{%
         {{hash=13202969e372bc82318f9629cbdd199b}{%
@@ -4860,8 +4908,8 @@
       \strng{authornamehash}{ad8e2e2a80d28ade21e86852b804fc9b}
       \strng{authorfullhash}{e8bccd48302a14eeba57d9dce2f49ef4}
       \strng{authorfullhashraw}{e8bccd48302a14eeba57d9dce2f49ef4}
-      \field{sortinit}{8}
-      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{shorttitle}
       \field{booktitle}{Proceedings of the 2019 conference of the North American chapter of the association for computational linguistics: human language technologies, volume 1 (long and short papers)}
@@ -4946,8 +4994,8 @@
       \strng{authornamehash}{85437fe07696e4c57f916c83d4ba5581}
       \strng{authorfullhash}{93bab62437d812a600c60ebf4dd3c5be}
       \strng{authorfullhashraw}{93bab62437d812a600c60ebf4dd3c5be}
-      \field{sortinit}{8}
-      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{Advances in neural information processing systems}
@@ -5358,8 +5406,8 @@
       \strng{authornamehash}{3d1c620805148cd1766b8bf51af48276}
       \strng{authorfullhash}{16c26622d4dcecc6081b44b436223d1b}
       \strng{authorfullhashraw}{16c26622d4dcecc6081b44b436223d1b}
-      \field{sortinit}{9}
-      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{shorttitle}
       \field{abstract}{We propose an efficient design of Transformer-based models for multivariate time series forecasting and self-supervised representation learning. It is based on two key components: (i) segmentation of time series into subseries-level patches which are served as input tokens to Transformer; (ii) channel-independence where each channel contains a single univariate time series that shares the same embedding and Transformer weights across all the series. Patching design naturally has three-fold benefit: local semantic information is retained in the embedding; computation and memory usage of the attention maps are quadratically reduced given the same look-back window; and the model can attend longer history. Our channel-independent patch time series Transformer ({PatchTST}) can improve the long-term forecasting accuracy significantly when compared with that of {SOTA} Transformer-based models. We also apply our model to self-supervised pre-training tasks and attain excellent fine-tuning performance, which outperforms supervised training on large datasets. Transferring of masked pre-trained representation on one dataset to others also produces {SOTA} forecasting accuracy. Code is available at: https://github.com/yuqinie98/{PatchTST}.}
@@ -5423,8 +5471,8 @@
       \strng{authornamehash}{8da9d8303d53405bd5903d766902199f}
       \strng{authorfullhash}{6d71337b252c9662ace0d05e723d7d78}
       \strng{authorfullhashraw}{6d71337b252c9662ace0d05e723d7d78}
-      \field{sortinit}{9}
-      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{booktitle}{Proceedings of the {IEEE} international conference on computer vision}
@@ -5498,8 +5546,8 @@
       \strng{authornamehash}{009ce81df9957b336af5b72e75724e0c}
       \strng{authorfullhash}{4573863b62d52acb9c29e180e6f47f26}
       \strng{authorfullhashraw}{4573863b62d52acb9c29e180e6f47f26}
-      \field{sortinit}{9}
-      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{shorttitle}
       \field{booktitle}{Proceedings of the {IEEE}/{CVF} international conference on computer vision}
@@ -5691,54 +5739,6 @@
       \endverb
       \verb{url}
       \verb https://proceedings.neurips.cc/paper/2021/hash/7f489f642a0ddb10272b5c31057f0663-Abstract.html
-      \endverb
-    \endentry
-    \entry{ba_layer_2016}{article}{}{}
-      \name{author}{3}{}{%
-        {{hash=750bb29ebaf655e36626e464041edb6d}{%
-           family={Ba},
-           familyi={B\bibinitperiod},
-           given={Jimmy\bibnamedelima Lei},
-           giveni={J\bibinitperiod\bibinitdelim L\bibinitperiod}}}%
-        {{hash=9ce51427604561924b91aa544c9c1b2a}{%
-           family={Kiros},
-           familyi={K\bibinitperiod},
-           given={Jamie\bibnamedelima Ryan},
-           giveni={J\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
-        {{hash=813bd95fe553e6079cd53a567b238287}{%
-           family={Hinton},
-           familyi={H\bibinitperiod},
-           given={Geoffrey\bibnamedelima E.},
-           giveni={G\bibinitperiod\bibinitdelim E\bibinitperiod}}}%
-      }
-      \strng{namehash}{059348b2d0b3fe9a67209502c14057d1}
-      \strng{fullhash}{059348b2d0b3fe9a67209502c14057d1}
-      \strng{fullhashraw}{059348b2d0b3fe9a67209502c14057d1}
-      \strng{bibnamehash}{059348b2d0b3fe9a67209502c14057d1}
-      \strng{authorbibnamehash}{059348b2d0b3fe9a67209502c14057d1}
-      \strng{authornamehash}{059348b2d0b3fe9a67209502c14057d1}
-      \strng{authorfullhash}{059348b2d0b3fe9a67209502c14057d1}
-      \strng{authorfullhashraw}{059348b2d0b3fe9a67209502c14057d1}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{{arXiv} preprint {arXiv}:1607.06450}
-      \field{title}{Layer normalization}
-      \field{urlday}{8}
-      \field{urlmonth}{1}
-      \field{urlyear}{2026}
-      \field{year}{2016}
-      \field{dateera}{ce}
-      \field{urldateera}{ce}
-      \verb{file}
-      \verb Available Version (via Google Scholar):C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\JQWGR5FA\\Ba et al. - 2016 - Layer normalization.pdf:application/pdf
-      \endverb
-      \verb{urlraw}
-      \verb https://arxiv.org/abs/1607.06450
-      \endverb
-      \verb{url}
-      \verb https://arxiv.org/abs/1607.06450
       \endverb
     \endentry
   \enddatalist

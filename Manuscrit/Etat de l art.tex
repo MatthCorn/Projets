@@ -342,7 +342,7 @@ Le flux de traitement débute par l'encodeur qui traite la source $(x_i)_i$. Gr�
 Ce principe est illustré par la figure \ref{simple transformer} à travers le cône de perception du vecteur $z_3$. Puisque $z_3$ a pour fonction de prédire $y_3$, il a accès via l'attention croisée à la totalité de la source $(x_i)_i$, mais son accès à la séquence cible est strictement contraint aux antécédents $S, y_1$ et $y_2$ via le masquage. Ainsi, chaque vecteur $z_k$ est construit en intégrant tout le contexte source $(h_i)_{1 \le i \le N}$ et le passé cible $(y_i)_{1 \le i \le k-1}$, sans jamais violer la causalité temporelle en accédant à $y_k$ ou à ses successeurs. Une fois la séquence $(z_i)_i$ calculée, une simple projection linéaire suivie d'un Softmax permet d'obtenir les probabilités de chaque symbole $y_k$.\\
 \begin{figure}
 \begin{center}
-\includegraphics[scale=0.4]{simple_transformer.png}
+\includegraphics[scale=0.55]{simple_transformer.png}
 \end{center}
 \caption{Flux d'information macroscopique dans l'architecture Transformer Encodeur-Décodeur}
 \label{simple transformer}
@@ -377,36 +377,6 @@ L'architecture du Décodeur, présentée en figure \ref{decoder transformer}, ad
 \label{decoder transformer}
 \end{figure}
 
-\subsubsection{Micro-architecture : reste à intégrer ces illustrations}
-
-L'illustration \ref{self attention} détaille le processus du calcul de la représentation contextuelle d'un élément cible $x_4$ (représenté en vert). Comme expliqué à l'instant, les éléments de la séquence sont projetés dans l'espace des requêtes, clés et valeurs, les scores d'attention sont calculés puis la pondération d'attention en est déduite et la nouvelle représentation de $x_4$ que nous notons $y_4$, est calculée en effectuant une somme des valeurs pondérées par les poids d'attention :
-\begin{align*}
-	q_4 &= x_4 W^Q, & k_j &= x_j W^K, & v_i &= x_i W^V \\
-	a_{4,j} &= \frac{\langle q_4, k_j \rangle}{\sqrt{d_{att}}}, & p_{4,j} &= \frac{\exp(a_{4,j})}{\sum_{k} \exp(a_{4,k})}, & y_4 &= \sum_{j} p_{4,j} v_j
-\end{align*}
-Ainsi, le vecteur résultant $y_4$ est une synthèse dynamique du contenu de la séquence.\\
-
-\begin{figure}
-\begin{center} 
-\includegraphics[scale=0.4]{self_attention.png}
-\end{center}
-\caption{Illustration du mécanisme d'Auto-Attention par produit scalaire}
-\label{self attention}
-\end{figure}
-
-La partie gauche de la figure \ref{other attention} illustre l'attention masqué : lors du calcul de la représentation pour la position 4 (carré vert), l'accès aux positions ultérieures 5 et 6 est bloqué par le masque. Le vecteur de sortie $y_4$ est ainsi construit exclusivement par l'agrégation des valeurs passées et présentes ($v_1$ à $v_4$), préservant l'intégrité causale du flux de données.
-
-La partie droite de la figure \ref{other attention} détaille l'attention croisée: la séquence du bas représente le flux cible, dont le troisième élément émet une requête $q_3$. Celle-ci est comparée à l'ensemble des clés $k$ issues de la séquence source (au milieu), permettant de pondérer les valeurs $v_1$ à $v_6$ correspondantes. Le vecteur résultant est donc une injection dynamique du contexte source pertinent au sein de la trajectoire cible, pilotée par les besoins de cette dernière.\\
-
-\begin{figure}
-\begin{center} 
-\includegraphics[scale=0.4]{other_attention.png}
-\end{center}
-\caption{Adaptations du mécanisme d'attention : restriction causale (gauche) et interaction inter-séquences (droite)}
-\label{other attention}
-\end{figure}
-
-
 \subsubsection{Micro-architecture : Le mécanisme d'Attention et ses variantes}
 Au cœur de ces blocs macroscopiques réside le véritable moteur de l'interaction : le mécanisme d'Attention. Contrairement aux architectures précédentes qui traitent la séquence par voisinage spatial ou récursivité temporelle, le Transformer repose sur un mécanisme d'interaction directe et globale. Il est basé sur un principe de recherche d’information entre une séquence de requête $\mathcal{Q} = (q_i)_{i \in \mathbf{I}}$ et un séquence valeur $\mathcal{V} = (v_j)_{j \in \mathbb{J}}$ caractérisée par une séquence de clé $\mathcal{K} = (k_j)_{j \in \mathbb{J}}$. Les ensembles d'indiciations de ces séquences $\mathbb{I}$ et $\mathbb{J}$ ne sont pas nécessairement identiques. On notera aussi par commodité $\mathcal{KV} = ((k_j, v_j))_{j \in \mathbb{J}}$.\\
 
@@ -419,18 +389,18 @@ a(q, k) = \frac{<q,k>}{\sqrt{d_{att}}}
 
 À requête $q$ fixée, la séquence de score d'attention $(a(q,k))_{k \in \mathcal{K}}$ est transformée par une fonction \textit{softmax} créant une pondération normalisée :
 \begin{equation}
-w(q,k, \mathcal{K}) = \frac{\exp(a(q, k))}{\sum_{k’ \in \mathcal{K}}\exp(a(q,k’))}
+p(q,k, \mathcal{K}) = \frac{\exp(a(q, k))}{\sum_{k’ \in \mathcal{K}}\exp(a(q,k’))}
 \label{pondatt}
 \end{equation}
 L'opérateur d'attention, noté $\mathsf{A}$, agrège alors l'information en calculant la somme des valeurs $\mathcal{V}$ pondérées par ces poids :
 \begin{equation}
-\mathsf{A}(q, \mathcal{KV}) = \sum_{(k, v) \in \mathcal{KV}} w(q,k, \mathcal{K}) v
+\mathsf{A}(q, \mathcal{KV}) = \sum_{(k, v) \in \mathcal{KV}} p(q,k, \mathcal{K}) v
 \label{attentionoperator}
 \end{equation}
 
 Cette formulation mathématique traduit le concept intuitif : pour un couple $(k,v) \in \mathcal{KV}$, plus le score $a(q,k)$ est élevé, plus la contribution de la valeur $v$ est grande dans la représentation contextuelle de la requête $\mathsf{A}(q, \mathcal{KV})$.\\
 
-Le facteur déterminant pour l'expressivité du modèle est l'aspect multi-tête : au lieu d’avoir un triplet de fonctions de projection $Q,K,V$ nous disposons de $h$ triplets $(Q_l,K_l,V_l)_{1 \le l \le h}$. Cette diversité permet la capture d'une plus grande variété d'interaction en projetant les séquences dans $h$ espaces de comparaisons différents.
+Le facteur déterminant pour l'expressivité du mécanisme est l'aspect multi-tête : au lieu d’avoir un triplet de fonctions de projection $Q,K,V$ nous disposons de $h$ triplets $(Q_l,K_l,V_l)_{1 \le l \le h}$. Cette diversité permet la capture d'une plus grande variété d'interaction en projetant les séquences dans $h$ espaces de comparaisons différents.
 N'importe quelle séquence traitée $(x_i)_{i \in \mathbb{X}}$, sera alors projetée simultanément dans $h$ espaces de représentation de requêtes
 \begin{equation}
 \mathcal{Q}_l =(Q_l(x_i))_{i \in \mathbb{X}}, \:\: 1 \le l \le h
@@ -454,9 +424,17 @@ Enfin, les sorties des $h$ têtes sont concaténées (opérateur $\oplus$) pour 
 
 Cette formulation générique connaît plusieurs variantes fondamentales qui se distinguent par la nature des interactions qu'elles sont sensées capturer.\\
 
-Premièrement, lorsque l'objectif est d'enrichir une séquence cible $(x_i)_{i \in \mathbb{I}}$ par le contexte d'une séquence source distincte $(y_j)_{j \in \mathbb{J}}$, on assigne les rôles de manière asymétrique. Pour toute tête $l \in \{1, \dots, h\}$, l'ensemble des requêtes est généré par la cible, soit $\mathcal{Q}_l = \{Q_l(x_i)\}_{i \in \mathbb{I}}$, tandis que l'ensemble des paires clé-valeur est généré par la source, soit $\mathcal{KV}_l = \{(K_l(y_j), V_l(y_j))\}_{j \in \mathbb{J}}$. La sortie est calculé en appliquant directement l'opération $\mathsf{MHA}$ \ref{MHAeq} à ces séquences de requêtes, clés et valeur, définissant ainsi l'opérateur d'attention croisée multi-tête ($\mathsf{MHCA}$ - Multi-Head Cross-Attention).\\
+Premièrement, lorsque l'objectif est d'enrichir une séquence cible $(x_i)_{i \in \mathbb{I}}$ par le contexte d'une séquence source distincte $(y_j)_{j \in \mathbb{J}}$, on assigne les rôles de manière asymétrique. Pour toute tête $l \in \{1, \dots, h\}$, l'ensemble des requêtes est généré par la cible, soit $\mathcal{Q}_l = \{Q_l(x_i)\}_{i \in \mathbb{I}}$, tandis que l'ensemble des paires clé-valeur est généré par la source, soit $\mathcal{KV}_l = \{(K_l(y_j), V_l(y_j))\}_{j \in \mathbb{J}}$. La sortie est calculé en appliquant directement l'opération $\mathsf{MHA}$ \ref{MHAeq} à ces séquences de requêtes, clés et valeur, définissant ainsi l'opérateur d'attention croisée multi-tête ($\mathsf{MHCA}$ - Multi-Head Cross-Attention). Une schématisation de ce mécanisme sur une unique tête est représenté dans la figure \ref{fig:cross_att}. \\
 
-Deuxièmement, lorsque l'objectif est d'enrichir une séquence $(x_i)_{i \in \mathbb{I}}$ par son propre contexte, la même séquence est utilisée pour tous les rôles. Pour toute tête $l$, on définit $\mathcal{Q}_l = \{Q_l(x_i)\}_{i \in \mathbb{I}}$ et $\mathcal{KV}_l = \{(K_l(x_i), V_l(x_i))\}_{i \in \mathbb{I}}$. L'application de l'opérateur $\mathsf{MHA}$ \ref{MHAeq} à ces séquences de requêtes, clés et valeurs définit alors l'opérateur d'auto-attention multi-tête ($\mathsf{MHSA}$ - Multi-Head Self-Attention).\\
+\begin{figure}[htbp]
+\begin{center} 
+\includegraphics[scale=0.4]{cross_attention.png}
+\end{center}
+\caption{Illustration de l'Attention Croisée ($\mathsf{MHCA}$). Les requêtes (en bleu) proviennent de la séquence cible et interrogent l'intégralité du contexte source (clés en jaune). À gauche, la requête $q_3$ agrège l'information de la séquence source (à l'origine des clés et valeurs $\mathcal{KV})$) pour construire $A(q_3,\mathcal{KV})) $, représenté dans la cellule verte. Le cône d'interaction est représenté en dégradé de bleu.  À droite, le même calcul est effectué indépendamment pour la requête $q_5$. Cette indépendance des calculs permet leur parallélisation.}
+\label{fig:cross_att}
+\end{figure}
+
+Deuxièmement, lorsque l'objectif est d'enrichir une séquence $(x_i)_{i \in \mathbb{I}}$ par son propre contexte, la même séquence est utilisée pour tous les rôles. Pour toute tête $l$, on définit $\mathcal{Q}_l = \{Q_l(x_i)\}_{i \in \mathbb{I}}$ et $\mathcal{KV}_l = \{(K_l(x_i), V_l(x_i))\}_{i \in \mathbb{I}}$. L'application de l'opérateur $\mathsf{MHA}$ \ref{MHAeq} à ces séquences de requêtes, clés et valeurs définit alors l'opérateur d'auto-attention multi-tête ($\mathsf{MHSA}$ - Multi-Head Self-Attention). Une schématisation de ce mécanisme sur une unique tête est représenté à gauche de la figure \ref{fig:compare_att}. \\
 
 Enfin, la génération autorégressive impose un respect strict de la causalité. Dans l'objectif est d'enrichir une séquence $(x_i)_{i \in \mathbb{I}}$ par son propre contexte de manière causale, les rôles sont encore assignés de manière symétrique, mais le calcul du score d’attention est modifié.
 Soient $x_i$ et $x_j$ deux éléments de la séquence, générant respectivement une requête $q_i$ et une clé $k_j$ dans la tête $l$. Le score d'attention est redéfini ainsi:
@@ -467,8 +445,18 @@ a(q_i, k_j) = &\frac{\langle q_i, k_j \rangle}{\sqrt{d_{att}}} &\text{si } j \le
 \end{align}
 \: \\
 
-Cette condition assure que pour tout $j > i$, le poids $w$ associé est nul, empêchant toute fuite d'information du futur vers le passé.
-L'attention masquée \ref{maskedattention} est réinjecté dans le calcul de pondération \ref{pondatt} et l'agrégation suit ensuite la mécanique standard jusqu'à l'équation \ref{MHAeq}, définissant ainsi l'opérateur d'auto-attention masquée multi-tête ($\mathsf{MMHSA}$ - Masked-Multi-Head Self-Attention).
+Cette condition assure que pour tout $j > i$, le poids $p$ associé est nul, empêchant toute fuite d'information du futur vers le passé.
+L'attention masquée \ref{maskedattention} est réinjecté dans le calcul de pondération \ref{pondatt} et l'agrégation suit ensuite la mécanique standard jusqu'à l'équation \ref{MHAeq}, définissant ainsi l'opérateur d'auto-attention masquée multi-tête ($\mathsf{MMHSA}$ - Masked Multi-Head Self-Attention). Une schématisation de ce mécanisme sur une unique tête est représenté à droite de la figure \ref{fig:compare_att}. 
+
+\begin{figure}[htbp]
+\begin{center} 
+\includegraphics[scale=0.4]{self_attention.png}
+\end{center}
+\caption{Comparaison des modes d'Auto-Attention. La séquence d'entré nourrit à la fois $\mathcal{Q}$ et $\mathcal{KV}$. À gauche, l'interaction est globale. La requête $q_4$ agrège l'information de toute la séquence pour construire  $A(q_4,\mathcal{KV}))$, représenté dans la cellule verte. Le cône d'interaction est représenté en dégradé de bleu. À droite, l'interaction est causale. L'accès aux clés futures est donc bloqué (score $-\infty$), cette restriction est visible sur le cône d'interaction en nuance de bleu. La requête $q_4$ agrège aux positions $j \le 4$ pour construire $A(q_4,\mathcal{KV}))$, qui constitue une prédiction des états futurs.  Pour les deux images, on représente en arrière plan les même calculs pour la requête $q_6$, réalisés de manière indépendante.}
+\label{fig:compare_att}
+\end{figure}
+
+
 
 \subsubsection{Le Transformer dans le texte : La divergence des architectures}
 Dans le traitement du langage naturel (NLP), le Transformer a provoqué une véritable explosion cambrienne des modèles, se scindant en trois familles distinctes.
