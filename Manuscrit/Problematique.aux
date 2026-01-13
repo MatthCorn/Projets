@@ -11,18 +11,23 @@
 \@writefile{toc}{\contentsline {section}{\numberline {3.2}Description de l'intégration du capteur de Mesures de Soutien Électronique et son fonctionnement}{11}{section.3.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2.1}Contexte opérationnel : La maîtrise du spectre électromagnétique}{11}{subsection.3.2.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2.2}Chaîne de traitement de l'information}{11}{subsection.3.2.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3.1}{\ignorespaces Visualisation de l'apport tactique. Le système transforme un environnement EM dense (gauche) en une situation tactique intelligible (droite), permettant la localisation et la classification des forces en présence.}}{12}{figure.caption.2}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:apport_tactic}{{3.1}{12}{Visualisation de l'apport tactique. Le système transforme un environnement EM dense (gauche) en une situation tactique intelligible (droite), permettant la localisation et la classification des forces en présence}{figure.caption.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2.3}Architecture et fonctionnement du capteur}{12}{subsection.3.2.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {3.3}Description de l'environnement numérique}{13}{section.3.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.1}Motivations}{13}{subsection.3.3.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.2}Architecture et fonctionnement de l'environnement numérique}{14}{subsection.3.3.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {3.4}Identification du goulot d'étranglement et limites opérationnelles}{15}{section.3.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.1}L'impératif de temps réel et le coût de la simulation}{15}{subsection.3.4.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.2}Analyse de la complexité et localisation du verrou}{16}{subsection.3.4.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {3.5}Formalisation et complexité du problème d'apprentissage}{16}{section.3.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.1}Nature des données et définition formelle de la tâche}{16}{subsection.3.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.2}Une double problématique : Traitement de séquence et Génération}{17}{subsection.3.5.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3.2}{\ignorespaces Illustration des chaînes de transformation des informations pour un capteur réel (haut), un environnement virtuel (milieu) et un environnement virtuel avec IA (bas). \textbf  {Haut :} La vérité terrain dicte l'émission d'impulsions, le signal physique est intercepté et les PDW sont déterminées par le capteur (en pointillés noirs). Ces informations sont agrégées (désentrelacement, pistage) et analysées (identification) pour produire un renseignement exploitable sur la vérité terrain initiale. \textbf  {Milieu :} Un environnement virtuel (périmètre en pointillés bleus) modélise la physique, à partir de l'émission des impulsions jusqu'à la caractérisation des PDW. La simulation des blocs est comportementale. \textbf  {Droite :} Le goulot d'étranglement (en pointillés rouges) est remplacé par un module d'IA. L'enchainement des blocs de traitement constitue encore un environnement virtuel mais avec IA.}}{13}{figure.caption.3}\protected@file@percent }
+\newlabel{fig:env}{{3.2}{13}{Illustration des chaînes de transformation des informations pour un capteur réel (haut), un environnement virtuel (milieu) et un environnement virtuel avec IA (bas). \textbf {Haut :} La vérité terrain dicte l'émission d'impulsions, le signal physique est intercepté et les PDW sont déterminées par le capteur (en pointillés noirs). Ces informations sont agrégées (désentrelacement, pistage) et analysées (identification) pour produire un renseignement exploitable sur la vérité terrain initiale. \textbf {Milieu :} Un environnement virtuel (périmètre en pointillés bleus) modélise la physique, à partir de l'émission des impulsions jusqu'à la caractérisation des PDW. La simulation des blocs est comportementale. \textbf {Droite :} Le goulot d'étranglement (en pointillés rouges) est remplacé par un module d'IA. L'enchainement des blocs de traitement constitue encore un environnement virtuel mais avec IA}{figure.caption.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.3}Description de l'environnement virtuel}{15}{section.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.1}Motivations}{15}{subsection.3.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.2}Architecture et fonctionnement de l'environnement virtuel}{15}{subsection.3.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3.4}Identification du goulot d'étranglement et limites opérationnelles}{17}{section.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.1}L'impératif de temps réel et le coût de la simulation}{17}{subsection.3.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.2}Analyse de la complexité et localisation du verrou}{17}{subsection.3.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3.5}Formalisation et complexité du problème d'apprentissage}{18}{section.3.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.1}Nature des données et définition formelle de la tâche}{18}{subsection.3.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.2}Une double problématique : Traitement de séquence et Génération}{18}{subsection.3.5.2}\protected@file@percent }
 \@setckpt{Problematique}{
-\setcounter{page}{18}
+\setcounter{page}{20}
 \setcounter{equation}{0}
 \setcounter{enumi}{0}
 \setcounter{enumii}{0}
@@ -37,10 +42,10 @@
 \setcounter{subsubsection}{0}
 \setcounter{paragraph}{0}
 \setcounter{subparagraph}{0}
-\setcounter{figure}{0}
+\setcounter{figure}{2}
 \setcounter{table}{0}
 \setcounter{parentequation}{0}
-\setcounter{caption@flags}{0}
+\setcounter{caption@flags}{2}
 \setcounter{continuedfloat}{0}
 \setcounter{mdf@globalstyle@cnt}{0}
 \setcounter{mdfcountframes}{0}
