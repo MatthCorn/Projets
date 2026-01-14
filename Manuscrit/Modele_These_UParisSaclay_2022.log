@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.11.20)  13 JAN 2026 17:24
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.11.20)  14 JAN 2026 17:08
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1606,84 +1606,91 @@ LaTeX Font Info:    Font shape `T1/opensans-TOsF/m/sc' will be
 LaTeX Font Info:    Font shape `T1/opensans-TOsF/m/sc' will be
 (Font)              scaled to size 10.40245pt on input line 24.
 [11]
-<env.png, id=438, 1323.44438pt x 657.2053pt>
+<dragon.png, id=438, 1324.95pt x 502.12593pt>
+File: dragon.png Graphic file (type png)
+<use dragon.png>
+Package pdftex.def Info: dragon.png  used on input line 36.
+(pdftex.def)             Requested size: 397.48807pt x 150.63893pt.
+<env.png, id=440, 1323.44438pt x 657.2053pt>
 File: env.png Graphic file (type png)
 <use env.png>
-Package pdftex.def Info: env.png  used on input line 36.
-(pdftex.def)             Requested size: 529.36838pt x 262.87746pt.
+Package pdftex.def Info: env.png  used on input line 46.
+(pdftex.def)             Requested size: 397.03638pt x 197.1631pt.
 
-Overfull \hbox (74.12427pt too wide) in paragraph at lines 36--37
- [] 
- []
-
-
-Overfull \hbox (1.4744pt too wide) in paragraph at lines 43--44
+Overfull \hbox (1.4744pt too wide) in paragraph at lines 53--54
 \T1/opensans-TOsF/m/sc/10.95 numérique trans-pa-rente ; il consti-tue une chaîn
 e de trai-te-ments phy-siques et lo-giques qui condi-
  []
 
-[12 <./apport_tactic.png>] [13 <./env.png>]
-Underfull \vbox (badness 4819) has occurred while \output is active []
-
- [14]
-Underfull \hbox (badness 10000) in paragraph at lines 61--62
+[12 <./apport_tactic.png> <./dragon.png>] [13 <./env.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 59--61
 
  []
 
-[15]
-Overfull \hbox (7.85065pt too wide) in paragraph at lines 63--64
+
+Underfull \vbox (badness 4819) has occurred while \output is active []
+
+ [14]
+<IOexemple.png, id=474, 867.24pt x 361.35pt>
+File: IOexemple.png Graphic file (type png)
+<use IOexemple.png>
+Package pdftex.def Info: IOexemple.png  used on input line 67.
+(pdftex.def)             Requested size: 433.61894pt x 180.67456pt.
+
+[15 <./IOexemple.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 81--82
+
+ []
+
+[16]
+Overfull \hbox (7.85065pt too wide) in paragraph at lines 83--84
 \T1/opensans-TOsF/m/sc/10.95 trale et la ca-rac-té-ri-sa-tion tem-po-relle. Pou
 r s'abs-traire de la si-mu-la-tion coû-teuse du temps continu,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 63--64
+Underfull \hbox (badness 10000) in paragraph at lines 83--84
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 65--66
+Underfull \hbox (badness 10000) in paragraph at lines 85--86
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 67--68
+Underfull \hbox (badness 10000) in paragraph at lines 87--88
 
  []
 
 
 Underfull \vbox (badness 2035) has occurred while \output is active []
 
- [16]
-[17]
-Underfull \hbox (badness 10000) in paragraph at lines 81--82
+ [17]
+[18]
+Underfull \hbox (badness 10000) in paragraph at lines 101--102
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 86--87
+Underfull \hbox (badness 10000) in paragraph at lines 106--107
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 88--89
+Underfull \hbox (badness 10000) in paragraph at lines 108--109
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 90--91
+Underfull \hbox (badness 10000) in paragraph at lines 110--111
 
  []
 
-[18]) [19]
+[19]) [20]
 \openout2 = `"Etat de l art.aux"'.
 
- (Etat de l art.tex [20
-
-
-
-
-]
+ (Etat de l art.tex
 Chapitre 4.
 
 Overfull \hbox (5.0637pt too wide) in paragraph at lines 27--28
@@ -1691,7 +1698,12 @@ Overfull \hbox (5.0637pt too wide) in paragraph at lines 27--28
 nnues pour leurs ca-pa-ci-tés à trai-ter des sé-quences,
  []
 
-[21] [22]
+[21
+
+
+
+
+] [22]
 Chapitre 5.
 [23
 
@@ -1755,13 +1767,13 @@ Underfull \hbox (badness 10000) in paragraph at lines 237--239
 
  []
 
-<BasicConvolution.png, id=657, 1152.55594pt x 533.74406pt>
+<BasicConvolution.png, id=665, 1152.55594pt x 533.74406pt>
 File: BasicConvolution.png Graphic file (type png)
 <use BasicConvolution.png>
 Package pdftex.def Info: BasicConvolution.png  used on input line 242.
 (pdftex.def)             Requested size: 288.13828pt x 133.43568pt.
 [34]
-<ComparaisonConvolution.png, id=668, 941.76843pt x 399.74344pt>
+<ComparaisonConvolution.png, id=676, 941.76843pt x 399.74344pt>
 File: ComparaisonConvolution.png Graphic file (type png)
 <use ComparaisonConvolution.png>
 Package pdftex.def Info: ComparaisonConvolution.png  used on input line 252.
@@ -1781,13 +1793,13 @@ Underfull \hbox (badness 10000) in paragraph at lines 297--299
 
  []
 
-<BasicRNN.png, id=732, 770.12718pt x 249.93375pt>
+<BasicRNN.png, id=740, 770.12718pt x 249.93375pt>
 File: BasicRNN.png Graphic file (type png)
 <use BasicRNN.png>
 Package pdftex.def Info: BasicRNN.png  used on input line 302.
 (pdftex.def)             Requested size: 269.54854pt x 87.47812pt.
 [39 <./BasicRNN.png>]
-<ComparaisonRNN.png, id=742, 1030.60031pt x 338.01282pt>
+<ComparaisonRNN.png, id=750, 1030.60031pt x 338.01282pt>
 File: ComparaisonRNN.png Graphic file (type png)
 <use ComparaisonRNN.png>
 Package pdftex.def Info: ComparaisonRNN.png  used on input line 312.
@@ -1808,23 +1820,23 @@ Underfull \hbox (badness 10000) in paragraph at lines 340--341
  []
 
 [42]
-<simple_transformer.png, id=790, 538.26094pt x 271.0125pt>
+<simple_transformer.png, id=798, 538.26094pt x 271.0125pt>
 File: simple_transformer.png Graphic file (type png)
 <use simple_transformer.png>
 Package pdftex.def Info: simple_transformer.png  used on input line 345.
 (pdftex.def)             Requested size: 296.04443pt x 149.05733pt.
-<full_transformer.png, id=792, 715.17188pt x 608.2725pt>
+<full_transformer.png, id=800, 715.17188pt x 608.2725pt>
 File: full_transformer.png Graphic file (type png)
 <use full_transformer.png>
 Package pdftex.def Info: full_transformer.png  used on input line 354.
 (pdftex.def)             Requested size: 286.06367pt x 243.30469pt.
-<enc_transformer.png, id=796, 721.19438pt x 590.205pt>
+<enc_transformer.png, id=804, 721.19438pt x 590.205pt>
 File: enc_transformer.png Graphic file (type png)
 <use enc_transformer.png>
 Package pdftex.def Info: enc_transformer.png  used on input line 364.
 (pdftex.def)             Requested size: 288.47264pt x 236.0778pt.
  [43 <./simple_transformer.png>]
-<dec_transformer.png, id=808, 854.44218pt x 615.80063pt>
+<dec_transformer.png, id=816, 854.44218pt x 615.80063pt>
 File: dec_transformer.png Graphic file (type png)
 <use dec_transformer.png>
 Package pdftex.def Info: dec_transformer.png  used on input line 374.
@@ -1896,7 +1908,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 427--428
 
  []
 
-<cross_attention.png, id=839, 1087.06125pt x 599.23875pt>
+<cross_attention.png, id=847, 1087.06125pt x 599.23875pt>
 File: cross_attention.png Graphic file (type png)
 <use cross_attention.png>
 Package pdftex.def Info: cross_attention.png  used on input line 431.
@@ -1918,7 +1930,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 445--447
 
  []
 
-<self_attention.png, id=846, 1090.82532pt x 588.69937pt>
+<self_attention.png, id=854, 1090.82532pt x 588.69937pt>
 File: self_attention.png Graphic file (type png)
 <use self_attention.png>
 Package pdftex.def Info: self_attention.png  used on input line 453.
@@ -1997,7 +2009,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 13--13
  []
 
 [55]
-<Charte_graphique_ups.png, id=928, 534.19576pt x 186.6975pt>
+<Charte_graphique_ups.png, id=936, 534.19576pt x 186.6975pt>
 File: Charte_graphique_ups.png Graphic file (type png)
 <use Charte_graphique_ups.png>
 Package pdftex.def Info: Charte_graphique_ups.png  used on input line 17.
@@ -2351,7 +2363,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 13--13
 
 ]
 Chapitre 14.
-<Logo_ups.png, id=1031, 380.17032pt x 160.34906pt>
+<Logo_ups.png, id=1039, 380.17032pt x 160.34906pt>
 File: Logo_ups.png Graphic file (type png)
 <use Logo_ups.png>
 Package pdftex.def Info: Logo_ups.png  used on input line 3.
@@ -2364,7 +2376,7 @@ NA-TIONS DES
 
 LaTeX Font Info:    Font shape `TS1/opensans-TOsF/b/n' will be
 (Font)              scaled to size 10.40245pt on input line 6.
-<logo_usp_AAIF.png, id=1032, 372.8475pt x 85.41pt>
+<logo_usp_AAIF.png, id=1040, 372.8475pt x 85.41pt>
 File: logo_usp_AAIF.png Graphic file (type png)
 <use logo_usp_AAIF.png>
 Package pdftex.def Info: logo_usp_AAIF.png  used on input line 7.
@@ -2374,7 +2386,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 6--8
 
  []
 
-<logo_usp_SEIF.png, id=1033, 341.64pt x 85.41pt>
+<logo_usp_SEIF.png, id=1041, 341.64pt x 85.41pt>
 File: logo_usp_SEIF.png Graphic file (type png)
 <use logo_usp_SEIF.png>
 Package pdftex.def Info: logo_usp_SEIF.png  used on input line 10.
@@ -2384,7 +2396,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 9--11
 
  []
 
-<logo_usp_PIF.png, id=1034, 362.3355pt x 85.41pt>
+<logo_usp_PIF.png, id=1042, 362.3355pt x 85.41pt>
 File: logo_usp_PIF.png Graphic file (type png)
 <use logo_usp_PIF.png>
 Package pdftex.def Info: logo_usp_PIF.png  used on input line 12.
@@ -2394,7 +2406,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 12--13
 
  []
 
-<logo_usp_SSMMH.png, id=1035, 372.8475pt x 85.41pt>
+<logo_usp_SSMMH.png, id=1043, 372.8475pt x 85.41pt>
 File: logo_usp_SSMMH.png Graphic file (type png)
 <use logo_usp_SSMMH.png>
 Package pdftex.def Info: logo_usp_SSMMH.png  used on input line 15.
@@ -2413,7 +2425,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 14--16
 
 [73 <./Logo_ups.png> <./logo_usp_AAIF.png> <./logo_usp_SEIF.png> <./logo_usp_PI
 F.png> <./logo_usp_SSMMH.png>]
-<logo_usp_SEVE.png, id=1047, 482.7636pt x 110.814pt>
+<logo_usp_SEVE.png, id=1055, 482.7636pt x 110.814pt>
 File: logo_usp_SEVE.png Graphic file (type png)
 <use logo_usp_SEVE.png>
 Package pdftex.def Info: logo_usp_SEVE.png  used on input line 18.
@@ -2423,7 +2435,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 17--19
 
  []
 
-<logo_usp_BIOSIGNE.png, id=1048, 372.8475pt x 85.41pt>
+<logo_usp_BIOSIGNE.png, id=1056, 372.8475pt x 85.41pt>
 File: logo_usp_BIOSIGNE.png Graphic file (type png)
 <use logo_usp_BIOSIGNE.png>
 Package pdftex.def Info: logo_usp_BIOSIGNE.png  used on input line 21.
@@ -2433,7 +2445,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 20--22
 
  []
 
-<logo_usp_ITFA.png, id=1049, 372.8475pt x 85.41pt>
+<logo_usp_ITFA.png, id=1057, 372.8475pt x 85.41pt>
 File: logo_usp_ITFA.png Graphic file (type png)
 <use logo_usp_ITFA.png>
 Package pdftex.def Info: logo_usp_ITFA.png  used on input line 23.
@@ -2443,7 +2455,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 23--24
 
  []
 
-<logo_usp_EDSP.png, id=1050, 372.8475pt x 85.41pt>
+<logo_usp_EDSP.png, id=1058, 372.8475pt x 85.41pt>
 File: logo_usp_EDSP.png Graphic file (type png)
 <use logo_usp_EDSP.png>
 Package pdftex.def Info: logo_usp_EDSP.png  used on input line 26.
@@ -2453,7 +2465,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 25--27
 
  []
 
-<logo_usp_2MIB.png, id=1051, 372.8475pt x 85.41pt>
+<logo_usp_2MIB.png, id=1059, 372.8475pt x 85.41pt>
 File: logo_usp_2MIB.png Graphic file (type png)
 <use logo_usp_2MIB.png>
 Package pdftex.def Info: logo_usp_2MIB.png  used on input line 29.
@@ -2463,7 +2475,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 28--30
 
  []
 
-<logo_usp_EDOM.png, id=1052, 372.8475pt x 85.41pt>
+<logo_usp_EDOM.png, id=1060, 372.8475pt x 85.41pt>
 File: logo_usp_EDOM.png Graphic file (type png)
 <use logo_usp_EDOM.png>
 Package pdftex.def Info: logo_usp_EDOM.png  used on input line 32.
@@ -2475,7 +2487,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 31--33
 
 [74 <./logo_usp_SEVE.png> <./logo_usp_BIOSIGNE.png> <./logo_usp_ITFA.png> <./lo
 go_usp_EDSP.png> <./logo_usp_2MIB.png> <./logo_usp_EDOM.png>]
-<logo_usp_INTERFACES.png, id=1063, 477.9456pt x 112.7412pt>
+<logo_usp_INTERFACES.png, id=1071, 477.9456pt x 112.7412pt>
 File: logo_usp_INTERFACES.png Graphic file (type png)
 <use logo_usp_INTERFACES.png>
 Package pdftex.def Info: logo_usp_INTERFACES.png  used on input line 35.
@@ -2485,7 +2497,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 34--36
 
  []
 
-<logo_usp_EDMH.png, id=1064, 352.152pt x 85.41pt>
+<logo_usp_EDMH.png, id=1072, 352.152pt x 85.41pt>
 File: logo_usp_EDMH.png Graphic file (type png)
 <use logo_usp_EDMH.png>
 Package pdftex.def Info: logo_usp_EDMH.png  used on input line 38.
@@ -2504,7 +2516,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 40--42
 
  []
 
-<logo_usp_PHENIICS.png, id=1065, 408.3255pt x 85.41pt>
+<logo_usp_PHENIICS.png, id=1073, 408.3255pt x 85.41pt>
 File: logo_usp_PHENIICS.png Graphic file (type png)
 <use logo_usp_PHENIICS.png>
 Package pdftex.def Info: logo_usp_PHENIICS.png  used on input line 44.
@@ -2514,7 +2526,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 43--45
 
  []
 
-<logo_usp_SDSV.png, id=1066, 372.8475pt x 85.41pt>
+<logo_usp_SDSV.png, id=1074, 372.8475pt x 85.41pt>
 File: logo_usp_SDSV.png Graphic file (type png)
 <use logo_usp_SDSV.png>
 Package pdftex.def Info: logo_usp_SDSV.png  used on input line 47.
@@ -2524,7 +2536,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 46--48
 
  []
 
-<logo_usp_SMEMAG.png, id=1067, 372.8475pt x 85.41pt>
+<logo_usp_SMEMAG.png, id=1075, 372.8475pt x 85.41pt>
 File: logo_usp_SMEMAG.png Graphic file (type png)
 <use logo_usp_SMEMAG.png>
 Package pdftex.def Info: logo_usp_SMEMAG.png  used on input line 50.
@@ -2536,7 +2548,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 49--51
 
 [75 <./logo_usp_INTERFACES.png> <./logo_usp_EDMH.png> <./logo_usp_PHENIICS.png>
  <./logo_usp_SDSV.png> <./logo_usp_SMEMAG.png>]
-<logo_usp_STIC.png, id=1077, 372.8475pt x 85.41pt>
+<logo_usp_STIC.png, id=1085, 372.8475pt x 85.41pt>
 File: logo_usp_STIC.png Graphic file (type png)
 <use logo_usp_STIC.png>
 Package pdftex.def Info: logo_usp_STIC.png  used on input line 53.
@@ -2546,7 +2558,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 52--54
 
  []
 
-<logo_usp_ABIES.png, id=1078, 362.3355pt x 85.41pt>
+<logo_usp_ABIES.png, id=1086, 362.3355pt x 85.41pt>
 File: logo_usp_ABIES.png Graphic file (type png)
 <use logo_usp_ABIES.png>
 Package pdftex.def Info: logo_usp_ABIES.png  used on input line 56.
@@ -2556,7 +2568,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 55--57
 
  []
 
-<logo_usp_CBMS.png, id=1079, 372.8475pt x 85.41pt>
+<logo_usp_CBMS.png, id=1087, 372.8475pt x 85.41pt>
 File: logo_usp_CBMS.png Graphic file (type png)
 <use logo_usp_CBMS.png>
 Package pdftex.def Info: logo_usp_CBMS.png  used on input line 59.
@@ -2566,7 +2578,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 58--60
 
  []
 
-<logo_usp_SSH.png, id=1080, 352.152pt x 85.41pt>
+<logo_usp_SSH.png, id=1088, 352.152pt x 85.41pt>
 File: logo_usp_SSH.png Graphic file (type png)
 <use logo_usp_SSH.png>
 Package pdftex.def Info: logo_usp_SSH.png  used on input line 62.
@@ -2576,7 +2588,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 61--63
 
  []
 
-<logo_usp_DEM.png, id=1081, 369.5625pt x 85.41pt>
+<logo_usp_DEM.png, id=1089, 369.5625pt x 85.41pt>
 File: logo_usp_DEM.png Graphic file (type png)
 <use logo_usp_DEM.png>
 Package pdftex.def Info: logo_usp_DEM.png  used on input line 65.
@@ -2983,10 +2995,10 @@ l'.
 
  ) 
 Here is how much of TeX's memory you used:
- 35356 strings out of 467871
- 695774 string characters out of 5418375
- 1612906 words of memory out of 5000000
- 63298 multiletter control sequences out of 15000+600000
+ 35374 strings out of 467871
+ 696087 string characters out of 5418375
+ 1614534 words of memory out of 5000000
+ 63314 multiletter control sequences out of 15000+600000
  657196 words of font info for 129 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  102i,15n,117p,2577b,2296s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -3011,10 +3023,10 @@ th/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy6.pfb><C:/U
 sers/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.p
 fb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/sy
 mbols/msbm10.pfb>
-Output written on Modele_These_UParisSaclay_2022.pdf (88 pages, 2533209 bytes).
+Output written on Modele_These_UParisSaclay_2022.pdf (88 pages, 2627304 bytes).
 
 PDF statistics:
- 1716 PDF objects out of 1728 (max. 8388607)
- 308 named destinations out of 1000 (max. 500000)
- 782 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1724 PDF objects out of 1728 (max. 8388607)
+ 310 named destinations out of 1000 (max. 500000)
+ 792 words of extra memory for PDF output out of 10000 (max. 10000000)
 

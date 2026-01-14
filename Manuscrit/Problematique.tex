@@ -11,17 +11,17 @@ Le chapitre sur la problématique contiendra les éléments suivants:
 
 \chapter{Problématique}
 \section{Introduction}
-L'objectif central de ces travaux de recherche est d'accélérer par intelligence artificielle la simulation d'un environnement virtuel modélisant l'interaction entre des impulsions RADAR et un capteur de Mesures de Soutien Électronique (ESM - Electronic Support Measures). Ce chapitre s'attache à définir précisément le périmètre et les enjeux de cette problématique. Dans un premier temps, nous détaillerons le fonctionnement opérationnel du capteur ESM et son intégration au sein de la chaîne de traitement de l'information tactique. Cette analyse contextuelle permettra de justifier la nécessité de disposer d'un environnement virtuel de simulation capable de reproduire fidèlement le comportement du capteur pour des besoins de validation. Nous exposerons ensuite l'architecture de cet environnement virtuel afin d'identifier les verrous technologiques qui limitent actuellement ses performances, en localisant spécifiquement le goulot d'étranglement computationnel. Cette analyse conduira finalement à la formalisation du problème d'accélération sous l'angle de l'apprentissage automatique, en mettant en évidence sa double nature de traitement de séquence et de génération conditionnelle.
+L'objectif central de ces travaux de recherche est d'accélérer par intelligence artificielle la simulation d'un environnement virtuel (VE - Virtual Environment) modélisant l'interaction entre des impulsions RADAR et un capteur de Mesures de Soutien Électronique (ESM - Electronic Support Measures). Ce chapitre s'attache à définir précisément le périmètre et les enjeux de cette problématique. Dans un premier temps, nous détaillerons le fonctionnement opérationnel du capteur ESM et son intégration au sein de la chaîne de traitement de l'information tactique. Cette analyse contextuelle permettra de justifier la nécessité de disposer d'un VE de simulation capable de reproduire fidèlement le comportement du capteur pour des besoins de validation. Nous exposerons ensuite l'architecture de cet VE afin d'identifier les verrous technologiques qui limitent actuellement ses performances, en localisant spécifiquement le goulot d'étranglement computationnel. Cette analyse conduira finalement à la formalisation du problème d'accélération sous l'angle de l'apprentissage automatique, en mettant en évidence sa double nature de traitement de séquence et de génération conditionnelle.
 \section{Description de l'intégration du capteur de Mesures de Soutien Électronique et son fonctionnement}
 
 \subsection{Contexte opérationnel : La maîtrise du spectre électromagnétique} 
 Dans le cadre d'un scénario de guerre électronique (GE), la survie de l'aéronef dépend de sa capacité à percevoir et comprendre son environnement électromagnétique (EM). L'appareil évolue dans un espace abondant d'émissions provenant de RADAR adverses ou civils, au sol ou aéroportés, cherchant eux-mêmes à détecter leur cible. Les caractéristiques techniques de ces signaux, telles que la fréquence, la largeur d'impulsion ou la période de répétition, constituent une signature unique permettant d'identifier l'émetteur et d'en déduire ses intentions tactiques (veille, poursuite, engagement). La mission des capteurs de ESM, illustrée dans la partie droite de la figure \ref{fig:apport_tactic}, est alors d'assurer une écoute passive et discrète du spectre pour détecter, de caractériser et de localiser ces menaces potentielles. Ils fournissent ainsi les données critiques à la décision stratégique et aux contre-mesures. 
 
-\begin{figure}
+\begin{figure}[htbp]
 \begin{center} 
 \includegraphics[scale=0.4]{apport_tactic.png}
 \end{center}
-\caption{Visualisation de l'apport tactique. Le système transforme un environnement EM dense (gauche) en une situation tactique intelligible (droite), permettant la localisation et la classification des forces en présence.}
+\caption{Visualisation de l'apport tactique. Le système transforme un environnement EM dense (gauche) en une situation tactique intelligible (droite), permettant la localisation et la classification des plateformes présentes.}
 \label{fig:apport_tactic}
 \end{figure}
 
@@ -29,13 +29,23 @@ Dans le cadre d'un scénario de guerre électronique (GE), la survie de l'aéron
 L'intégration du capteur s'inscrit dans une architecture de traitement séquentielle visant à transformer un signal physique brut en renseignement tactique exploitable. Le champ EM incident est initialement capté par le capteur ESM, qui opère la première conversion fondamentale : il détecte les impulsions radar et construit en temps réel des descripteurs numériques, les PDW (Pulse Description Word - Mot de Description d'Impulsion). Chaque PDW synthétise les paramètres mesurés de l'impulsion : Date d'arrivée (ToA), Largeur d'impulsion (LI), Fréquence, Niveau de puissance et Direction d'arrivée (DoA).
 Ce flux continu de PDW alimente ensuite les algorithmes de traitement de haut niveau. Une étape de désentrelacement regroupe d'abord les impulsions par émetteur sur un horizon temporel court, isolant les trains d'impulsions cohérents. Ces regroupements élémentaires sont ensuite consolidés par un processus de pistage (tracking) qui suit l'évolution des émetteurs sur le long terme pour en caractériser la cinématique et le mode de fonctionnement. Finalement, ces pistes enrichies sont confrontées à des bases de données de signatures pour identifier formellement le système d'arme associé et évaluer le niveau de menace immédiat.
 
-La figure \ref{fig:env} présente la chaîne de traitement d’un capteur réel (haut) ainsi que deux approches de simulation correspondant à un environnement virtuel (milieu) et un environnement virtuel avec IA (bas).
+Le flux de PDW généré peut avoir l'allure de \ref{fig:dragon}.
 
-\begin{figure}
+\begin{figure}[htbp]
 \begin{center} 
-\includegraphics[scale=0.4]{env.png}
+\includegraphics[scale=0.3]{dragon.png}
 \end{center}
-\caption{Illustration des chaînes de transformation des informations pour un capteur réel (haut), un environnement virtuel (milieu) et un environnement virtuel avec IA (bas). \textbf{Haut :} La vérité terrain dicte l'émission d'impulsions, le signal physique est intercepté et les PDW sont déterminées par le capteur (en pointillés noirs). Ces informations sont agrégées (désentrelacement, pistage) et analysées (identification) pour produire un renseignement exploitable sur la vérité terrain initiale. \textbf{Milieu :} Un environnement virtuel (périmètre en pointillés bleus) modélise la physique, à partir de l'émission des impulsions jusqu'à la caractérisation des PDW. La simulation des blocs est comportementale. \textbf{Droite :} Le goulot d'étranglement (en pointillés rouges) est remplacé par un module d'IA. L'enchainement des blocs de traitement constitue encore un environnement virtuel mais avec IA.}
+\caption{c'est pas un dragon}
+\label{fig:dragon}
+\end{figure}
+
+La figure \ref{fig:env} présente la chaîne de traitement d’un capteur réel (haut) ainsi que deux approches de simulation correspondant à un VE (milieu) et un VE avec IA (bas).
+
+\begin{figure}[htbp]
+\begin{center} 
+\includegraphics[scale=0.3]{env.png}
+\end{center}
+\caption{Illustration des chaînes de transformation des informations pour un capteur réel (haut), un VE (milieu) et un VE avec IA (bas). \textbf{Haut :} La vérité terrain dicte l'émission d'impulsions, le signal physique est intercepté et les PDW sont déterminées par le capteur (en pointillés noirs). Ces informations sont agrégées (désentrelacement, pistage) et analysées (identification) pour produire un renseignement exploitable sur la vérité terrain initiale. \textbf{Milieu :} Un VE (périmètre en pointillés bleus) modélise la physique, à partir de l'émission des impulsions jusqu'à la caractérisation des PDW. La simulation des blocs est comportementale. \textbf{Bas :} Le goulot d'étranglement du VE (en pointillés rouges) est remplacé par un module d'IA. L'enchainement des blocs de traitement constitue encore un VE mais avec IA.}
 \label{fig:env}
 \end{figure}
 
@@ -46,9 +56,19 @@ Le traitement débute par la conversion du champ EM incident en signal électriq
 
 Une fois les DNA identifiées sur la fenêtre d'analyse courante, elles sont transmises collectivement au système de suivi temporel. Ce module reçoit ainsi un paquet de détections simultanées qu'il doit associer aux ressources mémoires actives, qualifiées de "pistes" \cite{mardia_new_1989}. Le processus d'association est séquentiel et hiérarchisé : les DNA sont traitées une à une, par ordre de priorité croissante selon leur amplitude, afin de privilégier le suivi des signaux les plus énergétiques. Pour chaque détection candidate, le système recherche une correspondance parmi les pistes actives sur la base de critères de tolérance prédéfinis (proximité fréquentielle, cohérence de niveau). Une contrainte stricte d'unicité s'applique alors : une piste ne peut être mise à jour qu'une seule fois par fenêtre temporelle. En cas de corrélation valide avec une piste disponible (non encore mise à jour sur ce cycle), celle-ci intègre les nouveaux paramètres et prolonge sa durée de vie. Si aucune association n'est possible, ou si la piste candidate a déjà été servie par une détection prioritaire, une nouvelle piste est ouverte pour le signal, sous réserve qu'une ressource mémoire soit libre. La clôture d'une piste et la génération du PDW final \cite{adamy_ew_2001} s'opèrent finalement lorsqu'elle n'a pas reçu de mise à jour durant une période seuil ou lorsque l'impulsion dépasse sa limite de durée opérationnelle.
 
-La limitation matérielle du nombre de ces mémoires, conjuguée à leur logique d'allocation, engendre des artefacts de segmentation spécifiques. Premièrement, une contrainte de latence maximale impose de segmenter artificiellement les impulsions très longues ou continues pour assurer des mises à jour périodiques, générant une série de PDW contigus. Deuxièmement, les échecs de résolution d'ambiguïté peuvent provoquer une rupture de suivi prématurée. Si le masquage est transitoire, la piste reprend après une interruption, scindant l'impulsion en plusieurs entités. Si le masquage persiste jusqu'à la fin de l'émission, le suivi s'arrête définitivement, tronquant la fin du signal. Troisièmement, la saturation des ressources mémoires en environnement dense impacte directement la détection : si aucune piste n'est disponible à l'apparition du signal, il sera ignoré sur l'instant. Cela conduit soit à une acquisition tardive dès la libération d'une ressource, amputant alors le début du signal, soit à une perte totale de l'impulsion si aucune ressource ne se libère à temps. À l'inverse de ces phénomènes de fragmentation ou de perte, la résolution temporelle finie des bancs de filtres peut conduire à l'amalgame de deux impulsions brèves et rapprochées en un seul descripteur.
+La limitation matérielle du nombre de ces mémoires, conjuguée à leur logique d'allocation, engendre des artefacts de segmentation spécifiques. Premièrement, une contrainte de latence maximale impose de segmenter artificiellement les impulsions très longues ou continues pour assurer des mises à jour périodiques, générant une série de PDW contigus. Deuxièmement, les échecs de résolution d'ambiguïté peuvent provoquer une rupture de suivi prématurée. Si le masquage est transitoire, la piste reprend après une interruption, scindant l'impulsion en plusieurs entités. Si le masquage persiste jusqu'à la fin de l'émission, le suivi s'arrête définitivement, tronquant la fin du signal. Troisièmement, la saturation des ressources mémoires en environnement dense impacte directement la détection : si aucune piste n'est disponible à l'apparition du signal, il sera ignoré sur l'instant. Cela conduit soit à une acquisition tardive dès la libération d'une ressource, amputant alors le début du signal, soit à une perte totale de l'impulsion si aucune ressource ne se libère à temps. À l'inverse de ces phénomènes de fragmentation ou de perte, la résolution temporelle finie des bancs de filtres peut conduire à l'amalgame de deux impulsions brèves et rapprochées en un seul descripteur. 
+Ainsi, la séquence de PDW produite ne doit pas être considérée comme une simple mesure dégradée de la réalité, mais comme une reconstruction interprétée, portant intrinsèquement la signature des limitations fréquentielles et des heuristiques de gestion de ressources du capteur. \\
 
-Ainsi, la séquence de PDW produite ne doit pas être considérée comme une simple mesure dégradée de la réalité, mais comme une reconstruction interprétée, portant intrinsèquement la signature des limitations fréquentielles et des heuristiques de gestion de ressources du capteur.
+La figure \ref{fig:IOex} établit une comparaison entre l'état des informations présentes dans le signal analogique en sortie d'antenne, considérée comme une quasi-vérité terrain, et l'état des informations après caractérisation par le capteur, c'est-à-dire les PDW interceptés. Cette visualisation exploite une représentation dans le plan temps-fréquence pour mettre en exergue les phénomènes d'altération de l'information liée au traitement numérique.
+
+
+\begin{figure}[htbp]
+\begin{center} 
+\includegraphics[scale=0.5]{IOexemple.png}
+\end{center}
+\caption{Représentation dans un plan temps-fréquence des informations conceptuelles transitant dans la chaîne de traitement, visualisées à l'étape précédant (gauche) et succédant (droite) à la modélisation du processus de DCI (Détection et Caractérisation des Impulsions). La couleur de chaque rectangle encode l'amplitude du PDW. Les annotations identifient les dégradations structurelles induites par la chaîne de traitement : (a) Fusion de signaux distincts, (b) Disparition d'impulsion (non-détection), (c) Scission artificielle d'une impulsion continue, (d) Troncature avant, (e) Troncature arrière}
+\label{fig:IOex}
+\end{figure}
 
 \section{Description de l'environnement virtuel}
 \subsection{Motivations}
