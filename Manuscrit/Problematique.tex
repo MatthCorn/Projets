@@ -27,17 +27,7 @@ Dans le cadre d'un scénario de guerre électronique (GE), la survie de l'aéron
 
 \subsection{Chaîne de traitement de l'information} 
 L'intégration du capteur s'inscrit dans une architecture de traitement séquentielle visant à transformer un signal physique brut en renseignement tactique exploitable. Le champ EM incident est initialement capté par le capteur ESM, qui opère la première conversion fondamentale : il détecte les impulsions radar et construit en temps réel des descripteurs numériques, les PDW (Pulse Description Word - Mot de Description d'Impulsion). Chaque PDW synthétise les paramètres mesurés de l'impulsion : Date d'arrivée (ToA), Largeur d'impulsion (LI), Fréquence, Niveau de puissance et Direction d'arrivée (DoA).
-Ce flux continu de PDW alimente ensuite les algorithmes de traitement de haut niveau. Une étape de désentrelacement regroupe d'abord les impulsions par émetteur sur un horizon temporel court, isolant les trains d'impulsions cohérents. Ces regroupements élémentaires sont ensuite consolidés par un processus de pistage (tracking) qui suit l'évolution des émetteurs sur le long terme pour en caractériser la cinématique et le mode de fonctionnement. Finalement, ces pistes enrichies sont confrontées à des bases de données de signatures pour identifier formellement le système d'arme associé et évaluer le niveau de menace immédiat.
-
-Le flux de PDW généré peut avoir l'allure de \ref{fig:dragon}.
-
-\begin{figure}[htbp]
-\begin{center} 
-\includegraphics[scale=0.3]{dragon.png}
-\end{center}
-\caption{c'est pas un dragon}
-\label{fig:dragon}
-\end{figure}
+Ce flux continu de PDW alimente ensuite les algorithmes de traitement de haut niveau. Une étape de désentrelacement regroupe d'abord les impulsions par émetteur sur un horizon temporel court, isolant les trains d'impulsions cohérents. Ces regroupements élémentaires sont ensuite consolidés par un processus de pistage (tracking) qui suit l'évolution des émetteurs sur le long terme pour en caractériser la cinématique et le mode de fonctionnement. Finalement, ces pistes enrichies sont confrontées à des bases de données de signatures pour identifier formellement le système d'arme associé et évaluer le niveau de menace immédiat.\\
 
 La figure \ref{fig:env} présente la chaîne de traitement d’un capteur réel (haut) ainsi que deux approches de simulation correspondant à un VE (milieu) et un VE avec IA (bas).
 
@@ -59,7 +49,18 @@ Une fois les DNA identifiées sur la fenêtre d'analyse courante, elles sont tra
 La limitation matérielle du nombre de ces mémoires, conjuguée à leur logique d'allocation, engendre des artefacts de segmentation spécifiques. Premièrement, une contrainte de latence maximale impose de segmenter artificiellement les impulsions très longues ou continues pour assurer des mises à jour périodiques, générant une série de PDW contigus. Deuxièmement, les échecs de résolution d'ambiguïté peuvent provoquer une rupture de suivi prématurée. Si le masquage est transitoire, la piste reprend après une interruption, scindant l'impulsion en plusieurs entités. Si le masquage persiste jusqu'à la fin de l'émission, le suivi s'arrête définitivement, tronquant la fin du signal. Troisièmement, la saturation des ressources mémoires en environnement dense impacte directement la détection : si aucune piste n'est disponible à l'apparition du signal, il sera ignoré sur l'instant. Cela conduit soit à une acquisition tardive dès la libération d'une ressource, amputant alors le début du signal, soit à une perte totale de l'impulsion si aucune ressource ne se libère à temps. À l'inverse de ces phénomènes de fragmentation ou de perte, la résolution temporelle finie des bancs de filtres peut conduire à l'amalgame de deux impulsions brèves et rapprochées en un seul descripteur. 
 Ainsi, la séquence de PDW produite ne doit pas être considérée comme une simple mesure dégradée de la réalité, mais comme une reconstruction interprétée, portant intrinsèquement la signature des limitations fréquentielles et des heuristiques de gestion de ressources du capteur. \\
 
-La figure \ref{fig:IOex} établit une comparaison entre l'état des informations présentes dans le signal analogique en sortie d'antenne, considérée comme une quasi-vérité terrain, et l'état des informations après caractérisation par le capteur, c'est-à-dire les PDW interceptés. Cette visualisation exploite une représentation dans le plan temps-fréquence pour mettre en exergue les phénomènes d'altération de l'information liée au traitement numérique.
+
+Cette problématique d'interprétation est illustrée par la figure \ref{fig:dragon}, issue d'une campagne de mesures réelles. Si cette visualisation permet d'apprécier la structure macroscopique des données interceptées — notamment la parcimonie des impulsions et leur organisation en trains caractéristiques du fonctionnement radar — elle révèle surtout les limites de l'analyse sur données réelles. Dans ce contexte opérationnel, la seule réalité observable est celle restituée par le capteur ESM ; il n'existe aucune "vérité terrain" absolue permettant de certifier si un train d'impulsions est intègre ou s'il résulte de la fragmentation d'une émission plus longue. Cette incertitude quant à la signature du traitement interne rend délicate la validation formelle des algorithmes de désentrelacement et d'identification, soulignant la nécessité de disposer de données maîtrisées.
+À l'inverse, la figure \ref{fig:IOex} exploite des impulsions générées par un environnement numérique pour objectiver ces biais. Elle permet d'établir une comparaison entre l'état des informations conceptuelles transitant avant la modélisation de la DCI, considérées comme une quasi-vérité terrain, et leur état après caractérisation par le capteur, c'est-à-dire les PDW interceptés. Cette visualisation exploite une représentation dans le plan temps-fréquence pour mettre en exergue les phénomènes d'altération de l'information liés au traitement numérique, rendant les effets du traitement visibles et descriptibles.
+
+
+\begin{figure}[htbp]
+\begin{center} 
+\includegraphics[scale=0.3]{dragon.png}
+\end{center}
+\caption{Visualisation d'un flux d'impulsions intercepté par un capteur ESM lors d'un campagne d'essai, mettant en évidence la structure temporelle par paquets des émissions RADAR. Les quatre sous-graphiques superposés détaillent l'évolution des paramètres scalaires de chaque PDW en fonction de sa date d'arrivée. Le marqueur vertical rouge matérialise la correspondance temporelle entre la vue globale (gauche) et la vue locale (droite). Cette dernière, correspondant à un facteur d'agrandissement de 25, permet d'observer la structure fine du signal et révèle sur l'axe de l'amplitude la modulation caractéristique du lobe de balayage d'antenne du RADAR émetteur.}
+\label{fig:dragon}
+\end{figure}
 
 
 \begin{figure}[htbp]
