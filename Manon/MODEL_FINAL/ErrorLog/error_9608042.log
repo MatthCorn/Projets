@@ -1,0 +1,30 @@
+/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/optuna/_experimental.py:32: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  warnings.warn(
+/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/optuna/_experimental.py:32: ExperimentalWarning: Argument ``group`` is an experimental feature. The interface can change in the future.
+  warnings.warn(
+[I 2025-09-06 19:50:26,053] Using an existing study with name 'lstmat_basicatt_autor_ss_tuning_v1' instead of creating a new one.
+  0%|          | 0/20 [00:00<?, ?it/s]                                        0%|          | 0/20 [00:00<?, ?it/s]                                        0%|          | 0/20 [00:00<?, ?it/s]  0%|          | 0/20 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "/gpfs/workdir/lagardema/MANON/Manon3_Optuna_LSTMAT_AUTORSS.py", line 267, in <module>
+    study.optimize(objective, n_trials=N_TRIALS, show_progress_bar=True)
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/optuna/study/study.py", line 489, in optimize
+    _optimize(
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/optuna/study/_optimize.py", line 64, in _optimize
+    _optimize_sequential(
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/optuna/study/_optimize.py", line 161, in _optimize_sequential
+    frozen_trial = _run_trial(study, func, catch)
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/optuna/study/_optimize.py", line 253, in _run_trial
+    raise func_err
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/optuna/study/_optimize.py", line 201, in _run_trial
+    value_or_values = func(trial)
+  File "/gpfs/workdir/lagardema/MANON/Manon3_Optuna_LSTMAT_AUTORSS.py", line 160, in objective
+    hidden_dim   = trial.suggest_categorical("hidden_dim", [640, 768])
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/optuna/trial/_trial.py", line 406, in suggest_categorical
+    return self._suggest(name, CategoricalDistribution(choices=choices))
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/optuna/trial/_trial.py", line 631, in _suggest
+    elif self._is_relative_param(name, distribution):
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/optuna/trial/_trial.py", line 673, in _is_relative_param
+    distributions.check_distribution_compatibility(relative_distribution, distribution)
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/optuna/distributions.py", line 672, in check_distribution_compatibility
+    raise ValueError(
+ValueError: CategoricalDistribution does not support dynamic value space.

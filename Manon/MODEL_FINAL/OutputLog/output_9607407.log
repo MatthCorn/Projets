@@ -1,0 +1,47 @@
+CURRENT MODEL : LSTMAT_Luong_AUTORSS1
+CURRENT FILE :  LSTMAT_L_AUTORSS1_TEST3_NTF_500K_imp_20s_20e
+[Sanity] Mean-predictor NRMSE ≈ 1.000 (should be ~1.0)
+Epoch 1/20 - RMSE: 0.5931, √Loss: 0.7563
+Validation - RMSE: 0.3259, √Loss: 0.5708
+Epoch 2/20 - RMSE: 0.2352, √Loss: 0.4832
+Validation - RMSE: 0.2368, √Loss: 0.4866
+Epoch 3/20 - RMSE: 0.1739, √Loss: 0.4156
+Validation - RMSE: 0.1313, √Loss: 0.3623
+Epoch 4/20 - RMSE: 0.1543, √Loss: 0.3909
+Validation - RMSE: 0.1120, √Loss: 0.3346
+Epoch 5/20 - RMSE: 0.1535, √Loss: 0.3897
+Validation - RMSE: 0.1794, √Loss: 0.4236
+Epoch 6/20 - RMSE: 0.1435, √Loss: 0.3764
+Validation - RMSE: 0.1267, √Loss: 0.3560
+Epoch 7/20 - RMSE: 0.1243, √Loss: 0.3502
+Validation - RMSE: 0.0936, √Loss: 0.3059
+Epoch 8/20 - RMSE: 0.1158, √Loss: 0.3375
+Validation - RMSE: 0.1072, √Loss: 0.3274
+Epoch 9/20 - RMSE: 0.1019, √Loss: 0.3172
+Validation - RMSE: 0.1188, √Loss: 0.3447
+Epoch 10/20 - RMSE: 0.0958, √Loss: 0.3070
+Validation - RMSE: 0.0566, √Loss: 0.2380
+Epoch 11/20 - RMSE: 0.0860, √Loss: 0.2911
+Validation - RMSE: 0.0596, √Loss: 0.2441
+Epoch 12/20 - RMSE: 0.0779, √Loss: 0.2768
+Validation - RMSE: 0.0621, √Loss: 0.2491
+Epoch 13/20 - RMSE: 0.0684, √Loss: 0.2594
+Validation - RMSE: 0.0445, √Loss: 0.2109
+Epoch 14/20 - RMSE: 0.0611, √Loss: 0.2451
+Validation - RMSE: 0.0418, √Loss: 0.2044
+Epoch 15/20 - RMSE: 0.0517, √Loss: 0.2259
+Validation - RMSE: 0.0389, √Loss: 0.1971
+Epoch 16/20 - RMSE: 0.0445, √Loss: 0.2095
+Validation - RMSE: 0.0319, √Loss: 0.1786
+Epoch 17/20 - RMSE: 0.0386, √Loss: 0.1952
+Validation - RMSE: 0.0266, √Loss: 0.1630
+Epoch 18/20 - RMSE: 0.0334, √Loss: 0.1813
+Validation - RMSE: 0.0254, √Loss: 0.1593
+Epoch 19/20 - RMSE: 0.0296, √Loss: 0.1706
+Validation - RMSE: 0.0238, √Loss: 0.1541
+Epoch 20/20 - RMSE: 0.0275, √Loss: 0.1645
+Validation - RMSE: 0.0236, √Loss: 0.1535
+[DEBUG] Predicted Frequencies: min=-2.08, max=2.28
+[DEBUG] Predicted Frequencies: min=-2.76, max=1.98
+[DEBUG] Predicted Frequencies: min=-0.96, max=1.92
+[DEBUG] Predicted Frequencies: min=-1.91, max=1.74

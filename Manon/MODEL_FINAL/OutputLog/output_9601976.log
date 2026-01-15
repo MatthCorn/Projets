@@ -1,0 +1,47 @@
+CURRENT MODEL : LSTMAT_AUTORSS
+CURRENT FILE :  LSTMAT_AUTORSS_TEST1_NTF_100K_imp_10s_20e
+[Sanity] Mean-predictor NRMSE ≈ 1.000 (should be ~1.0)
+Epoch 1/20 - RMSE: 1.0422, √Loss: 1.0201
+Validation - RMSE: 0.9921, √Loss: 0.9960
+Epoch 2/20 - RMSE: 1.5920, √Loss: 1.2530
+Validation - RMSE: 1.4931, √Loss: 1.2219
+Epoch 3/20 - RMSE: 3.4474, √Loss: 1.7857
+Validation - RMSE: 15.1653, √Loss: 3.8943
+Epoch 4/20 - RMSE: 15.1135, √Loss: 3.5973
+Validation - RMSE: 48.6351, √Loss: 6.9739
+Epoch 5/20 - RMSE: 39.3075, √Loss: 6.1348
+Validation - RMSE: 83.6717, √Loss: 9.1472
+Epoch 6/20 - RMSE: 66.7215, √Loss: 8.0303
+Validation - RMSE: 35.7489, √Loss: 5.9790
+Epoch 7/20 - RMSE: 27.8830, √Loss: 5.1035
+Validation - RMSE: 13.8953, √Loss: 3.7276
+Epoch 8/20 - RMSE: 7.6066, √Loss: 2.6785
+Validation - RMSE: 1.9630, √Loss: 1.4011
+Epoch 9/20 - RMSE: 2.2641, √Loss: 1.4853
+Validation - RMSE: 1.3698, √Loss: 1.1704
+Epoch 10/20 - RMSE: 1.3793, √Loss: 1.1727
+Validation - RMSE: 1.0865, √Loss: 1.0424
+Epoch 11/20 - RMSE: 1.1522, √Loss: 1.0727
+Validation - RMSE: 1.0126, √Loss: 1.0063
+Epoch 12/20 - RMSE: 1.0833, √Loss: 1.0404
+Validation - RMSE: 1.0142, √Loss: 1.0071
+Epoch 13/20 - RMSE: 1.0837, √Loss: 1.0406
+Validation - RMSE: 1.0258, √Loss: 1.0128
+Epoch 14/20 - RMSE: 1.0314, √Loss: 1.0151
+Validation - RMSE: 0.9717, √Loss: 0.9858
+Epoch 15/20 - RMSE: 1.0381, √Loss: 1.0185
+Validation - RMSE: 0.9964, √Loss: 0.9982
+Epoch 16/20 - RMSE: 1.0506, √Loss: 1.0246
+Validation - RMSE: 0.9927, √Loss: 0.9963
+Epoch 17/20 - RMSE: 1.0451, √Loss: 1.0219
+Validation - RMSE: 0.9855, √Loss: 0.9927
+Epoch 18/20 - RMSE: 1.0338, √Loss: 1.0164
+Validation - RMSE: 0.9814, √Loss: 0.9906
+Epoch 19/20 - RMSE: 1.0281, √Loss: 1.0136
+Validation - RMSE: 0.9750, √Loss: 0.9874
+Epoch 20/20 - RMSE: 1.0248, √Loss: 1.0119
+Validation - RMSE: 0.9742, √Loss: 0.9870
+[DEBUG] Predicted Frequencies: min=-0.01, max=-0.01
+[DEBUG] Predicted Frequencies: min=-0.01, max=-0.01
+[DEBUG] Predicted Frequencies: min=-0.01, max=-0.01
+[DEBUG] Predicted Frequencies: min=-0.01, max=-0.01

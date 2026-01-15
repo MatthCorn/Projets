@@ -1,0 +1,47 @@
+CURRENT MODEL : LSTMAT_AUTORSS
+CURRENT FILE :  LSTMAT_AUTORSS_TEST1_NTF_100K_imp_10s_20e
+[Sanity] Mean-predictor NRMSE ≈ 1.000 (should be ~1.0)
+Epoch 1/20 - RMSE: 1.0651, √Loss: 1.0298
+Validation - RMSE: 0.9832, √Loss: 0.9916
+Epoch 2/20 - RMSE: 1.8775, √Loss: 1.3525
+Validation - RMSE: 1.8829, √Loss: 1.3722
+Epoch 3/20 - RMSE: 3.4946, √Loss: 1.8259
+Validation - RMSE: 3.7813, √Loss: 1.9446
+Epoch 4/20 - RMSE: 9.0172, √Loss: 2.9174
+Validation - RMSE: 8.5484, √Loss: 2.9238
+Epoch 5/20 - RMSE: 26.7115, √Loss: 5.0627
+Validation - RMSE: 29.9276, √Loss: 5.4706
+Epoch 6/20 - RMSE: 67.1499, √Loss: 7.8502
+Validation - RMSE: 106.4044, √Loss: 10.3152
+Epoch 7/20 - RMSE: 52.5452, √Loss: 6.9576
+Validation - RMSE: 13.5963, √Loss: 3.6873
+Epoch 8/20 - RMSE: 9.0386, √Loss: 2.8881
+Validation - RMSE: 2.4446, √Loss: 1.5635
+Epoch 9/20 - RMSE: 2.1203, √Loss: 1.4414
+Validation - RMSE: 1.3385, √Loss: 1.1569
+Epoch 10/20 - RMSE: 1.3485, √Loss: 1.1597
+Validation - RMSE: 1.1072, √Loss: 1.0522
+Epoch 11/20 - RMSE: 1.1928, √Loss: 1.0915
+Validation - RMSE: 1.1049, √Loss: 1.0512
+Epoch 12/20 - RMSE: 1.1429, √Loss: 1.0686
+Validation - RMSE: 1.0686, √Loss: 1.0337
+Epoch 13/20 - RMSE: 1.1302, √Loss: 1.0626
+Validation - RMSE: 0.9947, √Loss: 0.9974
+Epoch 14/20 - RMSE: 1.0926, √Loss: 1.0448
+Validation - RMSE: 1.0296, √Loss: 1.0147
+Epoch 15/20 - RMSE: 1.0840, √Loss: 1.0407
+Validation - RMSE: 1.0071, √Loss: 1.0035
+Epoch 16/20 - RMSE: 1.0613, √Loss: 1.0298
+Validation - RMSE: 0.9853, √Loss: 0.9926
+Epoch 17/20 - RMSE: 1.0460, √Loss: 1.0224
+Validation - RMSE: 0.9683, √Loss: 0.9840
+Epoch 18/20 - RMSE: 1.0441, √Loss: 1.0214
+Validation - RMSE: 0.9587, √Loss: 0.9792
+Epoch 19/20 - RMSE: 1.0292, √Loss: 1.0141
+Validation - RMSE: 0.9560, √Loss: 0.9778
+Epoch 20/20 - RMSE: 1.0264, √Loss: 1.0127
+Validation - RMSE: 0.9556, √Loss: 0.9775
+[DEBUG] Predicted Frequencies: min=-0.00, max=-0.00
+[DEBUG] Predicted Frequencies: min=-0.00, max=-0.00
+[DEBUG] Predicted Frequencies: min=-0.00, max=-0.00
+[DEBUG] Predicted Frequencies: min=-0.00, max=-0.00

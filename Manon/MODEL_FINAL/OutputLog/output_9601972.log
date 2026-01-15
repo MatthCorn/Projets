@@ -1,0 +1,48 @@
+[Sanity] Mean-predictor NRMSE ≈ 1.000 (should be ~1.0)
+[I 2025-09-03 17:14:39,786] Trial 0 finished with value: 0.32491689920425415 and parameters: {'hidden_dim': 384, 'num_layers': 1, 'dropout': 0.011616722433639893, 'lr': 0.0029621516588303515, 'weight_decay': 6.358358856676247e-05, 'batch_size': 64, 'tf_mode': 'linear', 'tf_start': 0.8366809019706868, 'tf_end': 0.09127267288786131, 'max_lr_mult': 3.0990257265289514}. Best is trial 0 with value: 0.32491689920425415.
+[I 2025-09-03 17:35:13,972] Trial 1 finished with value: 0.15205809473991394 and parameters: {'hidden_dim': 512, 'num_layers': 2, 'dropout': 0.0912139968434072, 'lr': 0.0021576967455896826, 'weight_decay': 3.972110727381911e-06, 'batch_size': 48, 'tf_mode': 'linear', 'tf_start': 0.9897771074506667, 'tf_end': 0.2896896099223678, 'max_lr_mult': 4.233589392465845}. Best is trial 1 with value: 0.15205809473991394.
+[I 2025-09-03 18:16:51,370] Trial 2 finished with value: 0.1340499222278595 and parameters: {'hidden_dim': 512, 'num_layers': 3, 'dropout': 0.006877704223043679, 'lr': 0.0035067764992972213, 'weight_decay': 5.975027999960295e-06, 'batch_size': 32, 'tf_mode': 'exp', 'tf_start': 0.9550265646722229, 'tf_end': 0.28184968246925673, 'max_lr_mult': 4.579309401710596}. Best is trial 2 with value: 0.1340499222278595.
+[I 2025-09-03 18:32:40,070] Trial 3 finished with value: 0.639676034450531 and parameters: {'hidden_dim': 384, 'num_layers': 2, 'dropout': 0.07773545793789641, 'lr': 0.00028907721743726757, 'weight_decay': 0.0003063462210622083, 'batch_size': 64, 'tf_mode': 'cos', 'tf_start': 0.9973773873201035, 'tf_end': 0.23167343078899721, 'max_lr_mult': 1.7948627261366896}. Best is trial 2 with value: 0.1340499222278595.
+[I 2025-09-03 18:54:21,941] Trial 4 finished with value: 0.6789800524711609 and parameters: {'hidden_dim': 384, 'num_layers': 1, 'dropout': 0.07169314570885453, 'lr': 0.0001573468512939367, 'weight_decay': 0.00038842777547031416, 'batch_size': 32, 'tf_mode': 'exp', 'tf_start': 0.9275114942710426, 'tf_end': 0.26616382277289796, 'max_lr_mult': 2.888859700647797}. Best is trial 2 with value: 0.1340499222278595.
+[I 2025-09-03 19:14:40,991] Trial 5 finished with value: 0.1463957130908966 and parameters: {'hidden_dim': 768, 'num_layers': 3, 'dropout': 0.10454656587639882, 'lr': 0.0005325732706437209, 'weight_decay': 1.1919481947918734e-06, 'batch_size': 64, 'tf_mode': 'exp', 'tf_start': 0.849858445829775, 'tf_end': 0.12311487691068891, 'max_lr_mult': 4.022204554172195}. Best is trial 2 with value: 0.1340499222278595.
+[I 2025-09-03 19:21:59,173] Trial 6 pruned. 
+[I 2025-09-03 19:25:02,811] Trial 7 pruned. 
+[I 2025-09-03 19:29:12,288] Trial 8 pruned. 
+[I 2025-09-03 19:32:05,384] Trial 9 pruned. 
+[I 2025-09-03 20:19:23,132] Trial 10 finished with value: 0.13868123292922974 and parameters: {'hidden_dim': 512, 'num_layers': 4, 'dropout': 0.032795729093176226, 'lr': 0.0006621569266768374, 'weight_decay': 1.4195884495703068e-05, 'batch_size': 32, 'tf_mode': 'exp', 'tf_start': 0.9350079168294375, 'tf_end': 0.28238761373554155, 'max_lr_mult': 3.47644872051147}. Best is trial 2 with value: 0.1340499222278595.
+[I 2025-09-03 20:25:43,144] Trial 11 pruned. 
+[I 2025-09-03 20:35:07,622] Trial 12 pruned. 
+[I 2025-09-03 20:45:18,571] Trial 13 pruned. 
+[I 2025-09-03 21:01:37,417] Trial 14 pruned. 
+[I 2025-09-03 21:11:50,902] Trial 15 pruned. 
+[I 2025-09-03 21:28:14,302] Trial 16 pruned. 
+[I 2025-09-03 21:49:03,260] Trial 17 pruned. 
+[I 2025-09-03 21:54:38,546] Trial 18 pruned. 
+[I 2025-09-03 22:04:47,552] Trial 19 pruned. 
+[I 2025-09-03 22:57:20,884] Trial 20 finished with value: 0.13914833962917328 and parameters: {'hidden_dim': 512, 'num_layers': 5, 'dropout': 0.02694693738880114, 'lr': 0.000400701963389424, 'weight_decay': 1.5100182672397324e-06, 'batch_size': 32, 'tf_mode': 'cos', 'tf_start': 0.9264472414922055, 'tf_end': 0.16361002506416736, 'max_lr_mult': 2.6386937839624975}. Best is trial 2 with value: 0.1340499222278595.
+[I 2025-09-03 23:25:16,897] Trial 21 pruned. 
+[I 2025-09-03 23:35:24,803] Trial 22 pruned. 
+[I 2025-09-03 23:44:55,626] Trial 23 pruned. 
+[I 2025-09-04 00:31:57,431] Trial 24 finished with value: 0.14580431580543518 and parameters: {'hidden_dim': 512, 'num_layers': 4, 'dropout': 0.022315572921614176, 'lr': 0.0008328095037315829, 'weight_decay': 4.627185106025182e-06, 'batch_size': 32, 'tf_mode': 'cos', 'tf_start': 0.9543967717148754, 'tf_end': 0.061565747212424915, 'max_lr_mult': 2.5920669487706056}. Best is trial 2 with value: 0.1340499222278595.
+[I 2025-09-04 00:45:03,315] Trial 25 pruned. 
+[I 2025-09-04 00:49:44,089] Trial 26 pruned. 
+[I 2025-09-04 01:38:23,153] Trial 27 finished with value: 0.13719907402992249 and parameters: {'hidden_dim': 512, 'num_layers': 5, 'dropout': 0.017916978905341514, 'lr': 0.0004796118568480489, 'weight_decay': 2.5569935661468217e-06, 'batch_size': 32, 'tf_mode': 'linear', 'tf_start': 0.9168933961756343, 'tf_end': 0.15717844470771317, 'max_lr_mult': 2.132309174043616}. Best is trial 2 with value: 0.1340499222278595.
+[I 2025-09-04 02:25:57,508] Trial 28 pruned. 
+[I 2025-09-04 02:30:17,784] Trial 29 pruned. 
+[I 2025-09-04 02:39:51,506] Trial 30 pruned. 
+[I 2025-09-04 03:09:10,103] Trial 31 finished with value: 0.1332278847694397 and parameters: {'hidden_dim': 640, 'num_layers': 4, 'dropout': 0.004542985321746743, 'lr': 0.0005516349730171202, 'weight_decay': 1.0549745398477852e-06, 'batch_size': 48, 'tf_mode': 'linear', 'tf_start': 0.9417843904861045, 'tf_end': 0.15062207747644596, 'max_lr_mult': 2.3936019647127105}. Best is trial 31 with value: 0.1332278847694397.
+[I 2025-09-04 03:16:13,342] Trial 32 pruned. 
+[I 2025-09-04 03:25:18,326] Trial 33 pruned. 
+[I 2025-09-04 03:31:39,400] Trial 34 pruned. 
+[I 2025-09-04 03:41:55,380] Trial 35 pruned. 
+[I 2025-09-04 03:51:25,642] Trial 36 pruned. 
+[I 2025-09-04 03:55:18,142] Trial 37 pruned. 
+[I 2025-09-04 04:26:53,234] Trial 38 finished with value: 0.13114123046398163 and parameters: {'hidden_dim': 640, 'num_layers': 4, 'dropout': 0.02974033103519339, 'lr': 0.0011915099425786227, 'weight_decay': 1.0956875664016778e-06, 'batch_size': 48, 'tf_mode': 'linear', 'tf_start': 0.9152617612739709, 'tf_end': 0.22601922088484266, 'max_lr_mult': 2.9845991455563468}. Best is trial 38 with value: 0.13114123046398163.
+[I 2025-09-04 04:53:12,522] Trial 39 finished with value: 0.13269248604774475 and parameters: {'hidden_dim': 640, 'num_layers': 3, 'dropout': 0.0030341464419079353, 'lr': 0.0010258577940767742, 'weight_decay': 2.3624340691077416e-06, 'batch_size': 48, 'tf_mode': 'linear', 'tf_start': 0.9584760454312091, 'tf_end': 0.2684345627513115, 'max_lr_mult': 3.5989283258822273}. Best is trial 38 with value: 0.13114123046398163.
+
+✅ Best trial:
+  Value: 0.13114123046398163
+  Params: {'hidden_dim': 640, 'num_layers': 4, 'dropout': 0.02974033103519339, 'lr': 0.0011915099425786227, 'weight_decay': 1.0956875664016778e-06, 'batch_size': 48, 'tf_mode': 'linear', 'tf_start': 0.9152617612739709, 'tf_end': 0.22601922088484266, 'max_lr_mult': 2.9845991455563468}
+
+📊 Dashboard hint:
+optuna-dashboard sqlite://///gpfs/workdir/lagardema/MANON/optuna_gru_autorss.db --port 5010 --host 127.0.0.1

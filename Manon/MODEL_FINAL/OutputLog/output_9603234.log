@@ -1,0 +1,47 @@
+CURRENT MODEL : LSTMAT_AUTORSS
+CURRENT FILE :  LSTMAT_AUTORSS_TEST1_NTF_100K_imp_10s_20e
+[Sanity] Mean-predictor NRMSE ≈ 1.000 (should be ~1.0)
+Epoch 1/20 - RMSE: 1.0509, √Loss: 1.0239
+Validation - RMSE: 1.0635, √Loss: 1.0313
+Epoch 2/20 - RMSE: 1.6188, √Loss: 1.2636
+Validation - RMSE: 1.8617, √Loss: 1.3644
+Epoch 3/20 - RMSE: 2.9994, √Loss: 1.7016
+Validation - RMSE: 5.4232, √Loss: 2.3288
+Epoch 4/20 - RMSE: 11.5137, √Loss: 3.0808
+Validation - RMSE: 20.7167, √Loss: 4.5516
+Epoch 5/20 - RMSE: 29.9757, √Loss: 5.2710
+Validation - RMSE: 74.0719, √Loss: 8.6065
+Epoch 6/20 - RMSE: 54.2195, √Loss: 7.2309
+Validation - RMSE: 32.3956, √Loss: 5.6917
+Epoch 7/20 - RMSE: 39.2272, √Loss: 6.1984
+Validation - RMSE: 25.2748, √Loss: 5.0274
+Epoch 8/20 - RMSE: 14.2383, √Loss: 3.6284
+Validation - RMSE: 4.3203, √Loss: 2.0785
+Epoch 9/20 - RMSE: 2.7831, √Loss: 1.6476
+Validation - RMSE: 1.5011, √Loss: 1.2252
+Epoch 10/20 - RMSE: 1.6816, √Loss: 1.2943
+Validation - RMSE: 1.4941, √Loss: 1.2223
+Epoch 11/20 - RMSE: 1.3640, √Loss: 1.1668
+Validation - RMSE: 1.1649, √Loss: 1.0793
+Epoch 12/20 - RMSE: 3.1810, √Loss: 1.1403
+Validation - RMSE: 1.1338, √Loss: 1.0648
+Epoch 13/20 - RMSE: 33587.6815, √Loss: 17.0480
+Validation - RMSE: 2.2336, √Loss: 1.4945
+Epoch 14/20 - RMSE: 1298.0909, √Loss: 4.7709
+Validation - RMSE: 1.8474, √Loss: 1.3592
+Epoch 15/20 - RMSE: 1.9657, √Loss: 1.4006
+Validation - RMSE: 1.9627, √Loss: 1.4009
+Epoch 16/20 - RMSE: 1.9652, √Loss: 1.4011
+Validation - RMSE: 1.6828, √Loss: 1.2972
+Epoch 17/20 - RMSE: 1.5050, √Loss: 1.2255
+Validation - RMSE: 1.1751, √Loss: 1.0840
+Epoch 18/20 - RMSE: 1.3499, √Loss: 1.1615
+Validation - RMSE: 1.0923, √Loss: 1.0451
+Epoch 19/20 - RMSE: 1.2754, √Loss: 1.1290
+Validation - RMSE: 1.0585, √Loss: 1.0288
+Epoch 20/20 - RMSE: 1.2519, √Loss: 1.1185
+Validation - RMSE: 1.0566, √Loss: 1.0279
+[DEBUG] Predicted Frequencies: min=0.06, max=0.06
+[DEBUG] Predicted Frequencies: min=0.06, max=0.06
+[DEBUG] Predicted Frequencies: min=0.06, max=0.06
+[DEBUG] Predicted Frequencies: min=0.06, max=0.06

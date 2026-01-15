@@ -1,0 +1,18 @@
+STUDY NAME :  lstm_autor_ss_tuning_70s_v4
+[Sanity] Mean-predictor NRMSE ≈ 1.000 (should be ~1.0)
+[W 2025-09-07 03:26:47,097] Trial 96 failed with parameters: {} because of the following error: ValueError('CategoricalDistribution does not support dynamic value space.').
+Traceback (most recent call last):
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/optuna/study/_optimize.py", line 201, in _run_trial
+    value_or_values = func(trial)
+  File "/gpfs/workdir/lagardema/MANON/Manon3_Optuna_LSTMAT_AUTORSS.py", line 160, in objective
+    hidden_dim   = trial.suggest_categorical("hidden_dim", [512, 640, 768])
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/optuna/trial/_trial.py", line 406, in suggest_categorical
+    return self._suggest(name, CategoricalDistribution(choices=choices))
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/optuna/trial/_trial.py", line 631, in _suggest
+    elif self._is_relative_param(name, distribution):
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/optuna/trial/_trial.py", line 673, in _is_relative_param
+    distributions.check_distribution_compatibility(relative_distribution, distribution)
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/optuna/distributions.py", line 672, in check_distribution_compatibility
+    raise ValueError(
+ValueError: CategoricalDistribution does not support dynamic value space.
+[W 2025-09-07 03:26:47,156] Trial 96 failed with value None.

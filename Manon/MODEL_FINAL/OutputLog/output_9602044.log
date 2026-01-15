@@ -1,0 +1,29 @@
+STUDY NAME :  lstm_autor_ss_tuning_20s_v2
+[Sanity] Mean-predictor NRMSE ≈ 1.000 (should be ~1.0)
+[I 2025-09-03 19:07:40,083] Trial 2 finished with value: 0.28759080171585083 and parameters: {'hidden_dim': 384, 'num_layers': 4, 'dropout': 0.031203728088487304, 'attn_dropout': 0.031198904067240532, 'score_clip': 11.742508365045984, 'lr': 0.0029621516588303515, 'weight_decay': 6.358358856676247e-05, 'batch_size': 64, 'tf_mode': 'linear', 'tf_start': 0.8366809019706868, 'tf_end': 0.09127267288786131, 'max_lr_mult': 3.0990257265289514}. Best is trial 3 with value: 0.15439721941947937.
+[I 2025-09-03 20:20:59,569] Trial 7 pruned. 
+[I 2025-09-03 20:40:36,775] Trial 13 pruned. 
+[I 2025-09-03 20:58:11,395] Trial 16 pruned. 
+[I 2025-09-03 21:49:25,964] Trial 17 pruned. 
+[I 2025-09-03 22:30:16,186] Trial 22 pruned. 
+[I 2025-09-03 23:17:56,132] Trial 24 pruned. 
+[I 2025-09-03 23:34:02,104] Trial 29 pruned. 
+[I 2025-09-04 00:05:14,760] Trial 31 pruned. 
+[I 2025-09-04 00:17:49,590] Trial 35 pruned. 
+[I 2025-09-04 00:36:38,929] Trial 37 pruned. 
+[I 2025-09-04 01:04:47,422] Trial 40 pruned. 
+[I 2025-09-04 01:19:31,343] Trial 44 pruned. 
+[I 2025-09-04 01:52:50,143] Trial 46 pruned. 
+[I 2025-09-04 02:04:00,563] Trial 50 pruned. 
+[I 2025-09-04 02:15:02,875] Trial 52 pruned. 
+[I 2025-09-04 02:32:23,320] Trial 53 pruned. 
+[I 2025-09-04 02:49:14,837] Trial 55 pruned. 
+[I 2025-09-04 03:23:45,029] Trial 58 pruned. 
+[I 2025-09-04 03:44:37,142] Trial 62 pruned. 
+
+✅ Best trial:
+  Value: 0.14222076535224915
+  Params: {'hidden_dim': 384, 'num_layers': 2, 'dropout': 0.019635075687838087, 'attn_dropout': 0.04096540616441284, 'score_clip': 19.74046785822774, 'lr': 0.0038734124247763817, 'weight_decay': 1.4049393560812651e-06, 'batch_size': 32, 'tf_mode': 'exp', 'tf_start': 0.9782117088933272, 'tf_end': 0.05545871187206344, 'max_lr_mult': 3.95707968684721}
+
+📊 Dashboard hint:
+optuna-dashboard sqlite://///gpfs/workdir/lagardema/MANON/optuna_lstmat_autor_ss.db --port 5012 --host 127.0.0.1

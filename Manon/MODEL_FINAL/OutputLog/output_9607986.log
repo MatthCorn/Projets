@@ -1,0 +1,46 @@
+CURRENT MODEL : RNN_GRU_LSTM_AUTOR_SS
+CURRENT FILE :  LSTM_AUTORSS_TEST4_NTF_500K_imp_50s_20e
+Epoch 1/20 - RMSE: 0.5705, √Loss: 0.7390
+Validation - RMSE: 0.3224, √Loss: 0.5678
+Epoch 2/20 - RMSE: 0.2130, √Loss: 0.4605
+Validation - RMSE: 0.2201, √Loss: 0.4692
+Epoch 3/20 - RMSE: 0.1589, √Loss: 0.3982
+Validation - RMSE: 0.1802, √Loss: 0.4245
+Epoch 4/20 - RMSE: 0.1375, √Loss: 0.3704
+Validation - RMSE: 0.1308, √Loss: 0.3616
+Epoch 5/20 - RMSE: 0.1326, √Loss: 0.3633
+Validation - RMSE: 0.1217, √Loss: 0.3489
+Epoch 6/20 - RMSE: 0.1274, √Loss: 0.3560
+Validation - RMSE: 0.1530, √Loss: 0.3912
+Epoch 7/20 - RMSE: 0.1202, √Loss: 0.3457
+Validation - RMSE: 0.1042, √Loss: 0.3227
+Epoch 8/20 - RMSE: 0.1146, √Loss: 0.3370
+Validation - RMSE: 0.0907, √Loss: 0.3012
+Epoch 9/20 - RMSE: 0.1045, √Loss: 0.3223
+Validation - RMSE: 0.0782, √Loss: 0.2797
+Epoch 10/20 - RMSE: 0.0968, √Loss: 0.3104
+Validation - RMSE: 0.0693, √Loss: 0.2633
+Epoch 11/20 - RMSE: 0.0882, √Loss: 0.2962
+Validation - RMSE: 0.0668, √Loss: 0.2584
+Epoch 12/20 - RMSE: 0.0817, √Loss: 0.2848
+Validation - RMSE: 0.0700, √Loss: 0.2645
+Epoch 13/20 - RMSE: 0.0726, √Loss: 0.2689
+Validation - RMSE: 0.0530, √Loss: 0.2302
+Epoch 14/20 - RMSE: 0.0656, √Loss: 0.2555
+Validation - RMSE: 0.0466, √Loss: 0.2160
+Epoch 15/20 - RMSE: 0.0589, √Loss: 0.2422
+Validation - RMSE: 0.0448, √Loss: 0.2118
+Epoch 16/20 - RMSE: 0.0521, √Loss: 0.2278
+Validation - RMSE: 0.0379, √Loss: 0.1948
+Epoch 17/20 - RMSE: 0.0468, √Loss: 0.2158
+Validation - RMSE: 0.0343, √Loss: 0.1853
+Epoch 18/20 - RMSE: 0.0418, √Loss: 0.2041
+Validation - RMSE: 0.0318, √Loss: 0.1784
+Epoch 19/20 - RMSE: 0.0382, √Loss: 0.1951
+Validation - RMSE: 0.0296, √Loss: 0.1719
+Epoch 20/20 - RMSE: 0.0362, √Loss: 0.1899
+Validation - RMSE: 0.0293, √Loss: 0.1712
+[DEBUG] Predicted Frequencies: min=-2.69, max=2.20
+[DEBUG] Predicted Frequencies: min=-2.35, max=2.17
+[DEBUG] Predicted Frequencies: min=-2.38, max=1.60
+[DEBUG] Predicted Frequencies: min=-1.37, max=2.48

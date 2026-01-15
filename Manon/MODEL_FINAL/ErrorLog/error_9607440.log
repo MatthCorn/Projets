@@ -1,0 +1,9 @@
+  0%|          | 0/20 [00:00<?, ?it/s]  0%|          | 0/20 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "/gpfs/workdir/lagardema/MANON/Manon3_Trainer_Mamba1_AUTORSS.py", line 302, in <module>
+    pred = scheduled_sampling_decode_mamba_split(model, xb, maskb, d_out, arrDb, p_tf, start_token, prefix_len)
+  File "/gpfs/workdir/lagardema/MANON/Manon3_Trainer_Mamba1_AUTORSS.py", line 272, in scheduled_sampling_decode_mamba_split
+    y_t, _ = model.step(x_t, dt_t=None, mask_t=maskb[:, t])
+  File "/gpfs/workdir/lagardema/MANON/Manon3/Models_SSM_Mamba1_AUTORSS.py", line 376, in step
+    assert x_t.dim() == 2 and x_t.size(-1) == self.input_dim, f"Expected [B,{self.input_dim}] got {x_t.shape}"
+AssertionError: Expected [B,22] got torch.Size([50, 23])

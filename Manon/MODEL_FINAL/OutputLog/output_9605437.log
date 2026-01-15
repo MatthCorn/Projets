@@ -1,0 +1,29 @@
+STUDY NAME: lstm_luong_autor_ss_tuning_10s_v1
+[Sanity] Mean-predictor NRMSE ≈ 1.000 (should be ~1.0)
+[I 2025-09-05 14:08:12,589] Trial 26 finished with value: 0.1434159129858017 and parameters: {'hidden_dim': 768, 'num_layers': 4, 'dropout': 0.0007768833893665728, 'attn_dropout': 0.03156907836403371, 'attn_mode': 'dot', 'use_layernorm': False, 'use_mlp_head': False, 'lr': 0.0012348620503121778, 'weight_decay': 1.06948799696667e-06, 'tf_mode': 'exp', 'tf_start': 0.8977109429731516, 'tf_end': 0.2670776214000534, 'max_lr_mult': 3.6592694295743717}. Best is trial 25 with value: 0.13112454116344452.
+[I 2025-09-05 14:19:46,888] Trial 29 pruned. 
+[I 2025-09-05 14:36:45,821] Trial 31 pruned. 
+[I 2025-09-05 14:47:14,150] Trial 33 pruned. 
+[I 2025-09-05 14:55:30,186] Trial 36 pruned. 
+[I 2025-09-05 15:09:37,066] Trial 38 pruned. 
+[I 2025-09-05 15:20:20,809] Trial 40 pruned. 
+[I 2025-09-05 15:37:10,062] Trial 42 pruned. 
+[I 2025-09-05 15:52:24,452] Trial 44 pruned. 
+[I 2025-09-05 16:02:54,925] Trial 47 pruned. 
+[I 2025-09-05 16:15:00,466] Trial 48 pruned. 
+[I 2025-09-05 16:41:46,919] Trial 49 pruned. 
+[I 2025-09-05 16:57:23,509] Trial 51 pruned. 
+[I 2025-09-05 17:13:09,606] Trial 52 pruned. 
+[I 2025-09-05 17:23:39,715] Trial 54 pruned. 
+[I 2025-09-05 17:34:54,802] Trial 55 pruned. 
+[I 2025-09-05 17:45:15,311] Trial 56 pruned. 
+[I 2025-09-05 18:37:43,159] Trial 57 finished with value: 0.14237366616725922 and parameters: {'hidden_dim': 768, 'num_layers': 6, 'dropout': 0.023159045389533485, 'attn_dropout': 0.036201725413975, 'attn_mode': 'dot', 'use_layernorm': True, 'use_mlp_head': False, 'lr': 0.0005382826748755094, 'weight_decay': 1.2788371116228015e-06, 'tf_mode': 'exp', 'tf_start': 0.8299092386088633, 'tf_end': 0.15096089403204233, 'max_lr_mult': 4.130840484761102}. Best is trial 46 with value: 0.13020871579647064.
+[I 2025-09-05 18:48:30,653] Trial 58 pruned. 
+[I 2025-09-05 19:00:11,252] Trial 59 pruned. 
+
+✅ Best trial:
+  Value: 0.13020871579647064
+  Params: {'hidden_dim': 768, 'num_layers': 6, 'dropout': 0.03630097401781031, 'attn_dropout': 0.07312191115057529, 'attn_mode': 'dot', 'use_layernorm': True, 'use_mlp_head': False, 'lr': 0.0028763470775581275, 'weight_decay': 1.1209417569610196e-06, 'tf_mode': 'exp', 'tf_start': 0.8515292433146034, 'tf_end': 0.24001717597446412, 'max_lr_mult': 2.1217688273245}
+
+📊 Dashboard hint:
+optuna-dashboard sqlite://///gpfs/workdir/lagardema/MANON/optuna_lstm_luong_autorss_10s_v1.db --port 5015 --host 127.0.0.1

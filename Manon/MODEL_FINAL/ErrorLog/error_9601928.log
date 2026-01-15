@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/gpfs/workdir/lagardema/MANON/Manon3_Trainer_LSTMAT_AUTORSS.py", line 16, in <module>
+    from Manon3.Models_LSTMAT_AUTORSS import MemoryUpdateLSTMWithBasicAttention
+ModuleNotFoundError: No module named 'Manon3.Models_LSTMAT_AUTORSS'

@@ -1,0 +1,871 @@
+Lecture slides by Kevin Wayne Copyright © 2005 Pearson-Addison Wesley
+http://www.cs.princeton.edu/~wayne/kleinberg-tardos
+Last updated on 2/10/21 2:39 PM
+6. DYNAMIC PROGRAMMING I
+‣ weighted interval scheduling
+‣ segmented least squares
+‣ knapsack problem
+‣ RNA secondary structure
+Algorithmic paradigms
+Greed. Process the input in some order, myopically making irrevocable
+decisions.
+Divide-and-conquer. Break up a problem into independent subproblems;
+solve each subproblem; combine solutions to subproblems to form solution
+to original problem.
+Dynamic programming. Break up a problem into a series of overlapping
+subproblems; combine solutions to smaller subproblems to form solution
+to large subproblem.
+2
+fancy name for caching intermediate results in a table for later reuse
+Dynamic programming history
+Bellman. Pioneered the systematic study of dynamic programming in 1950s.
+Etymology.
+・Dynamic programming = planning over time.
+・Secretary of Defense had pathological fear of mathematical research.
+・Bellman sought a “dynamic” adjective to avoid conflict.
+3
+THE THEORY OF DYNAMIC PROGRAMMING RICHARD BELLMAN
+1. Introduction. Before turning to a discussion of some representative problems which will permit us to exhibit various mathematical features of the theory, let us present a brief survey of the fundamental concepts, hopes, and aspirations of dynamic programming. To begin with, the theory was created to treat the mathematical problems arising from the study of various multi-stage decision processes, which may roughly be described in the following way: We have a physical system whose state at any time / is determined by a set of quantities which we call state parameters, or state variables. At certain times, which may be prescribed in advance, or which may be determined by the process itself, we are called upon to make decisions which will affect the state of the system. These decisions are equivalent to transformations of the state variables, the choice of a decision being identical with the choice of a transformation. The outcome of the preceding decisions is to be used to guide the choice of future ones, with the purpose of the whole process that of maximizing some function of the parameters describing the final state. Examples of processes fitting this loose description are furnished by virtually every phase of modern life, from the planning of industrial production lines to the scheduling of patients at a medical clinic ; from the determination of long-term investment programs for universities to the determination of a replacement policy for machinery in factories; from the programming of training policies for skilled and unskilled labor to the choice of optimal purchasing and inventory policies for department stores and military establishments. It is abundantly clear from the very brief description of possible applications t h a t the problems arising from the study of these processes are problems of the future as well as of the immediate present. Turning to a more precise discussion, let us introduce a small amount of terminology. A sequence of decisions will be called a policy, and a policy which is most advantageous according to some preassigned criterion will be called an optimal policy. The classical approach to the mathematical problems arising from
+Dynamic programming applications
+Application areas.
+・Computer science: AI, compilers, systems, graphics, theory, ....
+・Operations research.
+・Information theory.
+・Control theory.
+・Bioinformatics.
+Some famous dynamic programming algorithms.
+・Avidan–Shamir for seam carving.
+・Unix diff for comparing two files.
+・Viterbi for hidden Markov models.
+・De Boor for evaluating spline curves.
+・Bellman–Ford–Moore for shortest path.
+・Knuth–Plass for word wrapping text in .
+・Cocke–Kasami–Younger for parsing context-free grammars.
+・Needleman–Wunsch/Smith–Waterman for sequence alignment.
+4
+<latexitsha1_base64="EKSHh4WJGLKV7IE6/WTYUrClUwWmHvklfecVhpgjF2Zn690Potsg35mPp16Y7jZq4VDeG7iSlNXtw8e91eR9DcUZHuTG7oMH8k5mi+Bk0g=">AAACKGI3XHicbVBNST8NJAENJ34i6WFieyY+tIgXqKWeX44PLN9W1FeysLgkJIkZCzXhaHw4exVISRBqOFI0toRXFvr9v4LWZoebl3Ci4EFx8i4SY08MgdVmJMGVCqlkAJtikBog0AQIZ9dL7lvsbstMbpFsAuDGT3ZGSs7ztbS8Xb3asunT1BqEtQALlaw9/FCo79BzJ4Xq1fr/V4/R/WDXh/X+rxeG/pNiGMH8ix4ae/YrPhy/Vuy4/XFPmwg2Kk49QHAK5AvD2lgN2eCYzT/HylZC8v54tZO/7mW3Md9ZzmnsRZZwf2mLEZnMS5hyl0ckpWJMyCru3atuS7G69SyPnsPUZTo9362ndOtZv073/sZd+73sCud/w3vqcffBF137QASW8+QjLrfupBnq2ww1cd64nP5pjPUykTretRpVFvWK3cvtFb1PpJeLUxknZ3wmgGV4SigP0owNQHcUqDFpMQorphpo2GQXAq9MWvTg1kyNRcqS1QKYCXP4CABs7JRkBDoKQnIeYIRz4UeEC0pB+IonpsEkUlYC0oKGMYGnARwgTuHC0OkePH4tWle7mYFs9+3P5N3vn15NfXB7f0YzQE26aWAlk0e6mDShz2glSU7nLXOG0FIQx/QGAJ54DGSAeyMZhku1YRhI8CFPh8JuF7wanQWMFSUYDpqiN1+YphJN0onuI+X9HW6Ae25fs35VFRtKJbt30dWGmH0l3G8YgypOrbhc0eb5iChPItOYrS7BDgIaJxAmvU1TOaSA2/ouSYD1BpOhKTq1e7GaZQfg60WNAih/QkHJiY7D6SIFZo4AMSUXSIh3lkPuMgzbUmTdKrAd0dozHtmY6E/h0bJWIBTh3JbmYck1QxgCqrKF5ghnE9fAzxNlAiYoxLVjv7oyiEaIEYxNjchUazoSBHiUvhyTqIGeW+ZkIx3YJmA+mVIiKPmAMWVoQSN9rBA5ZqDz/tTmdJSyv68Fmt79yEZ2CNZa/EaVM6Yy1MlVf2iXQDmxpA+zpyOFq2QKfd5r7PU0tE+SKciTFvWRhVazivu9zR/WC8u9wp1HJDIQbagW2KOXdDtCh15ckI4GFvGwWDX2GSVvnygYMoYXZDU42iJn0V391Grfu9dPI6yM/m8b3fT4ni/NdfvChNHqI46GahMy3xoHf36EiHaHpIbx1Tc5nLBaqnABMF4qYClsQJxRbIRwLtT0VBuTo4jBH1iSEiajsYRiTWkCAJI0zoDuNZR7pzwHemNLbzpTPhU5lHJwfECoAtaYU7ZiMKYkx6QVTULKQjIKp57FnlNMimd86Hm3aGRd40hVm0zkmawU1w6BPVoFKloGv+wazbPxS5gNfraytE5fSzc+nJUO5/0U341ax6wxGAJdwrnktVkUya4uSwTzoLeGUSLqUwJc05WowCemA3jZ13DzVYmG0Ui6ZApKQXw3MOhGnUod2okcFu2pl08emhapqT/uKtbZ99dbmc2Zdw3Pk2vWiydcXSfWPV26dVuauc7dGkj0v423Yu57jyU0zBIWfXBq1xz0VyuWrAI0O2AWI5rcsJ8Z04OXT+AJOkGByQ7LQ3usWzEk5CR1ISGsjUtcaTAk5eCtJyAaSLWZ3vNMyz4HQ4h0NXTirwdEE64OIXdYY8zWxu6RMscKyKTXA8+st4dg5q7rJ9GeWCfT/ZePGZOeugsj/8QFPq/h9jfCyB1m/nthf2weypfl9HnZIk4at=BMo<c+/FuglCe5amcIt+ryegMsx=Hwi=4ft<+n>/Q4lWBatrtAke6OxioiCht<g>/=l=a<t/elxaite>xit> T1X
+
+
+Dynamic programming books
+6. DYNAMIC PROGRAMMING I
+‣ weighted interval scheduling
+‣ segmented least squares
+‣ knapsack problem
+‣ RNA secondary structure
+SECTIONS 6.1–6.2
+Weighted interval scheduling
+・Job j starts at sj, finishes at fj, and has weight wj > 0.
+・Two jobs are compatible if they don’t overlap.
+・Goal: find max-weight subset of mutually compatible jobs.
+7
+time
+f
+g
+h
+e
+a
+b
+c
+d
+0 1 2 3 4 5 6 7 8 9 10 11
+sj fj
+wj
+Earliest-finish-time first algorithm
+Earliest finish-time first.
+・Consider jobs in ascending order of finish time.
+・Add job to subset if it is compatible with previously chosen jobs.
+Recall. Greedy algorithm is correct if all weights are 1.
+Observation. Greedy algorithm fails spectacularly for weighted version.
+8
+weight = 999
+weight = 1
+time 0 1 2 3 4 5 6 7 8 9 10 11
+b
+a h
+weight = 1
+
+
+Weighted interval scheduling
+Convention. Jobs are in ascending order of finish time: f1 ≤ f2 ≤ . . . ≤ fn .
+Def. p( j) = largest index i < j such that job i is compatible with j.
+Ex. p(8) = 1, p(7) = 3, p(2) = 0.
+9
+time 0 1 2 3 4 5 6 7 8 9 10 11
+6
+7
+8
+4
+3
+1
+2
+5
+i is rightmost interval that ends before j begins
+Dynamic programming: binary choice
+Def. OPT( j) = max weight of any subset of mutually compatible jobs for
+subproblem consisting only of jobs 1, 2, ..., j.
+Goal. OPT(n) = max weight of any subset of mutually compatible jobs.
+Case 1. OPT( j) does not select job j.
+・Must be an optimal solution to problem consisting of remaining
+jobs 1, 2, ..., j – 1.
+Case 2. OPT( j) selects job j.
+・Collect profit wj.
+・Can’t use incompatible jobs { p(j) + 1, p(j) + 2, ..., j – 1 }.
+・Must include optimal solution to problem consisting of remaining
+compatible jobs 1, 2, ..., p( j).
+Bellman equation.
+10
+optimal substructure property (proof via exchange argument)
+OP T (j) = 0 B7 j = 0
+max { OP T (j 1), wj + OP T (p(j)) } B7 j > 0
+<latexit sha1_base64="qEOy02oDztIDL8rE3HZJCxx6JUo=">AAACxnicbVHbattAEF0pvaTuzUkf+zLUtMQ0NVJSaIpJCfSlfaoLcRPwCrNajex1Viuxu2pshKE/0g/r33Sl6KG2O7BwODN7ZuZMXEhhbBD88fy9e/cfPNx/1Hn85Omz592Dwx8mLzXHMc9lrq9jZlAKhWMrrMTrQiPLYolX8c3nOn/1E7URubq0qwKjjM2USAVn1lHT7u9vo8ujRR/o8JwOOzTGmVAVd4Jm3aHDAN4Atbi0UIFIYQ0LOIcAKJ0MTjGLXAXN2BKoxNQCrYAeQ6P3LuwfO0m4nS7gbUMVrkm/zlMtZnNXvN6V/tRIdyiqpB1h2u0Fg6AJ2AVhC3qkjdH0wDukSc7LDJXlkhkzCYPCRhXTVnCJbqfSYMH4DZvhxEHFMjRR1fi4hteOSSDNtXvKQsP++6NimTGrLHaVGbNzs52ryf/lJqVNz6JKqKK0qPhdo7SUYHOojwKJ0MitXDnAuBZuVuBzphm37nQbXRrtAvnGJtWyVILnCW6x0i6tZrWL4bZnu2B8Mvg4CL+/712ctXbuk5fkFTkiIflALsgXMiJjwr09r++deKf+Vz/3S//2rtT32j8vyEb4v/4CZY/TYA==</latexit>
+Weighted interval scheduling: brute force
+11
+BRUTE-FORCE (n, s1, ..., sn, f1, ..., fn, w1, ..., wn)
+_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+Sort jobs by finish time and renumber so that f1 ≤ f2 ≤ ... ≤ fn.
+Compute p[1], p[2], ..., p[n] via binary search.
+RETURN COMPUTE-OPT(n).
+COMPUTE-OPT( j )
+_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+IF (j = 0)
+RETURN 0.
+ELSE
+RETURN max {COMPUTE-OPT( j – 1), wj + COMPUTE-OPT( p[ j ]) }.
+What is running time of COMPUTE-OPT(n) in the worst case?
+A. Θ(n log n)
+B. Θ(n2)
+C. Θ(1.618n)
+D. Θ(2n)
+12
+Dynamic programming: quiz 1
+COMPUTE-OPT( j )
+_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+IF (j = 0)
+RETURN 0.
+ELSE
+RETURN max {COMPUTE-OPT( j – 1), wj + COMPUTE-OPT( p[ j ]) }.
+T (n) =
+(1) B7 n = 1
+2T (n 1) + (1) B7 n > 1
+<latexit sha1_base64="eY4cuuNdtPSoc87X0TvZnXEtJMc=">AAACsXicdVFtaxNBEN4732p8S6vfRBlMlZRiuCuFVopS8IsfKyS2mDvi3t5csmRv79idk4Qj3/2L/gl/g3vpCSbVgV0enpl5ZvbZpFTSUhD89Pxbt+/cvbdzv/Pg4aPHT7q7e19sURmBI1Gowlwl3KKSGkckSeFVaZDnicLLZP6xyV9+R2NloYe0LDHO+VTLTApOjpp0fwz7+gCiM3jfXJ0owanUtXCKdtWJzqLhDIn3wwN4AxHhgmqQGexrVx7uwwqiaDw4wTx2pUdOCd5C2KgdOi34b++HP72dCHXaDpt0e8EgWAfcBGELeqyNi8mutxelhahy1CQUt3YcBiXFNTckhUK3fWWx5GLOpzh2UPMcbVyvLVvBa8ekkBXGHU2wZv/uqHlu7TJPXGXOaWa3cw35r9y4ouw0rqUuK0ItrgdllQIqoPEfUmlQkFo6wIWRblcQM264IPdLG1PW2iWKjZfUi0pLUaS4xSpakOGNi+G2ZzfB6GjwbhB+Pu6dn7Z27rDn7BXrs5CdsHP2iV2wERPsl/fMe+G99I/9r/43P7ku9b225ynbCH/+G90py9g=</latexit>
+
+
+Weighted interval scheduling: brute force
+Observation. Recursive algorithm is spectacularly slow because of
+overlapping subproblems ⇒ exponential-time algorithm.
+Ex. Number of recursive calls for family of “layered” instances grows like
+Fibonacci sequence.
+13
+3
+4
+5
+1
+2
+p(1) = 0, p(j) = j-2
+43
+3 2 21
+21
+10
+1 010
+recursion tree
+5
+Weighted interval scheduling: memoization
+Top-down dynamic programming (memoization).
+・Cache result of subproblem j in M[j].
+・Use M[j] to avoid solving subproblem j more than once.
+14
+M-COMPUTE-OPT( j )
+_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+IF (M [ j ] is uninitialized)
+M [ j ] ← max { M-COMPUTE-OPT ( j – 1), wj + M-COMPUTE-OPT( p[ j ]) }.
+RETURN M [ j ].
+TOP-DOWN(n, s1, ..., sn, f1, ..., fn, w1, ..., wn)
+_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+Sort jobs by finish time and renumber so that f1 ≤ f2 ≤ ... ≤ fn.
+Compute p[1], p[2], ..., p[n] via binary search.
+M [ 0 ] ← 0.
+RETURN M-COMPUTE-OPT(n).
+global array
+Weighted interval scheduling: running time
+Claim. Memoized version of algorithm takes O(n log n) time.
+Pf.
+・Sort by finish time: O(n log n) via mergesort.
+・Compute p[j] for each j : O(n log n) via binary search.
+・M-COMPUTE-OPT( j ): each invocation takes O(1) time and either
+- (1) returns an initialized value M [ j]
+- (2) initializes M [ j] and makes two recursive calls
+・Progress measure Φ = # initialized entries among M[1.. n].
+- initially Φ = 0; throughout Φ ≤ n.
+- (2) increases Φ by 1 ⇒ ≤ 2n recursive calls.
+・Overall running time of M-COMPUTE-OPT(n) is O(n). ▪
+15 16
+
+
+Weighted interval scheduling: finding a solution
+Q. DP algorithm computes optimal value. How to find optimal solution?
+A. Make a second pass by calling FIND-SOLUTION(n).
+Analysis. # of recursive calls ≤ n ⇒ O(n).
+17
+FIND-SOLUTION( j )
+_____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________ ____________________________________________________________________________________________________________
+IF (j = 0)
+RETURN ∅.
+ELSE IF (wj + M [ p[ j ]] > M [ j – 1])
+RETURN { j } ∪ FIND-SOLUTION(p[ j ]).
+ELSE
+RETURN FIND-SOLUTION( j – 1).
+M [ j ] = max { M[j – 1], wj + M[p[ j ]] }.
+Weighted interval scheduling: bottom-up dynamic programming
+Bottom-up dynamic programming. Unwind recursion.
+Running time. The bottom-up version takes O(n log n) time.
+18
+BOTTOM-UP(n, s1, ..., sn, f1, ..., fn, w1, ..., wn)
+_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+Sort jobs by finish time and renumber so that f1 ≤ f2 ≤ ... ≤ fn.
+Compute p[1], p[2], ..., p[n].
+M [ 0 ] ← 0.
+FOR j = 1 TO n
+M [ j ] ← max { M [ j – 1], wj + M [ p[ j ]] }.
+_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+previously computed values
+MAXIMUM SUBARRAY PROBLEM
+Goal. Given an array x of n integer (positive or negative),
+find a contiguous subarray whose sum is maximum.
+Applications. Computer vision, data mining,
+genomic sequence analysis, technical job interviews, ....
+19
+12 5 −1 31 −61 59 26 −53 58 97 −93 −23 84 −15 6
+187
+MAXIMUM SUBARRAY PROBLEM
+Goal. Given an array x of n integer (positive or negative),
+find a contiguous subarray whose sum is maximum.
+Brute-force algorithm.
+・For each i and j : computer a[i] + a[i+1] + ... + a[j].
+・Takes Θ(n3) time.
+Apply “cumulative sum” trick.
+・Precompute cumulative sums: S[i] = a[0] + a[1] + ... + a[i].
+・Now a[i] + a[i+1] + ... + a[j] = S[j] − S[i−1].
+・Improves running time Θ(n2).
+20
+12 5 −1 31 −61 59 26 −53 58 97 −93 −23 84 −15 6
+187
+ij
+
+
+KADANE’S ALGORITHM
+Def. OPT( i) = max sum of any subarray of x whose rightmost
+index is i.
+Goal.
+Bellman equation.
+Running time. O(n).
+21
+take only element i
+take element i together with best subarray ending at index i − 1
+OP T (i) = x1 B7 i = 1
+max { xi, xi + OP T (i 1) } B7 i > 1
+<latexit sha1_base64="IzPr6CPzgLq87qXSEs8B8qojGEU=">AAACwnicbVFdb9MwFHXC1yhf3Xjk5YpqaBOjawCJoWpoEkLijSKtbFIdRY5z01p1nGA7KFXoD+Gn8WvAyfJAW65k+eice8/1vY4LKYwdjX57/q3bd+7e27vfe/Dw0eMn/f2DbyYvNccpz2Wur2NmUAqFUyusxOtCI8tiiVfx8mOjX/1AbUSuLu2qwDBjcyVSwZl1VNT/9WVyeSSOgY7P6bhHY5wLVXNnaNY9Oq6iAF4AtVhZqEGksAYB5xAApbPhG8xCl0MzVgGVmFqgNdATqCJx4vyaG15C6/8qOG4UqsV84dLWu6YfWtMeRZV07aP+YDQctQG7IOjAgHQxifa9A5rkvMxQWS6ZMbNgVNiwZtoKLtHNUxosGF+yOc4cVCxDE9btDtdw6JgE0ly7oyy07L8VNcuMWWWxy8yYXZhtrSH/p81Km56FtVBFaVHxm0ZpKcHm0HwIJEIjt3LlAONauLcCXzDNuHXfttGl9S6Qb0xSV6USPE9wi5W2spo1Wwy2d7YLpq+H74fB17eDi7NunXvkGXlOjkhA3pEL8plMyJRw8sc79Ibeqf/JX/rffXOT6ntdzVOyEf7Pv+19094=</latexit>
+miax OP T (i)
+<latexit sha1_base64="CZcWtyZJDhy3Lko1sMUcUMz99YY=">AAACOXicbVDLTgIxFO3gC/E14NJNIzHRDZkxJmLckLhxJyYgJEBIp1y0odOZtHcIZMKfuNWv8EfcujJu/QHLYyHoSZqcnHNfPUEshUHPe3cya+sbm1vZ7dzO7t7+gZsvPJgo0RzqPJKRbgbMgBQK6ihQQjPWwMJAQiMY3Ez9xhC0EZGq4TiGTsgelegLztBKXddth2zUFbR9Te+qtVNx1nWLXsmbgf4l/oIUyQLVbt4ptHsRT0JQyCUzpuV7MXZSplFwCZNcOzEQMz5gj9CyVLEQTCednT6hJ1bp0X6k7VNIZ+rvjpSFxozDwFaGDJ/MqjcV//NaCfbLnVSoOEFQfL6on0iKEZ3mQHtCA0c5toRxLeytlD8xzTjatJa2zGbHwJd+ko4SJXjUgxVV4gg1m9gU/dXM/pL6eemq5N9fFCvlRZxZckSOySnxySWpkFtSJXXCyZA8kxfy6rw5H86n8zUvzTiLnkOyBOf7B0NwrLA=</latexit>
+Goal. Given an n-by-n matrix A, find a rectangle whose sum is maximum.
+Applications. Databases, image processing, maximum likelihood
+estimation, technical job interviews, ...
+A=
+2505223
+4313211
+5635142
+1131411
+3320332
+2121131
+2401031
+<latexit sha1_base64="7MCCgMPkRZ+McrhVixdB+YGxHPQ=">AAADhXicbVLbbtNAEF3XQEu4teWRlxERiJdEdmJKJYQo4oXHIpG2Iraq9WaSrLpeW7tr1MjKx/EZfAGv8AesvbmXkXZ0dObMmfV400JwbYLgl7fn37v/YP/gYevR4ydPnx0eHV/ovFQMBywXubpKqUbBJQ4MNwKvCoU0SwVepjef6/rlD1Sa5/KbmRWYZHQi+Zgzaix1feR9/wTxe/hQp1jg2MAQ4hQnXFZUKTqbV8rFvNXpwWuAt3UKbOrUyHF16vQhjofdCLOkBZEjbArren8pgtBxK2VjAidLkfNsRJFzXyvDLTuHoqUnbHi6+npmsOrp73qu79TbcFqPWHv2lndyduFqC07ZilGOFhtrxYpPpgaS68N20A2agLsgXIA2WcS5/RvH8ShnZYbSMEG1HoZBYRLrazgTaJ1LjQVlN3SCQwslzVAnVfMK5vDKMiMY58oeaaBhNzsqmmk9y1KrzKiZ6t1aTf6vNizN+DSpuCxKg5K5QeNSgMmhflIw4gqZETMLKFPc3hXYlCrKjH14W1Ma7wLZ1pdUt6XkLB/hDivMrVF0brcY7u7sLrjodUO72q9R++x0sc8D8oK8JG9ISN6RM/KFnJMBYd5P77f3x/vr7/sdP/JPnHTPW/Q8J1vhf/wHS3ruiw==</latexit>
+MAXIMUM RECTANGLE PROBLEM
+22
+13
+j jʹ
+Assumption. Suppose you knew the left and right column indices j and jʹ.
+An O(n3) algorithm.
+・Precompute cumulative row sums .
+・For each j < jʹ :
+– define array x using row-sum differences:
+– run Kadane’s algorithm in array x
+Open problem. O(n3−ε) for any constant ε > 0.
+A=
+2505223 4313211 5635142 1131411 3320332 2121131
+2401031
+<latexit sha1_base64="7MCCgMPkRZ+McrhVixdB+YGxHPQ=">AAADhXicbVLbbtNAEF3XQEu4teWRlxERiJdEdmJKJYQo4oXHIpG2Iraq9WaSrLpeW7tr1MjKx/EZfAGv8AesvbmXkXZ0dObMmfV400JwbYLgl7fn37v/YP/gYevR4ydPnx0eHV/ovFQMBywXubpKqUbBJQ4MNwKvCoU0SwVepjef6/rlD1Sa5/KbmRWYZHQi+Zgzaix1feR9/wTxe/hQp1jg2MAQ4hQnXFZUKTqbV8rFvNXpwWuAt3UKbOrUyHF16vQhjofdCLOkBZEjbArren8pgtBxK2VjAidLkfNsRJFzXyvDLTuHoqUnbHi6+npmsOrp73qu79TbcFqPWHv2lndyduFqC07ZilGOFhtrxYpPpgaS68N20A2agLsgXIA2WcS5/RvH8ShnZYbSMEG1HoZBYRLrazgTaJ1LjQVlN3SCQwslzVAnVfMK5vDKMiMY58oeaaBhNzsqmmk9y1KrzKiZ6t1aTf6vNizN+DSpuCxKg5K5QeNSgMmhflIw4gqZETMLKFPc3hXYlCrKjH14W1Ma7wLZ1pdUt6XkLB/hDivMrVF0brcY7u7sLrjodUO72q9R++x0sc8D8oK8JG9ISN6RM/KFnJMBYd5P77f3x/vr7/sdP/JPnHTPW/Q8J1vhf/wHS3ruiw==</latexit>
+BENTLEY’S ALGORITHM
+23
+Sij =
+j
+k=1
+Aik
+<latexit sha1_base64="hAhGMhRyRjoYbIVIbkUh6Iy0kU0=">AAACUHicbVDBThsxEJ0N0NIAJcCxF4sIlQOKdqtK0AMSFReOVG0AKZuuvM4ETGzvyp6tiFb7CXwNV/gKTnwKJ+qEIJHAkyw/vTfj8bw0V9JRGD4Etbn5hQ8fFz/Vl5ZXPq821tZPXFZYgW2RqcyepdyhkgbbJEnhWW6R61ThaTo4HPmn/9A6mZk/NMyxq/m5kX0pOHkpaXz9nZTysmL7LHaFjpXUklxSDuKd/Xgnqv5esp++YFAljWbYCsdgb0k0IU2Y4DhZC9bjXiYKjYaE4s51ojCnbsktSaGwqseFw5yLAT/HjqeGa3TdcrxRxba80mP9zPpjiI3V1x0l184NdeorNacLN+uNxPe8TkH9vW4pTV4QGvE8qF8oRhkbxcN60qIgNfSECyv9X5m44JYL8iFOTRm/naOY2qS8KowUWQ9nVEVXZPkoxWg2s7ek/a31oxX9+t482JvEuQhfYBO2IYJdOIAjOIY2CLiGG7iFu+A+eAyeasFz6csNGzCFWv0/uUC01w==</latexit>
+solve maximum subarray problem in this array
+x=
+7 4 3 6 5 0
+1
+<latexit sha1_base64="KksKdRyhI0qOgtDRpYhf7ThpXdA=">AAACrnicbVHRatswFJXdrUvdrUvSt/ZFLBT20mB32doyBoW+7LGDZSnYJsjydSIqy0a6Hgkmj/3IfsN+YkpqmJPugsTRufeeKx0lpRQGff/Jcfdevd5/0znwDt++O3rf7fV/maLSHMa8kIW+T5gBKRSMUaCE+1IDyxMJk+Thdp2f/AZtRKF+4rKEOGczJTLBGVpq2n1c0Ogr/bbevEhChjSkUQIzoWqmNVuuar3yzi9pFIXDEeSxR0f/8PmnFv+lhT/T1sFvHwIvApU22l6kxWyONJ52B/7Q3wR9CYIGDEgTd9Oe04/Sglc5KOSSGRMGfomx1UXBJVjlykDJ+AObQWihYjmYuN74taJnlklpVmi7FNIN2+6oWW7MMk9sZc5wbnZza/J/ubDC7CquhSorBMWfB2WVpFjQtfk0FRo4yqUFjGth70r5nGnG0X7R1pSNdgl86yX1olKCFynssBIXqNnKuhjsevYSjC+G18Pgx2hwc9XY2SGn5AP5SAJySW7Id3JHxoSTP07POXFO3cCduLE7fS51nabnmGyFO/8L1OHLhA==</latexit>
+0−5−2
+xi = Sij Sij
+<latexit sha1_base64="6Iv2z52WvxSnJvX12CP4j21Z+nA=">AAACQHicbVDLSgMxFM34rPXV1oULN8EiurHMiKAuhIIblxWtFWoZMultjWYyQ3JHWob5Grf6FX6Fn+BK3LoyfSxs64HA4Zz7yD1BLIVB1/1w5uYXFpeWcyv51bX1jc1CsXRrokRzqPNIRvouYAakUFBHgRLuYg0sDCQ0gqeLgd94Bm1EpG6wH0MrZF0lOoIztJJf2O75gp7Taz8Vj/sZPRyxLO8Xym7FHYLOEm9MymSMml90SvftiCchKOSSGdP03BhbKdMouIQsf58YiBl/Yl1oWqpYCKaVDi/I6J5V2rQTafsU0qH6tyNloTH9MLCVIcMHM+0NxP+8ZoKd01YqVJwgKD5a1EkkxYgO4qBtoYGj7FvCuBb2r5Q/MM042tAmtgxnx8AnLkl7iRI8asOUKrGHmmU2RW86s1lSP6qcVbyr43L1dBxnjuyQXXJAPHJCquSS1EidcJKRF/JK3px359P5cr5HpXPOuGeLTMD5+QWvkq9d</latexit>
+6. DYNAMIC PROGRAMMING I
+‣ weighted interval scheduling
+‣ segmented least squares
+‣ knapsack problem
+‣ RNA secondary structure
+SECTION 6.3
+
+
+Least squares
+Least squares. Foundational problem in statistics.
+・Given n points in the plane: (x1, y1), (x2, y2) , ..., (xn, yn).
+・Find a line y = ax + b that minimizes the sum of the squared error:
+Solution. Calculus ⇒ min error is achieved when
+x
+y
+25
+a = n∑
+i xiyi − (∑
+i xi)(∑
+i yi)
+n∑
+i xi2 − (∑
+i xi)2 , b =
+∑
+i yi − a ∑
+i xi
+n
+<latexit sha1_base64="hou5sSfgRKm6MyHbI7CDNFaWlEGDnRPBwJcfwmvkDbeAPM5gL+sEV/idyuegZoOr/2L7XM4/7TD0oQ=">AAACunicbVFHNBbbTa9tQwwEHJXCSdVlWyl5lJrfae2YN3KuJHlEHjSqKBpYYJgVu01bEBRqYNwEoSrFvJ3bKtS9fIAklKSqIpQCEkghHber7Oh0RSMWKYJVpupQEcd10oh2svm0zjcFiRgTxe1wJlF2rJHlCS2feZY1VYxG7tYSaRrsfKojj4+hBvjn4cD9OIUT7vn96cHWOInN7mf9zciJMlVX5mZxnLdAWq5olI3gOZQS08Te7byMT/S2fE/TdemZzrNYajzSP9lWnKaJP2RokSdpGhSAPjyf6CuFWPY83S9j3/4b9atvO+zv5Fxew92sp/vOjFn/Vzu05au6Dv/h3G4yO8yzevsPr/xHrlbCsWVb1MXnw+IxYnlwoTmlMrKCGVx+O6cJyvSQAlhoTpn5INLawJKHyKARSpJGF4sOVc+lkjtSQEeMFnppPMbS4RsWD0kKh2T/Oy9FQLJ/lNTvU6vZ/Qf5mWU/F+zn+poL7b67G6SyNs0KcpNV9Rbp3CUnheJZORa08FhmFHMEMOCtFeCESypgmleAg/PgJICU6eOKfvO+g9VNdGPA33oJvyYP/UD0Bbs0kNWsmiKieATW6AFLOeRrmPFkLIiG29uMSTzuCWfWNTfBHpxR37LG5hY3juQ7G+dOz8X/9bw4jzr46YQz+W34/2d+59woZyzq289zcdV90c659f6rmNz4eX/tkcKtCz6TU3nfqwut5G3yJan1Pv8TVdTm5Q3DkzqTrTxz1NboXhyCqHr4JimqWv4/gGZWHphjoPVNfxhsLNkeI0upH4WOsw9xeEF+w0CWgeg2Aan2/QGCpbeyBJC0L8nsB6HxUOt60Hw/em+zPeSn/Vbc87CbeVYvqc/EbpgozqVEsbanC9cd5Z56RJlTVBbybMJMGm5DolEQwmChaksy2NdD1xMOVInNAMOxU0KaAHxUFBNawSguKUcGTOwDq3JhE6h26heXLxItBGrjlFG4lDC5cG158/xEK4F3qHnKzsFilEo5OIU2OR2dmWm/3WNrEPX2E89VpqeW+7dluyHiXxgl6dTQLG0aLKZ07Z1Rl8b5yCZVuQ6mlvU0afKVfCxu0R5dQjlWvF7xmMfXJblEuk+qCcoXMOdgJhew+81rNUiOtP1e/cOlQU5/Is4v4vrKNQg7Y6CVmYTj7ndQCS8r1reIof9UQRqTiLPNXpaLUhHFwZBioalMuPxkFKBuiC4gC/VPgt9uPXTobQKmom4SQBCnG0O88GPAc+GueGI/kAavMmyCLs3LXcqFX+SaDmPt7YIBefGE9cmdPzauc1uFO+qWaKvmKWzssLcUteaXqyX29Ihp2B59Bk5j5JoLqXUb4eJ7XV5YgnYRdxc8XpFNbkyrPUMPDQonx0Yaitmrzh93cF7DwCN+YuPYeDjPt4QZbX1v9bhX7vBEeVng77Gw+3/Y5ZBzYWbz8uAU67GTYeWM8SfZyveSKsdTF+t0QiWDEs2C3Sf1QY2hnx2eDSB6N2yH8Y5CzJ9Zi6mcHgkRvD605EJhIn5ZgKTe/iv3/g3ltvofvbhkBYfuSfuhYCPlGf2ce45YiWLQ0f/jzgCSJ4Tmr+lHtdn5VK9D1z<iV/KslkyavFt7zeS7xRei1At/R>Qt=S<2/Xlga=t<e/xliat>exit>
+SSE =
+n ∑
+i=1
+(yi − axi − b)2
+<latexit sha1_base64="PkZzNy3K17MLudiMqCf319i1Z/wkRpS2nqHyUNra6hd/TkwuE6lHpfFqgPMYEmptaEvhBhVWK/sWMQ8=">AAACV3icbVBDNTbxh9sNxAEJ04sYlLaAQEbTP65lSa4sRQKHjRLFyh64auooIUEKnjRp0yo0wt27MuFuV5lSaVEFAWJqFSQhAkJigApc4xqBySpABXIAQRlSEYPrSmCVwy1u5ptmMAJEhsgduuepv76dsb2meXc2PhOt0qoS0lpSWv+w/RZ0fnV8X/FQDyOVSIfuK47LEZw/9GBovrf0WwRL3fseA+DukQ+IcFSSAReQdJkvLefty5/ezfcnMz7HZOsjy+y/LeOULli0LUqQtVU+tBfOL6T9/7biT3rxqeVP1vH/7TWs4rP6nHOd+2XY0VX93qP74n8tj3K1bn/dz8+1f8+J/+V1fpOq9qvNV7SGb58ttcPk2cRyCmYBBzyPAJJtVCkKohVxUm/YHYkHh4ObjLVbSFlmJFojJcjkyWSQ2SpSF7p4KP8cAwG0geNTRc2wjKpjFvSNIO/pFHuJtTdpoL0rlq4b/16uSCU8dN0XjVaZiKabxq6M/g90hBTYGbpNDjUWmucIzJ+FX1/WXFiIz6iLlBg4SROcSncohHqbBOXNWf+mXfo3ke9pHmGe036w5ytn727xWWbIa1bLT2rmiWywudOzRcOI9MSkz/OlDldctjqeA66+ru0+D82cVAX9bobSWRfRafKBG98JoU+v1Xx9RYx/XOTl/5En+Ppi81i/GsWnHwf9/oqhtqBv3Hw/eRTw7LQTYhoOAJ93HBoc8QtAxjpP5WDcWqfzNctvb3qH1TLwRpueh3pvfyd/BI8PYdUjhJhPBOVSRK3xoda9hhtIJPGKRGGBc7a0tjKIJbPqkBGgT4KGthuZeX3cAJkTNB6LQmeKXYlc30XvNHDSLzKVGBzLwhKvxxdUQTP2OMfLE4K7sRaBeyRXoz/BWByOwv07ZoDO7m8woccesbo2M+Dk3I+l1O5bWmXBlMjiJ9NosflMtxvSfRxTcMZErIT1jaaF7cudVaJOW7YMD+mIt+TXrTcmShuR57ybr4O1w0X5okzj/el7xRmJrzTBOsBnvfCzizWgmS0oFyF1m+lhTy+NPtqck8q9dnFBTgojomF5SCdtLGVnKaWNatJEcpWYhkggwtlaprDUHTJCLDJFajKOaGsVGCBFQSkW6erw6hvCDTBQKdpyGS5uI4rwY8eKy4cMleNzOLtG9dCl63YrJkceLzrbFnrDUgupgT35F0+J5VtRUcrlSE/52LEStuzFczMIMX9tUVRJtTPCLkHGwDD0SV1+XIdRkinfuAZOx/fhZOFIhQRe3iDJdT8+cLh+F/ez9kM89ZG5jvR1Q67v1Dzs1provOr7HzGNczu3DHmGs83MEgKfLV5Ad+wiYjHGhATD2KhI7CKgAKCF/w+AxhdA1BziA+CLhAuC34z9Q0CfQC8cfhATFvi+3At8NPAgxfi5+4VgRvX15t7744gIOMd1fV4Kr1sNVwTWfqevVvY3FSmesd8+p7QHlhq8rVe81aO5LopJPlFzm<EA/Wqlzva8/tQge=Lx=gi<Yt/b>lXait<e/xliat>exit>
+Segmented least squares
+Segmented least squares.
+・Points lie roughly on a sequence of several line segments.
+・Given n points in the plane: (x1, y1), (x2, y2) , ..., (xn, yn) with
+x1 < x2 < ... < xn, find a sequence of lines that minimizes f (x).
+Q. What is a reasonable choice for f (x) to balance accuracy and parsimony?
+x
+y
+26
+goodness of fit number of lines
+Segmented least squares
+Segmented least squares.
+・Points lie roughly on a sequence of several line segments.
+・Given n points in the plane: (x1, y1), (x2, y2) , ..., (xn, yn) with
+x1 < x2 < ... < xn, find a sequence of lines that minimizes f (x).
+Goal. Minimize f (x) = E + c L for some constant c > 0, where
+・E = sum of the sums of the squared errors in each segment.
+・L = number of lines.
+x
+y
+27
+Dynamic programming: multiway choice
+Notation.
+・OPT( j ) = minimum cost for points p1, p2, ..., pj.
+・eij = SSE for for points pi, pi+1, ..., pj.
+To compute OPT( j):
+・Last segment uses points pi, pi+1, ..., pj for some i ≤ j.
+・Cost = eij + c + OPT(i – 1).
+Bellman equation.
+28
+optimal substructure property (proof via exchange argument)
+OP T (j) =
+0 B7 j = 0
+min
+1ij
+{ eij + c + OP T (i 1) } B7 j > 0
+<latexit sha1_base64="3Vqhon9XuZlMDxUy0KO6LsmTpKw=">AAAC6XicbVFNaxsxENVuv1L3I0567GWoaUgoNbtpoQkmJdBLD4W6ECcByxitPGvL0WoXSRtsxP6Jnkqv/SP9G/031W58qO0OSHq8edKbGSWFFMZG0Z8gvHf/wcNHO49bT54+e77b3tu/NHmpOQ54LnN9nTCDUigcWGElXhcaWZZIvEpuPtX5q1vURuTqwi4LHGVsqkQqOLOeGrd/f+1fHM6PgPbOaK9FE5wK5bh/0FQt2ovgAKjFhQUHIoUK5nAGEVA67L7DbOQVNBOKSpEJa8aOmjIxlvEbVyuOvQJioBJBNPu8quoztUCdNwQcOzGv4A1wv+o6xNv4yPNUi+nMi6pt94+Ne4uimqyqHLc7UTdqArZBvAIdsor+eC/Yp5OclxkqyyUzZhhHhR05pq3gEn3bpcHCN8GmOPRQsQzNyDWjruC1ZyaQ5tovZaFh/73hWGbMMku8MmN2ZjZzNfm/3LC06cnICVWUFhW/M0pLCTaH+t9gIjRyK5ceMK6FrxX4jGnGrf/dNZfm7QL5WiduUSrB8wlusNIurGb1FOPNmW2DwXH3tBt/e985P1mNc4e8JK/IIYnJB3JOPpM+GRAeHARfgkFwGcrwe/gj/HknDYPVnRdkLcJffwFz2eL9</latexit>
+
+
+Segmented least squares algorithm
+29
+SEGMENTED-LEAST-SQUARES(n, p1, ..., pn, c)
+__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+FOR j = 1 TO n
+FOR i = 1 TO j
+Compute the SSE eij for the points pi, pi+1, ..., pj.
+M [ 0] ← 0.
+FOR j = 1 TO n
+M [ j ] ← min 1 ≤ i ≤ j { eij + c + M [ i – 1] }.
+RETURN M [ n].
+__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+previously computed value
+Segmented least squares analysis
+Theorem. [Bellman 1961] DP algorithm solves the segmented least squares
+problem in O(n3) time and O(n2) space.
+Pf.
+・Bottleneck = computing SSE eij for each i and j.
+・O(n) to compute eij. ▪
+Remark. Can be improved to O(n2) time.
+・For each i : precompute cumulative sums .
+・Using cumulative sums, can compute eij in O(1) time.
+30
+aij = n ∑
+k xkyk − (∑
+k xk)(∑
+k yk)
+n∑
+k x2k − (∑
+k xk)2 , bij =
+∑
+k yk − aij
+∑
+k xk
+n
+<latexit sha1_base64="JCBiRCXJhESxyk1fFC/3jkfe/NfPhrXGhSqoE658mPsUdZCKbFjaDLWX72JabUvOVsRzGLDjMmhoMUA=">AAACyXicbVHFdSTbt9xRMAwFJH65UkWCrBjfQD/TGaU+1BuVSv76H29IZmiqU0ghWUMFFItOMEyFmSNjLuSL4iQkoqsBpRQbkwD1hgIpTvESOi9H86C8YC8a0DFxAbckhIycdi0kYau1TzXieXYnTn0jOF3tIG3axJdeJTHMuS6vfP8Y7m1DF6b2gkblqXyivh/ENi/OJh/jLg6/0CFgTvg08/PHTgpyYOaZk7zaWu77gXurcqgnBL2mJ0f5bnm4ZfzLPu9j9/e85rJnlyebk8QFkU1pRyeXYD+IaCbB8jM3G7/ldx5eczxt9vX63C/N4GxtR9LhsycPyeXunzrp0a8++sMsrnbqTrs31+vucbbvOWNzm19vs1r5Y3IR3XRADhkHFKicltMWEeZoKkU0w4SwThs0jKChqiPl4QxxKRJL7jIhEURnutBFQpGq4oRHcDGwypUREHOPmBJfJETM4jjF5xE3qy//+CNAdTcX4aqjKD3yQ6vvg950lAre8yYzQ1LXTn8kG2oQ4wx07EnEKkOQGpAW5sdJhgnTHnaBIeWF83xrVpiNIGz2u68+BaKXH+HnaFyRznp2n/spaolvr+aqacQKfwMmIgyBWvrsKNkFEjL+TBvSKN0dokM+jpHbndP6BXQ7TPSuxUn+T17wd5c8Qu9H+5creNYi3udb80oLHje7tsDm9y+e7xu98xU2Jz4sXOWM1W70cEJunP9nhKb+xn0TQ+7kT907H64o970Qyk6HJPlKv2kFW+l6cKParPSVNjZT7yoxiraQp+JRjL//v6EBbt353l4xXme7/uob4r6tX0RsS2eB0tagzG4aLnA8RdJpT4yIiCzX8eoBs9+6vEUdN/2pZNduzv7vBL/TirpHnJkuXO/wNrp7W06otcSqBSKi0vwYedDehZtxHRaWNZjUgC0AbaroMfzCtRShMFUgwJNnpbYB9rBMccCRpjZwNrJoErAFBJMel4iOwaB7zNGGYHELGt0kgdqQW0zYkrw2HlYvshoCZIKcQftcYf9dea1iCBbaCnSjRFnWnpXTQ89T04ac5SQJsXa67VWPYv8oHZdpD6DZSQThrWElz/Dsbv/SMj0RA5pnZy7Arf5c03dYb5Fd4u1id5JbGzj3MP+BHcdGa6RO3OitZoegNQzJzPI/e3n9X6rt1yCmILQdWH84gfb4WFruQLy40vxhUaqHnUFibZ3NWVok5oN4sSL4jgKZ0atKglUjFnZlM7BPoTQSUBlGjXbpyvZId+wCXYUiOKHw2LBRxMGcj5TBLc0erA3Zp0RrmfiVgbRNluDb0JIauzxec8zBpNodZmJt5r7V2QLZUZLVDpYMP5/arqJrUbKZKIWZcnGl1eaQhkjUOKjMzNckKr1MUuzpwIxlKjGGhwhR8XkGDZ7eBQcYf2weKlg46lbh6x8nmef9Ld0OgGXOvcv0Zz3Ms7/1XZDC8r7j8bU4LlNYsfvhfabIW81HoJb7bJsIPkS7J/IDKisKNkbmyJA7Gg5Q2SdgoMv5k3J+gjOdzSfBCAvHmwp/dEBveyzYaPtcn+BqDbft+/evGA+w+9N8Xgkf2f+X+zO7rM2/7myZoRi7/493a3M+na/v6kCnPEsPz3b5OdvRg/t=5k=Cx<zv/SylmLa3vtb+ewPx=Pi<3t/2>l0a=t<e/xliat>exit>
+i
+k=1
+xk ,
+i
+k=1
+yk ,
+i
+k=1
+x2k ,
+i
+k=1
+xk yk
+<latexit sha1_base64="E9Bo6rLIFL0/cuHYqsa/2SHtfn0=">AAACh3icbVDLSgMxFE3Hd33VunQTLIILKTMiPhZCxY1LBatCH0Mmc6uhmcyY3EjL0L/zJ/wFt/oBpnUQWz0QOJxzT25yokwKg77/VvLm5hcWl5ZXyqtr6xubla3qnUmt5tDkqUz1Q8QMSKGgiQIlPGQaWBJJuI/6l2P//gW0Eam6xWEGnYQ9KtETnKGTwkq3bWwS5v3zYNQVdBD2D2j72bKYTunDH708O989/DfhnHEqrNT8uj8B/UuCgtRIgetwq1Rtxym3CSjkkhnTCvwMOznTKLiEUbltDWSM99kjtBxVLAHTySdFjOieU2LaS7U7CulE/Z3IWWLMMIncZMLwycx6Y/E/r2Wxd9rJhcosguLfi3pWUkzpuFUaCw0c5dARxrVwb6X8iWnG0XU/tWVydwZ86if5wCrB0xhmVIkD1GzkWgxmO/tLmof1s3pwc1RrnBZ1LpMdskv2SUBOSINckWvSJJy8knfyQT69sud7x14x65WKzDaZgnfxBVkmxzI=</latexit>
+6. DYNAMIC PROGRAMMING I
+‣ weighted interval scheduling
+‣ segmented least squares
+‣ knapsack problem
+‣ RNA secondary structure
+SECTION 6.4
+Knapsack problem
+Goal. Pack knapsack so as to maximize total value of items taken.
+・There are n items: item i provides value vi > 0 and weighs wi > 0.
+・Value of a subset of items = sum of values of individual items.
+・Knapsack has weight limit of W.
+Ex. The subset { 1, 2, 5 } has value $35 (and weight 10).
+Ex. The subset { 3, 4 } has value $40 (and weight 11).
+Assumption. All values and weights are integral.
+32
+weights and values can be arbitrary positive integers
+$ 2 8
+7 kg
+$ 2 2
+6 kg
+$ 6
+2 kg
+$ 1
+1 kg
+$ 1 8
+5 kg
+11 kg
+Creative Commons Attribution-Share Alike 2.5 by Dake
+i vi wi
+1 $1 1 kg
+2 $6 2 kg
+3 $18 5 kg
+4 $22 6 kg
+5 $28 7 kg
+knapsack instance (weight limit W = 11)
+
+
+Which algorithm solves knapsack problem?
+A. Greedy-by-value: repeatedly add item with maximum vi.
+B. Greedy-by-weight: repeatedly add item with minimum wi.
+C. Greedy-by-ratio: repeatedly add item with maximum ratio vi / wi.
+D. None of the above.
+33
+Dynamic programming: quiz 2
+Creative Commons Attribution-Share Alike 2.5 by Dake
+$ 2
+8
+7 kg
+$ 2 2
+6 kg
+$ 6
+2 kg
+$ 1
+1 kg
+$ 1 8
+5 kg
+11 kg
+i vi wi
+1 $1 1 kg
+2 $6 2 kg
+3 $18 5 kg
+4 $22 6 kg
+5 $28 7 kg
+knapsack instance (weight limit W = 11)
+Which subproblems?
+A. OPT(w) = optimal value of knapsack problem with weight limit w.
+B. OPT(i) = optimal value of knapsack problem with items 1, ..., i.
+C. OPT(i, w) = optimal value of knapsack problem with items 1, ..., i
+subject to weight limit w.
+D. Any of the above.
+34
+Dynamic programming: quiz 3
+Dynamic programming: two variables
+Def. OPT(i, w) = optimal value of knapsack problem with items 1, ..., i,
+subject to weight limit w.
+Goal. OPT(n, W).
+Case 1. OPT(i, w) does not select item i.
+・OPT(i, w) selects best of { 1, 2, ..., i – 1 } subject to weight limit w.
+Case 2. OPT(i, w) selects item i.
+・Collect value vi.
+・New weight limit = w – wi.
+・OPT(i, w) selects best of { 1, 2, ..., i – 1 } subject to new weight limit.
+Bellman equation.
+35
+optimal substructure property (proof via exchange argument)
+possibly because wi > w
+OP T (i, w) =
+0 B7 i = 0
+OP T (i 1, w) B7 wi > w
+max { OP T (i 1, w), vi + OP T (i 1, w wi) } Qi?2`rBb2
+<latexit sha1_base64="yGc+dBk4QwRLdPr1J0EKEi2YjzI=">AAADBHicbVFNb9NAEF2brxK+0nLkMiICFZFGNkKlKCoq4sKNIDW0UjaK1puxs+p67e6um0RWzvwaTogr/wPxZ1i7OTgpI6309Gbem9mZKJfC2CD44/m3bt+5e2/nfuvBw0ePn7R3976ZrNAchzyTmT6PmEEpFA6tsBLPc40sjSSeRRefqvzZFWojMnVqlzmOU5YoEQvOrKMm7b9fBqf7ogvzV0D7x7TfohEmQpXceZpVi/YDeAnU4sJCCSKGFQg4hgAoHfUOMR27itrhIKw9tmrnEwEfYN6spilbAJUYW6Cl6wkNeRdot6KunOx1I3HgfKr5gGqRzJxw1WiU2RnquTDo+lHaoqim6+kn7U7QC+qAmyBcgw5Zx2Cy6+3RacaLFJXlkhkzCoPcjkumreAS3ToKgznjFyzBkYOKpWjGZX2FFbxwzBTiTLunLNRsU1Gy1JhlGrnKlNmZ2c5V5P9yo8LGR+NSqLywqPh1o7iQYDOoTgpToZFbuXSAcS3crMBnTDNu3eE3utTeOfKNn5SLQgmeTXGLlXZhNau2GG7v7CYYvum974Vf33ZOjtbr3CHPyHOyT0LyjpyQz2RAhoR7H73Ey71L/7v/w//p/7ou9b215inZCP/3P7Vj6Os=</latexit>
+Knapsack problem: bottom-up dynamic programming
+36
+KNAPSACK(n, W, w1, ..., wn, v1, ..., vn )
+__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+FOR w = 0 TO W
+M [ 0, w] ← 0.
+FOR i = 1 TO n
+FOR w = 0 TO W
+IF (wi > w) M [ i, w ] ← M [ i – 1, w ].
+ELSE M [ i, w ] ← max { M [ i – 1, w ], vi + M [ i – 1, w – wi] }.
+RETURN M [ n, W].
+__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+previously computed values
+OP T (i, w) =
+0 B7 i = 0
+OP T (i 1, w) B7 wi > w
+max { OP T (i 1, w), vi + OP T (i 1, w wi) } Qi?2`rBb2
+<latexit sha1_base64="yGc+dBk4QwRLdPr1J0EKEi2YjzI=">AAADBHicbVFNb9NAEF2brxK+0nLkMiICFZFGNkKlKCoq4sKNIDW0UjaK1puxs+p67e6um0RWzvwaTogr/wPxZ1i7OTgpI6309Gbem9mZKJfC2CD44/m3bt+5e2/nfuvBw0ePn7R3976ZrNAchzyTmT6PmEEpFA6tsBLPc40sjSSeRRefqvzZFWojMnVqlzmOU5YoEQvOrKMm7b9fBqf7ogvzV0D7x7TfohEmQpXceZpVi/YDeAnU4sJCCSKGFQg4hgAoHfUOMR27itrhIKw9tmrnEwEfYN6spilbAJUYW6Cl6wkNeRdot6KunOx1I3HgfKr5gGqRzJxw1WiU2RnquTDo+lHaoqim6+kn7U7QC+qAmyBcgw5Zx2Cy6+3RacaLFJXlkhkzCoPcjkumreAS3ToKgznjFyzBkYOKpWjGZX2FFbxwzBTiTLunLNRsU1Gy1JhlGrnKlNmZ2c5V5P9yo8LGR+NSqLywqPh1o7iQYDOoTgpToZFbuXSAcS3crMBnTDNu3eE3utTeOfKNn5SLQgmeTXGLlXZhNau2GG7v7CYYvum974Vf33ZOjtbr3CHPyHOyT0LyjpyQz2RAhoR7H73Ey71L/7v/w//p/7ou9b215inZCP/3P7Vj6Os=</latexit>
+
+
+Knapsack problem: bottom-up dynamic programming demo
+37
+0 1 2 3 4 5 6 7 8 9 10 11
+{} 0 0 0 0 0 0 0 0 0 0 0 0
+{1} 0 1 1 1 1 1 1 1 1 1 1 1
+{ 1, 2 } 0 1 6 7 7 7 7 7 7 7 7 7
+{ 1, 2, 3 } 0 1 6 7 7 18 19 24 25 25 25 25
+{ 1, 2, 3, 4 } 0 1 6 7 7 18 22 24 28 29 29 40
+{ 1, 2, 3, 4, 5 } 0 1 6 7 7 18 22 28 29 34 35 40
+weight limit w
+subset of items 1, ..., i
+OPT(i, w) = optimal value of knapsack problem with items 1, ..., i, subject to weight limit w
+OP T (i, w) =
+0 B7 i = 0
+OP T (i 1, w) B7 wi > w
+max {OP T (i 1, w), vi + OP T (i 1, w wi} Qi?2`rBb2
+<latexit sha1_base64="Z2vromkJx+wQ2wpWsn/gLtchm2Q=">AAAC+nicbVFda9swFJW9ry77SrvHvVwWNjqWBnuMtSN0FPayt2XQrIXIBFm5TkRl2Uhyk2D8a/Y09ro/ssf9m8luHpx0FwSHc889VzqKcymMDYK/nn/n7r37D/Yedh49fvL0WXf/4LvJCs1xzDOZ6cuYGZRC4dgKK/Ey18jSWOJFfPW57l9cozYiU+d2nWOUsrkSieDMOmra/fN1dH4o+rB8A3R4SocdGuNcqJI7T1N16DCA10AtriyUIBKoQMApBEDpZPAB08gpGoejsPHY0S6nAj7Bsq2mKVsBlZhYoCW0ZvtA+3DtBt622KPagWoxXzh51bLP7AL1Uhh0WyjtUFSzzZ2n3V4wCJqC2yDcgB7Z1Gi67x3QWcaLFJXlkhkzCYPcRiXTVnCJLoTCYM74FZvjxEHFUjRR2WRfwSvHzCDJtDvKQsO2J0qWGrNOY6dMmV2Y3V5N/q83KWxyEpVC5YVFxW8WJYUEm0H9kTATGrmVawcY18LdFfiCacat++6tLY13jnzrJeWqUIJnM9xhpV1ZzeoUw93MboPxu8HHQfjtfe/sZBPnHnlBXpJDEpJjcka+kBEZE+4de5GXeHO/8n/4P/1fN1Lf28w8J1vl//4H1VHmOQ==</latexit>
+i vi wi
+1 $1 1 kg
+2 $6 2 kg
+3 $18 5 kg
+4 $22 6 kg
+5 $28 7 kg
+Knapsack problem: running time
+Theorem. The DP algorithm solves the knapsack problem with n items
+and maximum weight W in Θ(n W) time and Θ(n W) space.
+Pf.
+・Takes O(1) time per table entry.
+・There are Θ(n W) table entries.
+・After computing optimal values, can trace back to find solution:
+OPT(i, w) takes item i iff M [i, w] > M [i – 1, w]. ▪
+Remarks.
+・Algorithm depends critically on assumption that weights are integral.
+・Assumption that values are integral was not used.
+38
+weights are integers between 1 and W
+Does there exist a poly-time algorithm for the knapsack problem?
+A. Yes, because the DP algorithm takes Θ(n W) time.
+B. No, because Θ(n W) is not a polynomial function of the input size.
+C. No, because the problem is NP-hard.
+D. Unknown.
+39
+Dynamic programming: quiz 4
+“pseudo-polynomial”
+equivalent to P ≠ NP conjecture because knapsack problem is NP-hard
+COIN CHANGING
+Problem. Given n coin denominations { d1, d2, ..., dn } and a target value V,
+find the fewest coins needed to make change for V (or report impossible).
+Recall. Greedy cashier’s algorithm is optimal for U.S. coin denominations,
+but not for arbitrary coin denominations.
+Ex. { 1, 10, 21, 34, 70, 100, 350, 1295, 1500 }.
+Optimal. 140¢ = 70 + 70.
+40
+
+
+Def. OPT(v) = min number of coins to make change for v.
+Goal. OPT(V).
+Multiway choice. To compute OPT(v),
+・Select a coin of denomination ci for some i.
+・Select fewest coins to make change for v – ci.
+Bellman equation.
+Running time. O(n V).
+COIN CHANGING
+41
+optimal substructure property (proof via exchange argument)
+<latexit sha1_base64="6B5tGCszYw5e5nluRWvumveoBFs=">AAAC/HicbVFNb9NAEF2brxI+mpYjlxERqAgR2QjaSKGoEhduBKlpK2VDtF6Pk1XXa8s7jhJZ4ddwQ1z5Idz4N6zdHEjCSPY+v3m78/w2yrWyFAR/PP/W7Tt37+3dbz14+Ojxfvvg8MJmZSFxKDOdFVeRsKiVwSEp0niVFyjSSONldP2x7l/OsbAqM+e0zHGciqlRiZKCHDVp//48OD+avwTeP+X9Fo9wqkwl3YF21eJ9rkxCS4AXwAkXBBWoBFYwh/cQAOej7jGmY6dzX7ua000NT5XhWqWK7KQKgWsE1bzNql4SAl45GxDCK2hMwWuIJ6q2BrxQ05kTrHanfGimtDiaeO170u4E3aAp2AXhGnTYugaTA++Qx5ksUzQktbB2FAY5jStRkJIaXRClxVzIazHFkYNGpGjHVRP+Cp47JoYkK9xjCBr23x2VSK1dppFTpoJmdrtXk//rjUpKeuNKmbwkNPJmUFJqoAzqm4RYFShJLx0QslDOK8iZKIQkd98bU5qzc5Qbf1ItSqNkFuMWq2lBhahTDLcz2wUXb7rhu27w5W3nrLfOc489Zc/YEQvZCTtjn9iADZn0et5Xb+rN/G/+d/+H//NG6nvrPU/YRvm//gIVIecP</latexit>
+OP T (v) =
+8>>>><
+>>>>:
+1 B7 v < 0
+0 B7 v = 0
+min
+1in { 1 + OP T (v di) } B7 v > 0
+6. DYNAMIC PROGRAMMING I
+‣ weighted interval scheduling
+‣ segmented least squares
+‣ knapsack problem
+‣ RNA secondary structure
+SECTION 6.5
+RNA secondary structure
+RNA. String B = b1b2...bn over alphabet { A, C, G, U }.
+Secondary structure. RNA is single-stranded so it tends to loop back and
+form base pairs with itself. This structure is essential for understanding
+behavior of molecule.
+G
+U
+C
+A
+AG
+A
+G
+GC
+A
+U G
+A
+U
+U
+A
+G
+A
+CA
+A
+C
+U
+G
+A
+G
+U
+C
+A
+U
+C
+G
+G
+G
+C
+C
+G
+RNA secondary structure for GUCGAUUGAGCGAAUGUAACAACGUGGCUACGGCGAGA
+43
+base
+base pair
+Secondary structure. A set of pairs S = { (bi, bj) } that satisfy:
+・[Watson–Crick] S is a matching and each pair in S is a Watson–Crick
+complement: A–U, U–A, C–G, or G–C.
+RNA secondary structure
+44
+A CGUGGCCAU
+S is not a secondary structure (C-A is not a valid Watson-Crick pair)
+B =ACGUGGCCCAU S = { (b1, b10), (b2, b9), (b3, b8) }
+base pair in secondary structure
+C
+GG
+C
+A
+G
+C
+U
+UA
+
+
+Secondary structure. A set of pairs S = { (bi, bj) } that satisfy:
+・[Watson–Crick] S is a matching and each pair in S is a Watson–Crick
+complement: A–U, U–A, C–G, or G–C.
+・[No sharp turns] The ends of each pair are separated by at least 4
+intervening bases. If (bi, bj) ∈ S, then i < j – 4.
+RNA secondary structure
+45
+GG
+C
+A
+G
+U
+UA
+G
+A UGGG CAU
+S is not a secondary structure (≤4 intervening bases between G and C)
+G
+B =AUGGGGCAU S = { (b1, b9), (b2, b8), (b3, b7) }
+Secondary structure. A set of pairs S = { (bi, bj) } that satisfy:
+・[Watson–Crick] S is a matching and each pair in S is a Watson–Crick
+complement: A–U, U–A, C–G, or G–C.
+・[No sharp turns] The ends of each pair are separated by at least 4
+intervening bases. If (bi, bj) ∈ S, then i < j – 4.
+・[Non-crossing] If (bi, bj) and (bk, bl) are two pairs in S, then we cannot
+have i < k < j < l.
+RNA secondary structure
+46
+A GUUGGCCAU
+S is not a secondary structure (G-C and U-A cross)
+C
+GG
+C
+A
+U
+G
+U
+UA
+B =ACUUGGCCAU S = { (b1, b10), (b2, b8), (b3, b9) }
+Secondary structure. A set of pairs S = { (bi, bj) } that satisfy:
+・[Watson–Crick] S is a matching and each pair in S is a Watson–Crick
+complement: A–U, U–A, C–G, or G–C.
+・[No sharp turns] The ends of each pair are separated by at least 4
+intervening bases. If (bi, bj) ∈ S, then i < j – 4.
+・[Non-crossing] If (bi, bj) and (bk, bl) are two pairs in S, then we cannot
+have i < k < j < l.
+RNA secondary structure
+47
+A UGUGGCCAU
+S is a secondary structure (with 3 base pairs)
+C
+GG
+C
+A
+G
+U
+U
+UA
+B =AUGUGGCCAU S = { (b1, b10), (b2, b9), (b3, b8) }
+RNA secondary structure
+Secondary structure. A set of pairs S = { (bi, bj) } that satisfy:
+・[Watson–Crick] S is a matching and each pair in S is a Watson–Crick
+complement: A–U, U–A, C–G, or G–C.
+・[No sharp turns] The ends of each pair are separated by at least 4
+intervening bases. If (bi, bj) ∈ S, then i < j – 4.
+・[Non-crossing] If (bi, bj) and (bk, bl) are two pairs in S, then we cannot
+have i < k < j < l.
+Free-energy hypothesis. RNA molecule will form the secondary structure
+with the minimum total free energy.
+Goal. Given an RNA molecule B = b1b2...bn, find a secondary structure S
+that maximizes the number of base pairs.
+approximate by number of base pairs (more base pairs ⇒ lower free energy)
+48
+
+
+Is the following a secondary structure?
+A. Yes.
+B. No, violates Watson–Crick condition.
+C. No, violates no-sharp-turns condition.
+D. No, violates no-crossing condition.
+49
+Dynamic programming: quiz 5
+G
+U
+C
+A
+AG
+A
+G
+GC
+A
+U G
+A
+U
+U
+A
+G
+CG
+GU
+C
+C
+G
+Which subproblems?
+A. OPT( j) = max number of base pairs in secondary structure
+of the substring b1b2 ... bj.
+B. OPT( j) = max number of base pairs in secondary structure
+of the substring bj bj+1 ... bn.
+C. Either A or B.
+D. Neither A nor B.
+50
+Dynamic programming: quiz 6
+RNA secondary structure: subproblems
+First attempt. OPT( j) = maximum number of base pairs in a secondary
+structure of the substring b1b2 ... bj.
+Goal. OPT(n).
+Choice. Match bases bt and bj.
+Difficulty. Results in two subproblems (but one of wrong form).
+・Find secondary structure in b1b2 ... bt–1.
+・Find secondary structure in bt+1bt+2 ... bj–1.
+OPT(t–1)
+need more subproblems (first base no longer b1)
+51
+1t j
+match bases bt and bn
+last base
+Dynamic programming over intervals
+Def. OPT(i, j) = maximum number of base pairs in a secondary structure
+of the substring bi bi+1 ... bj.
+Case 1. If i ≥ j – 4.
+・OPT(i, j) = 0 by no-sharp-turns condition.
+Case 2. Base bj is not involved in a pair.
+・OPT(i, j) = OPT(i, j – 1).
+Case 3. Base bj pairs with bt for some i ≤ t < j – 4.
+・Non-crossing condition decouples resulting two subproblems.
+・OPT(i, j) = 1 + max t { OPT(i, t – 1) + OPT(t + 1, j – 1) }.
+take max over t such that i ≤ t < j – 4 and bt and bj are Watson–Crick complements
+52
+it j
+match bases bj and bt
+
+
+In which order to compute OPT(i, j) ?
+A. Increasing i, then j.
+B. Increasing j, then i.
+C. Either A or B.
+D. Neither A nor B.
+53
+Dynamic programming: quiz 7
+it j
+match bases bj and bt
+OPT(i, j) depends upon OPT(i, t-1) and OPT(t+1, j-1)
+Bottom-up dynamic programming over intervals
+Q. In which order to solve the subproblems?
+A. Do shortest intervals first—increasing order of ⎜j − i⎟.
+Theorem. The DP algorithm solves the RNA secondary structure problem in
+O(n3) time and O(n2) space.
+54
+6 7 8 9 10
+40 0 0
+30 0
+20
+1
+i
+j
+order in which to solve subproblems
+RNA-SECONDARY-STRUCTURE(n, b1, ..., bn )
+__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+FOR k = 5 TO n – 1
+FOR i = 1 TO n – k
+j ← i + k.
+Compute M[i, j] using formula.
+RETURN M[1, n].
+__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+all needed values are already computed
+Dynamic programming summary
+Outline.
+・Define a collection of subproblems.
+・Solution to original problem can be computed from subproblems.
+・Natural ordering of subproblems from “smallest” to “largest” that
+enables determining a solution to a subproblem from solutions to
+smaller subproblems.
+Techniques.
+・Binary choice: weighted interval scheduling.
+・Multiway choice: segmented least squares.
+・Adding a new variable: knapsack problem.
+・Intervals: RNA secondary structure.
+Top-down vs. bottom-up dynamic programming. Opinions differ.
+55
+typically, only a polynomial number of subproblems

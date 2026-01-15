@@ -1,0 +1,47 @@
+CURRENT MODEL : LSTMAT_AUTORSS
+CURRENT FILE :  LSTMAT_AUTORSS_TEST3_NTF__500K_imp_50s_20e
+[Sanity] Mean-predictor NRMSE ≈ 1.000 (should be ~1.0)
+Epoch 1/20 - RMSE: 0.5949, √Loss: 0.7624
+Validation - RMSE: 0.4572, √Loss: 0.6762
+Epoch 2/20 - RMSE: 0.2579, √Loss: 0.5068
+Validation - RMSE: 0.2923, √Loss: 0.5407
+Epoch 3/20 - RMSE: 0.1971, √Loss: 0.4437
+Validation - RMSE: 0.2481, √Loss: 0.4981
+Epoch 4/20 - RMSE: 0.1762, √Loss: 0.4195
+Validation - RMSE: 0.2300, √Loss: 0.4796
+Epoch 5/20 - RMSE: 0.1653, √Loss: 0.4061
+Validation - RMSE: 0.2001, √Loss: 0.4473
+Epoch 6/20 - RMSE: 0.1493, √Loss: 0.3858
+Validation - RMSE: 0.1612, √Loss: 0.4015
+Epoch 7/20 - RMSE: 0.1364, √Loss: 0.3685
+Validation - RMSE: 0.1307, √Loss: 0.3616
+Epoch 8/20 - RMSE: 0.1245, √Loss: 0.3522
+Validation - RMSE: 0.1105, √Loss: 0.3324
+Epoch 9/20 - RMSE: 0.1182, √Loss: 0.3430
+Validation - RMSE: 0.1080, √Loss: 0.3286
+Epoch 10/20 - RMSE: 0.1151, √Loss: 0.3377
+Validation - RMSE: 0.1052, √Loss: 0.3244
+Epoch 11/20 - RMSE: 0.1046, √Loss: 0.3229
+Validation - RMSE: 0.0917, √Loss: 0.3028
+Epoch 12/20 - RMSE: 0.0965, √Loss: 0.3102
+Validation - RMSE: 0.0841, √Loss: 0.2899
+Epoch 13/20 - RMSE: 0.0896, √Loss: 0.2987
+Validation - RMSE: 0.0757, √Loss: 0.2751
+Epoch 14/20 - RMSE: 0.0809, √Loss: 0.2840
+Validation - RMSE: 0.0824, √Loss: 0.2870
+Epoch 15/20 - RMSE: 0.0743, √Loss: 0.2721
+Validation - RMSE: 0.0643, √Loss: 0.2535
+Epoch 16/20 - RMSE: 0.0678, √Loss: 0.2600
+Validation - RMSE: 0.0589, √Loss: 0.2428
+Epoch 17/20 - RMSE: 0.0624, √Loss: 0.2496
+Validation - RMSE: 0.0556, √Loss: 0.2357
+Epoch 18/20 - RMSE: 0.0578, √Loss: 0.2402
+Validation - RMSE: 0.0522, √Loss: 0.2285
+Epoch 19/20 - RMSE: 0.0544, √Loss: 0.2330
+Validation - RMSE: 0.0503, √Loss: 0.2242
+Epoch 20/20 - RMSE: 0.0526, √Loss: 0.2291
+Validation - RMSE: 0.0497, √Loss: 0.2229
+[DEBUG] Predicted Frequencies: min=-3.04, max=2.27
+[DEBUG] Predicted Frequencies: min=-2.55, max=2.28
+[DEBUG] Predicted Frequencies: min=-2.64, max=1.60
+[DEBUG] Predicted Frequencies: min=-1.35, max=2.66

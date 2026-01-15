@@ -1,0 +1,29 @@
+STUDY NAME :  rnn_autor_ss_tuning_50s_v1
+[Sanity] Mean-predictor NRMSE ≈ 1.000 (should be ~1.0)
+[I 2025-09-04 23:40:15,242] Trial 0 finished with value: 0.777396559715271 and parameters: {'hidden_dim': 512, 'num_layers': 2, 'dropout': 0.015599452033620266, 'lr': 1.4347159517201392e-05, 'weight_decay': 0.0003967605077052988, 'tf_mode': 'cos', 'tf_start': 0.9939819704323989, 'tf_end': 0.2497327922401265, 'max_lr_mult': 1.8493564427131046}. Best is trial 0 with value: 0.777396559715271.
+[I 2025-09-05 00:23:22,224] Trial 3 finished with value: 0.3032150864601135 and parameters: {'hidden_dim': 768, 'num_layers': 3, 'dropout': 0.029122914019804193, 'lr': 0.0004480975918214954, 'weight_decay': 2.62108787826544e-06, 'tf_mode': 'exp', 'tf_start': 0.9570351922786027, 'tf_end': 0.05990213464750792, 'max_lr_mult': 3.0569377536544464}. Best is trial 3 with value: 0.3032150864601135.
+[I 2025-09-05 00:30:48,524] Trial 6 pruned. 
+[I 2025-09-05 01:14:14,505] Trial 9 finished with value: 0.3605748414993286 and parameters: {'hidden_dim': 512, 'num_layers': 3, 'dropout': 0.05200680211778108, 'lr': 0.00029891977384598987, 'weight_decay': 3.5856126103453987e-06, 'tf_mode': 'linear', 'tf_start': 0.9789654700855298, 'tf_end': 0.17936999364332554, 'max_lr_mult': 4.687496940092467}. Best is trial 4 with value: 0.30150657892227173.
+[I 2025-09-05 01:36:24,365] Trial 13 pruned. 
+[I 2025-09-05 01:43:47,971] Trial 16 pruned. 
+[I 2025-09-05 01:51:11,260] Trial 19 pruned. 
+[I 2025-09-05 02:00:59,457] Trial 22 pruned. 
+[I 2025-09-05 02:44:18,374] Trial 25 finished with value: 0.30135709047317505 and parameters: {'hidden_dim': 640, 'num_layers': 3, 'dropout': 0.012256487121472735, 'lr': 0.0006143131905465871, 'weight_decay': 7.582130934034336e-06, 'tf_mode': 'exp', 'tf_start': 0.9782794056462663, 'tf_end': 0.1357548935525792, 'max_lr_mult': 2.6111313330592716}. Best is trial 25 with value: 0.30135709047317505.
+[I 2025-09-05 03:34:10,063] Trial 29 finished with value: 0.297172486782074 and parameters: {'hidden_dim': 640, 'num_layers': 4, 'dropout': 0.009128678940882285, 'lr': 0.0005704999622751941, 'weight_decay': 2.4768202208470963e-06, 'tf_mode': 'exp', 'tf_start': 0.9782089259421205, 'tf_end': 0.14815541745538544, 'max_lr_mult': 2.7129284145242525}. Best is trial 29 with value: 0.297172486782074.
+[I 2025-09-05 04:13:14,403] Trial 38 pruned. 
+[I 2025-09-05 04:22:04,267] Trial 44 pruned. 
+[I 2025-09-05 04:30:50,921] Trial 46 pruned. 
+[I 2025-09-05 04:38:18,653] Trial 48 pruned. 
+[I 2025-09-05 04:47:04,548] Trial 49 pruned. 
+[I 2025-09-05 04:55:53,917] Trial 51 pruned. 
+[I 2025-09-05 05:31:08,592] Trial 53 pruned. 
+[I 2025-09-05 05:41:04,943] Trial 56 pruned. 
+[I 2025-09-05 05:49:51,582] Trial 58 pruned. 
+[I 2025-09-05 05:58:31,844] Trial 59 pruned. 
+
+✅ Best trial:
+  Value: 0.297172486782074
+  Params: {'hidden_dim': 640, 'num_layers': 4, 'dropout': 0.009128678940882285, 'lr': 0.0005704999622751941, 'weight_decay': 2.4768202208470963e-06, 'tf_mode': 'exp', 'tf_start': 0.9782089259421205, 'tf_end': 0.14815541745538544, 'max_lr_mult': 2.7129284145242525}
+
+📊 Dashboard hint:
+optuna-dashboard sqlite://///gpfs/workdir/lagardema/MANON/optuna_rnn_autorss_50s_v1.db --port 5010 --host 127.0.0.1

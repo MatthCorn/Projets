@@ -1,0 +1,29 @@
+STUDY NAME :  gru_autor_ss_tuning_20s_v1
+[Sanity] Mean-predictor NRMSE ≈ 1.000 (should be ~1.0)
+[I 2025-09-03 18:14:43,543] Trial 0 finished with value: 0.2984885573387146 and parameters: {'hidden_dim': 384, 'num_layers': 1, 'dropout': 0.011616722433639893, 'lr': 0.0029621516588303515, 'weight_decay': 6.358358856676247e-05, 'batch_size': 64, 'tf_mode': 'linear', 'tf_start': 0.8366809019706868, 'tf_end': 0.09127267288786131, 'max_lr_mult': 3.0990257265289514}. Best is trial 0 with value: 0.2984885573387146.
+[I 2025-09-03 18:53:50,149] Trial 1 finished with value: 0.21258759498596191 and parameters: {'hidden_dim': 512, 'num_layers': 2, 'dropout': 0.0912139968434072, 'lr': 0.0021576967455896826, 'weight_decay': 3.972110727381911e-06, 'batch_size': 48, 'tf_mode': 'linear', 'tf_start': 0.9897771074506667, 'tf_end': 0.2896896099223678, 'max_lr_mult': 4.233589392465845}. Best is trial 1 with value: 0.21258759498596191.
+[I 2025-09-03 20:05:46,733] Trial 2 finished with value: 0.21082040667533875 and parameters: {'hidden_dim': 512, 'num_layers': 3, 'dropout': 0.006877704223043679, 'lr': 0.0035067764992972213, 'weight_decay': 5.975027999960295e-06, 'batch_size': 32, 'tf_mode': 'exp', 'tf_start': 0.9550265646722229, 'tf_end': 0.28184968246925673, 'max_lr_mult': 4.579309401710596}. Best is trial 2 with value: 0.21082040667533875.
+[I 2025-09-03 20:35:08,393] Trial 3 finished with value: 0.6593100428581238 and parameters: {'hidden_dim': 384, 'num_layers': 2, 'dropout': 0.07773545793789641, 'lr': 0.00028907721743726757, 'weight_decay': 0.0003063462210622083, 'batch_size': 64, 'tf_mode': 'cos', 'tf_start': 0.9973773873201035, 'tf_end': 0.23167343078899721, 'max_lr_mult': 1.7948627261366896}. Best is trial 2 with value: 0.21082040667533875.
+[I 2025-09-03 21:20:42,322] Trial 4 finished with value: 0.7303462028503418 and parameters: {'hidden_dim': 384, 'num_layers': 1, 'dropout': 0.07169314570885453, 'lr': 0.0001573468512939367, 'weight_decay': 0.00038842777547031416, 'batch_size': 32, 'tf_mode': 'exp', 'tf_start': 0.9275114942710426, 'tf_end': 0.26616382277289796, 'max_lr_mult': 2.888859700647797}. Best is trial 2 with value: 0.21082040667533875.
+[I 2025-09-03 21:57:01,825] Trial 5 finished with value: 0.23564410209655762 and parameters: {'hidden_dim': 768, 'num_layers': 3, 'dropout': 0.10454656587639882, 'lr': 0.0005325732706437209, 'weight_decay': 1.1919481947918734e-06, 'batch_size': 64, 'tf_mode': 'exp', 'tf_start': 0.849858445829775, 'tf_end': 0.12311487691068891, 'max_lr_mult': 4.022204554172195}. Best is trial 2 with value: 0.21082040667533875.
+[I 2025-09-03 22:09:59,547] Trial 6 pruned. 
+[I 2025-09-03 22:15:50,235] Trial 7 pruned. 
+[I 2025-09-03 22:23:36,548] Trial 8 pruned. 
+[I 2025-09-03 22:29:43,254] Trial 9 pruned. 
+[I 2025-09-03 23:53:56,100] Trial 10 finished with value: 0.20168408751487732 and parameters: {'hidden_dim': 512, 'num_layers': 4, 'dropout': 0.032795729093176226, 'lr': 0.0006621569266768374, 'weight_decay': 1.4195884495703068e-05, 'batch_size': 32, 'tf_mode': 'exp', 'tf_start': 0.9350079168294375, 'tf_end': 0.28238761373554155, 'max_lr_mult': 3.47644872051147}. Best is trial 10 with value: 0.20168408751487732.
+[I 2025-09-04 00:17:21,653] Trial 11 pruned. 
+[I 2025-09-04 00:33:59,509] Trial 12 pruned. 
+[I 2025-09-04 00:53:12,144] Trial 13 pruned. 
+[I 2025-09-04 01:21:44,489] Trial 14 pruned. 
+[I 2025-09-04 01:40:56,068] Trial 15 pruned. 
+[I 2025-09-04 02:51:32,221] Trial 16 finished with value: 0.21450981497764587 and parameters: {'hidden_dim': 512, 'num_layers': 3, 'dropout': 0.030458731375078266, 'lr': 0.0007503870588499262, 'weight_decay': 2.5506857508936362e-05, 'batch_size': 32, 'tf_mode': 'linear', 'tf_start': 0.9153497078758391, 'tf_end': 0.27587464919904175, 'max_lr_mult': 2.1980954556089025}. Best is trial 10 with value: 0.20168408751487732.
+[I 2025-09-04 03:20:30,508] Trial 17 pruned. 
+[I 2025-09-04 03:31:35,170] Trial 18 pruned. 
+[I 2025-09-04 03:50:41,974] Trial 19 pruned. 
+
+✅ Best trial:
+  Value: 0.20168408751487732
+  Params: {'hidden_dim': 512, 'num_layers': 4, 'dropout': 0.032795729093176226, 'lr': 0.0006621569266768374, 'weight_decay': 1.4195884495703068e-05, 'batch_size': 32, 'tf_mode': 'exp', 'tf_start': 0.9350079168294375, 'tf_end': 0.28238761373554155, 'max_lr_mult': 3.47644872051147}
+
+📊 Dashboard hint:
+optuna-dashboard sqlite://///gpfs/workdir/lagardema/MANON/optuna_gru_autorss_20s_v1.db --port 5010 --host 127.0.0.1

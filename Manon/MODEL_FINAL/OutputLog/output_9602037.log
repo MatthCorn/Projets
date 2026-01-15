@@ -1,0 +1,28 @@
+[Sanity] Mean-predictor NRMSE ≈ 1.000 (should be ~1.0)
+[I 2025-09-03 18:24:18,949] Trial 1 finished with value: 0.24650314450263977 and parameters: {'hidden_dim': 384, 'num_layers': 4, 'dropout': 0.031203728088487304, 'attn_dropout': 0.031198904067240532, 'score_clip': 11.742508365045984, 'lr': 0.0029621516588303515, 'weight_decay': 6.358358856676247e-05, 'batch_size': 64, 'tf_mode': 'linear', 'tf_start': 0.8366809019706868, 'tf_end': 0.09127267288786131, 'max_lr_mult': 3.0990257265289514}. Best is trial 0 with value: 0.24517226219177246.
+[I 2025-09-03 19:05:03,487] Trial 4 finished with value: 0.15568438172340393 and parameters: {'hidden_dim': 512, 'num_layers': 2, 'dropout': 0.058428929707043636, 'attn_dropout': 0.07327236865873835, 'score_clip': 23.682099526511077, 'lr': 0.0021576967455896826, 'weight_decay': 3.972110727381911e-06, 'batch_size': 48, 'tf_mode': 'linear', 'tf_start': 0.9897771074506667, 'tf_end': 0.2896896099223678, 'max_lr_mult': 4.233589392465845}. Best is trial 3 with value: 0.15439721941947937.
+[I 2025-09-03 20:20:36,042] Trial 6 finished with value: 0.15217559039592743 and parameters: {'hidden_dim': 512, 'num_layers': 4, 'dropout': 0.024407646968955768, 'attn_dropout': 0.09903538202225404, 'score_clip': 11.031655633456552, 'lr': 0.0035067764992972213, 'weight_decay': 5.975027999960295e-06, 'batch_size': 32, 'tf_mode': 'exp', 'tf_start': 0.9550265646722229, 'tf_end': 0.28184968246925673, 'max_lr_mult': 4.579309401710596}. Best is trial 6 with value: 0.15217559039592743.
+[I 2025-09-03 21:46:35,494] Trial 12 finished with value: 0.14579430222511292 and parameters: {'hidden_dim': 384, 'num_layers': 5, 'dropout': 0.03890413762918213, 'attn_dropout': 0.11507153205929473, 'score_clip': 26.35113158999403, 'lr': 0.0034757550461719322, 'weight_decay': 1.9882846476641e-06, 'batch_size': 32, 'tf_mode': 'exp', 'tf_start': 0.973467339875089, 'tf_end': 0.12271850750652138, 'max_lr_mult': 4.8040396619596715}. Best is trial 12 with value: 0.14579430222511292.
+[I 2025-09-03 22:14:36,136] Trial 21 pruned. 
+[I 2025-09-03 22:40:16,365] Trial 23 pruned. 
+[I 2025-09-03 22:51:40,387] Trial 25 pruned. 
+[I 2025-09-03 23:14:45,713] Trial 27 pruned. 
+[I 2025-09-03 23:23:19,191] Trial 28 pruned. 
+[I 2025-09-03 23:40:21,492] Trial 30 pruned. 
+[I 2025-09-04 00:00:54,777] Trial 32 pruned. 
+[I 2025-09-04 00:07:06,002] Trial 34 pruned. 
+[I 2025-09-04 00:23:43,512] Trial 36 pruned. 
+[I 2025-09-04 00:44:17,400] Trial 38 pruned. 
+[I 2025-09-04 00:53:26,395] Trial 41 pruned. 
+[I 2025-09-04 01:56:06,560] Trial 43 finished with value: 0.14222076535224915 and parameters: {'hidden_dim': 384, 'num_layers': 2, 'dropout': 0.019635075687838087, 'attn_dropout': 0.04096540616441284, 'score_clip': 19.74046785822774, 'lr': 0.0038734124247763817, 'weight_decay': 1.4049393560812651e-06, 'batch_size': 32, 'tf_mode': 'exp', 'tf_start': 0.9782117088933272, 'tf_end': 0.05545871187206344, 'max_lr_mult': 3.95707968684721}. Best is trial 43 with value: 0.14222076535224915.
+[I 2025-09-04 02:27:28,557] Trial 51 pruned. 
+[I 2025-09-04 03:14:40,628] Trial 54 finished with value: 0.15797173976898193 and parameters: {'hidden_dim': 384, 'num_layers': 6, 'dropout': 0.01578100407542152, 'attn_dropout': 0.11957897584606067, 'score_clip': 22.015009435791725, 'lr': 0.0019266710848255626, 'weight_decay': 1.315432705729032e-06, 'batch_size': 64, 'tf_mode': 'exp', 'tf_start': 0.9332151992504709, 'tf_end': 0.1651296527362191, 'max_lr_mult': 3.926420477154037}. Best is trial 43 with value: 0.14222076535224915.
+[I 2025-09-04 03:30:03,111] Trial 61 pruned. 
+[I 2025-09-04 03:38:18,443] Trial 64 pruned. 
+
+✅ Best trial:
+  Value: 0.14222076535224915
+  Params: {'hidden_dim': 384, 'num_layers': 2, 'dropout': 0.019635075687838087, 'attn_dropout': 0.04096540616441284, 'score_clip': 19.74046785822774, 'lr': 0.0038734124247763817, 'weight_decay': 1.4049393560812651e-06, 'batch_size': 32, 'tf_mode': 'exp', 'tf_start': 0.9782117088933272, 'tf_end': 0.05545871187206344, 'max_lr_mult': 3.95707968684721}
+
+📊 Dashboard hint:
+optuna-dashboard sqlite://///gpfs/workdir/lagardema/MANON/optuna_lstmat_autor_ss.db --port 5012 --host 127.0.0.1

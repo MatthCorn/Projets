@@ -1,0 +1,37 @@
+CURRENT MODEL : LSTMAT_AUTORSS
+CURRENT FILE :  LSTMAT_AUTORSS_TEST5_NTF__500K_imp_20s_15e
+[Sanity] Mean-predictor NRMSE ≈ 1.000 (should be ~1.0)
+Epoch 1/15 - RMSE: 0.5992, √Loss: 0.7593
+Validation - RMSE: 0.4093, √Loss: 0.6398
+Epoch 2/15 - RMSE: 0.2594, √Loss: 0.5086
+Validation - RMSE: 0.3270, √Loss: 0.5718
+Epoch 3/15 - RMSE: 0.2106, √Loss: 0.4584
+Validation - RMSE: 0.2096, √Loss: 0.4578
+Epoch 4/15 - RMSE: 0.1890, √Loss: 0.4341
+Validation - RMSE: 0.1721, √Loss: 0.4149
+Epoch 5/15 - RMSE: 0.1789, √Loss: 0.4222
+Validation - RMSE: 0.1595, √Loss: 0.3994
+Epoch 6/15 - RMSE: 0.1748, √Loss: 0.4169
+Validation - RMSE: 0.1641, √Loss: 0.4051
+Epoch 7/15 - RMSE: 0.1580, √Loss: 0.3963
+Validation - RMSE: 0.1209, √Loss: 0.3477
+Epoch 8/15 - RMSE: 0.1454, √Loss: 0.3798
+Validation - RMSE: 0.1026, √Loss: 0.3202
+Epoch 9/15 - RMSE: 0.1290, √Loss: 0.3579
+Validation - RMSE: 0.0907, √Loss: 0.3012
+Epoch 10/15 - RMSE: 0.1119, √Loss: 0.3332
+Validation - RMSE: 0.0770, √Loss: 0.2775
+Epoch 11/15 - RMSE: 0.0938, √Loss: 0.3052
+Validation - RMSE: 0.0622, √Loss: 0.2495
+Epoch 12/15 - RMSE: 0.0782, √Loss: 0.2789
+Validation - RMSE: 0.0504, √Loss: 0.2245
+Epoch 13/15 - RMSE: 0.0640, √Loss: 0.2522
+Validation - RMSE: 0.0402, √Loss: 0.2006
+Epoch 14/15 - RMSE: 0.0534, √Loss: 0.2302
+Validation - RMSE: 0.0359, √Loss: 0.1895
+Epoch 15/15 - RMSE: 0.0477, √Loss: 0.2176
+Validation - RMSE: 0.0349, √Loss: 0.1868
+[DEBUG] Predicted Frequencies: min=-1.99, max=2.21
+[DEBUG] Predicted Frequencies: min=-2.53, max=1.91
+[DEBUG] Predicted Frequencies: min=-0.97, max=1.88
+[DEBUG] Predicted Frequencies: min=-1.87, max=1.67

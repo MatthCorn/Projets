@@ -1,0 +1,66 @@
+/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/optuna/_experimental.py:32: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  warnings.warn(
+/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/optuna/_experimental.py:32: ExperimentalWarning: Argument ``group`` is an experimental feature. The interface can change in the future.
+  warnings.warn(
+Traceback (most recent call last):
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/sqlalchemy/engine/base.py", line 1961, in _exec_single_context
+    self.dialect.do_execute(
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/sqlalchemy/engine/default.py", line 944, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: table studies already exists
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/gpfs/workdir/lagardema/MANON/Manon3_Optuna_RNN_AUTORSS.py", line 269, in <module>
+    study = optuna.create_study(
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/optuna/_convert_positional_args.py", line 135, in converter_wrapper
+    return func(**kwargs)  # type: ignore[call-arg]
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/optuna/study/study.py", line 1295, in create_study
+    storage = storages.get_storage(storage)
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/optuna/storages/__init__.py", line 49, in get_storage
+    return _CachedStorage(RDBStorage(storage))
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/optuna/storages/_rdb/storage.py", line 238, in __init__
+    models.BaseModel.metadata.create_all(self.engine)
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/sqlalchemy/sql/schema.py", line 5924, in create_all
+    bind._run_ddl_visitor(
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/sqlalchemy/engine/base.py", line 3246, in _run_ddl_visitor
+    conn._run_ddl_visitor(visitorcallable, element, **kwargs)
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/sqlalchemy/engine/base.py", line 2451, in _run_ddl_visitor
+    visitorcallable(
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/sqlalchemy/sql/visitors.py", line 661, in traverse_single
+    return meth(obj, **kw)
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/sqlalchemy/sql/ddl.py", line 984, in visit_metadata
+    self.traverse_single(
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/sqlalchemy/sql/visitors.py", line 661, in traverse_single
+    return meth(obj, **kw)
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/sqlalchemy/sql/ddl.py", line 1017, in visit_table
+    CreateTable(
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/sqlalchemy/sql/ddl.py", line 321, in _invoke_with
+    return bind.execute(self)
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/sqlalchemy/engine/base.py", line 1413, in execute
+    return meth(
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/sqlalchemy/sql/ddl.py", line 187, in _execute_on_connection
+    return connection._execute_ddl(
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/sqlalchemy/engine/base.py", line 1524, in _execute_ddl
+    ret = self._execute_context(
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/sqlalchemy/engine/base.py", line 1840, in _execute_context
+    return self._exec_single_context(
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/sqlalchemy/engine/base.py", line 1980, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/sqlalchemy/engine/base.py", line 2349, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/sqlalchemy/engine/base.py", line 1961, in _exec_single_context
+    self.dialect.do_execute(
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/sqlalchemy/engine/default.py", line 944, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) table studies already exists
+[SQL: 
+CREATE TABLE studies (
+	study_id INTEGER NOT NULL, 
+	study_name VARCHAR(512) NOT NULL, 
+	PRIMARY KEY (study_id)
+)
+
+]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)

@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/gpfs/workdir/lagardema/MANON/Manon3_Trainer_LSTMAT_AUTORSS.py", line 117, in <module>
+    [(TrainingInput, TrainingOutput, TrainingMasks, _),(ValidationInput, ValidationOutput, ValidationMasks, _)] = GetData(
+  File "/gpfs/workdir/lagardema/MANON/Inter/Model/DataMaker.py", line 185, in GetData
+    return GetDataSecond(d_in, n_pulse_plateau, n_sat, n_mes, len_in, len_out, n_data_training,
+  File "/gpfs/workdir/lagardema/MANON/Inter/Model/DataMaker.py", line 277, in GetDataSecond
+    input_data_ = torch.load(os.path.join(save_path, file, phase + '_input_data'))
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/torch/serialization.py", line 1425, in load
+    with _open_file_like(f, "rb") as opened_file:
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/torch/serialization.py", line 751, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/gpfs/users/lagardema/myenv/lib/python3.9/site-packages/torch/serialization.py", line 732, in __init__
+    super().__init__(open(name, mode))
+FileNotFoundError: [Errno 2] No such file or directory: 'Manon3/Data/config(18)/training_input_data'

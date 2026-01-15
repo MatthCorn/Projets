@@ -1,0 +1,25 @@
+[Sanity] Mean-predictor NRMSE ≈ 1.000 (~1.0)
+Epoch 1/20 - RMSE: 1.1252, √Loss: 1.0558 | Val RMSE: 0.9925, √Val: 0.9963
+Epoch 2/20 - RMSE: 1.0814, √Loss: 1.0396 | Val RMSE: 1.1017, √Val: 1.0496
+Epoch 3/20 - RMSE: 0.9768, √Loss: 0.9876 | Val RMSE: 0.9836, √Val: 0.9918
+Epoch 4/20 - RMSE: 0.7994, √Loss: 0.8932 | Val RMSE: 0.9803, √Val: 0.9901
+Epoch 5/20 - RMSE: 0.5969, √Loss: 0.7721 | Val RMSE: 0.9819, √Val: 0.9909
+Epoch 6/20 - RMSE: 0.5210, √Loss: 0.7214 | Val RMSE: 0.9623, √Val: 0.9810
+Epoch 7/20 - RMSE: 0.4693, √Loss: 0.6847 | Val RMSE: 0.9009, √Val: 0.9492
+Epoch 8/20 - RMSE: 0.4311, √Loss: 0.6562 | Val RMSE: 0.8493, √Val: 0.9216
+Epoch 9/20 - RMSE: 0.4088, √Loss: 0.6390 | Val RMSE: 0.7563, √Val: 0.8697
+Epoch 10/20 - RMSE: 0.3898, √Loss: 0.6240 | Val RMSE: 0.7375, √Val: 0.8588
+Epoch 11/20 - RMSE: 0.3749, √Loss: 0.6119 | Val RMSE: 0.6804, √Val: 0.8248
+Epoch 12/20 - RMSE: 0.3663, √Loss: 0.6048 | Val RMSE: 0.6326, √Val: 0.7953
+Epoch 13/20 - RMSE: 0.3545, √Loss: 0.5950 | Val RMSE: 0.6097, √Val: 0.7808
+Epoch 14/20 - RMSE: 0.3433, √Loss: 0.5856 | Val RMSE: 0.5705, √Val: 0.7553
+Epoch 15/20 - RMSE: 0.3373, √Loss: 0.5804 | Val RMSE: 0.5488, √Val: 0.7408
+Epoch 16/20 - RMSE: 0.3305, √Loss: 0.5745 | Val RMSE: 0.5280, √Val: 0.7266
+Epoch 17/20 - RMSE: 0.3250, √Loss: 0.5697 | Val RMSE: 0.5182, √Val: 0.7198
+Epoch 18/20 - RMSE: 0.3204, √Loss: 0.5656 | Val RMSE: 0.5049, √Val: 0.7106
+Epoch 19/20 - RMSE: 0.3170, √Loss: 0.5626 | Val RMSE: 0.4928, √Val: 0.7020
+Epoch 20/20 - RMSE: 0.3158, √Loss: 0.5616 | Val RMSE: 0.4928, √Val: 0.7020
+[DEBUG] Predicted Frequencies: min=-0.61, max=1.55
+[DEBUG] Predicted Frequencies: min=-1.17, max=0.85
+[DEBUG] Predicted Frequencies: min=-0.70, max=1.41
+[DEBUG] Predicted Frequencies: min=-1.07, max=0.44
