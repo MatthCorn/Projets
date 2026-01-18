@@ -8,18 +8,18 @@ import os
 
 from Inter.Model.DataMaker import GetData
 
-from FWForecasting_OG.Library.LRScheduler import CosineScheduler
-from FWForecasting_OG.Library.Parameters_SIMPLE import get_parameter
-from FWForecasting_OG.Library.LOSS import weighted_normalized_mse_loss_1 as loss_fct
-from FWForecasting_OG.Library.Visualization_LengthAdapter import plot_visuals
-from FWForecasting_OG.Library.Save_Plot_File import save_file, plot_graph, plot_graph_with_min
+from Manon.Library.LRScheduler import CosineScheduler
+from Manon.Library.Parameters_SIMPLE import get_parameter
+from Manon.Library.LOSS import weighted_normalized_mse_loss_1 as loss_fct
+from Manon.Library.Visualization_LengthAdapter import plot_visuals
+from Manon.Library.Save_Plot_File import save_file, plot_graph, plot_graph_with_min
 
-from FWForecasting_OG.Library.Decoder_Input_Output import build_decoder_input_output_parallel
-#from FWForecasting_OG.Library.Decoder_Input_Output1 import build_decoder_input_output_parallel
+from Manon.Library.Decoder_Input_Output import build_decoder_input_output_parallel
+#from Manon.Library.Decoder_Input_Output1 import build_decoder_input_output_parallel
 
-from FWForecasting_OG.Library.Helper_Autoregression import scheduled_sampling_decode_lstm_luong_cached, ar_decode_lstm_luong_cached
+from Manon.Library.Helper_Autoregression import scheduled_sampling_decode_lstm_luong_cached, ar_decode_lstm_luong_cached
 
-from FWForecasting_OG.Models.Models_LSTMAT_L_ARSS1 import MemoryUpdateLSTMWithAttention
+from Manon.Models.Models_LSTMAT_L_ARSS1 import MemoryUpdateLSTMWithAttention
 ################################################################################################################################################
 
 
