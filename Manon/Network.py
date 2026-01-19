@@ -1,199 +1,235 @@
+import math
 import torch
 import torch.nn as nn
-from Complete.Transformer.EncoderTransformer import EncoderLayer
-from Complete.Transformer.EasyFeedForward import FeedForward
-from Complete.Transformer.DecoderTransformer import DecoderLayer
-from Complete.Transformer.PositionalEncoding import PositionalEncoding
+import torch.nn.functional as F
 from Complete.Transformer.LearnableModule import LearnableParameters
 
 
-class TransformerTranslator(nn.Module):
+class LuongAttention(nn.Module):
 
-    def __init__(self, d_in, d_out, d_att=32, n_heads=4, n_encoders=3, n_decoders=3, width_FF=[32], widths_embedding=[32],
-                 len_in=10, len_out=20, norm='post', dropout=0, size_tampon_target=12, size_tampon_source=8):
+    def __init__(self, hidden_dim, scaled=True, dropout=0.0):
         super().__init__()
-        self.d_in = d_in
-        self.d_out = d_out
-        self.d_att = d_att
-        self.size_tampon_target = size_tampon_target
-        self.size_tampon_source = size_tampon_source
+        self.scaled = scaled
+        self.dropout = nn.Dropout(dropout) if dropout > 0 else nn.Identity()
 
-        self.enc_embedding = FeedForward(d_in=d_in, d_out=d_att, widths=widths_embedding, dropout=dropout)
-        self.dec_embedding = FeedForward(d_in=d_out, d_out=d_att, widths=widths_embedding, dropout=dropout)
+        self.W = nn.Linear(hidden_dim, hidden_dim, bias=False)
 
-        self.enc_pos_encoding = PositionalEncoding(d_att=d_att, dropout=dropout, max_len=len_in + 1)
-        self.dec_pos_encoding = PositionalEncoding(d_att=d_att, dropout=dropout, max_len=len_out + 1)
+    def forward(self, h, T_hist=5):
+        B, T, H = h.shape
 
-        self.end_token = LearnableParameters(torch.normal(0, 1, [1, 1, d_att]))
-        self.start_token = LearnableParameters(torch.normal(0, 1, [1, 1, d_att]))
-        self.pad_token = LearnableParameters(torch.normal(0, 1, [1, 1, d_att]))
+        # Keys/Values
+        K = self.W(h)
+        V = h  # [B, T, H]
+        Q = h  # [B, T, H]
 
-        self.encoders = nn.ModuleList()
-        for i in range(n_encoders):
-            self.encoders.append(EncoderLayer(d_att=d_att, n_heads=n_heads, norm=norm, width_FF=width_FF, dropout_FF=dropout, dropout_SA=dropout))
+        # Scores: [B, T, T] = Q @ K^T
+        scores = torch.bmm(Q, K.transpose(1, 2))
+        if self.scaled:
+            scores = scores / math.sqrt(H)
 
-        self.decoders = nn.ModuleList()
-        for i in range(n_decoders):
-            self.decoders.append(DecoderLayer(d_att=d_att, n_heads=n_heads, norm=norm, width_FF=width_FF, dropout_A=dropout, dropout_FF=dropout))
+        # 1. Masque Causal standard (Garde le triangle inférieur)
+        mask_future = torch.tril(torch.ones(T, T, device=h.device, dtype=torch.bool))
+        # 2. Masque de Fenêtre (Garde ce qui est au-dessus de la limite -T_hist)
+        # diagonal=-K signifie qu'on part de la K-ième diagonale en dessous de la centrale
+        mask_past = torch.triu(torch.ones(T, T, device=h.device, dtype=torch.bool), diagonal=-(T_hist-1))
+        # 3. Intersection : Il faut satisfaire les DEUX conditions
+        valid_mask = mask_future & mask_past
+        # 4. Application
+        scores = scores.masked_fill(~valid_mask, float("-inf"))
 
-        self.register_buffer("mask_decoder", torch.tril(torch.ones(len_out + 1, len_out + 1)).unsqueeze(0).unsqueeze(0), persistent=False)
+        # Softmax attention
+        attn = F.softmax(scores, dim=-1)  # [B, T, T]
+        attn = attn.nan_to_num(0.0)  # guard against all -inf rows
+        attn = self.dropout(attn)
 
-        self.last_decoder = FeedForward(d_in=d_att, d_out=d_out, widths=[16], dropout=0)
-
-
-    def forward(self, source, target, input_mask):
-        source_pad_mask, source_end_mask, target_pad_mask, target_end_mask = input_mask
-
-        # source.shape = (batch_size, len_in, d_in)
-        # target.shape = (batch_size, len_out, d_out)
-
-        trg = self.dec_embedding(target)
-        src = self.enc_embedding(source)
-
-        # source.shape = (batch_size, len_in, d_att)
-        # target.shape = (batch_size, len_out, d_att)
-
-        src = (src * (1 - source_end_mask) * (1 - source_pad_mask) +
-               self.end_token() * source_end_mask +
-               self.pad_token() * source_pad_mask)
-        trg = (trg * (1 - target_end_mask) * (1 - target_pad_mask) +
-               self.end_token() * target_end_mask +
-               self.pad_token() * target_pad_mask)
+        # Context
+        context = torch.bmm(attn, V)  # [B, T, H]
+        return context
 
 
-        src = torch.concat((src[:, :self.size_tampon_source], self.start_token().expand(trg.size(0), 1, -1), src[:, self.size_tampon_source:]), dim=1)
-        trg = torch.concat((trg[:, :self.size_tampon_target], self.start_token().expand(trg.size(0), 1, -1), trg[:, self.size_tampon_target:]), dim=1)
+class MemoryUpdateLSTMWithAttention(nn.Module):
+    def __init__(
+            self,
+            input_dim_1,
+            input_dim_2,
+            hidden_dim,
+            output_dim,
+            num_layers=1,
+            dropout=0.0,
+            mem_length=5,
+            attn_dropout=0.0,
+            use_layernorm=True,
+            use_mlp_head=True,
+            pack_with_mask=False,
+    ):
+        super().__init__()
+        self.hidden_dim = hidden_dim
+        self.mem_length = mem_length
+        self.pack_with_mask = pack_with_mask
+        self.use_layernorm = use_layernorm
+        self.use_mlp_head = use_mlp_head
 
-        trg = self.dec_pos_encoding(trg)
-        src = self.enc_pos_encoding(src)
-        # trg.shape = (batch_size, len_out + 1, d_att)
-        # src.shape = (batch_size, len_in + 1, d_att)
+        self.lstm = nn.LSTM(input_size=hidden_dim, hidden_size=hidden_dim, num_layers=num_layers, batch_first=True,
+                            dropout=dropout if num_layers > 1 else 0.0, bidirectional=False, )
 
-        for encoder in self.encoders:
-            src = encoder(src)
+        self.embedding_1 = nn.Sequential(
+            nn.Linear(input_dim_1, hidden_dim),
+            nn.GELU(),
+            nn.Dropout(dropout) if dropout > 0 else nn.Identity(),
+            nn.Linear(hidden_dim, hidden_dim),
+        )
+        self.embedding_2 = nn.Sequential(
+            nn.Linear(input_dim_2, hidden_dim),
+            nn.GELU(),
+            nn.Dropout(dropout) if dropout > 0 else nn.Identity(),
+            nn.Linear(hidden_dim, hidden_dim),
+        )
+        self.merge_embeddings = nn.Sequential(
+            nn.GELU(),
+            nn.Dropout(dropout) if dropout > 0 else nn.Identity(),
+            nn.Linear(2*hidden_dim, hidden_dim),
+        )
+        self.combiner = nn.Sequential(
+            nn.Linear(2*hidden_dim, hidden_dim),
+            nn.GELU(),
+            nn.Dropout(dropout) if dropout > 0 else nn.Identity(),
+            nn.Linear(hidden_dim, hidden_dim),
+        )
 
-        for decoder in self.decoders:
-            trg = decoder(target=trg, source=src, mask=self.mask_decoder)
-        # trg.shape = (batch_size, len_out + 1, d_att)
+        self.next_token = LearnableParameters(torch.normal(0, 1, [1, 1, hidden_dim]))
 
-        is_token_end = torch.norm(trg - self.end_token(), dim=-1, keepdim=True) / torch.norm(self.end_token())
-        trg = self.last_decoder(trg)
-        trg[:, :-1] = trg[:, :-1] * (1 - target_end_mask) + target_end_mask * is_token_end[:, :-1]
-        # trg.shape = (batch_size, len_out + 1, d_out)
+        if use_layernorm:
+            self.post_rnn_ln = nn.LayerNorm(hidden_dim)
 
-        return trg
+        self.attn = LuongAttention(hidden_dim=hidden_dim, scaled=True, dropout=attn_dropout, )
 
-    def calibrate_thresholds(self, source, target, input_mask, window_mask, n_data):
-        source_pad_mask, source_end_mask, target_pad_mask, target_end_mask = input_mask
-
-        # source.shape = (batch_size, len_in, d_in)
-        # target.shape = (batch_size, len_out, d_out)
-
-        trg = self.dec_embedding(target)
-        src = self.enc_embedding(source)
-
-        # source.shape = (batch_size, len_in, d_att)
-        # target.shape = (batch_size, len_out, d_att)
-
-        src = (src * (1 - source_end_mask) * (1 - source_pad_mask) +
-               self.end_token() * source_end_mask +
-               self.pad_token() * source_pad_mask)
-        trg = (trg * (1 - target_end_mask) * (1 - target_pad_mask) +
-               self.end_token() * target_end_mask +
-               self.pad_token() * target_pad_mask)
-
-        src = torch.concat((src[:, :self.size_tampon_source], self.start_token().expand(trg.size(0), 1, -1),
-                            src[:, self.size_tampon_source:]), dim=1)
-        trg = torch.concat((trg[:, :self.size_tampon_target], self.start_token().expand(trg.size(0), 1, -1),
-                            trg[:, self.size_tampon_target:]), dim=1)
-
-        trg = self.dec_pos_encoding(trg)
-        src = self.enc_pos_encoding(src)
-        # trg.shape = (batch_size, len_out + 1, d_att)
-        # src.shape = (batch_size, len_in + 1, d_att)
-
-        for encoder in self.encoders:
-            src = encoder(src)
-
-        for decoder in self.decoders:
-            trg = decoder(target=trg, source=src, mask=self.mask_decoder)
-        # trg.shape = (batch_size, len_out + 1, d_att)
-
-        is_end_token = torch.norm(trg[:, :-1] - self.end_token(), dim=-1, keepdim=True) / torch.norm(self.end_token())
-        is_end_token = is_end_token.reshape(n_data, -1, *is_end_token.shape[1:])[:, -1]
-
-        target_end_mask = target_end_mask.reshape(n_data, -1, *is_end_token.shape[1:])[:, -1]
-
-        id_end = window_mask.to(bool).reshape(n_data, -1, *window_mask.shape[1:])[:, -1]
-
-        is_end_token = is_end_token[id_end]
-        target_end_mask = target_end_mask[id_end]
-
-        trg = self.last_decoder(trg)[:, :-1]
-        trg[:, :, -1] = trg[:, :, -1] + torch.arange(-self.size_tampon_target, trg.shape[1] - self.size_tampon_target).reshape(1, -1)
-        trg = trg.reshape(n_data, -1, *trg.shape[1:])[:, :-1].reshape(-1, *trg.shape[1:])
-
-        window_mask = window_mask.reshape(n_data, -1, *window_mask.shape[1:])[:, :-1].reshape(-1, *window_mask.shape[1:])[:, self.size_tampon_target:]
-
-        id_last = torch.arange(window_mask.shape[1]).reshape(1, -1, 1) < window_mask.sum(dim=1, keepdim=True) + 1
-
-        is_last_token = trg[:, self.size_tampon_target:, -1:] + trg[:, self.size_tampon_target:, -2:-1]
-        is_last_token = is_last_token[id_last]
-        window_mask = window_mask[id_last]
-
-        from Tools.MCC import best_mcc_threshold_torch
-
-        best_thr_end, best_mcc_end = best_mcc_threshold_torch(1 - target_end_mask, is_end_token)
-        best_thr_last, best_mcc_last = best_mcc_threshold_torch(1 - window_mask, is_last_token)
-
-        print('best threshold for end_token detection : ', best_thr_end)
-        print('best mcc score for end_token detection : ', best_mcc_end)
-        print('best threshold for last_ detection : ', best_thr_last)
-        print('best mcc score for last_ detection : ', best_mcc_last)
-
-        return best_thr_end, best_thr_last
-
-    def recursive_eval(self, source, target, input_mask, n=0, fast=False):
-        if not (fast and n>0):
-            source_pad_mask, source_end_mask, _ = input_mask
-
-            src = self.enc_embedding(source)
-
-            src = (src * (1 - source_end_mask) * (1 - source_pad_mask) +
-                   self.end_token() * source_end_mask +
-                   self.pad_token() * source_pad_mask)
-
-            src = torch.concat((src[:, :self.size_tampon_source], self.start_token().expand(src.size(0), 1, -1),
-                                src[:, self.size_tampon_source:]), dim=1)
-
-            src = self.enc_pos_encoding(src)
-
-            for encoder in self.encoders:
-                src = encoder(src)
-            self.src_mem = src
-
+        if use_mlp_head:
+            self.head = nn.Sequential(
+                nn.Linear(hidden_dim, hidden_dim),
+                nn.GELU(),
+                nn.Dropout(dropout) if dropout > 0 else nn.Identity(),
+                nn.Linear(hidden_dim, output_dim),
+            )
         else:
-            src = self.src_mem
+            self.head = nn.Linear(hidden_dim, output_dim)
 
-        _, _, target_pad_mask = input_mask
+        self._init_weights()
 
-        trg = self.dec_embedding(target)
+    def _init_weights(self):
+        # LSTM orthogonal init
+        for name, param in self.lstm.named_parameters():
+            if "weight_ih" in name:
+                nn.init.xavier_uniform_(param)
+            elif "weight_hh" in name:
+                nn.init.orthogonal_(param)
+            elif "bias" in name:
+                nn.init.zeros_(param)
 
-        trg = (trg * (1 - target_pad_mask) +
-               self.pad_token() * target_pad_mask)
+        # Linear layers
+        def init_linear(m):
+            if isinstance(m, nn.Linear):
+                nn.init.xavier_uniform_(m.weight)
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
 
-        trg = torch.concat((trg[:, :self.size_tampon_target], self.start_token().expand(trg.size(0), 1, -1), trg[:, self.size_tampon_target:]), dim=1)
+        self.apply(init_linear)
 
-        trg = self.dec_pos_encoding(trg)
 
-        for decoder in self.decoders:
-            trg = decoder(target=trg, source=src, mask=self.mask_decoder)
+    def forward(self, input_1, input_2, next_mask=None):
+        if next_mask is None:
+            next_mask = torch.zeros(*input_1.shape[:-1], 1)
+        x_1 = self.embedding_1(input_1)
+        x_2 = self.embedding_2(input_2)
+        x_2 = x_2 * (1 - next_mask) + next_mask * self.next_token()
 
-        target_end_mask = torch.zeros_like(target_pad_mask)
-        target_end_mask[0, n + self.size_tampon_target] = 1
+        x = self.merge_embeddings(torch.cat([x_1, x_2],dim=-1))  # [B, T, input_dim]
 
-        is_end = torch.norm((trg[:, :-1] - self.end_token()) * target_end_mask)  / torch.norm(self.end_token())
+        rnn_out, _ = self.lstm(x)  # [B, T, H]
 
-        trg = self.last_decoder(trg)
+        if self.use_layernorm:
+            rnn_out = self.post_rnn_ln(rnn_out)
 
-        return trg, is_end
+        context = self.attn(rnn_out, T_hist=self.mem_length)  # [B,T,H], [B,T,T]
+        combined = self.combiner(torch.cat([rnn_out, context], dim=-1))  # [B, T, 2H]
+        next_dist = torch.norm(combined - self.next_token(), dim=-1) / math.sqrt(self.hidden_dim)
+        pred = self.head(combined)  # [B, T, output_dim]
+
+        return pred, next_dist
+
+    # lightweight single-step Luong attention for one query q_t against past H (decoder states)
+    def _attend_step(self, H_all, q_t):
+        # H_all: [B, L, H], q_t: [B, H]
+        K = self.attn.W(H_all)  # [B, L, H]
+        V = H_all
+        # scores: [B, 1, L] = q_t @ K^T
+        scores = torch.bmm(q_t.unsqueeze(1), K.transpose(1, 2))
+        if self.attn.scaled:
+            scores = scores / math.sqrt(K.size(-1))
+        # causal already ensured by using only past states in H_all
+        attn = torch.softmax(scores, dim=-1)  # [B,1,L]
+        attn = self.attn.dropout(attn)
+        ctx = torch.bmm(attn, V).squeeze(1)  # [B,H]
+        return ctx
+
+    def step(self, input_1, input_2, hidden=None, H_past=None, next_mask=None):
+        """
+        Returns:
+          y_t:    [B, output_dim]
+          hidden: (h,c) new LSTM state
+          H_new:  [B, L+1, H] updated decoder hidden history (pre-LN)
+        """
+        # run one LSTM step
+        if next_mask is None:
+            next_mask = torch.zeros(*input_1.shape[:-1], 1, 1)
+        x_1 = self.embedding_1(input_1.unsqueeze(1))
+        x_2 = self.embedding_2(input_2.unsqueeze(1))
+        x_2 = x_2 * (1 - next_mask) + next_mask * self.next_token()
+
+        x = self.merge_embeddings(torch.cat([x_1, x_2], dim=-1)) # [B,1,F]
+
+        rnn_out, hidden = self.lstm(x, hidden)  # rnn_out: [B,1,H]
+        h_t = rnn_out.squeeze(1)  # [B,H]
+
+        # layernorm (keep cache in the same space the attention sees during forward)
+        if self.use_layernorm:
+            h_t = self.post_rnn_ln(h_t)  # [B,H]
+
+        # update decoder-state cache
+        if H_past is None:
+            H_new = h_t.unsqueeze(1)  # [B,1,H]
+        else:
+            H_new = torch.cat([H_past[:, -(self.mem_length - 1):], h_t.unsqueeze(1)], dim=1)  # [B,L+1,H]
+
+        # Luong attention over [past + current] decoder states (causal by construction)
+        ctx_t = self._attend_step(H_new, h_t)  # [B,H]
+
+        # head
+        combined_t = self.combiner(torch.cat([h_t, ctx_t], dim=-1).unsqueeze(1))  # [B,1,2H]
+        next_dist = torch.norm(combined_t - self.next_token(), dim=-1) / math.sqrt(self.hidden_dim)
+        y_t = self.head(combined_t).squeeze(1)  # [B,output_dim]
+        return y_t, hidden, H_new, next_dist
+
+if __name__ == '__main__':
+    N = MemoryUpdateLSTMWithAttention(10, 10, 64, 5)
+    x1 = torch.normal(0, 1, (40, 20, 10))
+    x2 = torch.normal(0, 1, (40, 20, 10))
+    y1, next_dist_1 = N(x1, x2)
+
+    y_list = []
+    next_dist_list = []
+    hidden = None
+    H_past = None
+    for k in range(x1.shape[1]):
+        x1_k = x1[:, k]
+        x2_k = x2[:, k]
+        y_k, hidden, H_past, next_dist = N.step(x1_k, x2_k, hidden, H_past)
+        y_list.append(y_k.unsqueeze(1))
+        next_dist_list.append(next_dist)
+    y2 = torch.cat(y_list, dim=1)
+    next_dist_2 = torch.cat(next_dist_list, dim=1)
+
+    print(y2[0, :, 0])
+    print(y1[0, :, 0])
+
+    print(next_dist_1[0])
+    print(next_dist_2[0])

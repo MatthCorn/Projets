@@ -42,10 +42,15 @@ def PostProcess(Input, Output, Masks, len_in, len_out, n_data):
     Output[..., -1] = torch.arange(0, len_out, 1) - Output[..., -1]
     AddMask = Masks[0][:, :, 0]
 
+    tps_maintien = 1
     Mask = torch.arange(0, len_out, 1).unsqueeze(0) >= AddMask.argmax(dim=-1).unsqueeze(1)
     TOE_Out = Output[:, :, -1] + Output[:, :, -2]
     TOE_Out[Mask] = torch.inf
     TOA_In = torch.arange(0, len_in, 1).expand(n_data, -1)
+    TOE_In = TOA_In + Input[..., -1]
+    DTOA_In = torch.cat([TOA_In[:, 1:] - TOA_In[:, :-1],
+                         (TOE_In.max(dim=1).values - TOA_In[:, -1] + tps_maintien).unsqueeze(-1)], dim=-1)
+    Input = torch.cat([Input, DTOA_In.unsqueeze(-1)], dim=-1)
 
     TimeEvent = torch.cat((TOE_Out, TOA_In), dim=-1)
     ArgSorted_TimeEvent = torch.argsort(TimeEvent, dim=-1)
