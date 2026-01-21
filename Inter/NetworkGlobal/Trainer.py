@@ -323,13 +323,13 @@ if __name__ == '__main__':
                             os.mkdir(save_path)
                         except:
                             pass
-                        error = {"TrainingError": TrainingError,
-                                 "ValidationError": ValidationError,
-                                 "PlottingError": PlottingError}
+                        error_dict = {"TrainingError": TrainingError,
+                                      "ValidationError": ValidationError,
+                                      "PlottingError": PlottingError}
                         saveObjAsXml(
                             {k: v for k, v in param.items() if not (k in ['resume_from'])},
                             os.path.join(save_path, "param"))
-                        saveObjAsXml(error, os.path.join(save_path, "error"))
+                        saveObjAsXml(error_dict, os.path.join(save_path, "error"))
                         torch.save(best_state_dict, os.path.join(save_path, "Best_network"))
                         torch.save(N.state_dict().copy(), os.path.join(save_path, "Last_network"))
                         torch.save(weight_l, os.path.join(save_path, "WeightL"))
@@ -412,9 +412,9 @@ if __name__ == '__main__':
         window_index += 1
         j = 0
 
-    error = {"TrainingError": TrainingError,
-             "ValidationError": ValidationError,
-             "PlottingError": PlottingError}
+    error_dict = {"TrainingError": TrainingError,
+                  "ValidationError": ValidationError,
+                  "PlottingError": PlottingError}
 
     print(f"Final Error: {float(ValidationError[-1])}")
 
@@ -422,7 +422,7 @@ if __name__ == '__main__':
         saveObjAsXml(
             {k: v for k, v in param.items() if not (k in ['resume_from'])},
             os.path.join(save_path, "param"))
-        saveObjAsXml(error, os.path.join(save_path, "error"))
+        saveObjAsXml(error_dict, os.path.join(save_path, "error"))
         torch.save(best_state_dict, os.path.join(save_path, "Best_network"))
         torch.save(N.state_dict().copy(), os.path.join(save_path, "Last_network"))
         torch.save(weight_l, os.path.join(save_path, "WeightL"))

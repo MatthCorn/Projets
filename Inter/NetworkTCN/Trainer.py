@@ -1,8 +1,6 @@
-from Inter.NetworkSSM.SpecialUtils import GetData
-from Inter.NetworkSSM.Network import MemoryUpdateLSTMWithAttention
+from Inter.NetworkTCN.SpecialUtils import GetData
+from Inter.NetworkTCN.Network import MemoryUpdateTCN
 from Complete.LRScheduler import Scheduler
-from GradObserver.GradObserverClass import DictGradObserver
-from Tools.ParamObs import DictParamObserver
 from math import sqrt
 import torch
 from tqdm import tqdm
@@ -20,9 +18,9 @@ if __name__ == '__main__':
     ################################################################################################################################################
     # création des paramètres de la simulation
 
-    param = {"n_decoder": 5,
-             "len_in": 10,
-             "len_out": 15,
+    param = {"n_decoder": 3,
+             "len_in": 20,
+             "len_out": 25,
              "n_pulse_plateau": 6,
              "n_sat": 5,
              "n_mes": 6,
@@ -38,7 +36,7 @@ if __name__ == '__main__':
              },
              "mult_grad": 10000,
              "weight_decay": 1e-3,
-             "NDataT": 200000,
+             "NDataT": 1000000,
              "NDataV": 1000,
              "batch_size": 1000,
              "n_iter": 80,
@@ -49,7 +47,6 @@ if __name__ == '__main__':
              "plot_distrib": "log",
              "error_weighting": "y",
              "max_lr": 5,
-             "FreqGradObs": -1,
              "warmup": 5,
              "resume_from": "r",
              "period_checkpoint": 15 * 60,  # en seconde
@@ -93,17 +90,17 @@ if __name__ == '__main__':
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    N = MemoryUpdateLSTMWithAttention(input_dim_1=param['d_in'],
-            input_dim_2=param['d_in'],
-            hidden_dim=param['d_att'],
-            output_dim=param['d_in'],
-            num_layers=param['n_decoder'],
-            dropout=param['dropout'],
-            mem_length=5,
-            attn_dropout=param['dropout'],
-            use_layernorm=True,
-            use_mlp_head=True,
-            pack_with_mask=False)
+    N = MemoryUpdateTCN(
+        input_dim_1=param['d_in'],
+        input_dim_2=param['d_in'],
+        hidden_dim=param['d_att'],  # Taille interne des embeddings
+        output_dim=param['d_in'],
+        # C'est ici que vous réglez la puissance du TCN :
+        tcn_channels=[param['d_att']] * param['n_decoder'],  # 5 blocs → dilation jusqu'à 16
+        kernel_size=3,
+        dropout=param['dropout'],
+        use_layernorm=True,
+    )
 
     N.to(device)
 
@@ -140,7 +137,7 @@ if __name__ == '__main__':
     from Tools.XMLTools import saveObjAsXml
 
     local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
-    save_dir = os.path.join(local, 'Inter', 'NetworkSSM', 'Save')
+    save_dir = os.path.join(local, 'Inter', 'NetworkTCN', 'Save')
     data_dir = os.path.join(local, 'Inter', 'Data')
 
     try:
@@ -152,9 +149,6 @@ if __name__ == '__main__':
 
         print(f"Reprise à partir du checkpoint : {save_path}")
         N.load_state_dict(torch.load(os.path.join(save_path, "Last_network")))
-        with open(os.path.join(save_path, "DictGrad.pkl"), "rb") as f:
-            DictGrad = pickle.load(f)
-        DictGrad.reconnect(N)
 
         checkpoint = torch.load(os.path.join(save_path, "Scheduler.pt"))
 
@@ -209,8 +203,6 @@ if __name__ == '__main__':
         optimizer = optimizers[param['optim']](N.parameters(), weight_decay=param["weight_decay"], lr=param["lr_option"]["value"])
         lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"], max_steps=n_updates, type=param["lr_option"]["type"])
 
-        DictGrad = DictGradObserver(N)
-
         TrainingError = []
         TrainingErrorNext = []
         ValidationError = []
@@ -259,7 +251,6 @@ if __name__ == '__main__':
 
             error = 0
             error_next = 0
-            time_to_observe = (int(j * param["FreqGradObs"]) == (j * param["FreqGradObs"])) and (param['FreqGradObs'] > 0)
 
             n_minibatch_epoch = n_minibatch - p
             while p < n_minibatch:
@@ -301,9 +292,6 @@ if __name__ == '__main__':
                     if lr_scheduler is not None:
                         lr_scheduler.step()
 
-                    if k == 0 and p == 0 and time_to_observe:
-                        DictGrad.update()
-
                     error += float(err) / (n_batch_epoch * n_minibatch_epoch)
                     error_next += float(err_next) / (n_batch_epoch * n_minibatch_epoch)
 
@@ -313,10 +301,10 @@ if __name__ == '__main__':
                             os.mkdir(save_path)
                         except:
                             pass
-                        error = {"TrainingError": TrainingError,
-                                 "ValidationError": ValidationError}
+                        error_dict = {"TrainingError": TrainingError,
+                                      "ValidationError": ValidationError}
                         saveObjAsXml({k: v for k, v in param.items() if not (k in ['resume_from'])},os.path.join(save_path, "param"))
-                        saveObjAsXml(error, os.path.join(save_path, "error"))
+                        saveObjAsXml(error_dict, os.path.join(save_path, "error"))
                         torch.save(best_state_dict, os.path.join(save_path, "Best_network"))
                         torch.save(N.state_dict().copy(), os.path.join(save_path, "Last_network"))
                         torch.save(weight_l, os.path.join(save_path, "WeightL"))
@@ -327,19 +315,11 @@ if __name__ == '__main__':
                             "scheduler_hparams": lr_scheduler.get_hparams()
                         }, os.path.join(save_path, "Scheduler.pt"))
 
-                        with open(os.path.join(save_path, "DictGrad.pkl"), "wb") as file:
-                            pickle.dump(DictGrad, file)
-                        with open(os.path.join(save_path, "ParamObs.pkl"), "wb") as file:
-                            ParamObs = DictParamObserver(N)
-                            pickle.dump(ParamObs, file)
                 k = 0
             p = 0
 
             TrainingError.append(error)
             TrainingErrorNext.append(error_next)
-
-            if time_to_observe:
-                DictGrad.next(j)
 
             with torch.no_grad():
                 Input1 = ValidationInput1.to(device)
@@ -389,22 +369,17 @@ if __name__ == '__main__':
         window_index += 1
         j = 0
 
-    error = {"TrainingError": TrainingError,
-             "TrainingErrorNext": TrainingErrorNext,
-             "ValidationError": ValidationError,
-             "ValidationErrorNext": ValidationErrorNext}
+    error_dict = {"TrainingError": TrainingError,
+                  "TrainingErrorNext": TrainingErrorNext,
+                  "ValidationError": ValidationError,
+                  "ValidationErrorNext": ValidationErrorNext}
 
     print(f"Final Error: {float(ValidationError[-1])}")
 
     if period_checkpoint != -1:
         saveObjAsXml({k: v for k, v in param.items() if not (k in ['resume_from'])},os.path.join(save_path, "param"))
-        saveObjAsXml(error, os.path.join(save_path, "error"))
+        saveObjAsXml(error_dict, os.path.join(save_path, "error"))
         torch.save(best_state_dict, os.path.join(save_path, "Best_network"))
         torch.save(N.state_dict().copy(), os.path.join(save_path, "Last_network"))
         torch.save(weight_l, os.path.join(save_path, "WeightL"))
         torch.save(weight_f, os.path.join(save_path, "WeightF"))
-        with open(os.path.join(save_path, "DictGrad.pkl"), "wb") as file:
-            pickle.dump(DictGrad, file)
-        with open(os.path.join(save_path, "ParamObs.pkl"), "wb") as file:
-            ParamObs = DictParamObserver(N)
-            pickle.dump(ParamObs, file)

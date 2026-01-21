@@ -234,7 +234,7 @@ if __name__ == '__main__':
             64,  # Taille interne des embeddings
             5,
             # C'est ici que vous réglez la puissance du TCN :
-            tcn_channels=[64, 64, 64, 64, 64],  # 5 blocs => dilation jusqu'à 16
+            tcn_channels=[64, 64, 64, 64, 64],  # 5 blocs → dilation jusqu'à 16
             kernel_size=3,
             dropout=0.0,
             use_layernorm=True,
