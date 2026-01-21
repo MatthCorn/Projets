@@ -42,8 +42,11 @@ def GetData(d_in, n_pulse_plateau, n_sat, n_mes, len_in, len_out, n_data_trainin
              ValidationNextMaskInput, ValidationNextMaskOutput, ValidationNoSequenceMask)]
 
 def PostProcess(Input, Output, Masks, len_in, len_out, n_data):
+    AddMask = Masks[0][:, :, 0].clone()
+    Input = Input.clone()
+    Output = Output.clone()
+
     Output[..., -1] = torch.arange(0, len_out, 1) - Output[..., -1]
-    AddMask = Masks[0][:, :, 0]
 
     tps_maintien = 1
     Mask = torch.arange(0, len_out, 1).unsqueeze(0) >= AddMask.argmax(dim=-1).unsqueeze(1)
@@ -66,7 +69,7 @@ def PostProcess(Input, Output, Masks, len_in, len_out, n_data):
     Output_position = ((torch.cumsum(IsOutput_position, dim=-1) - 1) * IsOutput_position).to(torch.int64)
 
     NextMaskInput = 1 - IsOutput_position.unsqueeze(-1)
-    NextMaskOutput = torch.roll(NextMaskInput, shifts=-1, dims=-1)
+    NextMaskOutput = torch.roll(NextMaskInput, shifts=-1, dims=1)
 
     ProcessedInput1 = torch.gather(Input, dim=1, index=Input_position.unsqueeze(-1).expand(*Input_position.shape, Input.shape[-1]))
     ProcessedInput2 = torch.gather(Output, dim=1, index=Output_position.unsqueeze(-1).expand(*Output_position.shape, Output.shape[-1]))

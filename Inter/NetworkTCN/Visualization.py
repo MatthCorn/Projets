@@ -201,6 +201,22 @@ def RecursiveGeneration(save_path):
         parallel=False
     )
 
+    (PInput1, PInput2, POutput, NextMaskInput, NextMaskOutput, OnSequenceMask) = PostProcess(Input, Output, Masks, param['len_in'], param['len_out'], 1)
+
+    N = MemoryUpdateTCN(
+        input_dim_1=param['d_in'],
+        input_dim_2=param['d_in'],
+        hidden_dim=param['d_att'],
+        output_dim=param['d_in'],
+        tcn_channels=[param['d_att']] * param['n_decoder'],
+        kernel_size=3,
+        dropout=param['dropout'],
+        use_layernorm=True,
+    )
+    N.load_state_dict(torch.load(os.path.join(save_path, 'Last_network')))
+
+    print(sum(p.numel() for p in N.parameters() if p.requires_grad))
+
     df = param['sensitivity']
     range_plot = param['len_in'] + param['n_pulse_plateau']
     f_min = Input[:, :, 0].min() - 5 * df
@@ -251,23 +267,6 @@ def RecursiveGeneration(save_path):
                          linewidth=0.3)
         ax4.add_patch(rect)
 
-    (PInput1, PInput2, POutput, NextMaskInput, NextMaskOutput, OnSequenceMask) = PostProcess(Input, Output, Masks, param['len_in'], param['len_out'], 1)
-
-
-    N = MemoryUpdateTCN(
-        input_dim_1=param['d_in'],
-        input_dim_2=param['d_in'],
-        hidden_dim=param['d_att'],
-        output_dim=param['d_in'],
-        tcn_channels=[param['d_att']] * param['n_decoder'],
-        kernel_size=3,
-        dropout=param['dropout'],
-        use_layernorm=True,
-    )
-    N.load_state_dict(torch.load(os.path.join(save_path, 'Last_network')))
-
-    print(sum(p.numel() for p in N.parameters() if p.requires_grad))
-
     # GuidedPrediction, _ = N(Input1, Input2, NextMaskInput)
 
     # end_list = []
@@ -285,7 +284,6 @@ def RecursiveGeneration(save_path):
     # plt.plot(end_list, 'r')
     # plt.plot(Masks[1][0, :, 0].tolist(), 'b')
     # plt.show()
-
 
     PInput = PInput1[0, :, :-1][(NextMaskInput * OnSequenceMask)[0, :, 0].to(bool)]
     L = PInput.tolist()
