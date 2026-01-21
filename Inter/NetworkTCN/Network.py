@@ -185,6 +185,8 @@ class MemoryUpdateTCN(nn.Module):
         # 1. Embeddings de l'instant t
         if next_mask is None:
             next_mask = torch.zeros(*input_1.shape[:-1], 1, 1).to(input_1.device)
+        else:
+            next_mask = next_mask.unsqueeze(-1)
 
         x_1 = self.embedding_1(input_1.unsqueeze(1))
         x_2 = self.embedding_2(input_2.unsqueeze(1))
@@ -226,7 +228,7 @@ class MemoryUpdateTCN(nn.Module):
 
         # On retourne le buffer mis à jour au lieu de (hidden, H_past)
         # H_past n'est plus utile car pas d'attention
-        return y_t, buffer, None, next_dist
+        return y_t, buffer, next_dist
 
 if __name__ == '__main__':
     N = MemoryUpdateTCN(10,
@@ -241,16 +243,17 @@ if __name__ == '__main__':
     )
     x1 = torch.normal(0, 1, (40, 20, 10))
     x2 = torch.normal(0, 1, (40, 20, 10))
-    y1, next_dist_1 = N(x1, x2)
+    mask = torch.randint(0, 2, (40, 20, 1))
+    y1, next_dist_1 = N(x1, x2, mask)
 
     y_list = []
     next_dist_list = []
-    hidden = None
-    H_past = None
+    buffer = None
     for k in range(x1.shape[1]):
         x1_k = x1[:, k]
         x2_k = x2[:, k]
-        y_k, hidden, H_past, next_dist = N.step(x1_k, x2_k, hidden, H_past)
+        next_mask = mask[:, k]
+        y_k, buffer, next_dist = N.step(x1_k, x2_k, buffer, next_mask)
         y_list.append(y_k.unsqueeze(1))
         next_dist_list.append(next_dist.unsqueeze(1))
     y2 = torch.cat(y_list, dim=1)

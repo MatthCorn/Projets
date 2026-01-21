@@ -1,4 +1,4 @@
-from Inter.NetworkSSM.SpecialUtils import GetData
+from Inter.NetworkTCN.SpecialUtils import GetData
 from Inter.NetworkSSM.Network import MemoryUpdateLSTMWithAttention
 from Complete.LRScheduler import Scheduler
 from math import sqrt
