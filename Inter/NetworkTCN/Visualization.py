@@ -171,15 +171,14 @@ updating = False  # flag global pour éviter récursion
 
 
 def RecursiveGeneration(save_path):
-    from Inter.Model.DataMaker import GetData
-    from Inter.NetworkTCN.SpecialUtils import PostProcess
+    from Inter.NetworkTCN.SpecialUtils import GetData
     import torch
 
     param = loadXmlAsObj(os.path.join(save_path, 'param'))
     weight_l = torch.load(os.path.join(save_path, 'WeightL'), weights_only=False)
     weight_f = torch.load(os.path.join(save_path, 'WeightF'), weights_only=False)
 
-    [(Input, Output, Masks, Std), _] = GetData(
+    [(PInput1, PInput2, POutput, Std, NextMaskInput, NextMaskOutput, OnSequenceMask), _] = GetData(
         d_in=param['d_in'] - 1,
         n_pulse_plateau=param['n_pulse_plateau'],
         n_sat=param['n_sat'],
@@ -197,11 +196,8 @@ def RecursiveGeneration(save_path):
         distrib=param["plot_distrib"],
         weight_f=weight_f,
         weight_l=weight_l,
-        type='complete',
         parallel=False
     )
-
-    (PInput1, PInput2, POutput, NextMaskInput, NextMaskOutput, OnSequenceMask) = PostProcess(Input, Output, Masks, param['len_in'], param['len_out'], 1)
 
     N = MemoryUpdateTCN(
         input_dim_1=param['d_in'],
@@ -219,55 +215,15 @@ def RecursiveGeneration(save_path):
 
     df = param['sensitivity']
     range_plot = param['len_in'] + param['n_pulse_plateau']
-    f_min = Input[:, :, 0].min() - 5 * df
-    f_max = Input[:, :, 0].max() + 5 * df
-    l_std = Input[0, :, 1].std()
+    f_min = PInput1[:, :, 0].min() - 5 * df
+    f_max = PInput1[:, :, 0].max() + 5 * df
+    l_std = PInput1[0, :, 1].std()
 
     from matplotlib import colors
     from matplotlib.patches import Rectangle
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
 
-    # n_pulse_predicted = [x > 0.1 for x in end_list].index(False)
-    # L = Prediction[0][:n_pulse_predicted].tolist()
-    L = Input[0].tolist()
-    for i, vector in enumerate(L):
-        T1 = i
-        T2 = T1 + vector[-1]
-        F = vector[0]
-        N = 0.5 * np.tanh(vector[1] / l_std) + 1
-
-        r, g, b, a = value_to_rgb(N)
-
-        rect = Rectangle((T1, F - df),  # coin bas gauche
-                         T2 - T1,  # largeur
-                         2 * df,  # hauteur
-                         facecolor=(r, g, b, 0.8),
-                         edgecolor='k',
-                         linewidth=0.3)
-        ax3.add_patch(rect)
-    #
-    # GuidedPrediction = GuidedPrediction[0][((1 - NextMaskOutput) * OnSequenceMask)[0, :, 0].to(bool)]
-    # TOA_Input = (torch.cumsum(NextMaskInput, dim=1) - 1)[0, :, 0][((1 - NextMaskInput) * OnSequenceMask)[0, :, 0].to(bool)]
-    # GuidedPrediction[:, -1] += TOA_Input
-    # L = GuidedPrediction.tolist()
-    R = Output[0][:Masks[0][0, :, 0].tolist().index(1.)].tolist()
-    for i, vector in enumerate(R):
-        T1 = i - vector[-1]
-        T2 = T1 + vector[-2]
-        F = vector[0]
-        N = 0.5 * np.tanh(vector[1] / l_std) + 1
-
-        r, g, b, a = value_to_rgb(N)
-
-        rect = Rectangle((T1, F - df),  # coin bas gauche
-                         T2 - T1,  # largeur
-                         2 * df,  # hauteur
-                         facecolor=(r, g, b, 0.8),
-                         edgecolor='k',
-                         linewidth=0.3)
-        ax4.add_patch(rect)
-
-    # GuidedPrediction, _ = N(Input1, Input2, NextMaskInput)
+    GuidedPrediction, _ = N(PInput1, PInput2, NextMaskInput)
 
     # end_list = []
     #
@@ -322,6 +278,44 @@ def RecursiveGeneration(save_path):
                          edgecolor='k',
                          linewidth=0.3)
         ax2.add_patch(rect)
+
+    # n_pulse_predicted = [x > 0.1 for x in end_list].index(False)
+    # L = Prediction[0][:n_pulse_predicted].tolist()
+    # for i, vector in enumerate(L):
+    #     T1 = i
+    #     T2 = T1 + vector[-1]
+    #     F = vector[0]
+    #     N = 0.5 * np.tanh(vector[1] / l_std) + 1
+    #
+    #     r, g, b, a = value_to_rgb(N)
+    #
+    #     rect = Rectangle((T1, F - df),  # coin bas gauche
+    #                      T2 - T1,  # largeur
+    #                      2 * df,  # hauteur
+    #                      facecolor=(r, g, b, 0.8),
+    #                      edgecolor='k',
+    #                      linewidth=0.3)
+    #     ax3.add_patch(rect)
+
+    GuidedPrediction = GuidedPrediction[0][((1 - NextMaskOutput) * OnSequenceMask)[0, :, 0].to(bool)]
+    TOA_Input = (torch.cumsum(NextMaskInput, dim=1) - 1)[0, :, 0][((1 - NextMaskInput) * OnSequenceMask)[0, :, 0].to(bool)]
+    GuidedPrediction[:, -1] += TOA_Input
+    R = GuidedPrediction.tolist()
+    for i, vector in enumerate(R):
+        T1 = i - vector[-1]
+        T2 = T1 + vector[-2]
+        F = vector[0]
+        N = 0.5 * np.tanh(vector[1] / l_std) + 1
+
+        r, g, b, a = value_to_rgb(N)
+
+        rect = Rectangle((T1, F - df),  # coin bas gauche
+                         T2 - T1,  # largeur
+                         2 * df,  # hauteur
+                         facecolor=(r, g, b, 0.8),
+                         edgecolor='k',
+                         linewidth=0.3)
+        ax4.add_patch(rect)
 
     from mpl_toolkits.axes_grid1 import make_axes_locatable
 
