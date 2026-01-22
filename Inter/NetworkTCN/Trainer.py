@@ -5,7 +5,7 @@ from math import sqrt
 import torch
 from tqdm import tqdm
 import time
-
+from Tools.MCCutils import soft_mcc
 import warnings
 
 warnings.filterwarnings("ignore")
@@ -281,13 +281,13 @@ if __name__ == '__main__':
                     if param['error_weighting'] == 'n':
                         StdBatch = torch.mean(StdBatch)
 
-                    Prediction, next_dist = N(Input1Batch, Input2Batch, NMInputBatch)
+                    Prediction, is_next = N(Input1Batch, Input2Batch, NMInputBatch)
 
                     err = (torch.norm((Prediction - OutputBatch) * (1 - NMOutputBatch) * OSMBatch / StdBatch, p=2) /
                            sqrt((torch.sum((1 - NMOutputBatch) * OSMBatch) - batch_size) * d_out))
-                    err_next = torch.norm(next_dist * NMOutputBatch * OSMBatch) / sqrt(torch.sum(NMOutputBatch * OSMBatch) - batch_size)
+                    err_next = torch.mean((1 - soft_mcc(is_next, NMOutputBatch, OSMBatch)) / StdBatch) * torch.mean(StdBatch)
 
-                    (param["mult_grad"] * (err + 0.1 * err_next)).backward()
+                    (param["mult_grad"] * (1 * err + 0.01 * err_next)).backward()
                     optimizer.step()
                     if lr_scheduler is not None:
                         lr_scheduler.step()
@@ -336,11 +336,11 @@ if __name__ == '__main__':
                     Std = torch.mean(Std)
 
                 N.eval()
-                Prediction, next_dist = N(Input1, Input2, NMInput)
+                Prediction, is_next = N(Input1, Input2, NMInput)
                 N.train()
 
                 err = torch.norm((Prediction - Output) * (1 - NMOutput) * OSM / Std, p=2) / sqrt((torch.sum((1 - NMOutput) * OSM) - NDataV) * d_out)
-                err_next = torch.norm(next_dist * NMOutput * OSM) / sqrt(torch.sum(NMOutput * OSM) - NDataV)
+                err_next = torch.mean((1 - soft_mcc(is_next, NMOutput, OSM)) / Std) * torch.mean(Std)
 
                 ValidationError.append(float(err))
                 ValidationErrorNext.append(float(err_next))

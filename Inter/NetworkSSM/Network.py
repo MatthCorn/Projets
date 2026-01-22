@@ -204,7 +204,7 @@ class MemoryUpdateLSTMWithAttention(nn.Module):
         ctx_t = self._attend_step(H_new, h_t)  # [B,H]
 
         # head
-        combined_t = self.combiner(torch.cat([h_t, ctx_t], dim=-1).unsqueeze(1))  # [B,1,2H]
+        combined_t = self.combiner(torch.cat([h_t, ctx_t], dim=-1).unsqueeze(1))  # [B,1,H]
         next_dist = torch.norm(combined_t - self.next_token(), dim=-1) / torch.norm(self.next_token())
         y_t = self.head(combined_t).squeeze(1)  # [B,output_dim]
         return y_t, hidden, H_new, next_dist

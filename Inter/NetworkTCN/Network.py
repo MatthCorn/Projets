@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from torch.nn.utils import weight_norm
+from Tools.MCCutils import CosineDetector
 from Complete.Transformer.LearnableModule import LearnableParameters
 
 
@@ -135,6 +136,8 @@ class MemoryUpdateTCN(nn.Module):
         # On récupère le champ récepteur pour gérer le buffer
         self.max_history = self.tcn.receptive_field
 
+        self.next_detector = CosineDetector()
+
         if use_layernorm:
             # On normalise la sortie du TCN (c'est souvent utile)
             # Attention: LayerNorm sur (B, C, T) ou (B, T, C) -> ici on le fera sur la dernière dim
@@ -173,9 +176,9 @@ class MemoryUpdateTCN(nn.Module):
         pred = self.head(tcn_out)
 
         # Calcul optionnel de distance (votre logique existante)
-        next_dist = torch.norm(tcn_out - self.next_token(), dim=-1, keepdim=True) / torch.norm(self.next_token())
+        is_next = self.next_detector(tcn_out, self.next_token())
 
-        return pred, next_dist
+        return pred, is_next
 
     def step(self, input_1, input_2, buffer=None, next_mask=None):
         """
@@ -224,11 +227,11 @@ class MemoryUpdateTCN(nn.Module):
 
         # (Pour compatibilité avec votre code existant qui attend 4 sorties)
         # Ici next_dist est calculé sur le vecteur courant
-        next_dist = torch.norm(h_t - self.next_token().squeeze(0).squeeze(0), dim=-1) / torch.norm(self.next_token())
+        is_next = self.next_detector(h_t.unsqueeze(1), self.next_token())
 
         # On retourne le buffer mis à jour au lieu de (hidden, H_past)
         # H_past n'est plus utile car pas d'attention
-        return y_t, buffer, next_dist
+        return y_t, buffer, is_next
 
 if __name__ == '__main__':
     N = MemoryUpdateTCN(10,
@@ -244,23 +247,23 @@ if __name__ == '__main__':
     x1 = torch.normal(0, 1, (40, 20, 10))
     x2 = torch.normal(0, 1, (40, 20, 10))
     mask = torch.randint(0, 2, (40, 20, 1))
-    y1, next_dist_1 = N(x1, x2, mask)
+    y1, is_next_1 = N(x1, x2, mask)
 
     y_list = []
-    next_dist_list = []
+    is_next_list = []
     buffer = None
     for k in range(x1.shape[1]):
         x1_k = x1[:, k]
         x2_k = x2[:, k]
         next_mask = mask[:, k]
-        y_k, buffer, next_dist = N.step(x1_k, x2_k, buffer, next_mask)
+        y_k, buffer, is_next = N.step(x1_k, x2_k, buffer, next_mask)
         y_list.append(y_k.unsqueeze(1))
-        next_dist_list.append(next_dist.unsqueeze(1))
+        is_next_list.append(is_next)
     y2 = torch.cat(y_list, dim=1)
-    next_dist_2 = torch.cat(next_dist_list, dim=1)
+    is_next_2 = torch.cat(is_next_list, dim=1)
 
     print(y2[0, :, 0])
     print(y1[0, :, 0])
 
-    print(next_dist_1[0, :, 0])
-    print(next_dist_2[0])
+    print(is_next_1[0, :, 0])
+    print(is_next_2[0, :, 0])

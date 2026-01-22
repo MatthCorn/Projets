@@ -141,7 +141,7 @@ class TransformerTranslator(nn.Module):
         is_last_token = is_last_token[id_last]
         window_mask = window_mask[id_last]
 
-        from Tools.MCC import best_mcc_threshold_torch
+        from Tools.MCCutils import best_mcc_threshold_torch
 
         best_thr_end, best_mcc_end = best_mcc_threshold_torch(1 - target_end_mask, is_end_token)
         best_thr_last, best_mcc_last = best_mcc_threshold_torch(1 - window_mask, is_last_token)

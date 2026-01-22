@@ -631,6 +631,6 @@ def RecVisualizeScenario(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkSSM\Save\2026-01-20__17-22'
+    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkSSM\Save\2026-01-22__10-44'
 
     PlotError(save_path)

@@ -22,20 +22,34 @@ class MHSA(nn.Module):
 
         # self.ResetParam()
 
-    def forward(self, x, mask=None, RoPE=lambda u: u):
-        # x.shape = (batch_size, len_seq, d_model)
-        batch_size, len_seq, _ = x.shape
+    def forward(self, x, mask=None, RoPE=lambda u: u, past_kv=None):
 
-        Kt = RoPE(self.key(x)).reshape(batch_size, len_seq, self.n_heads, self.d_head).permute(0, 2, 3, 1)
-        # Kt.shape = (batch_size, n_heads, d_head, len_seq)
-        V = self.value(x).reshape(batch_size, len_seq, self.n_heads, self.d_head).transpose(1, 2)
-        # V.shape = (batch_size, n_heads, len_seq, d_head)
+        if past_kv is not None:
+            past_k, past_v = past_kv
+            K = torch.cat([past_k, self.key(x)], dim=1)
+
+            batch_size, len_seq, _ = K.shape
+            Kt = RoPE(K).reshape(batch_size, len_seq, self.n_heads, self.d_head).permute(0, 2, 3, 1)
+            # Kt.shape = (batch_size, n_heads, d_head, len_seq)
+            V = torch.cat([past_v, self.value(x)], dim=1).reshape(batch_size, len_seq, self.n_heads, self.d_head).transpose(1, 2)
+            # V.shape = (batch_size, n_heads, len_seq, d_head)
+
+        else:
+            # x.shape = (batch_size, len_seq, d_model)
+            batch_size, len_seq, _ = x.shape
+
+            Kt = RoPE(self.key(x)).reshape(batch_size, len_seq, self.n_heads, self.d_head).permute(0, 2, 3, 1)
+            # Kt.shape = (batch_size, n_heads, d_head, len_seq)
+            V = self.value(x).reshape(batch_size, len_seq, self.n_heads, self.d_head).transpose(1, 2)
+            # V.shape = (batch_size, n_heads, len_seq, d_head)
+
+        batch_size, len_input, _ = x.shape
         Q = RoPE(self.query(x)).reshape(batch_size, len_seq, self.n_heads, self.d_head).transpose(1, 2)
         # Q.shape = (batch_size, n_heads, len_seq, d_head)
 
         if mask is not None:
-            mask = mask[:, :, :len_seq, :len_seq]
-            # mask.shape = (1, 1, len_seq, len_seq)
+            mask = mask[:, :, :len_seq, :len_input]
+            # mask.shape = (1, 1, len_seq, len_input)
 
         SA = self.SelfAttention(Q, Kt, V, mask=mask)
         # RSA.shape = (batch_size, n_heads, len_seq, d_head)

@@ -146,7 +146,7 @@ def PlotError(save_path):
     ax2.plot(ValidationErrorNext, 'b', label="Validation")
     ax2.set_ylim(bottom=0)
     ax2.legend(loc='upper right')
-    ax2.set_title("Erreur mémoire")
+    ax2.set_title("Erreur Next")
 
     fig.tight_layout(pad=1.0)
 
@@ -219,27 +219,36 @@ def RecursiveGeneration(save_path):
     f_max = PInput1[:, :, 0].max() + 5 * df
     l_std = PInput1[0, :, 1].std()
 
+    GuidedPrediction, IsNextPrediction = N(PInput1, PInput2, NextMaskInput)
+
+    Input = PInput1.clone()[0][(NextMaskInput * OnSequenceMask)[0, :, 0].to(bool)].unsqueeze(0)
+    Output = []
+    is_next_list = []
+    buffer = None
+    next_mask = torch.ones(1, 1)
+    Input2 = torch.zeros(*Input[:, 0].shape)
+    next_threshold = 0.5
+    k_in = 0
+    for _ in range(param['len_out'] + param['len_in']):
+        Input1 = Input[:, k_in]
+        Output_k, buffer, is_next = N.step(Input1, Input2, buffer, next_mask)
+        Input2 = Output_k
+        Output.append(Output_k.unsqueeze(1))
+        next_mask = 0 * next_mask + float(is_next > next_threshold)
+        is_next_list.append(float(is_next))
+        if (is_next > next_threshold) and (k_in != param['len_in'] - 1):
+            k_in += 1
+
+    Output = torch.cat(Output, dim=1)
+
+    plt.plot(is_next_list, 'r')
+    plt.plot(IsNextPrediction[0, :, 0].tolist(), 'g')
+    plt.plot(NextMaskOutput[0, :, 0].tolist(), 'b')
+    plt.show()
+
     from matplotlib import colors
     from matplotlib.patches import Rectangle
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
-
-    GuidedPrediction, _ = N(PInput1, PInput2, NextMaskInput)
-
-    # end_list = []
-    #
-    # Prediction = Output
-    # for n in range(param['len_out']):
-    #     Prediction, is_end = N.recursive_eval(Input, Prediction, n)
-    #     Prediction = Prediction[:, :-1, :]
-    #     end_list.append(float(is_end))
-    #
-    # Prediction, is_end = N.recursive_eval(Input, Prediction, n + 1)
-    # Prediction = Prediction[:, :-1, :]
-    # end_list.append(float(is_end))
-    #
-    # plt.plot(end_list, 'r')
-    # plt.plot(Masks[1][0, :, 0].tolist(), 'b')
-    # plt.show()
 
     PInput = PInput1[0, :, :-1][(NextMaskInput * OnSequenceMask)[0, :, 0].to(bool)]
     L = PInput.tolist()
@@ -279,30 +288,37 @@ def RecursiveGeneration(save_path):
                          linewidth=0.3)
         ax2.add_patch(rect)
 
-    # n_pulse_predicted = [x > 0.1 for x in end_list].index(False)
-    # L = Prediction[0][:n_pulse_predicted].tolist()
-    # for i, vector in enumerate(L):
-    #     T1 = i
-    #     T2 = T1 + vector[-1]
-    #     F = vector[0]
-    #     N = 0.5 * np.tanh(vector[1] / l_std) + 1
-    #
-    #     r, g, b, a = value_to_rgb(N)
-    #
-    #     rect = Rectangle((T1, F - df),  # coin bas gauche
-    #                      T2 - T1,  # largeur
-    #                      2 * df,  # hauteur
-    #                      facecolor=(r, g, b, 0.8),
-    #                      edgecolor='k',
-    #                      linewidth=0.3)
-    #     ax3.add_patch(rect)
+    NMOutputPrediction = (IsNextPrediction > next_threshold).to(torch.int64)
+    NMIntputPrediction = torch.roll(NMOutputPrediction, dims=1, shifts=1)
+    NMIntputPrediction[:, 0, :] = 1
+    OSMPred = torch.roll(torch.cumsum(NMOutputPrediction, dim=1) < param['len_in'], dims=1, shifts=1)
+    OSMPred[:, 0, :] = 1
+    Output = Output[0][((1 - NMOutputPrediction) * OSMPred)[0, :, 0].to(bool)]
+    TOA_Input = (torch.cumsum(NMIntputPrediction, dim=1) - 1)[0, :, 0][((1 - NMOutputPrediction) * OSMPred)[0, :, 0].to(bool)]
+    Output[:, -1] += TOA_Input
+    L = Output.tolist()
+    for i, vector in enumerate(L):
+        T1 = i
+        T2 = T1 + vector[-1]
+        F = vector[0]
+        N = 0.5 * np.tanh(vector[1] / l_std) + 1
+
+        r, g, b, a = value_to_rgb(N)
+
+        rect = Rectangle((T1, F - df),  # coin bas gauche
+                         T2 - T1,  # largeur
+                         2 * df,  # hauteur
+                         facecolor=(r, g, b, 0.8),
+                         edgecolor='k',
+                         linewidth=0.3)
+        ax3.add_patch(rect)
 
     GuidedPrediction = GuidedPrediction[0][((1 - NextMaskOutput) * OnSequenceMask)[0, :, 0].to(bool)]
     TOA_Input = (torch.cumsum(NextMaskInput, dim=1) - 1)[0, :, 0][((1 - NextMaskInput) * OnSequenceMask)[0, :, 0].to(bool)]
     GuidedPrediction[:, -1] += TOA_Input
     R = GuidedPrediction.tolist()
     for i, vector in enumerate(R):
-        T1 = i - vector[-1]
+        T1 = vector[-1]
         T2 = T1 + vector[-2]
         F = vector[0]
         N = 0.5 * np.tanh(vector[1] / l_std) + 1
@@ -371,7 +387,7 @@ def RecursiveGeneration(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkTCN\Save\2026-01-21__14-11'
+    save_path = r'C:\Users\Matth\Documents\Projets\Inter\NetworkTCN\Save\2026-01-22__15-33'
 
     # PlotError(save_path)
 
