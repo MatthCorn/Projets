@@ -14,12 +14,12 @@ class PositionalEncoding(nn.Module):
         pe[0, :, 1::2] = torch.cos(position * div_term)
         self.register_buffer('pe', pe.to(device=device))
 
-    def forward(self, x):
+    def forward(self, x, stride=0):
         """
         Arguments:
             x: Tensor, shape ``[batch_size, seq_len, embedding_dim]``
         """
-        x = x + self.pe[:, :x.size(1)]
+        x = x + self.pe[:, stride:x.size(1)+stride]
         return self.dropout(x)
 
 
@@ -34,7 +34,7 @@ class Rotary(torch.nn.Module):
     def forward(self, x):
         # x.shape = (batch_size, len_seq, dim)
         len_seq = self.len_seq * self.len_seq_y
-
+        print("peut poser problème avec l'implémentation MHSA.forward où past_kv != None")
         # rotate_half
         rotate_half_x = (x.reshape(-1, len_seq, self.dim//2, 2) * self.rotator)[..., [1, 0]].reshape(-1, len_seq, self.dim)
 

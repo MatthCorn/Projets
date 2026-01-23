@@ -23,19 +23,25 @@ class MHSA(nn.Module):
         # self.ResetParam()
 
     def forward(self, x, mask=None, RoPE=lambda u: u, past_kv=None):
+        batch_size, len_input, _ = x.shape
 
         if past_kv is not None:
             past_k, past_v = past_kv
-            K = torch.cat([past_k, self.key(x)], dim=1)
 
-            batch_size, len_seq, _ = K.shape
-            Kt = RoPE(K).reshape(batch_size, len_seq, self.n_heads, self.d_head).permute(0, 2, 3, 1)
+            K = torch.cat([past_k, self.key(x).reshape(batch_size, -1, self.n_heads, self.d_head)], dim=1)
+
+            batch_size, len_seq, *_ = K.shape
+
+            Kt = RoPE(K).permute(0, 2, 3, 1)
             # Kt.shape = (batch_size, n_heads, d_head, len_seq)
-            V = torch.cat([past_v, self.value(x)], dim=1).reshape(batch_size, len_seq, self.n_heads, self.d_head).transpose(1, 2)
+            V = torch.cat([past_v, self.value(x).reshape(batch_size, -1, self.n_heads, self.d_head).transpose(1, 2)], dim=2)
             # V.shape = (batch_size, n_heads, len_seq, d_head)
+
+            past_kv[0], past_kv[1] = K, V
 
         else:
             # x.shape = (batch_size, len_seq, d_model)
+            # len_seq = len_input
             batch_size, len_seq, _ = x.shape
 
             Kt = RoPE(self.key(x)).reshape(batch_size, len_seq, self.n_heads, self.d_head).permute(0, 2, 3, 1)
@@ -43,21 +49,21 @@ class MHSA(nn.Module):
             V = self.value(x).reshape(batch_size, len_seq, self.n_heads, self.d_head).transpose(1, 2)
             # V.shape = (batch_size, n_heads, len_seq, d_head)
 
-        batch_size, len_input, _ = x.shape
-        Q = RoPE(self.query(x)).reshape(batch_size, len_seq, self.n_heads, self.d_head).transpose(1, 2)
-        # Q.shape = (batch_size, n_heads, len_seq, d_head)
-
         if mask is not None:
-            mask = mask[:, :, :len_seq, :len_input]
-            # mask.shape = (1, 1, len_seq, len_input)
+            mask = mask[:, :, -len_input:, -len_seq:]
+            # mask.shape = (1, 1, len_input, len_seq)
+
+        Q = RoPE(self.query(x)).reshape(batch_size, len_input, self.n_heads, self.d_head).transpose(1, 2)
+        # Q.shape = (batch_size, n_heads, len_input, d_head)
 
         SA = self.SelfAttention(Q, Kt, V, mask=mask)
         # RSA.shape = (batch_size, n_heads, len_seq, d_head)
 
-        concat = SA.transpose(1, 2).reshape(batch_size, len_seq, self.d_att)
-        # concat.shape = (batch_size, len_seq, d_att)
+        concat = SA.transpose(1, 2).reshape(batch_size, len_input, self.d_att)
+        # concat.shape = (batch_size, len_input, d_att)
 
         return self.dropout(self.linear(concat))
+
 
     def SelfAttention(self, Q, Kt, V, mask):
         d_head = self.d_head

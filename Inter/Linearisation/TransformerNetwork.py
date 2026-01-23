@@ -18,15 +18,15 @@ class CausalEncoderLayer(nn.Module):
         self.mask_self_attention = MHSA(d_att, n_heads, dropout=dropout_A)
         self.feed_forward = FeedForward(d_att, d_att, widths=width_FF, dropout=dropout_FF)
 
-    def forward(self, input, mask, RoPE=lambda u: u):
+    def forward(self, input, mask, RoPE=lambda u: u, past_kv=None):
         if self.norm == 'pre':
-            y = self.self_attention(self.first_layer_norm(input), mask=mask, RoPE=RoPE) + input
+            y = self.mask_self_attention(self.first_layer_norm(input), mask=mask, RoPE=RoPE, past_kv=past_kv) + input
             y = self.feed_forward(self.third_layer_norm(y)) + y
         elif self.norm == 'post':
-            y = self.first_layer_norm(self.self_attention(input, mask=mask, RoPE=RoPE) + input)
+            y = self.first_layer_norm(self.mask_self_attention(input, mask=mask, RoPE=RoPE, past_kv=past_kv) + input)
             y = self.third_layer_norm(self.feed_forward(y) + y)
         else:
-            y = self.self_attention(input, mask=mask, RoPE=RoPE) + input
+            y = self.mask_self_attention(input, mask=mask, RoPE=RoPE, past_kv=past_kv) + input
             y = self.feed_forward(y) + y
         return y
 
@@ -46,6 +46,8 @@ class Transformer(nn.Module):
     ):
         super().__init__()
         self.hidden_dim = hidden_dim
+        self.n_heads = n_head
+        self.d_head = hidden_dim // n_head
         self.pos_encoding = PositionalEncoding(d_att=hidden_dim, dropout=dropout, max_len=len_out)
 
         # --- 1. EMBEDDINGS (Votre logique spécifique) ---
@@ -85,6 +87,7 @@ class Transformer(nn.Module):
             self.head = nn.Linear(hidden_dim, output_dim)
 
         self.register_buffer("mask", torch.tril(torch.ones(len_out, len_out)).unsqueeze(0).unsqueeze(0), persistent=False)
+        self.past_kv = None
 
 
     def forward(self, input_1, input_2, next_mask=None):
@@ -102,7 +105,7 @@ class Transformer(nn.Module):
         x = self.pos_encoding(x)
 
         for layer in self.transformer_core:
-            x = layer(x, mask)
+            x = layer(x, self.mask)
 
         # C. Sortie directe (Pas d'attention, pas de combinaison complexe)
         pred = self.head(x)
@@ -112,12 +115,19 @@ class Transformer(nn.Module):
 
         return pred, is_next
 
-    def step(self, input_1, input_2, buffer=None, next_mask=None):
+    def step(self, input_1, input_2, next_mask=None):
         """
         Mode Inférence Pas-à-Pas (Bufferisé).
         buffer: contient l'historique brut des embeddings [Batch, Hidden, T_history]
         """
-        # 1. Embeddings de l'instant t
+        # 1. Gestion du Buffer
+        if self.past_kv is None:
+            batch_size, *_ = input_1.shape
+            self.past_kv = [[torch.zeros(batch_size, 0, self.n_heads, self.d_head),
+                             torch.zeros(batch_size, self.n_heads, 0, self.d_head)].copy()
+                            for _ in range(len(self.transformer_core))]
+
+        # 2. Embeddings de l'instant t
         if next_mask is None:
             next_mask = torch.zeros(*input_1.shape[:-1], 1, 1).to(input_1.device)
         else:
@@ -127,46 +137,31 @@ class Transformer(nn.Module):
         x_2 = self.embedding_2(input_2.unsqueeze(1))
         x_2 = x_2 * (1 - next_mask) + next_mask * self.next_token()
 
-        # x_t : [Batch, 1, Hidden]
-        x_t = self.merge_embeddings(torch.cat([x_1, x_2], dim=-1))
+        # x : [Batch, 1, Hidden]
+        x = self.merge_embeddings(torch.cat([x_1, x_2], dim=-1))
+        x = self.pos_encoding(x, stride=self.past_kv[0][0].shape[1])
 
-        # 2. Gestion du Buffer
-        if buffer is None:
-            buffer = x_t
-        else:
-            buffer = torch.cat([buffer, x_t], dim=1)
+        for i, layer in enumerate(self.transformer_core):
+            x = layer(x, self.mask, past_kv=self.past_kv[i])
 
-        # 3. Inférence
-        # On applique le TCN sur tout le buffer
-        tcn_out_seq = self.tcn(buffer)  # [Batch, Channels, Buffer_Len]
+        # C. Sortie directe (Pas d'attention, pas de combinaison complexe)
+        pred = self.head(x)
 
-        # On ne prend que le DERNIER point temporel (l'instant présent)
-        h_t = tcn_out_seq[:, :, -1]  # [Batch, Channels]
+        # Calcul optionnel de distance (votre logique existante)
+        is_next = self.next_detector(x, self.next_token())
 
-        if self.use_layernorm:
-            h_t = self.post_tcn_ln(h_t)
-
-        # 4. Sortie
-        y_t = self.head(h_t)  # [Batch, Output_Dim]
-
-        # (Pour compatibilité avec votre code existant qui attend 4 sorties)
-        # Ici next_dist est calculé sur le vecteur courant
-        is_next = self.next_detector(h_t.unsqueeze(1), self.next_token())
-
-        # On retourne le buffer mis à jour au lieu de (hidden, H_past)
-        # H_past n'est plus utile car pas d'attention
-        return y_t, buffer, is_next
+        return pred, is_next
 
 if __name__ == '__main__':
-    N = MemoryUpdateTCN(10,
-            10,
-            64,  # Taille interne des embeddings
-            5,
-            # C'est ici que vous réglez la puissance du TCN :
-            tcn_channels=[64, 64, 64, 64, 64],  # 5 blocs → dilation jusqu'à 16
-            kernel_size=3,
-            dropout=0.0,
-            use_layernorm=True,
+    N = Transformer(
+        10,
+        10,
+        64,
+        5,
+        len_out=20,
+        n_layer=5,
+        n_head=4,
+        dropout=0.0
     )
     x1 = torch.normal(0, 1, (40, 20, 10))
     x2 = torch.normal(0, 1, (40, 20, 10))
@@ -175,13 +170,12 @@ if __name__ == '__main__':
 
     y_list = []
     is_next_list = []
-    buffer = None
     for k in range(x1.shape[1]):
         x1_k = x1[:, k]
         x2_k = x2[:, k]
         next_mask = mask[:, k]
-        y_k, buffer, is_next = N.step(x1_k, x2_k, buffer, next_mask)
-        y_list.append(y_k.unsqueeze(1))
+        y_k, is_next = N.step(x1_k, x2_k, next_mask)
+        y_list.append(y_k)
         is_next_list.append(is_next)
     y2 = torch.cat(y_list, dim=1)
     is_next_2 = torch.cat(is_next_list, dim=1)
