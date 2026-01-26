@@ -107,21 +107,11 @@ def objective(trial, RUN_DIR, params):
 
 if __name__ == "__main__":
     params = {
-        "n_encoder": ['suggest', 'int', [2, 4]],
-        "n_decoder": ['suggest', 'int', [2, 4]],
-        "d_att": ['suggest', 'categorical', [64, 128]],
-        "widths_embedding": ['suggest', 'categorical', [[16], [32]]],
-        "width_FF": [128],
-        "n_heads": ['suggest', 'categorical', [2, 4]],
-        "dropout": ['suggest', 'float', [0, 0.3]],
         "lr_option": {
             "value": ['suggest', 'float', [1e-6, 1e-3], {'log': True}],
             "reset": "y",
             "type": "cos"
         },
-        "mult_grad": ["suggest", "int", [1e0, 1e4], {"log": False}],
-        "weight_decay": ['suggest', 'float', [1e-6, 1e-2], {'log': True}],
-        "batch_size": ['suggest', 'categorical', [512, 1024]],
         "training_strategy": [
             {"mean": [-5, 5], "std": [1, 5]},
             {"mean": [-5, 5], "std": [0.2, 5]}
