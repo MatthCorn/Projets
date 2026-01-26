@@ -143,8 +143,11 @@ if __name__ == "__main__":
         with open(json_file, "r") as f:
             temp_param = json.load(f)
         params.update(temp_param)
-    except:
-        pass
+    except Exception as e:
+        if len(sys.argv) == 0:
+            print('nothing loaded')
+        else:
+            print(e)
 
     job_id = os.getenv("SLURM_JOB_ID", str(uuid.uuid4().hex))  # fallback si tu testes en local
     if params['retake_job']:
