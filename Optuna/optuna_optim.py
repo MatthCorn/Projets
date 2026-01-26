@@ -48,7 +48,7 @@ def objective(trial, RUN_DIR, params):
 
     # Lancement du script d'entraînement
     process = subprocess.Popen(
-        ["python", os.path.join(*params['script']), json_file, progress_file],
+        ["python", os.path.join(local, *params['script']), json_file, progress_file],
         text=True,
         stdout=None,
         stderr=None,
