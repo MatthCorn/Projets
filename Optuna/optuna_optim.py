@@ -12,10 +12,6 @@ warnings.filterwarnings("ignore")
 os.environ["MKL_THREADING_LAYER"] = "GNU"
 
 local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
-TRAINER_SCRIPT = {"global": os.path.join(local, "Inter", "NetworkGlobal", "Trainer.py"),
-                  "windowed": os.path.join(local, "Inter", "NetworkGlobalWindowed", "Trainer.py"),
-                  "memory": os.path.join(local, "Inter", "NetworkRecursive", "Trainer.py")}
-
 
 def deep_suggest(trial, objet, key=None):
     if isinstance(objet, list):
@@ -52,7 +48,7 @@ def objective(trial, RUN_DIR, params):
 
     # Lancement du script d'entraînement
     process = subprocess.Popen(
-        ["python", TRAINER_SCRIPT[params['script']], json_file, progress_file],
+        ["python", os.path.join(*params['script']), json_file, progress_file],
         text=True,
         stdout=None,
         stderr=None,
@@ -134,7 +130,7 @@ if __name__ == "__main__":
         "NDataT": 5000,
         "NDataV": 100,
         "period_checkpoint": -1,
-        "script": 'global',
+        "script": ['Inter', 'NetworkGlobal', 'Trainer.py'],
         "n_trials": 10,
         "prune": True,
         "retake_job": False

@@ -35,7 +35,6 @@ if __name__ == '__main__':
              "dropout": 0,
              "optim": "Adam",
              "network": "Transformer",
-             "weight_error": [1., 1.],
              "lr_option": {
                  "value": 1e-5,
                  "reset": "y",
@@ -53,6 +52,7 @@ if __name__ == '__main__':
              "distrib": "log",
              "plot_distrib": "log",
              "error_weighting": "y",
+             "weight_error": 0.5,
              "max_lr": 5,
              "warmup": 5,
              "resume_from": "r",
@@ -295,9 +295,7 @@ if __name__ == '__main__':
                            sqrt((torch.sum((1 - NMOutputBatch) * OSMBatch) - batch_size) * d_out))
                     err_next = torch.mean((1 - soft_mcc(is_next, NMOutputBatch, OSMBatch)) / StdBatch) * torch.mean(StdBatch)
 
-                    w1, w2 = param["weight_error"]
-                    w1, w2 = w1 / (w1 + w2), w2 / (w1 + w2)
-                    (param["mult_grad"] * (w1 * err + w2 * err_next)).backward()
+                    (param["mult_grad"] * (param['error_weighting'] * err + (1 - param['error_weighting']) * err_next)).backward()
                     optimizer.step()
                     if lr_scheduler is not None:
                         lr_scheduler.step()
