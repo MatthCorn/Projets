@@ -116,28 +116,17 @@ if __name__ == "__main__":
             {"mean": [-5, 5], "std": [1, 5]},
             {"mean": [-5, 5], "std": [0.2, 5]}
         ],
-        "n_iter": 10,  # pour optuna, on réduit un peu pour tester
+        "n_iter": 4,  # pour optuna, on réduit un peu pour tester
         "NDataT": 5000,
         "NDataV": 100,
         "period_checkpoint": -1,
-        "script": ['Inter', 'NetworkGlobal', 'Trainer.py'],
+        "script": ['Inter', 'Linearisation', 'Trainer.py'],
         "n_trials": 10,
         "prune": True,
         "retake_job": False
     }
 
     import sys
-
-    try:
-        json_file = sys.argv[1]
-        with open(json_file, "r") as f:
-            temp_param = json.load(f)
-        params.update(temp_param)
-    except Exception as e:
-        if len(sys.argv) == 0:
-            print('nothing loaded')
-        else:
-            print(e)
 
     job_id = os.getenv("SLURM_JOB_ID", str(uuid.uuid4().hex))  # fallback si tu testes en local
     if params['retake_job']:
@@ -146,6 +135,18 @@ if __name__ == "__main__":
         with open(json_file, "r") as f:
             temp_param = json.load(f)
         params.update(temp_param)
+
+    else:
+        try:
+            json_file = sys.argv[1]
+            with open(json_file, "r") as f:
+                temp_param = json.load(f)
+            params.update(temp_param)
+        except Exception as e:
+            if len(sys.argv) == 0:
+                print('nothing loaded')
+            else:
+                print(e)
 
     # Définir le répertoire de sauvegarde global
     run_dir = os.path.join(local, "Optuna", "Save", f"job_{job_id}")
