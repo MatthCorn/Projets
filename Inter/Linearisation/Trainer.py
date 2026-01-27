@@ -157,6 +157,7 @@ if __name__ == '__main__':
 
         print(f"Reprise à partir du checkpoint : {save_path}")
         N.load_state_dict(torch.load(os.path.join(save_path, "Last_network")))
+        best_state_dict = torch.load(os.path.join(save_path, "Best_network"))
 
         checkpoint = torch.load(os.path.join(save_path, "Scheduler.pt"))
 
