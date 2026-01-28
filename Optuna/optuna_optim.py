@@ -123,7 +123,7 @@ if __name__ == "__main__":
         "script": ['Inter', 'Linearisation', 'Trainer.py'],
         "n_trials": 10,
         "prune": True,
-        "retake_job": False
+        "retake_job": 11512632
     }
 
     import sys
@@ -147,6 +147,8 @@ if __name__ == "__main__":
                 print('nothing loaded')
             else:
                 print(e)
+
+    print(params)
 
     # Définir le répertoire de sauvegarde global
     run_dir = os.path.join(local, "Optuna", "Save", f"job_{job_id}")
