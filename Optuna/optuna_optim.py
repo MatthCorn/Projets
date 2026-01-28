@@ -186,6 +186,8 @@ if __name__ == "__main__":
         if n_done >= params['n_trials']:
             print(f"Objectif atteint : {n_done}/{params['n_trials']} trials terminés.")
             break
+        else:
+            print('oi')
 
         study.optimize(lambda x: objective(x, run_dir, params), n_trials=1)
 
