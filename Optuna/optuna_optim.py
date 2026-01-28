@@ -129,26 +129,25 @@ if __name__ == "__main__":
     import sys
 
     job_id = os.getenv("SLURM_JOB_ID", str(uuid.uuid4().hex))  # fallback si tu testes en local
-    if params['retake_job']:
-        job_id = params['retake_job']
-        json_file = os.path.join(local, "Optuna", "Save", f"job_{job_id}", f"params_{job_id}.json")
+
+    try:
+        json_file = sys.argv[1]
         with open(json_file, "r") as f:
             temp_param = json.load(f)
-        params.update(temp_param)
 
-    else:
-        try:
-            json_file = sys.argv[1]
+        if temp_param['retake_job']:
+            job_id = temp_param['retake_job']
+            json_file = os.path.join(local, "Optuna", "Save", f"job_{job_id}", f"params_{job_id}.json")
             with open(json_file, "r") as f:
                 temp_param = json.load(f)
-            params.update(temp_param)
-        except Exception as e:
-            if len(sys.argv) == 0:
-                print('nothing loaded')
-            else:
-                print(e)
 
-    print(params)
+        params.update(temp_param)
+
+    except Exception as e:
+        if len(sys.argv) == 0:
+            print('nothing loaded')
+        else:
+            print(e)
 
     # Définir le répertoire de sauvegarde global
     run_dir = os.path.join(local, "Optuna", "Save", f"job_{job_id}")
@@ -186,8 +185,6 @@ if __name__ == "__main__":
         if n_done >= params['n_trials']:
             print(f"Objectif atteint : {n_done}/{params['n_trials']} trials terminés.")
             break
-        else:
-            print('oi')
 
         study.optimize(lambda x: objective(x, run_dir, params), n_trials=1)
 
