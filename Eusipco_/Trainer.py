@@ -1,7 +1,7 @@
 from Eusipco_.DataMaker import MakeTargetedData
-from Eusipco.Transformer import Network as Transformer
-from Eusipco.RNN import RNNEncoder as RNN
-from Eusipco.CNN import Encoder as CNN
+from Eusipco_.TransformerNetwork import Network as Transformer
+from Eusipco_.LSTMNetwork import Network as LSTM
+from Eusipco_.ConvolutionNetwork import Network as CNN
 from Complete.LRScheduler import Scheduler
 from math import sqrt
 import torch
@@ -24,13 +24,17 @@ if __name__ == '__main__':
     ################################################################################################################################################
     # création des paramètres de la simulation
 
-    param = {"n_encoder": 10,
+    param = {"n_layers": 10,
              "len_in": 10,
              "d_in": 10,
-             "d_att": 128,
-             "network": "Transformer",
+             "d_model": 128,
+             "n_head": 4,
+             "kernel_size": 5,
+             "mem_length": 5,
+             "norm": "post",
              "WidthsEmbedding": [32],
              "dropout": 0,
+             "network": "LSTM",
              "optim": "Adam",
              "lr_option": {
                  "value": 3e-4,
@@ -39,10 +43,10 @@ if __name__ == '__main__':
              },
              "mult_grad": 10000,
              "weight_decay": 1e-3,
-             "NDataT": 50000,
+             "NDataT": 5000,
              "NDataV": 1000,
              "batch_size": 1000,
-             "n_iter": 30,
+             "n_iter": 10,
              "training_strategy": [
                  {"mean": [-10, 10], "std": [0.0001, 5]},
                  {"mean": [-10, 10], "std": [0.0001, 5]},
@@ -87,7 +91,7 @@ if __name__ == '__main__':
     Network = {
         "Transformer": Transformer,
         "CNN": CNN,
-        "RNN": RNN
+        "LSTM": LSTM
     }[param["network"]]
 
     period_checkpoint = param["period_checkpoint"]  # <= 0 : pas de checkpoint en entrainement, -1 : pas de sauvegarde du tout
@@ -102,8 +106,16 @@ if __name__ == '__main__':
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    N = Network(n_encoder=param["n_encoder"], d_in=param["d_in"], d_att=param["d_att"],
-                WidthsEmbedding=param["WidthsEmbedding"], dropout=param["dropout"])
+    N = Network(n_layers=param["n_layers"],
+                len_in=param["len_in"],
+                d_in=param["d_in"],
+                d_model=param["d_model"],
+                n_head=param["n_head"],
+                kernel_size=param["kernel_size"],
+                mem_length=param["mem_length"],
+                norm=param["norm"],
+                WidthsEmbedding=param["WidthsEmbedding"],
+                dropout=param["dropout"])
 
     N.to(device)
 
@@ -155,7 +167,6 @@ if __name__ == '__main__':
 
     local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
     save_dir = os.path.join(local, 'Eusipco_', 'Save')
-    data_dir = os.path.join(local, 'Eusipco_', 'Data')
 
     try:
         from Tools.XMLTools import loadXmlAsObj
@@ -233,12 +244,10 @@ if __name__ == '__main__':
 
     ################################################################################################################################################
 
-    for window in param["training_strategy"]:
-        if param["lr_option"]["reset"] == "y":
-            optimizer = optimizers[param['optim']](N.parameters(), weight_decay=param["weight_decay"], lr=param["lr_option"]["value"])
-
-            n_updates = int(NDataT / batch_size) * n_iter_window
-            warmup_steps = int(NDataT / batch_size * param["warmup"])
+    while window_index < len(param["training_strategy"]):
+        window = param["training_strategy"][window_index]
+        if param["lr_option"]["reset"] == "y" and (j == 0):
+            optimizer = optim(N.parameters(), weight_decay=param["weight_decay"], lr=param["lr_option"]["value"])
             lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"], max_steps=n_updates, type=param["lr_option"]["type"])
 
         TrainingInput, TrainingOutput, TrainingStd = MakeTargetedData(
@@ -265,22 +274,31 @@ if __name__ == '__main__':
             Weight=Weight,
         )
 
-        for j in tqdm(range(n_iter_window)):
+        pbar = tqdm(total=n_iter_window, initial=j)
+        t = time.time()
+        while j < n_iter_window:
             error = 0
             perf = 0
-            time_for_GIF = (j in torch.linspace(0, n_iter_window, nb_frames_window, dtype=int))
 
-            for p in range(n_minibatch):
+            time_for_GIF = (j in torch.linspace(0, n_iter_window, nb_frames_window, dtype=int)) and (nb_frames_GIF > 0)
+
+            n_minibatch_epoch = n_minibatch - p
+            while p < n_minibatch:
                 InputMiniBatch = TrainingInput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
                 OutputMiniBatch = TrainingOutput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
                 StdMiniBatch = TrainingStd[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
 
-                for k in range(n_batch):
+                p += 1
+
+                n_batch_epoch = n_batch - k
+                while k < n_batch:
                     optimizer.zero_grad(set_to_none=True)
 
                     InputBatch = InputMiniBatch[k * batch_size:(k + 1) * batch_size]
                     OutputBatch = OutputMiniBatch[k * batch_size:(k + 1) * batch_size]
                     StdBatch = StdMiniBatch[k * batch_size:(k + 1) * batch_size]
+
+                    k += 1
 
                     if param['error_weighting'] == 'n':
                         StdBatch = torch.mean(StdBatch)
@@ -296,6 +314,30 @@ if __name__ == '__main__':
                     error += float(err) / (n_batch * n_minibatch)
                     perf += float(torch.sum(ChoseOutput(Prediction, InputBatch) == ChoseOutput(OutputBatch, InputBatch))) / (NDataT * NVec)
 
+                    if (time.time() - t > period_checkpoint) and (period_checkpoint > 0):
+                        t = time.time()
+                        try:
+                            os.mkdir(save_path)
+                        except:
+                            pass
+                        error = {"TrainingError": TrainingError,
+                                 "ValidationError": ValidationError,
+                                 "TrainingPerf": TrainingPerf,
+                                 "ValidationPerf": ValidationPerf,
+                                 "PlottingPerf": PlottingPerf,
+                                 "PlottingError": PlottingError}
+                        saveObjAsXml(param, os.path.join(save_path, "param"))
+                        saveObjAsXml(error, os.path.join(save_path, "error"))
+                        torch.save(best_state_dict, os.path.join(save_path, "Best_network"))
+                        torch.save(N.state_dict().copy(), os.path.join(save_path, "Last_network"))
+                        torch.save(Weight, os.path.join(save_path, "Weight"))
+
+                k = 0
+            p = 0
+
+            TrainingError.append(error)
+            TrainingPerf.append(perf)
+
             with torch.no_grad():
                 Input = ValidationInput.to(device)
                 Output = ValidationOutput.to(device)
@@ -310,8 +352,18 @@ if __name__ == '__main__':
                 ValidationError.append(float(err))
                 ValidationPerf.append(float(torch.sum(ChoseOutput(Prediction, Input) == ChoseOutput(Output, Input))) / (NDataV * NVec))
 
-            TrainingError.append(error)
-            TrainingPerf.append(perf)
+            if period_checkpoint == -1:
+                if len(sys.argv) > 2:
+                    if not 'progress_file' in locals():
+                        progress_file = sys.argv[2]
+                        # On crée / vide le fichier au début
+                        with open(progress_file, "w") as f:
+                            f.write("")
+                    try:
+                        with open(progress_file, "a") as f:
+                            f.write(f"{j + n_iter_window * window_index} {ValidationError[-1] if ValidationError else float('inf')}\n")
+                    except Exception as e:
+                        print(f"[WARN] Could not write progress: {e}", flush=True)
 
             if error == min(TrainingError):
                 best_state_dict = N.state_dict().copy()
@@ -332,22 +384,12 @@ if __name__ == '__main__':
                     PlottingError.append(err.reshape(res_GIF, res_GIF).tolist())
                     PlottingPerf.append(perf.reshape(res_GIF, res_GIF).tolist())
 
-            if time_for_checkpoint:
-                try:
-                    os.mkdir(save_path)
-                except:
-                    pass
-                error = {"TrainingError": TrainingError,
-                         "ValidationError": ValidationError,
-                         "TrainingPerf": TrainingPerf,
-                         "ValidationPerf": ValidationPerf,
-                         "PlottingPerf": PlottingPerf,
-                         "PlottingError": PlottingError}
-                saveObjAsXml(param, os.path.join(save_path, "param"))
-                saveObjAsXml(error, os.path.join(save_path, "error"))
-                torch.save(best_state_dict, os.path.join(save_path, "Best_network"))
-                torch.save(N.state_dict().copy(), os.path.join(save_path, "Last_network"))
-                torch.save(Weight, os.path.join(save_path, "Weight"))
+            j += 1
+            pbar.n = j
+            pbar.refresh()
+
+        window_index += 1
+        j = 0
 
     error = {"TrainingError": TrainingError,
              "ValidationError": ValidationError,
@@ -355,8 +397,12 @@ if __name__ == '__main__':
              "ValidationPerf": ValidationPerf,
              "PlottingPerf": PlottingPerf,
              "PlottingError": PlottingError}
-    saveObjAsXml(param, os.path.join(save_path, "param"))
-    saveObjAsXml(error, os.path.join(save_path, "error"))
-    torch.save(best_state_dict, os.path.join(save_path, "Best_network"))
-    torch.save(N.state_dict().copy(), os.path.join(save_path, "Last_network"))
-    torch.save(Weight, os.path.join(save_path, "Weight"))
+
+    print(f"Final Error: {float(ValidationError[-1])}")
+
+    if period_checkpoint != -1:
+        saveObjAsXml(param, os.path.join(save_path, "param"))
+        saveObjAsXml(error, os.path.join(save_path, "error"))
+        torch.save(best_state_dict, os.path.join(save_path, "Best_network"))
+        torch.save(N.state_dict().copy(), os.path.join(save_path, "Last_network"))
+        torch.save(Weight, os.path.join(save_path, "Weight"))

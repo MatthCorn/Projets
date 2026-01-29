@@ -24,10 +24,10 @@ class Network(nn.Module):
             nn.Linear(d_model, d_model),
         )
 
-        self.post_rnn_ln = nn.LayerNorm(d_model)
+        self.post_rnn_ln = nn.LayerNorm(2 * d_model)
 
         self.head = nn.Sequential(
-            nn.Linear(d_model, d_model),
+            nn.Linear(2 * d_model, d_model),
             nn.GELU(),
             nn.Dropout(dropout) if dropout > 0 else nn.Identity(),
             nn.Linear(d_model, d_in)
