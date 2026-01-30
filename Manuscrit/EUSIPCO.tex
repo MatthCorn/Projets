@@ -1,0 +1,94 @@
+\chapter{Capacité de discernement des modèles}
+
+La fidélité de la modélisation par intelligence artificielle du bloc de Détection et Caractérisation des Impulsions (DCI) dépend intrinsèquement de la capacité du modèle à discerner et comparer finement les éléments d'une séquence. Contrairement aux applications de Traitement du Langage Naturel (NLP) où les données (mots ou tokens) appartiennent à un ensemble fini, les signaux radar évoluent dans des espaces continus. Par conséquent, l'espace latent du modèle est densément peuplé de représentations vectorielles qu'il est complexe de séparer sans ambiguïté (à l'inverse du NLP).\\
+
+Pour évaluer et valider les capacités de discernement de nos architectures dans ce contexte continu, nous avons défini une tâche de référence : un problème d'ordonnancement supervisé. Le modèle reçoit en entrée une séquence de vecteurs et doit prédire une nouvelle séquence qui doit correspondre à l'entrée réordonnée selon une règle implicite afin de minimiser l'erreur d'apprentissage. L'objectif est de mesurer l'aptitude générale d'un réseau de neurones à identifier les caractéristiques pertinentes et à établir des comparaisons fines entre les éléments pour construire une sortie cohérente.\\
+
+Il est important de préciser que notre objectif n'est pas de concevoir un algorithme de tri performant dans l'absolu, mais d'évaluer des architectures de traitement de séquence généralistes. Nous avons donc exclu de cette étude les modèles spécifiquement conçus pour le tri algorithmique, souvent structurellement incapables de généraliser à d'autres tâches. Notre démarche vise à valider une architecture polyvalente capable, par la suite, de traiter la complexité des signaux radar.\\
+
+Ce chapitre reprend les résultats de nos travaux publiés à la conférence EUSIPCO. Nous y détaillons notamment deux contributions méthodologiques :
+\begin{itemize}
+\item une fonction de coût pondérée équilibrant l'impact de chaque séquence dans l'apprentissage
+\item une stratégie de fenêtrage des données permettant un apprentissage par curriculum.
+\end{itemize}
+
+\section{construction des ensembles}
+
+Cette section décrit la construction des données utilisées pour l'apprentissage supervisé. L'ensemble d'entrainement est constitué de couple \textit{séquence brute - séquence ordonnée}, où chaque séquence correspond à une liste de 10 vecteurs $V_0, ..., V_9$ de l'espace $\mathbb{R}^5$. Les éléments de la séquence brute sont tirés aléatoirement. La règle implicite d'ordonnancement repose sur le calcul d'un score pour chaque vecteur $V_i$ permettant de trier les vecteurs par scores correspondant croissant. Chaque score $S_i$ résulte du produit scalaire entre son vecteur associé $V_i$ et un hyperparamètre $U$ unitaire de $\mathbb{R}^5$, inhérent à la règle implicite d'ordonnancement.
+
+On définit aussi une mesure $\lambda$ de la difficulté à trier une séquence $V_0, ..., V_9$, qui repose sur l'idée qu'une séquence est dure à trier si les scores associés $S_0, ..., S_9$ sont proches. 
+$$\lambda = \frac{\sigma(S_0, ..., S_9)}{\mu_{max}} - \mu{min}$$
+Ce calcul correspond à la difficulté qu'aura une IA à séparer les éléments. $\mu_{max} - \mu{min}$ correspond à la large de la plage sur laquelle les scores sont observables. Plus $\lambda$ est petit et plus la séquence est dure à trier.
+Le calcul assure que les 3 cas suivant sont aussi difficile du point de vue d'un problème d'apprentissage automatique :
+\begin{enumerate}
+\item trier des vecteurs dont les scores sont espacés en moyenne de 1 attengnant des valeurs entre 0 et 10
+\item trier des vecteurs dont les scores sont espacés en moyenne de 1 attengnant des valeurs entre 100 et 110 (il suffit d'apprendre une translation pour être équivalente à 1)
+\item trier des vecteurs dont les scores sont espacés en moyenne de 10 attengnant des valeurs entre 0 et 100 (il suffit d'apprendre un facteur d'échelle pour être équivalent à 1)
+\end{enumerate}
+En revanche, apprendre à trier des vecteurs dont les scores sont espacés en moyenne de 0.1 attengnant des valeurs entre 0 et 10 requière des capacités de discernament accrue par rapport au cas 1.\\
+
+Nous induisons un biais lors de la construction des séquences afin de contrôler la difficulté de la séquence à être traitée par le modèle. L'esprit est d'imposer la valeur des scores $S_i$ en transformant $V_i$ en 
+\begin{equation}
+\label{tilde}
+\tilde{V_i} = V_i - <V_i, U> U + S_i U
+\end{equation}
+
+En détail, pour créer une séquence de difficulté $lambda$ dans les cas où nos scores peuvent prendre des valeurs entre $\mu_{min}$ et $\mu_{max}$ :
+\begin{itemize}
+\item On choisit à notre guise $\mu \in [\mu_{min}: \mu_{max}]$ correspondant à la moyenne des scores attendus dans notre séquence
+\item On pose $\sigma = \lambda (\mu_{max} - \mu_{min})$ correspondant à l'écart type de nos scores attendus dans notre séquence
+\item On tire aléatoirement de manière iid nos scores attendus selon une loi normale $N(\mu, \sigma)$
+\item On tire aléatoirement nos vecteurs $V_i -> N(0, S_iI_5)$ afin d'assurer que $||V_i||_2 = ||\tilde{V_i}||_2$
+\item On transforme nos vecteurs $V_i$ en utilisant l'équation \ref{tilde} (on les appelle encore $V_i$)
+\end{itemize}
+La séquence $V_1, ..., V_9$ ainsi construite est environ de difficulé $\lambda$. Plus précisément on peut aussi la caractériser par $\sigma$ et $\mu$ l'écart type et la moyenne des scores associés. (utile pour la suite)
+
+
+
+\section{Génération des données et protocole de construction}
+
+Cette section détaille la méthodologie de construction des ensembles de données synthétiques utilisés pour l'apprentissage supervisé. L'objectif est de générer des couples $(\mathbf{X}, \mathbf{Y})$ où $\mathbf{X}$ est une séquence de $N=10$ vecteurs $\{V_1, \dots, V_N\}$ de $\mathbb{R}^5$ et $\mathbf{Y}$ est la séquence cible ordonnée correspondante.
+
+\subsection{Règle d'ordonnancement implicite}
+L'ordre des vecteurs est déterminé par une règle latente, inconnue du modèle lors de l'apprentissage. Cette règle repose sur la projection des vecteurs sur un hyperparamètre directeur $U \in \mathbb{R}^5$, unitaire ($\|U\|_2 = 1$). Pour chaque vecteur $V_i$, un score scalaire $S_i$ est calculé selon :
+\begin{equation}
+    S_i = \langle V_i, U \rangle
+\end{equation}
+La tâche du modèle consiste à prédire l'ordonnancement des vecteurs $V_i$ induit par le tri croissant des scores $S_i$.
+
+\subsection{Définition de la difficulté et invariances}
+Afin d'évaluer la robustesse du modèle, nous introduisons une mesure quantifiant la difficulté intrinsèque de tri d'une séquence. Intuitivement, une séquence est difficile à trier si les scores de ses éléments sont proches les uns des autres relativement à la plage de valeurs globale.
+
+Nous définissons le paramètre de difficulté $\lambda$ (lié au ratio de séparabilité $r$) comme le rapport entre la dispersion locale des scores au sein d'une séquence et l'étendue globale du domaine de définition des scores :
+\begin{equation}
+\lambda = \frac{\sigma_S}{\mu_{max} - \mu_{min}}
+\end{equation}
+où $\sigma_S$ est l'écart-type des scores $\{S_1, \dots, S_N\}$ de la séquence, et $[\mu_{min}, \mu_{max}]$ représente l'intervalle global des moyennes possibles.
+
+Cette formulation permet de normaliser la difficulté en tenant compte des invariances naturelles du problème d'ordonnancement :
+\begin{enumerate}
+    \item \textbf{Invariance par translation :} Trier des scores répartis autour de 0 ou autour de 100 est un problème de complexité équivalente pour un réseau de neurones, qui peut aisément apprendre un biais additif.
+    \item \textbf{Invariance d'échelle :} Trier des scores espacés de 1 sur une plage de 10 est équivalent à trier des scores espacés de 10 sur une plage de 100.
+\end{enumerate}
+En revanche, réduire l'espacement moyen des scores (diminuer $\sigma_S$) sans changer l'échelle globale impose au modèle une contrainte de discernement accrue. Ainsi, plus $\lambda$ est faible, plus la séparabilité des vecteurs est critique, augmentant la complexité de la tâche.
+
+\subsection{Algorithme de génération sous contrainte}
+Pour contrôler précisément la difficulté $\lambda$ des données d'entraînement, nous ne pouvons nous contenter d'un tirage aléatoire uniforme des vecteurs. Nous procédons par une méthode inverse, consistant à fixer d'abord les scores cibles $\{S_i\}$ pour imposer la difficulté souhaitée, puis à construire les vecteurs $V_i$ correspondants.
+
+La procédure de génération pour une séquence de difficulté $\lambda$ sur un domaine $[\mu_{min}, \mu_{max}]$ est la suivante :
+
+\begin{enumerate}
+    \item \textbf{Échantillonnage des paramètres de distribution :} Nous tirons aléatoirement la moyenne cible de la séquence $\mu \sim \mathcal{U}([\mu_{min}, \mu_{max}])$. L'écart-type cible est fixé par la contrainte de difficulté : $\sigma = \lambda (\mu_{max} - \mu_{min})$.
+    
+    \item \textbf{Génération des scores :} Les scores $\{S_1, \dots, S_N\}$ sont tirés de manière i.i.d. selon une loi normale $\mathcal{N}(\mu, \sigma^2)$.
+    
+    \item \textbf{Initialisation des vecteurs :} Des vecteurs bruts $V^{raw}_i$ sont générés aléatoirement. Afin de maintenir une cohérence entre la norme du vecteur et son score projeté, nous utilisons une initialisation adaptative $V^{raw}_i \sim \mathcal{N}(0, S_i I_5)$.
+    
+    \item \textbf{Correction par projection orthogonale :} Enfin, pour garantir que $\langle V_i, U \rangle = S_i$ exactement, nous appliquons la transformation suivante qui ajuste la composante colinéaire à $U$ tout en préservant la composante orthogonale :
+    \begin{equation}
+        \label{eq:projection}
+        V_i = V^{raw}_i - \langle V^{raw}_i, U \rangle U + S_i U
+    \end{equation}
+\end{enumerate}
+
+Cette construction assure que la séquence générée possède rigoureusement les propriétés statistiques (moyenne $\mu$ et dispersion $\sigma$) requises pour tester le modèle à un niveau de difficulté $\lambda$ précis.
