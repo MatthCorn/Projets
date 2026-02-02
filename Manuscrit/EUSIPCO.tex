@@ -12,39 +12,6 @@ Ce chapitre reprend les résultats de nos travaux publiés à la conférence EUS
 \item une stratégie de fenêtrage des données permettant un apprentissage par curriculum.
 \end{itemize}
 
-\section{construction des ensembles}
-
-Cette section décrit la construction des données utilisées pour l'apprentissage supervisé. L'ensemble d'entrainement est constitué de couple \textit{séquence brute - séquence ordonnée}, où chaque séquence correspond à une liste de 10 vecteurs $V_0, ..., V_9$ de l'espace $\mathbb{R}^5$. Les éléments de la séquence brute sont tirés aléatoirement. La règle implicite d'ordonnancement repose sur le calcul d'un score pour chaque vecteur $V_i$ permettant de trier les vecteurs par scores correspondant croissant. Chaque score $S_i$ résulte du produit scalaire entre son vecteur associé $V_i$ et un hyperparamètre $U$ unitaire de $\mathbb{R}^5$, inhérent à la règle implicite d'ordonnancement.
-
-On définit aussi une mesure $\lambda$ de la difficulté à trier une séquence $V_0, ..., V_9$, qui repose sur l'idée qu'une séquence est dure à trier si les scores associés $S_0, ..., S_9$ sont proches. 
-$$\lambda = \frac{\sigma(S_0, ..., S_9)}{\mu_{max}} - \mu{min}$$
-Ce calcul correspond à la difficulté qu'aura une IA à séparer les éléments. $\mu_{max} - \mu{min}$ correspond à la large de la plage sur laquelle les scores sont observables. Plus $\lambda$ est petit et plus la séquence est dure à trier.
-Le calcul assure que les 3 cas suivant sont aussi difficile du point de vue d'un problème d'apprentissage automatique :
-\begin{enumerate}
-\item trier des vecteurs dont les scores sont espacés en moyenne de 1 attengnant des valeurs entre 0 et 10
-\item trier des vecteurs dont les scores sont espacés en moyenne de 1 attengnant des valeurs entre 100 et 110 (il suffit d'apprendre une translation pour être équivalente à 1)
-\item trier des vecteurs dont les scores sont espacés en moyenne de 10 attengnant des valeurs entre 0 et 100 (il suffit d'apprendre un facteur d'échelle pour être équivalent à 1)
-\end{enumerate}
-En revanche, apprendre à trier des vecteurs dont les scores sont espacés en moyenne de 0.1 attengnant des valeurs entre 0 et 10 requière des capacités de discernament accrue par rapport au cas 1.\\
-
-Nous induisons un biais lors de la construction des séquences afin de contrôler la difficulté de la séquence à être traitée par le modèle. L'esprit est d'imposer la valeur des scores $S_i$ en transformant $V_i$ en 
-\begin{equation}
-\label{tilde}
-\tilde{V_i} = V_i - <V_i, U> U + S_i U
-\end{equation}
-
-En détail, pour créer une séquence de difficulté $lambda$ dans les cas où nos scores peuvent prendre des valeurs entre $\mu_{min}$ et $\mu_{max}$ :
-\begin{itemize}
-\item On choisit à notre guise $\mu \in [\mu_{min}: \mu_{max}]$ correspondant à la moyenne des scores attendus dans notre séquence
-\item On pose $\sigma = \lambda (\mu_{max} - \mu_{min})$ correspondant à l'écart type de nos scores attendus dans notre séquence
-\item On tire aléatoirement de manière iid nos scores attendus selon une loi normale $N(\mu, \sigma)$
-\item On tire aléatoirement nos vecteurs $V_i -> N(0, S_iI_5)$ afin d'assurer que $||V_i||_2 = ||\tilde{V_i}||_2$
-\item On transforme nos vecteurs $V_i$ en utilisant l'équation \ref{tilde} (on les appelle encore $V_i$)
-\end{itemize}
-La séquence $V_1, ..., V_9$ ainsi construite est environ de difficulé $\lambda$. Plus précisément on peut aussi la caractériser par $\sigma$ et $\mu$ l'écart type et la moyenne des scores associés. (utile pour la suite)
-
-
-
 \section{Génération des données et protocole de construction}
 
 Cette section détaille la méthodologie de construction des ensembles de données synthétiques utilisés pour l'apprentissage supervisé. L'objectif est de générer des couples $(\mathbf{X}, \mathbf{Y})$ où $\mathbf{X}$ est une séquence de $N=10$ vecteurs $\{V_1, \dots, V_N\}$ de $\mathbb{R}^5$ et $\mathbf{Y}$ est la séquence cible ordonnée correspondante.
@@ -54,41 +21,112 @@ L'ordre des vecteurs est déterminé par une règle latente, inconnue du modèle
 \begin{equation}
     S_i = \langle V_i, U \rangle
 \end{equation}
-La tâche du modèle consiste à prédire l'ordonnancement des vecteurs $V_i$ induit par le tri croissant des scores $S_i$.
+La tâche du modèle consiste à prédire l'ordonnancement des vecteurs $V_i$ induit par le tri croissant des scores $S_i$, en se basant uniquement sur l'observation des données, sans connaissance a priori de la règle d'ordonnancement.
 
 \subsection{Définition de la difficulté et invariances}
-Afin d'évaluer la robustesse du modèle, nous introduisons une mesure quantifiant la difficulté intrinsèque de tri d'une séquence. Intuitivement, une séquence est difficile à trier si les scores de ses éléments sont proches les uns des autres relativement à la plage de valeurs globale.
+Afin d'évaluer la robustesse du modèle, nous introduisons une mesure quantifiant la difficulté intrinsèque de tri d'une séquence. Intuitivement, une séquence est difficile à trier si les scores de ses éléments sont proches les uns des autres relativement à l'étendue globale des valeurs possibles.
 
-Nous définissons le paramètre de difficulté $\lambda$ (lié au ratio de séparabilité $r$) comme le rapport entre la dispersion locale des scores au sein d'une séquence et l'étendue globale du domaine de définition des scores :
+Pour caractériser cette mesure de difficulté, nous définissons deux métriques intermédiaires à l'échelle de la séquence de vecteurs:
+\begin{itemize}
+    \item La moyenne $\mu_S$, correspond à la moyenne arithmétique des scores de la séquence.
+    \item L'écart-type $\sigma_S$, quantifie la dispersion des scores autour de cette moyenne.
+\end{itemize}
+\: \\
+
+Ces métriques prennent leurs sens lorsqu'elles sont confrontées aux contraintes globales du problème. Ces contraintes globales en partie caractérisés par un $[\mu_{min}, \mu_{max}]$, une constante fixée pour la génération des données, correspondant à l'intervalle dans lequel les $\mu_S$ sont contraintes de se trouver. \\ 
+
+Nous pouvons à présent introduire le \textbf{ratio de séparabilité} $r$ d'une séquence, définit comme le rapport entre sa mesure $\sigma_S$  et cette étendue globale sur laquelle sa mesure $\mu_S$ peut se trouver :
 \begin{equation}
-\lambda = \frac{\sigma_S}{\mu_{max} - \mu_{min}}
+r = \frac{\sigma_S}{\mu_{max} - \mu_{min}}
 \end{equation}
-où $\sigma_S$ est l'écart-type des scores $\{S_1, \dots, S_N\}$ de la séquence, et $[\mu_{min}, \mu_{max}]$ représente l'intervalle global des moyennes possibles.
 
-Cette formulation permet de normaliser la difficulté en tenant compte des invariances naturelles du problème d'ordonnancement :
-\begin{enumerate}
-    \item \textbf{Invariance par translation :} Trier des scores répartis autour de 0 ou autour de 100 est un problème de complexité équivalente pour un réseau de neurones, qui peut aisément apprendre un biais additif.
-    \item \textbf{Invariance d'échelle :} Trier des scores espacés de 1 sur une plage de 10 est équivalent à trier des scores espacés de 10 sur une plage de 100.
-\end{enumerate}
-En revanche, réduire l'espacement moyen des scores (diminuer $\sigma_S$) sans changer l'échelle globale impose au modèle une contrainte de discernement accrue. Ainsi, plus $\lambda$ est faible, plus la séparabilité des vecteurs est critique, augmentant la complexité de la tâche.
+Cette formulation respecte les intuitions naturelles concernant une tâche de discernement:
+\begin{itemize}
+    \item Trier des scores espacés de 1 sur une plage de 10 répartie autour de 0 ($r=\frac{1}{5 - (-5)} = 0.1$) ou autour de 100 ($r=\frac{1}{105 - 95} = 0.1$) \textbf{est équivalente} pour un réseau de neurones, qui peut aisément apprendre un biais additif.
+    \item Trier des scores espacés de 1 sur une plage de 10 ($r=\frac{1}{10} = 0.1$) ou trier des scores espacés de 10 sur une plage de 100 ($r=\frac{10}{100} = 0.1$) \textbf{est équivalent} pour un réseau de neurones, qui peut apprendre un changement d'échelle.
+    \item Trier des scores espacés de 1 sur une plage de 100 ($r=\frac{1}{100} = 0.01$) ou trier des scores espacés de 10 sur une plage de 100 ($r=\frac{10}{100} = 0.1$) \textbf{n'est pas équivalent} pour un réseau de neurones, qui nécessite un niveau de discernement accru pour le premier cas.
+\end{itemize}
+\: \\
+
+Ainsi, le paramètre $r$ contrôle le niveau de discernement exigé du réseau pour ordonner la séquence correspondante. La difficulté de traitement d'une séquence par le modèle peut donc être définit comme l'inverse du ratio de séparabilité, qui augmente à mesure que $r$ diminue.
 
 \subsection{Algorithme de génération sous contrainte}
-Pour contrôler précisément la difficulté $\lambda$ des données d'entraînement, nous ne pouvons nous contenter d'un tirage aléatoire uniforme des vecteurs. Nous procédons par une méthode inverse, consistant à fixer d'abord les scores cibles $\{S_i\}$ pour imposer la difficulté souhaitée, puis à construire les vecteurs $V_i$ correspondants.
+Pour imposer le ratio de séparabilité $r$ souhaité, nous procédons par une méthode inverse : nous fixons d'abord les statistiques des scores cibles $(S_i)_i$, puis nous construisons les vecteurs $(V_i)_i$ correspondants.
 
-La procédure de génération pour une séquence de difficulté $\lambda$ sur un domaine $[\mu_{min}, \mu_{max}]$ est la suivante :
+La procédure de génération pour une séquence de ratio $r$, contrainte au domaine global $[\mu_{min}, \mu_{max}]$, est la suivante :
 
-\begin{enumerate}
-    \item \textbf{Échantillonnage des paramètres de distribution :} Nous tirons aléatoirement la moyenne cible de la séquence $\mu \sim \mathcal{U}([\mu_{min}, \mu_{max}])$. L'écart-type cible est fixé par la contrainte de difficulté : $\sigma = \lambda (\mu_{max} - \mu_{min})$.
+\begin{itemize}
+    \item \textbf{Échantillonnage des paramètres locaux :} Nous tirons aléatoirement la moyenne spécifique de la séquence, notée $\mu$, selon une loi uniforme sur le domaine global : $\mu \sim \mathcal{U}([\mu_{min}, \mu_{max}])$. L'écart-type cible de la séquence est ensuite déterminé par la contrainte de difficulté : $\sigma = r \times (\mu_{max} - \mu_{min})$.
     
     \item \textbf{Génération des scores :} Les scores $\{S_1, \dots, S_N\}$ sont tirés de manière i.i.d. selon une loi normale $\mathcal{N}(\mu, \sigma^2)$.
     
-    \item \textbf{Initialisation des vecteurs :} Des vecteurs bruts $V^{raw}_i$ sont générés aléatoirement. Afin de maintenir une cohérence entre la norme du vecteur et son score projeté, nous utilisons une initialisation adaptative $V^{raw}_i \sim \mathcal{N}(0, S_i I_5)$.
+    \item \textbf{Initialisation des vecteurs :} Des vecteurs bruts $V^{raw}_i$ sont générés. Afin de maintenir une cohérence statistique entre la norme du vecteur et son score projeté, $V^{raw}_i$ est tiré selon $\mathcal{N}(0, S_i \mathbf{I}_5)$.
     
-    \item \textbf{Correction par projection orthogonale :} Enfin, pour garantir que $\langle V_i, U \rangle = S_i$ exactement, nous appliquons la transformation suivante qui ajuste la composante colinéaire à $U$ tout en préservant la composante orthogonale :
+    \item \textbf{Correction du score :} On ajuste la composante de $V^{raw}_i$ colinéaire à $U$ pour assurer l'égalité  $\langle V_i, U \rangle = S_i$, tout en préservant la composante orthogonale :
     \begin{equation}
         \label{eq:projection}
         V_i = V^{raw}_i - \langle V^{raw}_i, U \rangle U + S_i U
     \end{equation}
-\end{enumerate}
+\end{itemize}
 
-Cette construction assure que la séquence générée possède rigoureusement les propriétés statistiques (moyenne $\mu$ et dispersion $\sigma$) requises pour tester le modèle à un niveau de difficulté $\lambda$ précis.
+Ce protocole assure une double propriété statistique à l'ensemble de données généré. À l'échelle macroscopique des données, les séquences couvrent uniformément tout le domaine  $[\mu_{min}, \mu_{max}]$. À l'échelle des séquences, chaque exemple respecte la contrainte de séparabilité $r$ avec laquelle elle a été contrainte, permettant de composer les ensembles d'apprentissage avec plus ou moins de difficulté.
+
+\section{Stratégie d'apprentissage et protocole expérimental}
+La génération de données synthétiques décrite précédemment nous permet de produire des séquences de difficulté arbitraire. Cependant, l'entraînement direct sur des données à forte complexité (faible ratio de séparabilité $r$) s'avère inefficace, le modèle peinant à converger vers une solution optimale. Cette section détaille les mécanismes mis en place pour guider l'apprentissage : une fonction de coût normalisée pour garantir l'équité du gradient, une stratégie de curriculum pour augmenter progressivement la difficulté, et enfin les architectures neuronales confrontées lors de nos expériences.
+
+\subsection{Fonction de coût et métriques d'entraînement}
+Pour entraîner le modèle à prédire une séquence ordonnée $\mathbf{P}_k$ proche de la séquence cible $\mathbf{T}_k$, l'approche standard consiste à minimiser la distance Euclidienne moyenne. Toutefois, cette métrique brute est sensible à l'échelle des valeurs : une séquence dont les vecteurs ont une grande norme dominerait le calcul de l'erreur par rapport à une séquence de faible amplitude, biaisant ainsi le gradient.\\
+
+Pour pallier ce problème, nous introduisons une erreur pondérée. Nous définissons d'abord l'erreur de séquence brute $E(\mathbf{P}_k, \mathbf{T}_k)$ comme la norme Euclidienne de la différence, normalisée par la dimension :
+\begin{equation}
+E(\mathbf{P}_k, \mathbf{T}_k) = \frac{| \mathbf{P}_k - \mathbf{T}_k |_2}{\sqrt{N \times d}}
+\end{equation}
+
+Afin de contextualiser cette erreur, nous calculons un facteur de normalisation correspondant à l'erreur qu'obtiendrait un "prédicteur naïf". Ce prédicteur naïf se contente de prédire, pour chaque élément de la séquence, le vecteur moyen de la séquence cible $\mathbf{\bar{T}}_k$. L'erreur pondérée $err$ est alors définie par le rapport :
+\begin{equation}
+err(\mathbf{P}_k, \mathbf{T}_k) = \frac{E(\mathbf{P}_k, \mathbf{T}_k)}{E(\mathrm{Rep}(\mathbf{\bar{T}}_k), \mathbf{T}_k)}
+\end{equation}
+où $\mathrm{Rep}(\mathbf{\bar{T}}_k)$ est la séquence constituée de $N$ répétitions du vecteur moyen. Grâce à cette normalisation, toutes les séquences contribuent équitablement à la fonction de coût globale, quelle que soit l'amplitude de leurs valeurs. La perte finale minimisée durant l'apprentissage est la moyenne quadratique de ces erreurs pondérées sur un lot (batch) de $b$ séquences.\\
+ 
+En complément de la fonction de coût, nous surveillons la justesse (accuracy) positionnelle. Cette métrique, définie plus formellement dans les résultats, quantifie la proportion de vecteurs pour lesquels le modèle a prédit la position exacte relative dans l'ordre trié.
+
+\subsection{Apprentissage par Curriculum et définition des fenêtres}
+Plutôt que d'exposer immédiatement le modèle à l'ensemble de la distribution des difficultés, nous adoptons une stratégie de \textit{Curriculum Learning}. L'idée est de soumettre le réseau à des tâches de difficulté croissante.\\
+
+Nous formalisons cela par la notion de fenêtre d'apprentissage. Une fenêtre définit l'espace probabiliste dans lequel les paramètres des séquences sont tirés. Elle est caractérisée par le produit cartésien de deux intervalles :
+\begin{itemize}
+\item L'intervalle des moyennes $[\mu_{min}, \mu_{max}]$, qui reste constant (le domaine global).
+\item L'intervalle des écarts-types autorisés $[\sigma_{min}, \sigma_{max}]$.
+\end{itemize}
+\: \\
+
+La progression du curriculum est contrôlée par la borne inférieure $\sigma_{min}$. Initialement, cette borne est élevée, ne permettant que la génération de séquences "faciles" (scores très dispersés, ratio $r$ élevé). Au fur et à mesure de l'entraînement, nous abaissons $\sigma_{min}$ par paliers successifs, introduisant des séquences de plus en plus difficiles (scores resserrés).\\
+
+Concrètement, nous définissons une série de fenêtres où $\sigma_{min}$ est piloté par un paramètre $\lambda$ décroissant, tel que $\sigma_{min} = \lambda (\mu_{max} - \mu_{min})$. Le paramètre $\lambda$ évolue de $1$ (séquences triviales) jusqu'à $10^{-4}$ (séquences nécessitant une très haute précision), forçant le modèle à affiner progressivement ses capacités de discernement.
+
+\subsection{Plan d'expérience et architectures}
+Afin de valider cette approche et de démontrer que la capacité de tri dépend de l'architecture, nous confrontons deux modèles reconnus pour le traitement de séquence :
+\begin{enumerate}
+\item Réseau Convolutionnel (CNN) : Nous implémentons une architecture basée sur les travaux de Kalchbrenner et al., composée de 10 couches avec 10 neurones par couche, totalisant 1.9 millions de paramètres. Les convolutions traitent les dépendances locales entre vecteurs voisins.
+\item Transformer (Encodeur) : Nous utilisons l'encodeur de l'architecture Transformer proposée par Vaswani et al.. Ce modèle comporte 10 couches d'attention (Self-Attention) à 4 têtes dans un espace de dimension 128, pour un total de 0.6 millions de paramètres. Le mécanisme d'attention permet de capturer les dépendances globales, chaque vecteur pouvant être comparé à tous les autres simultanément.
+\end{enumerate}
+\: \\
+
+Le protocole expérimental consiste à entraîner ces deux modèles successivement sur 9 fenêtres de difficulté croissante, chaque fenêtre comportant 500 000 séquences, afin d'observer l'évolution de leurs performances et leurs limites respectives en termes de précision de tri.
+
+\section{Stratégie d'apprentissage et architectures neuronales}
+La génération de données synthétiques nous permet de produire des séquences de difficulté arbitraire, mais l'entraînement d'un réseau de neurones sur ces données requiert une méthodologie spécifique. Comme nous l'avons exposé dans nos travaux précédents, l'approche standard de minimisation de l'erreur quadratique moyenne s'avère insuffisante face à la dynamique des scores dans un espace continu. Cette section détaille la fonction de coût pondérée et la stratégie de curriculum mises en place pour permettre la convergence des modèles.
+
+\subsection{Fonction de coût normalisée}
+L'un des obstacles majeurs identifiés lors de l'entraînement réside dans la disparité des contributions des séquences au gradient. Une séquence dont les vecteurs possèdent une grande norme induit une erreur absolue élevée, masquant ainsi l'erreur fine des séquences de faible amplitude. Pour pallier ce biais d'échelle, nous avons développé une métrique d'erreur pondérée.\\
+
+Nous définissons d'abord l'erreur brute de séquence $E(P_k, T_k)$ entre la prédiction $P_k$ et la cible $T_k$ (toutes deux de taille $n \times d$) par la norme Euclidienne normalisée par la dimensionnalité: \begin{equation} E(P_k, T_k) = \frac{| P_k - T_k |_2}{\sqrt{n \times d}} \end{equation} Pour contextualiser cette erreur, nous calculons un facteur de normalisation $E_k$ correspondant à l'erreur qu'obtiendrait un prédicteur naïf se contentant de prédire le vecteur moyen $\overline{T}_k$ pour tous les éléments de la séquence. Ce terme de normalisation, défini par $E_k = E(\mathrm{Rep}(\overline{T}_k), T_k)$, permet de s'affranchir de l'échelle des valeurs. L'erreur pondérée est ainsi définie par le ratio: \begin{equation} err(P_k, T_k) = \frac{E(P_k, T_k)}{E_k} \end{equation} La fonction de coût finale $\mathrm{Err}(\mathbf{P}, \mathbf{T})$, minimisée durant l'apprentissage par descente de gradient, est la racine de la moyenne quadratique de ces erreurs pondérées sur l'ensemble du batch de taille $b$. Cette formulation garantit que chaque séquence contribue équitablement à l'ajustement des poids du réseau, indépendamment de sa position dans l'espace des valeurs.
+
+\subsection{Apprentissage par Curriculum} 
+L'exposition immédiate du modèle à l'ensemble de la distribution des difficultés mène fréquemment à des optima locaux insatisfaisants. Pour contourner ce problème, nous adoptons une stratégie de Curriculum Learning progressive. Cette méthode repose sur la définition de fenêtres d'apprentissage, caractérisées par le produit cartésien d'un intervalle de moyennes $[\mu_{min}, \mu_{max}]$ et d'un intervalle d'écarts-types $[\sigma_{min}, \sigma_{max}]$.\\
+
+Au sein d'une fenêtre donnée, les paramètres statistiques des séquences sont échantillonnés uniformément pour la moyenne et logarithmiquement pour l'écart-type. La stratégie consiste à faire évoluer la borne inférieure de l'écart-type, contrôlée par un paramètre $\lambda$, afin d'augmenter progressivement la difficulté. L'entraînement débute avec $\lambda=1$, correspondant à des séquences facilement séparables, et progresse par paliers jusqu'à $\lambda=10^{-4}$, forçant le modèle à affiner ses capacités de discernement sur des données de plus en plus denses. Concrètement, le modèle est entraîné successivement sur 9 fenêtres de difficulté croissante, chacune contenant 500 000 séquences, permettant un transfert d'apprentissage efficace du cas simple vers le cas complexe.
+
+\subsection{Architectures évaluées} 
+Afin de dissocier la difficulté intrinsèque du problème des capacités du modèle, nous évaluons cette méthodologie sur deux architectures distinctes. La première est un Réseau de Neurones Convolutif (CNN) basé sur les travaux de Kalchbrenner et al. , composé de 10 couches de 10 neurones, totalisant 1.9 millions de paramètres. La seconde, qui constitue notre cible principale, est l'encodeur de l'architecture Transformer de Vaswani et al.. Ce modèle, configuré avec 10 couches d'attention à 4 têtes dans un espace de dimension 128 (0.6M paramètres), exploite le mécanisme de self-attention pour capturer les dépendances globales nécessaires à la comparaison inter-éléments.
+
