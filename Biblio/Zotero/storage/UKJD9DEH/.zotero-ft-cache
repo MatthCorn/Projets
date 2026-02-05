@@ -1,0 +1,15 @@
+One Attention Head Is All You Need for Sorting Fixed-Length Lists
+
+We trained a single layer attention-only transformer to sort a fixed-length list of non-repeating tokens. It turned out to implement an operation consisting of looking into the unsorted list and searching for tokens that are greater than the current token, giving greater weight to the ones that are closer in the ordering. This attention pattern was clearest in transformers with one attention head, whereas increasing the number of heads led to development of more complex algorithms. We further explored how the same task was accomplished by zero-layer models as well as how varying list length, vocabulary size, and model complexity impacts the results.
+
+More information
+Download
+Download
+One Attention Head Is All You Need for Sorting Fixed-Length Lists.pdf
+350 kB
+Leave a comment
+
+Log in with itch.io to leave a comment.
+
+itch.io·View all by MatthewBaggins·Report·Embed
+Misc › Free

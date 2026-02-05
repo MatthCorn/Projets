@@ -2,11 +2,13 @@
 
 La fidélité de la modélisation par intelligence artificielle du bloc de Détection et Caractérisation des Impulsions (DCI) dépend intrinsèquement de la capacité du modèle à discerner et comparer finement les éléments d'une séquence. Contrairement aux applications de Traitement du Langage Naturel (NLP) où les données (mots ou tokens) appartiennent à un ensemble fini, les signaux radar évoluent dans des espaces continus. Par conséquent, l'espace latent du modèle est densément peuplé de représentations vectorielles qu'il est complexe de séparer sans ambiguïté (à l'inverse du NLP).\\
 
-Pour évaluer et valider les capacités de discernement de nos architectures dans ce contexte continu, nous avons défini une tâche de référence : un problème d'ordonnancement supervisé. Le modèle reçoit en entrée une séquence de vecteurs et doit prédire une nouvelle séquence qui doit correspondre à l'entrée réordonnée selon une règle implicite afin de minimiser l'erreur d'apprentissage. L'objectif est de mesurer l'aptitude générale d'un réseau de neurones à identifier les caractéristiques pertinentes et à établir des comparaisons fines entre les éléments pour construire une sortie cohérente.\\
+Pour évaluer et valider les capacités de discernement de nos architectures dans ce contexte continu, nous avons défini une tâche de référence : un problème d'ordonnancement supervisé. Le modèle reçoit en entrée une séquence de vecteurs et doit prédire une nouvelle séquence qui doit correspondre à l'entrée réordonnée selon une règle implicite afin de minimiser l'erreur d'apprentissage. L'objectif est de mesurer l'aptitude générale d'un réseau de neurones à identifier les caractéristiques pertinentes et à établir des comparaisons fines entre les éléments pour construire une sortie cohérente. 
+
+Cette démarche s'inscrit directement dans le domaine de l'interprétabilité mécaniste (mechanistic interpretability, \cite{olah_zoom_2020}), qui analyse les capacités algorithmiques des réseaux de neurones. Des études récentes (\cite{urdshals_structure_2025}, \cite{matthew_one_nodate})  ont spécifiquement exploité des tâches de tri sur des entiers pour analyser le fonctionnement des Transformers.\\
 
 Il est important de préciser que notre objectif n'est pas de concevoir un algorithme de tri performant dans l'absolu, mais d'évaluer des architectures de traitement de séquence généralistes. Nous avons donc exclu de cette étude les modèles spécifiquement conçus pour le tri algorithmique, souvent structurellement incapables de généraliser à d'autres tâches. Notre démarche vise à valider une architecture polyvalente capable, par la suite, de traiter la complexité des signaux radar.\\
 
-Ce chapitre reprend les résultats de nos travaux publiés à la conférence EUSIPCO. Nous y détaillons notamment deux contributions méthodologiques :
+Ce chapitre reprend les résultats de nos travaux publiés à la conférence EUSIPCO \cite{cornu_learning_2025}. Nous y détaillons notamment deux contributions méthodologiques :
 \begin{itemize}
 \item une fonction de coût pondérée équilibrant l'impact de chaque séquence dans l'apprentissage
 \item une stratégie de fenêtrage des données permettant un apprentissage par curriculum.
@@ -21,7 +23,15 @@ L'ordre des vecteurs est déterminé par une règle latente, inconnue du modèle
 \begin{equation}
     S_i = \langle V_i, U \rangle
 \end{equation}
-La tâche du modèle consiste à prédire l'ordonnancement des vecteurs $V_i$ induit par le tri croissant des scores $S_i$, en se basant uniquement sur l'observation des données, sans connaissance a priori de la règle d'ordonnancement.
+La tâche du modèle consiste à prédire l'ordonnancement des vecteurs $V_i$ induit par le tri croissant des scores $S_i$, en se basant uniquement sur l'observation des données, sans connaissance a priori de la règle d'ordonnancement. Ce principe est illustré dans la figure \ref{fig:sort}.
+
+\begin{figure}[htbp]
+\begin{center} 
+\includegraphics[scale=0.4]{Sorting.png}
+\end{center}
+\caption{Diagramme de la procédure de tri décrite. Les différentes étapes sont visibles de haut en bas : départ de la séquence désordonnée, association d'un score par élément, ordonnancement par critère de score croissant et enfin restitution de la séquence ordonnée.}
+\label{fig:sort}
+\end{figure}
 
 \subsection{Définition de la difficulté et invariances}
 Afin d'évaluer la robustesse du modèle, nous introduisons une mesure quantifiant la difficulté intrinsèque de tri d'une séquence. Intuitivement, une séquence est difficile à trier si les scores de ses éléments sont proches les uns des autres relativement à l'étendue globale des valeurs possibles.
@@ -71,62 +81,125 @@ La procédure de génération pour une séquence de ratio $r$, contrainte au dom
 
 Ce protocole assure une double propriété statistique à l'ensemble de données généré. À l'échelle macroscopique des données, les séquences couvrent uniformément tout le domaine  $[\mu_{min}, \mu_{max}]$. À l'échelle des séquences, chaque exemple respecte la contrainte de séparabilité $r$ avec laquelle elle a été contrainte, permettant de composer les ensembles d'apprentissage avec plus ou moins de difficulté.
 
-\section{Stratégie d'apprentissage et protocole expérimental}
-La génération de données synthétiques décrite précédemment nous permet de produire des séquences de difficulté arbitraire. Cependant, l'entraînement direct sur des données à forte complexité (faible ratio de séparabilité $r$) s'avère inefficace, le modèle peinant à converger vers une solution optimale. Cette section détaille les mécanismes mis en place pour guider l'apprentissage : une fonction de coût normalisée pour garantir l'équité du gradient, une stratégie de curriculum pour augmenter progressivement la difficulté, et enfin les architectures neuronales confrontées lors de nos expériences.
-
-\subsection{Fonction de coût et métriques d'entraînement}
-Pour entraîner le modèle à prédire une séquence ordonnée $\mathbf{P}_k$ proche de la séquence cible $\mathbf{T}_k$, l'approche standard consiste à minimiser la distance Euclidienne moyenne. Toutefois, cette métrique brute est sensible à l'échelle des valeurs : une séquence dont les vecteurs ont une grande norme dominerait le calcul de l'erreur par rapport à une séquence de faible amplitude, biaisant ainsi le gradient.\\
-
-Pour pallier ce problème, nous introduisons une erreur pondérée. Nous définissons d'abord l'erreur de séquence brute $E(\mathbf{P}_k, \mathbf{T}_k)$ comme la norme Euclidienne de la différence, normalisée par la dimension :
-\begin{equation}
-E(\mathbf{P}_k, \mathbf{T}_k) = \frac{| \mathbf{P}_k - \mathbf{T}_k |_2}{\sqrt{N \times d}}
-\end{equation}
-
-Afin de contextualiser cette erreur, nous calculons un facteur de normalisation correspondant à l'erreur qu'obtiendrait un "prédicteur naïf". Ce prédicteur naïf se contente de prédire, pour chaque élément de la séquence, le vecteur moyen de la séquence cible $\mathbf{\bar{T}}_k$. L'erreur pondérée $err$ est alors définie par le rapport :
-\begin{equation}
-err(\mathbf{P}_k, \mathbf{T}_k) = \frac{E(\mathbf{P}_k, \mathbf{T}_k)}{E(\mathrm{Rep}(\mathbf{\bar{T}}_k), \mathbf{T}_k)}
-\end{equation}
-où $\mathrm{Rep}(\mathbf{\bar{T}}_k)$ est la séquence constituée de $N$ répétitions du vecteur moyen. Grâce à cette normalisation, toutes les séquences contribuent équitablement à la fonction de coût globale, quelle que soit l'amplitude de leurs valeurs. La perte finale minimisée durant l'apprentissage est la moyenne quadratique de ces erreurs pondérées sur un lot (batch) de $b$ séquences.\\
- 
-En complément de la fonction de coût, nous surveillons la justesse (accuracy) positionnelle. Cette métrique, définie plus formellement dans les résultats, quantifie la proportion de vecteurs pour lesquels le modèle a prédit la position exacte relative dans l'ordre trié.
-
-\subsection{Apprentissage par Curriculum et définition des fenêtres}
-Plutôt que d'exposer immédiatement le modèle à l'ensemble de la distribution des difficultés, nous adoptons une stratégie de \textit{Curriculum Learning}. L'idée est de soumettre le réseau à des tâches de difficulté croissante.\\
-
-Nous formalisons cela par la notion de fenêtre d'apprentissage. Une fenêtre définit l'espace probabiliste dans lequel les paramètres des séquences sont tirés. Elle est caractérisée par le produit cartésien de deux intervalles :
-\begin{itemize}
-\item L'intervalle des moyennes $[\mu_{min}, \mu_{max}]$, qui reste constant (le domaine global).
-\item L'intervalle des écarts-types autorisés $[\sigma_{min}, \sigma_{max}]$.
-\end{itemize}
-\: \\
-
-La progression du curriculum est contrôlée par la borne inférieure $\sigma_{min}$. Initialement, cette borne est élevée, ne permettant que la génération de séquences "faciles" (scores très dispersés, ratio $r$ élevé). Au fur et à mesure de l'entraînement, nous abaissons $\sigma_{min}$ par paliers successifs, introduisant des séquences de plus en plus difficiles (scores resserrés).\\
-
-Concrètement, nous définissons une série de fenêtres où $\sigma_{min}$ est piloté par un paramètre $\lambda$ décroissant, tel que $\sigma_{min} = \lambda (\mu_{max} - \mu_{min})$. Le paramètre $\lambda$ évolue de $1$ (séquences triviales) jusqu'à $10^{-4}$ (séquences nécessitant une très haute précision), forçant le modèle à affiner progressivement ses capacités de discernement.
-
-\subsection{Plan d'expérience et architectures}
-Afin de valider cette approche et de démontrer que la capacité de tri dépend de l'architecture, nous confrontons deux modèles reconnus pour le traitement de séquence :
-\begin{enumerate}
-\item Réseau Convolutionnel (CNN) : Nous implémentons une architecture basée sur les travaux de Kalchbrenner et al., composée de 10 couches avec 10 neurones par couche, totalisant 1.9 millions de paramètres. Les convolutions traitent les dépendances locales entre vecteurs voisins.
-\item Transformer (Encodeur) : Nous utilisons l'encodeur de l'architecture Transformer proposée par Vaswani et al.. Ce modèle comporte 10 couches d'attention (Self-Attention) à 4 têtes dans un espace de dimension 128, pour un total de 0.6 millions de paramètres. Le mécanisme d'attention permet de capturer les dépendances globales, chaque vecteur pouvant être comparé à tous les autres simultanément.
-\end{enumerate}
-\: \\
-
-Le protocole expérimental consiste à entraîner ces deux modèles successivement sur 9 fenêtres de difficulté croissante, chaque fenêtre comportant 500 000 séquences, afin d'observer l'évolution de leurs performances et leurs limites respectives en termes de précision de tri.
-
 \section{Stratégie d'apprentissage et architectures neuronales}
 La génération de données synthétiques nous permet de produire des séquences de difficulté arbitraire, mais l'entraînement d'un réseau de neurones sur ces données requiert une méthodologie spécifique. Comme nous l'avons exposé dans nos travaux précédents, l'approche standard de minimisation de l'erreur quadratique moyenne s'avère insuffisante face à la dynamique des scores dans un espace continu. Cette section détaille la fonction de coût pondérée et la stratégie de curriculum mises en place pour permettre la convergence des modèles.
 
 \subsection{Fonction de coût normalisée}
-L'un des obstacles majeurs identifiés lors de l'entraînement réside dans la disparité des contributions des séquences au gradient. Une séquence dont les vecteurs possèdent une grande norme induit une erreur absolue élevée, masquant ainsi l'erreur fine des séquences de faible amplitude. Pour pallier ce biais d'échelle, nous avons développé une métrique d'erreur pondérée.\\
+Nous détaillons ici la fonction de coût utilisée lors de l'entraînement de nos modèles, telle que présentée dans l'article [CITE]. Cette métrique se base initialement sur une erreur de reconstruction brute $\mathcal{L}_{raw}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k)$ entre une séquence prédite $\hat{\mathbf{Y}}_k$ et une séquence cible ordonnée $\mathbf{Y}_k$ :
 
-Nous définissons d'abord l'erreur brute de séquence $E(P_k, T_k)$ entre la prédiction $P_k$ et la cible $T_k$ (toutes deux de taille $n \times d$) par la norme Euclidienne normalisée par la dimensionnalité: \begin{equation} E(P_k, T_k) = \frac{| P_k - T_k |_2}{\sqrt{n \times d}} \end{equation} Pour contextualiser cette erreur, nous calculons un facteur de normalisation $E_k$ correspondant à l'erreur qu'obtiendrait un prédicteur naïf se contentant de prédire le vecteur moyen $\overline{T}_k$ pour tous les éléments de la séquence. Ce terme de normalisation, défini par $E_k = E(\mathrm{Rep}(\overline{T}_k), T_k)$, permet de s'affranchir de l'échelle des valeurs. L'erreur pondérée est ainsi définie par le ratio: \begin{equation} err(P_k, T_k) = \frac{E(P_k, T_k)}{E_k} \end{equation} La fonction de coût finale $\mathrm{Err}(\mathbf{P}, \mathbf{T})$, minimisée durant l'apprentissage par descente de gradient, est la racine de la moyenne quadratique de ces erreurs pondérées sur l'ensemble du batch de taille $b$. Cette formulation garantit que chaque séquence contribue équitablement à l'ajustement des poids du réseau, indépendamment de sa position dans l'espace des valeurs.
+\begin{equation}
+    \mathcal{L}_{raw}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k) = \frac{\| \hat{\mathbf{Y}}_k - \mathbf{Y}_k \|_2}{\sqrt{N \cdot d}}
+\end{equation}
 
-\subsection{Apprentissage par Curriculum} 
-L'exposition immédiate du modèle à l'ensemble de la distribution des difficultés mène fréquemment à des optima locaux insatisfaisants. Pour contourner ce problème, nous adoptons une stratégie de Curriculum Learning progressive. Cette méthode repose sur la définition de fenêtres d'apprentissage, caractérisées par le produit cartésien d'un intervalle de moyennes $[\mu_{min}, \mu_{max}]$ et d'un intervalle d'écarts-types $[\sigma_{min}, \sigma_{max}]$.\\
+Si l'on considère un prédicteur naïf générant en sortie $N$ répétitions du vecteur moyen de la séquence cible $\boldsymbol{\mu}_k$, l'erreur brute résultante $\mathcal{L}_{raw}(\mathbf{1}\boldsymbol{\mu}_k^\top, \mathbf{Y}_k)$ devient proportionnelle à la dispersion (ou l'amplitude) des éléments de la séquence $\mathbf{Y}_k$. L'utilisation directe de l'erreur brute induirait donc un déséquilibre dans le processus d'optimisation, favorisant les séquences de forte amplitude au détriment de la précision fine.
 
-Au sein d'une fenêtre donnée, les paramètres statistiques des séquences sont échantillonnés uniformément pour la moyenne et logarithmiquement pour l'écart-type. La stratégie consiste à faire évoluer la borne inférieure de l'écart-type, contrôlée par un paramètre $\lambda$, afin d'augmenter progressivement la difficulté. L'entraînement débute avec $\lambda=1$, correspondant à des séquences facilement séparables, et progresse par paliers jusqu'à $\lambda=10^{-4}$, forçant le modèle à affiner ses capacités de discernement sur des données de plus en plus denses. Concrètement, le modèle est entraîné successivement sur 9 fenêtres de difficulté croissante, chacune contenant 500 000 séquences, permettant un transfert d'apprentissage efficace du cas simple vers le cas complexe.
+Pour corriger ce biais, nous définissons un facteur de normalisation par séquence, correspondant à cette erreur "naïve", qui permet d'uniformiser l'influence des séquences dans le gradient total :
+\begin{equation}
+    \mathcal{L}_{ref}(\mathbf{Y}_k) = \frac{\| \mathbf{Y}_k - \mathbf{1}\boldsymbol{\mu}_k^\top \|_2}{\sqrt{N \cdot d}}
+\end{equation}
+
+La métrique pondérée, assurant une contribution équitable de chaque séquence au processus d'apprentissage, est alors définie par le ratio:
+\begin{equation}
+    \mathcal{L}_{weighted}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k) = \frac{\mathcal{L}_{raw}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k)}{\mathcal{L}_{ref}(\mathbf{Y}_k)}
+\end{equation}
+
+Enfin, cette métrique, sommée sur un ensemble d'apprentissage (batch) de $b$ éléments, définit la fonction de coût globale minimisée durant l'entraînement :
+\begin{equation}
+    \mathcal{L}\left((\hat{\mathbf{Y}}_k)_{1 \leq k \leq b}, (\mathbf{Y}_k)_{1 \leq k \leq b}\right) = \sqrt{\frac{1}{b} \sum_{k=1}^b \mathcal{L}_{weighted}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k)^2}
+\end{equation}
+
+\subsection{Métrique d'évaluation : La Justesse Positionnelle}
+Bien que la fonction de coût $\mathcal{L}$ guide l'optimisation des poids, elle reste une mesure de distance continue qui peut être difficile à interpréter en termes de réussite ou d'échec du tri. Pour évaluer la performance opérationnelle du modèle, nous introduisons une seconde métrique : la justesse (ou accuracy), notée $\mathcal{J}$.\\
+
+La justesse évalue la capacité du modèle à restaurer l'ordre des éléments. Comme on ne produit pas explicitement les éléments de la séquence triée $\mathbf{Y} = (V_1, ..., V_{10})$ mais seulement une approximation $\hat{\mathbf{Y}} = (\hat{V}_1, ..., \hat{V}_{10})$, on procède en calculant l'indice correspondant au vecteur de la séquence triée le plus proche de chaque prédiction $\hat{V}_i$:
+\begin{equation*}
+    \mathrm{id}(\hat{V}_i, \mathbf{Y}) = \underset{1 \leq j \leq 10}{\operatorname{argmin}}(\left\| V_j - \hat{V}_i \right\|_2)
+\end{equation*}
+
+Si $\mathrm{id}(\hat{V}_i, \mathbf{Y}) = i$, on considère que le réseau a placé correctement l'élément $i$. En moyennant sur l'ensemble de la séquence, on obtient la justesse d'une prédiction :
+\begin{equation} 
+\label{just}
+\mathcal{J}_{local}(\mathbf{Y}, \hat{\mathbf{Y}}) = \frac{1}{10} \sum_{i=1}^{10}\mathds{1}_{ \{ i \} }(\mathrm{id}(\hat{V}_i, \mathbf{Y}) )
+\end{equation}
+ 
+Cette métrique est ensuite moyennée sur l'ensemble des $b$ séquences du lot (batch) ou du jeu de test pour obtenir une évaluation globale de la justesse du modèle :
+\begin{equation}
+\mathcal{J} = \frac{1}{b} \sum_{k=1}^{b} \mathcal{J}_{local}(\mathbf{Y}_k, \hat{\mathbf{Y}}_k)
+\end{equation}
+
+Le résultat fournit une valeur entre 0 et 1 (100\%), directement interprétable comme le pourcentage d'impulsions correctement réordonnées par le modèle.
+
+\subsection{Apprentissage progressif}
+L'exposition immédiate du modèle à l'ensemble de la distribution des difficultés mène fréquemment à des optima locaux insatisfaisants. Pour contourner ce problème, nous adoptons une stratégie d'apprentissage progressive.\\
+
+L'objectif final est de permettre au modèle de généraliser sur l'espace complet du problème. Dans nos expériences, cet espace cible est défini par l'intervalle de moyennes $[\mu_{min}, \mu_{max}] = [-10, 10]$ et l'intervalle d'écarts-types $[\sigma_{min}, \sigma_{max}] = [10^{-4}, 5]$, ce qui correspond à une exigence de séparabilité de $r = 5.10^{-6}$.\\
+
+Pour y parvenir, nous définissons des fenêtres d'apprentissage transitoires caractérisées par le domaine $[\mu_{min}, \mu_{max}] \times [\lambda, \sigma_{max}]$. Le paramètre évolutif $\lambda$ agit comme une borne inférieure mobile pour l'écart-type, augmentant progressivement la complexité des données.\\
+
+La stratégie consiste à faire décroître $\lambda$ par paliers successifs. L'entraînement débute avec $\lambda=1$. À ce stade, les séquences sont générées avec un écart-type $\sigma \in [1, 5]$, correspondant exclusivement à des cas facilement séparables. Le paramètre est ensuite réduit progressivement à travers 9 fenêtres successives, suivant la suite de valeurs $\lambda \in [1; 3.10^{-1}; 1.10^{-1};3.10^{-2};1.10^{-2};3.10^{-3};1.10^{-3};3.10^{-4};1.10^{-4}]$, jusqu'à exposer le modèle à la totalité de la densité des données. Chaque étape du curriculum comprend 170 itérations sur 500 000 séquences, assurant un transfert d'apprentissage efficace et stable du cas simple vers le cas complexe.
 
 \subsection{Architectures évaluées} 
-Afin de dissocier la difficulté intrinsèque du problème des capacités du modèle, nous évaluons cette méthodologie sur deux architectures distinctes. La première est un Réseau de Neurones Convolutif (CNN) basé sur les travaux de Kalchbrenner et al. , composé de 10 couches de 10 neurones, totalisant 1.9 millions de paramètres. La seconde, qui constitue notre cible principale, est l'encodeur de l'architecture Transformer de Vaswani et al.. Ce modèle, configuré avec 10 couches d'attention à 4 têtes dans un espace de dimension 128 (0.6M paramètres), exploite le mécanisme de self-attention pour capturer les dépendances globales nécessaires à la comparaison inter-éléments.
+Afin de dissocier la difficulté intrinsèque du problème des capacités du modèle, nous évaluons cette méthodologie sur deux architectures distinctes. La première est un Réseau de Neurones Convolutif (CNN) spécialisé dans le traitement de séquence \cite{kalchbrenner_neural_2017} , composé de 10 couches de 10 neurones, totalisant 1.9 millions de paramètres. La seconde, qui constitue notre cible principale, est l'encodeur de l'architecture Transformer \cite{vaswani_attention_2017}. Ce modèle, configuré avec 10 couches d'attention à 4 têtes dans un espace de dimension 128 (0.6M paramètres), exploite le mécanisme de self-attention pour capturer les dépendances globales nécessaires à la comparaison inter-éléments.
 
+\section{Résultats expérimentaux et analyse}
+Cette section présente l'évaluation des performances des modèles sur la tâche de tri continu. 
+
+\subsection{Protocole de visualisation}
+Afin d'analyser le comportement des modèles sur l'ensemble du domaine opératoire, nous adoptons une double approche. La première repose sur une représentation cartographique permettant de visualiser pour quelles valeurs de moyenne $\mu$ et d'écart-type $\sigma$ les séquences mettent le modèle en difficulté. La seconde consiste en une analyse quantitative globale, permettant de visualiser, en fonction de la difficulté des données, à la fois l'erreur et la justesse du modèle, mais aussi la distribution de ces quantités (à travers des diagrammes à boîte) sur les données.
+
+\subsubsection{Cartographies de performance}
+Pour visualiser la performance du modèle au-delà d'un simple scalaire, nous introduisons une représentation matricielle de l'espace des séquences sous forme d'images de $40 \times 40$ pixels. Chaque pixel de cette cartographie correspond à la performance du modèle à un point de fonctionnement précis, évaluée sur un ensemble de séquences générées avec des statistiques $(\mu, \sigma)$ fixes. Dans cette représentation, l'axe horizontal représente la moyenne $\mu$ des scores de la séquence, tandis que l'axe vertical représente l'écart-type $\sigma$ des scores sur une échelle logarithmique. La couleur du pixel code l'intensité de la performance (Erreur ou Justesse). Cette visualisation permet d'identifier instantanément les corrélations entre les propriétés statistiques des données et la capacité du modèle à les traiter. Par exemple, la figure \ref{fig:cartobase} illustre un modèle échouant sur des séquences avec des faibles valeurs $\sigma$, donc difficilement séparable.
+
+\begin{figure}[htbp]
+\begin{center} 
+\includegraphics[scale=0.4]{CartoBaseline.png}
+\end{center}
+\caption{Cartographie des performances du Transformer de référence (Baseline). Le modèle est entraîné directement sur l'intégralité du domaine ($[\mu_{min}, \mu_{max}] = [-10, 10]$ et $[\sigma_{min}, \sigma_{max}] = [10^{-4}, 5]$) durant 1600 itérations (500 000 séquences). L'erreur de reconstruction est représenté à gauche, la justesse est représenté à droite. On observe un échec sur les zones de faible séparabilité (gauche de chaque image). La décorrélation entre les images visible au centre gauche (zone violette de faible erreur apparente mais de justesse nulle) illustre l'incapacité de la fonction de coût standard non pondérée à guider l'apprentissage sur des séquences de faible amplitude.}
+\label{fig:cartobase}
+\end{figure}
+
+\subsubsection{Analyse statistique par diagrammes en boîte}
+En complément des cartographies, nous utilisons des diagrammes en boîte couplés à des courbes de performance moyenne. Ces graphiques représentent l'erreur et la justesse des modèles en fonction de la difficulté des données (paramétrée par $\lambda$). L'intérêt de cette représentation est de visualiser non seulement la moyenne, mais aussi la dispersion des performances à travers l'usage de diagramme en boîte, exprimant simplement la présence de régions qui échappent à la compréhension du modèle.
+
+\subsection{Évaluation du modèle de référence}
+Dans un premier temps, nous évaluons un modèle de référence entraîné selon une approche conventionnelle, c'est-à-dire sans les contributions méthodologiques proposées dans ce chapitre. L'apprentissage est réalisé directement sur l'ensemble du domaine (sans curriculum) et minimise une Erreur Quadratique Moyenne (RMSE) classique. Cette erreur est uniquement normalisée par l'écart-type global des sorties du jeu de données pour assurer la stabilité numérique, mais reste dépourvue de la pondération séquence par séquence que nous avons introduite.\\
+
+L'analyse des cartographies de ce modèle, figure \ref{fig:cartobase}, révèle un échec significatif de l'apprentissage sur une large partie du domaine. La carte de justesse montre que le modèle échoue quasi-systématiquement à trier les séquences présentant une faible dispersion $\sigma$ (partie inférieure de l'image). Plus notable encore, la carte d'erreur présente une anomalie majeure : une zone de faible erreur apparente (en violet) est visible sur la gauche de l'image, là où la justesse est pourtant nulle. Cet artefact démontre l'incapacité de la fonction de coût standard à guider l'apprentissage : le modèle minimise mécaniquement l'erreur absolue sur les séquences de faible amplitude (faible $\mu$ et $\sigma$) sans apprendre l'ordre correct, créant une illusion de convergence.\\
+
+Ces observations qualitatives sont corroborées par l'analyse quantitative, figure \ref{fig:perfbase}. Les courbes de performance montrent une chute rapide de la justesse dès que la difficulté augmente. De plus, les diagrammes en boîte mettent en évidence une dispersion très importante des performances. Cette hétérogénéité confirme que le modèle échoue sur les séquences à faible séparabilité, cas critiques qui deviennent prépondérants dans les données testées à mesure que la complexité augmente.
+
+\begin{figure}[htbp]
+\begin{center} 
+\includegraphics[scale=0.8]{PerfBaseline.png}
+\end{center}
+\caption{Évolution de la performance globale en fonction de la difficulté ($\lambda$). Les courbes pleines comparent les performances moyennes (Erreur à gauche et Justesse à droite) du CNN et du Transformer entraînés en 1600 itérations sur $500000$ séquences distribuées sur $[\mu_{min}, \mu_{max}] = [-10, 10]$ et $[\sigma_{min}, \sigma_{max}] = [\lambda, 5]$. Les diagrammes en boîte (représentés uniquement pour le Transformer par souci de lisibilité) mettent en évidence une disparité croissante des capacités de traitement : à mesure que la difficulté augmente ($\lambda$ diminue vers $10^{-4}$), la distribution des résultats s'étale considérablement, confirmant que le modèle échoue sur les séquences les plus complexes devenues prépondérantes.}
+\label{fig:perfbase}
+\end{figure}
+
+\subsection{Évaluation de la méthodologie proposée}
+Nous évaluons ensuite l'efficacité de notre méthodologie complète, qui couple la stratégie d'apprentissage progressif par fenêtre à la fonction de coût pondérée.\\
+
+L'évolution des cartographies de performance, figure \ref{fig:cartomethod}, illustre la dynamique de cette approche : on observe la progression d'un "front". Le modèle étend progressivement sa capacité de généralisation vers les zones de faible séparabilité à mesure que les fenêtres d'apprentissage s'agrandissent. Contrairement au cas de référence, la progression de la justesse est ici parfaitement corrélée à celle de l'erreur pondérée.\\
+
+\begin{figure}[htbp]
+\begin{center} 
+\includegraphics[scale=0.3]{CartoMethod.png}
+\end{center}
+\caption{Performance du Transformer à différentes étapes de l'apprentissage (de gauche à droit) : après la $2^e$, la $4^e$, la $8^e$ et la $10^e$ fenêtres. L'erreur est présenté à gauche, la justesse à droite. La ligne noire verticale représente la limite de la dernière fenêtre d'entrainement, ce qui permet d'identifier la propagation des performances du modèle vers les zones de faible séparabilité.}
+\label{fig:cartomethod}
+\end{figure}
+
+Cette robustesse est confirmée par l'analyse statistique finale, représenté figure \ref{fig:perfmethod}. Les diagrammes en boîte montrent une dispersion des performances bien plus faible, même pour les niveaux de difficulté élevés. Cela indique que les performances du modèle sont homogènes sur l'ensemble des séquences, quelle que soit leur configuration statistique $(\mu, \sigma)$, validant ainsi l'efficacité de la stratégie de pondération et d'apprentissage progressif.
+
+\begin{figure}[htbp]
+\begin{center} 
+\includegraphics[scale=0.8]{PerfMethod.png}
+\end{center}
+\caption{Performance finale avec stratégie d'apprentissage progressif et pondération. Les courbes présentent l'évolution de l'erreur (gauche) et de la justesse (droite) à l'issue du protocole d'apprentissage progressif sur les mêmes fenêtres de difficulté ($\lambda$ variant de $1$ à $10^{-4}$). Contrairement au cas de référence \ref{fig:perfbase}, les diagrammes en boîte du Transformer révèlent une dispersion minime même lorsque la difficulté est maximale. Cette homogénéité appuie l'efficacité de l'approche.}
+\label{fig:perfmethod}
+\end{figure}
+
+\subsection{Synthèse et comparaison des architectures}
+En conclusion, nous comparons les performances finales atteintes par le Transformer et le CNN grâce à notre méthodologie. Les résultats démontrent la supériorité de l'architecture Transformer pour cette tâche de discernement fin. Alors que les deux modèles affichent des performances comparables sur les tâches triviales ($\lambda \approx 1$), le CNN voit ses performances se dégrader plus rapidement lorsque la séparabilité diminue. Le Transformer, grâce à son mécanisme d'attention globale, maintient une justesse élevée (proche de 100\%) sur une plage de difficulté beaucoup plus étendue.\\
+
+Quantitativement, l'apport de la stratégie d'apprentissage progressif et de la pondération est déterminant : il permet de repousser la limite de discernement du modèle de plusieurs ordres de grandeur. Là où l'approche de référence échouait pour des ratios de séparabilité $r \approx 10^{-4}$, notre stratégie permet au Transformer de maintenir un tri cohérent jusqu'à $r \approx 5.10^{-6}$. Cette marge de progression valide la pertinence de l'approche itérative pour l'apprentissage de relations d'ordre dans les espaces continus denses.
