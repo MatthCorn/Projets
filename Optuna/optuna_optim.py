@@ -121,9 +121,10 @@ if __name__ == "__main__":
         "NDataV": 100,
         "period_checkpoint": -1,
         "script": ['Inter', 'Linearisation', 'Trainer.py'],
+        "network": "GRU",
         "n_trials": 10,
         "prune": True,
-        "retake_job": 11512632
+        "retake_job": False
     }
 
     import sys

@@ -1,4 +1,22 @@
-\chapter{Dépliement du problème : une approche événementielle}
+\chapter{Dépliage du problème : une approche événementielle}
+
+\section{Plan}
+\begin{itemize}
+\item Motivation
+\item Formalisation du problème
+\item Visualisation (vraiment utile)
+\item Présentation CAID
+\item Extension des essaies
+	\begin{itemize}
+	\item pré-traitement
+	\item architecture
+	\item fonction de perte
+	\item résultats
+	\end{itemize}
+\item Conclusion
+\end{itemize}
+\; \\
+
 Ce chapitre introduit une méthodologie alternative pour le traitement des signaux radar. En rupture avec les approches globales de type \textit{sequence-to-sequence} (Seq2Seq) abordées précédemment, nous proposons ici une reformulation du problème axée sur la causalité et le traitement flux-à-flux (\textit{stream processing}). Cette approche vise à s'affranchir des limitations de longueur de séquence tout en mimant plus fidèlement le comportement physique du système de Détection et Caractérisation des Impulsions (DCI).
 \section{Motivation : Du traitement de séquence à la modélisation dynamique}
 L'approche classique consistant à traiter l'intégralité d'une séquence d'impulsions en une seule passe se heurte à deux obstacles majeurs : un goulot d'étranglement computationnel et une dissonance conceptuelle avec le système réel.
@@ -17,6 +35,7 @@ C'est un système dynamique réactif régis par deux types d'événements :
 \item \textbf{L'émission d'une impulsion synthétisée} par le mécanisme de suivi provoque la libération de ressources mémoires.
 \end{enumerate}
 Il apparaît donc plus naturel de chercher à modéliser ce comportement "pas-à-pas". L'objectif est de transformer le problème de prédiction globale en un problème de prédiction locale causale : étant donné une impulsion incidente, le modèle doit prédire la cascade d'événements (émissions) qui surviennent avant l'arrivée de l'impulsion incidente suivante.
+
 \section{Formalisation du problème "Flux-à-flux"}
 Pour implémenter cette approche avec un réseau de neurones, nous devons transformer la structure des données. Cette transformation résulte de la confrontation entre la nature continue du flux radar et la nature discrète des réseaux de neurones. Nous détaillons ici les choix de conception nécessaires pour résoudre ce conflit.
 \subsection{Contraintes architecturales et choix de conception}
@@ -42,7 +61,7 @@ Le modèle doit savoir où il se situe dans la séquence des émissions (doit-il
 \end{itemize}
 Ce dernier choix s'apparente à une approche auto-régressive guidée (Teacher Forcing), soulageant la mémoire interne du modèle en lui rappelant explicitement son état précédent.
 \section{Protocole de transformation des données}
-La combinaison de ces choix aboutit à un algorithme de "dépliement" des données. Une séquence temporelle d'événements est transformée en une série de couples $((\text{Entrées}), \text{Cible})$ indépendants.
+La combinaison de ces choix aboutit à un algorithme de "dépliage" des données. Une séquence temporelle d'événements est transformée en une série de couples $((\text{Entrées}), \text{Cible})$ indépendants.
 \subsection{Illustration du mécanisme}
 Considérons une chronologie mixte d'événements réels, triés par temps, impliquant 3 impulsions incidentes ($I$) et 5 impulsions émises ($O$) :
 \begin{equation}
@@ -74,71 +93,269 @@ Le processus de génération des données d'entraînement se déroule comme suit
 Au final, la séquence temporelle initiale est convertie en un ensemble de 8 échantillons d'apprentissage. Cette transformation permet de ramener un problème de traitement de séquence complexe et long à une succession de tâches de régression locales de courte portée, parfaitement adaptées à l'entraînement d'un réseau de neurones récurrent supervisé.
 
 
-\section{Validation expérimentale sur architectures récurrentes}
-Afin de valider la pertinence de cette formulation événementielle (flux-à-flux), nous avons mené une étude comparative sur des architectures de type réseaux de neurones récurrents. Ces travaux, présentés lors de la conférence [Nom de la conf si tu veux, sinon "publiés récemment"], explorent la capacité de modèles tels que les RNN, LSTM et leurs variantes attentionnelles à apprendre cette dynamique causale.
-\subsection{Implémentation du protocole et architectures}
-Conformément au formalisme établi précédemment, l'entrée du décodeur à chaque pas de temps $s$ est construite en concaténant l'impulsion incidente courante $x_s$, la précédente prédiction $\tilde{y}_{s-1}$ et une information temporelle relative. Cette caractéristique temporelle, notée $\Delta t_s$, est cruciale pour le mode flux-à-flux : elle mesure le délai entre l'arrivée de la nouvelle impulsion et la fin de la précédente émission ($TOA(x_s) - TOE(\hat{y}_{s-1})$). Elle permet au modèle de s'affranchir des indices absolus et de traiter des séquences de longueur arbitraire, mimant le comportement "sans état" d'un capteur réel.
-Nous avons évalué plusieurs familles d'architectures sur ce protocole : \begin{itemize} \item Les baselines récurrentes : RNN, GRU et LSTM classiques. \item Les variantes augmentées par attention : L'ajout de mécanismes d'attention (type Bahdanau ou Luong) permet au modèle de requêter ses états passés pour affiner sa prédiction courante, compensant la perte de mémoire contextuelle sur les longues séquences. \end{itemize}
-\subsection{Stratégie d'évaluation : Traduction vs Prévision}
-Pour isoler les difficultés, nous avons comparé deux modes d'apprentissage: \begin{enumerate} \item La formulation "Traduction" (Translation) : Le modèle a accès à la totalité de la séquence d'entrée (futur inclus) via un encodeur bidirectionnel. Bien que non réaliste opérationnellement, ce mode sert de banc d'essai (benchmark) pour mesurer la capacité maximale de modélisation des architectures. \item La formulation "Prévision" (Forecasting) : C'est l'implémentation stricte de notre approche événementielle. Le modèle est purement causal et auto-régressif, ne voyant que le passé et le présent. C'est la configuration cible pour le déploiement. \end{enumerate}
-\subsection{Analyse des résultats}
-Les expérimentations, menées sur un jeu de données synthétique de 500 000 séquences, ont mis en évidence plusieurs dynamiques clés.
-Limites des récurrents simples : Dans la configuration cible (Forecasting), les architectures récurrentes basiques (RNN, GRU) montrent rapidement leurs limites. Le RNN sature dès les courtes séquences, et bien que le LSTM offre une bonne précision à court terme, il souffre de dérive (drift) sur les horizons longs (50 impulsions et plus).
-Apport décisif de l'attention : L'introduction de mécanismes d'attention change la donne. La variante LSTM avec attention de Luong s'impose comme la plus performante. En mode traduction, elle divise l'erreur par trois par rapport à un LSTM standard. En mode prévision, elle parvient à maintenir une stabilité remarquable sur les longues séquences, là où les autres modèles divergent. Cela confirme que la mémoire seule ne suffit pas ; la capacité à "relire" l'histoire récente est indispensable pour maintenir la cohérence du flux.
-Rôle de l'optimisation bayésienne : Il est important de noter que ces performances n'ont été atteintes que grâce à une stratégie d'optimisation des hyperparamètres rigoureuse. L'utilisation d'algorithmes bayésiens (TPE via Optuna) a permis d'identifier des configurations robustes (notamment sur le learning rate et le dropout), réduisant l'erreur de validation d'un facteur 4 par rapport aux recherches manuelles.
-En conclusion, ces travaux valident la faisabilité de l'approche événementielle "dépliée". Ils démontrent qu'un modèle LSTM augmenté par attention, correctement optimisé, est capable d'apprendre la logique causale du DCI et de générer des séquences d'impulsions cohérentes en flux continu.
-
-
-\section{Validation expérimentale sur architectures récurrentes}
-La formalisation du problème sous forme de flux causal, telle que définie dans la section précédente, a fait l'objet d'une validation expérimentale dédiée. Ces travaux, détaillés dans [CITER ARTICLE], visaient à identifier l'architecture récurrente la plus à même de modéliser la dynamique événementielle du DCI.
-Nous présentons ici le protocole expérimental mis en place et les résultats comparatifs obtenus sur des architectures de type RNN, GRU et LSTM.
-\subsection{Protocole d'évaluation en mode "Forecasting"}
-Pour coller à la réalité opérationnelle du système, l'entraînement et l'évaluation ont été réalisés exclusivement en mode prévision (Forecasting). Dans cette configuration, le modèle ne dispose d'aucune information sur le futur de la séquence. À chaque pas de temps $t$, l'entrée du réseau est construite par concaténation de trois éléments : \begin{enumerate} \item L'impulsion incidente courante $x_t$ (caractéristiques du signal radar). \item La prédiction précédente du modèle $\hat{y}_{t-1}$ (ou la vérité terrain lors de l'apprentissage avec Teacher Forcing). \item Une caractéristique temporelle relative $\Delta t$, mesurant le délai entre l'arrivée de l'impulsion courante et la fin de l'émission précédente. \end{enumerate} L'utilisation de $\Delta t$ est déterminante : elle permet au modèle de s'affranchir des références temporelles absolues et de traiter des flux de durée arbitraire, mimant le comportement "sans état" (stateless) du système physique .
-Les modèles ont été entraînés sur un jeu de données synthétique de 500 000 séquences, couvrant une large variété de densités d'impulsions et de scénarios d'interférence.
-\subsection{Comparaison des architectures}
-Trois familles d'architectures récurrentes ont été évaluées : les RNN classiques, les GRU (Gated Recurrent Units) et les LSTM (Long Short-Term Memory). De plus, pour pallier la dégradation potentielle de la mémoire sur les longues séquences, des variantes augmentées par des mécanismes d'attention (Attention additive et Attention de Luong) ont été testées .
-Les performances, mesurées en erreur quadratique moyenne normalisée (NRMSE) sur des horizons de prévision croissants, mettent en évidence une hiérarchie claire :
-\begin{itemize} \item Échec des modèles simples : Le RNN standard sature très vite, avec une erreur élevée (0.21) dès que l'horizon dépasse 20 impulsions. Le LSTM classique, bien que performant sur les courts horizons, souffre de dérive (drift) sur les séquences longues, perdant la cohérence du contexte. \item Robustesse du GRU : Le GRU offre un compromis intéressant, montrant une meilleure stabilité que le LSTM simple sur les longs horizons (erreur de 0.18 à 50 impulsions contre 0.20 pour le LSTM). \item Supériorité de l'Attention de Luong : L'architecture LSTM augmentée par l'attention de Luong (LSTMAT-L) surpasse toutes les autres configurations. Elle atteint l'erreur la plus faible sur les courts horizons (0.07 à 10 impulsions) et, surtout, maintient cette précision stable sur les longs horizons (0.15 à 50 impulsions). \end{itemize}
-Ces résultats démontrent que la mémoire récurrente seule est insuffisante pour modéliser la complexité du DCI sur la durée. La capacité du mécanisme d'attention à "relire" les états passés pour contextualiser la prédiction courante s'avère indispensable.
-
-
-\section{Validation expérimentale sur architectures récurrentes}
-La formalisation du problème sous forme de flux causal, telle que définie dans la section précédente, a fait l'objet d'une validation expérimentale dédiée. Ces travaux, détaillés dans [CITER VOTRE ARTICLE CAID], visaient à identifier l'architecture récurrente la plus à même de modéliser la dynamique événementielle du DCI dans un contexte de simulation.
-Nous présentons ici le protocole expérimental mis en place et les résultats comparatifs obtenus, en nous concentrant exclusivement sur la formulation "Forecasting" qui reflète les contraintes de causalité du système réel.
-\subsection{Protocole d'évaluation en mode "Forecasting"}
-Pour garantir la représentativité opérationnelle, l'entraînement et l'évaluation ont été réalisés en mode prévision causale (Forecasting). Dans cette configuration, le modèle ne dispose d'aucune information sur le futur de la séquence.
-À chaque pas de temps $s$, l'entrée du décodeur $z_s$ est construite par la concaténation de trois éléments: \begin{enumerate} \item L'impulsion incidente courante $x_s$. \item La prédiction précédente du modèle $\tilde{y}_{s-1}$ (ou la vérité terrain lors de l'apprentissage avec Teacher Forcing). \item Une caractéristique temporelle relative $\Delta t_s$, mesurant le délai entre l'arrivée de l'impulsion courante et la fin de l'émission précédente ($\Delta t_s = TOA(x_s) - TOE(\tilde{y}_{s-1})$). \end{enumerate}
-L'utilisation de $\Delta t_s$ est déterminante : normalisée par séquence, elle permet au modèle de s'affranchir des références temporelles absolues et de traiter des flux de durée arbitraire et de densité variable, mimant le comportement du système physique.
-Les modèles ont été entraînés sur un jeu de données synthétique de 500 000 séquences générées par un simulateur haute-fidélité, couvrant une large gamme de contextes opérationnels.
-\subsection{Comparaison des architectures}
-Trois familles d'architectures récurrentes ont été évaluées : les cellules classiques (RNN, GRU, LSTM) et leurs variantes augmentées par des mécanismes d'attention (Attention additive et Attention de Luong).
-Les performances, mesurées en erreur quadratique moyenne normalisée (NRMSE) sur des horizons de prévision croissants (10, 20 et 50 impulsions), mettent en évidence une hiérarchie claire:
-\begin{itemize} \item Instabilité des récurrents simples sur le long terme : Le RNN standard sature rapidement avec une erreur élevée (0.21) dès que l'horizon s'allonge. Le LSTM classique, bien que très performant sur les courts horizons (0.1146 à 10 impulsions), souffre de dérive (drift) sur les séquences plus longues (0.2001 à 50 impulsions). Le GRU offre une stabilité intermédiaire mais reste limité .
-\item **L'apport décisif de l'Attention de Luong :** L'architecture **LSTM augmentée par l'attention de Luong** (LSTMAT-L) surpasse toutes les autres configurations. Elle atteint l'erreur la plus faible sur les courts horizons (0.0744) et maintient une stabilité remarquable sur les longs horizons (0.1542 à 50 impulsions)[cite: 570].
-\end{itemize}
-Ces résultats confirment que pour reproduire la logique du "mesureur" radar, la mémoire récurrente seule est insuffisante ; la capacité du modèle à "relire" ses états passés via un mécanisme d'attention précis (bilinéaire type Luong) est indispensable pour maintenir la cohérence temporelle du flux.
-\subsection{Rôle critique de l'optimisation des hyperparamètres}
-Enfin, il convient de souligner que la convergence de ces modèles a nécessité une méthodologie d'optimisation rigoureuse. Les premières expérimentations manuelles plafonnaient à une erreur de validation élevée ($\approx 0.35$). L'adoption d'une stratégie d'optimisation bayésienne (TPE via le framework Optuna) a permis d'explorer efficacement l'espace des hyperparamètres. Cette approche a réduit l'erreur de validation d'un facteur 4, atteignant une performance optimale de 0.08. Ce constat établit que pour des tâches de modélisation dynamique complexe, l'optimisation automatisée n'est pas une option de confort mais une composante méthodologique critique pour débloquer le potentiel des architectures neuronales.
-
 \section{Validation de l'approche sur architectures récurrentes}
-Dans cette section, nous présentons les résultats publié à CAID [ref]. Cet article démontre que dans le cadre des architectures récurrentes, l'approche flux-à-flux est bien plus pertinente que l'approche séquences-ver- séquences. L'article établie aussi quelle architecture récurrente est la plus performante dans ce contexte. Cette section présente uniquement les résultats de montage dit "en mode prévision" qui correspond au mode flux-à-flux. Nous omettrons ici la description de la transformation précises des données pour les rendre exploitables par les architectures, ainsi que la métrique calculé pour l'optimisation et le suivi de l'apprentissage. En effet, ces informations sont présentes en détail dans l'article [ref]. De plus une transformation semblable, utilisée dans la section suivante qui présente une extension des expériences, est entièrement décrite dans la section suivante. La loss peut quand-à-elle être considérée identique à l'équation (4) mais où le terme de base (3) est calculé sur la séquence dépliée.
-
+Dans cette section, nous présentons les résultats publiés lors de la conférence CAID. Cet article démontre que pour la modélisation du traitement radar, l'approche "flux-à-flux" (ici désignée par le terme Forecasting) est particulièrement pertinente pour capturer la causalité temporelle du système. L'étude établit également quelle variante d'architecture récurrente offre le meilleur compromis entre mémoire et stabilité dans ce contexte.
+Cette section se concentre exclusivement sur les résultats obtenus en mode "prévision" (forecasting), qui correspond à la configuration opérationnelle cible. Nous omettrons ici la description détaillée de la transformation des données (le dépliage en séquences d'événements) ainsi que la métrique spécifique utilisée pour l'optimisation. Ces éléments méthodologiques sont détaillés dans l'article et une transformation analogue sera exposée en détail dans la section suivante consacrée aux extensions de ces travaux. La fonction de coût utilisée ici est comparable à l'équation (4) présentée précédemment, où le terme de normalisation est calculé sur la séquence événementielle dépliée.
 \subsection{Les architectures}
-Les architectures évaluées sont des architectures classiques pour le traitement de séquences flux-à-flux. [dire pourquoi ces choix d'architectures est pertinent dans le cadre d'une comparaison (basé sur l'article + vérité générale)]:
+Afin d'identifier la structure la plus adaptée, nous avons évalué un panel d'architectures récurrentes classiques. Ce choix est motivé par la nature séquentielle et causale du problème, où chaque prédiction dépend de l'historique des états internes. Les modèles comparés sont les suivants :
+\begin{itemize} \item \textbf{RNN (Vanilla Recurrent Neural Network)} : Il constitue l'architecture de référence la plus simple. Bien que théoriquement capable de traiter des séquences, il souffre notoirement du problème de disparition du gradient, limitant sa capacité à retenir l'information sur de longues périodes. \item \textbf{LSTM (Long Short-Term Memory)} : Cette architecture introduit des portes logiques (entrée, oubli, sortie) pour réguler le flux d'information. Elle est conçue spécifiquement pour capturer les dépendances à long terme qui échappent aux RNN simples. \item \textbf{GRU (Gated Recurrent Unit)} : Variante simplifiée du LSTM, le GRU fusionne certaines portes pour réduire le nombre de paramètres tout en conservant une capacité de mémoire comparable. Il offre souvent une convergence plus rapide et une meilleure stabilité numérique. \item \textbf{LSTMAT (LSTM + Attention Additive)} : Il s'agit d'un décodeur LSTM augmenté d'un mécanisme d'attention de type Bahdanau. À chaque pas de temps, le modèle calcule un score additif pour pondérer l'importance des états cachés passés, permettant de "relire" l'historique pertinent. \item \textbf{LSTMAT-L (LSTM + Attention de Luong)} : Cette variante utilise un mécanisme d'attention bilinéaire (produit scalaire généralisé). Plus efficace calculatoirement, cette formulation tend à mieux passer l'échelle sur les longues séquences en offrant des gradients plus nets lors de l'alignement temporel. \end{itemize}
+\subsection{Résultats expérimentaux}
+L'évaluation concerne ici uniquement la configuration Forecasting, où le modèle ne dispose d'aucun accès au futur et génère les impulsions de manière purement causale.
+Afin de garantir une comparaison équitable, chaque architecture a fait l'objet une optimisation rigoureuse de ses hyper-paramètres via un algorithme bayésien (TPE via Optuna). Cette étape a permis de s'assurer que les écarts de performance observés sont structurels et non liés à un mauvais réglage. La table ci-dessous résume la configuration géométrique optimale (nombre de couches $L$ et dimension latente $H$) retenue pour chaque modèle à l'issue de cette optimisation:
+\begin{table}[h]
+\centering
+\begin{tabular}{l c c}
+\hline
+\textbf{Architecture} & \textbf{Dimension cachée ($H$)} & \textbf{Nombre de couches ($L$)} \\
+\hline
+RNN & 640 & 4 \\
+GRU & 640 & 5 \\
+LSTM & 768 & 4 \\
+LSTMAT (Basic) & 768 & 4 \\
+LSTMAT-L (Luong) & 768 & 6 \\
+\hline
+\end{tabular}
+\caption{Configurations optimales des architectures évaluées (issues de l'annexe de l'article [ref]).}
+\end{table}
+Les entraînements ont été réalisés sur des ensembles de données synthétiques de 500 000 séquences, permettant de couvrir une grande diversité de scénarios d'interférence. La performance est mesurée par l'erreur quadratique moyenne normalisée (NRMSE) sur des horizons de prédiction croissants (10, 20 et 50 impulsions).
+
+\begin{table}[h] 
+\centering 
+\begin{tabular}{l c c c} 
+\hline 
+\textbf{Modèle} & \textbf{10 impulsions} & \textbf{20 impulsions} & \textbf{50 impulsions} \\ 
+\hline 
+RNN & 0.1261 & 0.2109 & 0.2156 \\
+GRU & 0.1260 & 0.1981 & 0.1945 \\ 
+LSTM & 0.1146 & 0.2192 & 0.2001 \\ 
+LSTMAT (Basic) & 0.1053 & 0.1757 & 0.1684 \\ 
+\textbf{LSTMAT-L (Luong)} & \textbf{0.0744} & \textbf{0.1566} & \textbf{0.1542} \\ 
+\hline 
+\end{tabular} 
+\caption{Comparaison des performances (NRMSE) en mode Forecasting en fonction de la longueur de la séquence.} 
+\end{table}
+
+Les résultats mettent en évidence plusieurs dynamiques caractéristiques : \begin{itemize} \item Limite des modèles simples : Le RNN et le LSTM standard montrent leurs limites sur la durée. Si le LSTM est performant à court terme (0.1146), il décroche significativement sur les horizons longs (0.2001 à 50 impulsions), victime de dérive temporelle (drift). Le GRU offre une stabilité légèrement supérieure sur le long terme mais reste insuffisant. \item Apport de l'attention : L'ajout de mécanismes d'attention améliore la robustesse globale. La variante avec attention additive (LSTMAT) réduit l'erreur à long terme (0.1684). \item Supériorité de Luong : L'architecture LSTMAT-L se distingue nettement. Elle offre non seulement la meilleure précision sur les courts horizons (0.0744), mais maintient surtout une erreur stable ($\approx 0.15$) lorsque la séquence s'allonge. Cela confirme que la capacité à "requêter" précisément l'historique via une attention bilinéaire est cruciale pour maintenir la cohérence du flux radar sur la durée. \end{itemize}
+\subsection{Conclusion}
+Cette étude valide expérimentalement la pertinence de l'approche par flux (Forecasting) couplée à une architecture LSTM avec attention de Luong. Ces travaux, présentés sous forme de poster à la conférence CAID, ont reçu un accueil favorable, confirmant l'intérêt de la communauté pour des modèles neuronaux capables de reproduire la causalité fine des chaînes de traitement signal. Ces résultats constituent le socle sur lequel nous bâtissons les extensions présentées dans la section suivante.
+
+
+\section{Extension des essais : Généralisation à d'autres architectures}
+Cette section étend la discussion sur la pertinence du dépliage des données ("Unfolding") initiée avec les travaux présentés à la conférence CAID [ref]. Si l'étude précédente se concentrait sur les architectures récurrentes, nous avons constaté que la formulation événementielle du problème permet en réalité l'utilisation de toute architecture de traitement de séquence, à condition qu'elle respecte la contrainte de causalité et opère de manière auto-régressive.
+Afin d'éprouver cette généralisation, nous réitérons les expériences en introduisant deux nouvelles familles d'architectures : les Réseaux de Neurones Convolutifs Temporels (TCN) et les Transformers. Ces modèles étant déjà des standards de comparaison dans le paradigme sequence-to-sequence, leur évaluation dans ce contexte "déplié" offre une perspective comparative précieuse.
+Nous détaillons ici les adaptations nécessaires au pré-traitement des données pour maximiser l'efficacité de ces modèles, la sélection des architectures, ainsi que les métriques spécifiques définies pour guider l'apprentissage conjoint de la régression (valeurs des PDW) et de la classification (arrêt de la génération).
+\subsection{Préparation des données et ingénierie des caractéristiques}
+Le passage d'une modélisation globale à une modélisation locale impose une adaptation de la représentation des données, notamment temporelles. Comme évoqué précédemment [ref chapitre antérieur], nos données brutes encodent le temps de manière relative à la position dans la séquence pour garantir la croissance des valeurs. Cependant, dans le contexte du dépliage où les séquences d'entrée et de sortie sont entrelacées, cette représentation doit être ajustée pour fournir au modèle une information locale et immédiatement exploitable.
+\subsubsection{Encodage relatif local du temps}
+L'objectif est de fournir au réseau des différentiels de temps pertinents pour sa décision courante, sans l'obliger à maintenir un compteur global complexe.
 \begin{itemize}
-\item RNN : c'est l'architecture de base, de référence
-\item LSTM : c'est une amélioration aidant les longues dépendances
-\item GRU : [décrire en 2 mots]
-\item LSTMAT : [décrire]
-\item LSTMAT-L : [décrire]
+\item Pour les impulsions incidentes ($PDW_{in}$) : L'information temporelle est préservée par le processus de dépliage (qui est réversible). Cependant, pour permettre au modèle d'anticiper le nombre de $PDW_{out}$ à générer avant la prochaine impulsion incidente, nous enrichissons la représentation de $PDW_{in}^{(i)}$. Nous concaténons à ses caractéristiques le différentiel de temps avec l'impulsion suivante : $\Delta T_{in} = TOA(PDW_{in}^{(i+1)}) - TOA(PDW_{in}^{(i)})$.
+Cette information permet au modèle d'estimer la "fenêtre temporelle" disponible pour ses émissions. Dans le cas d'une fin de séquence, une valeur arbitrairement grande est utilisée pour signifier au modèle qu'il doit vider sa mémoire (générer toutes les réponses restantes).
+
+\item **Pour les impulsions interceptées ($PDW_{out}$) :** Dans la configuration *seq2seq*, l'encodage du temps de sortie nécessitait une référence globale. Ici, grâce à la synchronisation des flux permise par le dépliage, nous pouvons adopter un encodage strictement local. Le temps d'émission d'une $PDW_{out}$ (qu'elle soit en entrée *Input 2* ou en cible *Output*) est encodé relativement au temps d'arrivée de l'impulsion incidente courante ($PDW_{in}^{(i)}$) qui la conditionne.
+
+Soit $TOE(PDW_{out})$ le temps de fin de l'impulsion émise. La valeur fournie au réseau est :
+\begin{equation}
+    \Delta T_{local} = TOE(PDW_{out}) - TOA(PDW_{in}^{(i)})
+\end{equation}
+Ce changement de repère simplifie considérablement la tâche d'apprentissage : le modèle n'a plus besoin de mémoriser l'historique absolu, mais seulement de placer ses émissions relativement à l'événement déclencheur courant.
+\end{itemize}
+\subsubsection{Gestion des masques et exemple de dépliage}
+Outre les valeurs, la structure du dépliage nécessite la gestion de plusieurs masques pour piloter l'apprentissage et la fonction de coût :
+\begin{itemize}
+\item MI (Mask Input) : Indique si l'entrée secondaire (Input 2) est le jeton spécial \texttt{NEXT} (1) ou une PDW valide (0).
+\item MO (Mask Output) : Indique si la cible attendue est le jeton \texttt{NEXT} (1) ou une PDW valide (0).
+\item MP (Mask Padding) : Indique si la position est valide (1) ou si elle relève du remplissage (padding) de fin de batch (0).
+\end{itemize}
+Pour illustrer ce mécanisme, considérons une séquence courte avec 2 impulsions incidentes ($I_1, I_2$) générant respectivement 1 et 0 impulsion de sortie ($O_1$). La séquence dépliée de longueur 4 se construit ainsi :
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Pas de temps} & \textbf{t=1} & \textbf{t=2} & \textbf{t=3} & \textbf{t=4} \\
+\hline
+\textbf{Input 1} ($PDW_{in}$) & $I_1$ & $I_1$ & $I_2$ & Pad \\
+\hline
+\textbf{Input 2} (Contexte) & \texttt{NEXT} & $O_1$ & \texttt{NEXT} & Pad \\
+\hline
+\textbf{Target} (Sortie) & $O_1$ & \texttt{NEXT} & \texttt{NEXT} & Pad \\
+\hline
+\hline
+\textbf{Masque MI} (Input 2 is Next?) & 1 & 0 & 1 & 0 \\
+\hline
+\textbf{Masque MO} (Target is Next?) & 0 & 1 & 1 & 0 \\
+\hline
+\textbf{Masque MP} (Valid?) & 1 & 1 & 1 & 0 \\
+\hline
+\end{tabular}
+\caption{Exemple de construction des données et des masques pour une séquence courte dépliée.}
+\label{tab:unfolding_example}
+\end{table}
+\subsection{Sélection des architectures}
+Nous comparons trois architectures distinctes, choisies pour leur représentativité des différents paradigmes de traitement séquentiel.
+\subsubsection{Le Transformer (Attention Mechanism)}
+Le modèle utilisé est un Décodeur Transformer standard, inspiré de l'architecture "Attention Is All You Need" [Vaswani et al., 2017]. Contrairement à l'encodeur qui voit tout le contexte, le décodeur utilise un mécanisme de Masked Self-Attention pour garantir la causalité : chaque position ne peut prêter attention qu'aux positions précédentes. Cette architecture est particulièrement adaptée pour capturer des dépendances complexes et non-locales dans la séquence dépliée.
+\subsubsection{Le TCN (Temporal Convolutional Network)}
+Le TCN [Bai et al., 2018] propose une alternative convolutionnelle aux réseaux récurrents. Il repose sur des convolutions causales dilatées (dilated causal convolutions).
+\begin{itemize}
+\item Causales : Pour garantir qu'il n'y a pas de fuite d'information du futur vers le passé.
+\item Dilatées : Pour augmenter exponentiellement le champ réceptif du réseau avec la profondeur, lui permettant de "voir" loin dans le passé sans exploser le nombre de paramètres.
+\end{itemize}
+L'étude de Bai et al. suggère que les TCN peuvent surpasser les RNN classiques sur de nombreuses tâches séquentielles tout en étant plus efficaces à entraîner grâce au parallélisme.
+\subsubsection{Le GRU (Recurrent Network)}
+Pour la famille des réseaux récurrents, nous avons choisi le GRU (Gated Recurrent Unit). Contrairement à l'étude précédente, nous n'utilisons pas ici de mécanismes d'attention explicites (comme LSTMAT), car le Transformer couvre déjà ce besoin fonctionnel. Nous souhaitons conserver des architectures "orthogonales" dans leurs principes de fonctionnement. De plus, les résultats précédents [ref tableau section précédente] ont montré que le GRU offrait le meilleur compromis performance/stabilité sur les séquences longues (plus de 20 PDW) dans une configuration sans attention externe.
+\subsubsection{Structure commune et hyper-paramètres}
+Toutes les architectures partagent une structure commune en blocs pour l'inférence :
+
+\begin{itemize}
+\item Embedding causal : Transformation de la séquence d'entrée en représentations latentes.
+\item Injection du jeton NEXT : Un vecteur latent appris $V_{next}$ remplace les représentations aux positions indiquées par le masque $MI$.
+\item Corps du modèle : Le cœur de l'architecture (GRU, TCN, Transformer) enrichit la séquence latente de manière causale.
+\item Têtes de sortie : 
+	\begin{itemize}
+	\item Un Décodeur projette l'état latent vers l'espace des PDW (régression).
+	\item Un Comparateur calcule la similarité cosinus entre l'état latent et le vecteur $V_{next}$ pour prédire la fin de séquence (classification).
+	\end{itemize}
+\end{itemize}
+Les hyper-paramètres de chaque architecture ont été optimisés via une recherche bayésienne (TPESampler d'Optuna) sur des entraînements courts.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Paramètre} & \textbf{Transformer} & \textbf{TCN} & \textbf{GRU} \\
+\hline
+Dimension Latente ($d_{model}$) & 128 & 128 & 256 \\
+Nombre de couches ($L$) & 4 & 6 & 2 \\
+Têtes d'attention / Taille Noyau & 4 têtes & $k=3$ & - \\
+Dropout & 0.1 & 0.2 & 0.1 \\
+\hline
+\end{tabular}
+\caption{Hyper-paramètres géométriques retenus pour chaque architecture.}
+\label{tab:hyperparams}
+\end{table}
+
+\subsection{Fonction de perte et métriques d'évaluation}
+L'apprentissage est guidé par une fonction de perte composite qui minimise simultanément l'erreur de reconstruction des PDW et l'erreur de détection du jeton \texttt{NEXT}.
+\subsubsection{Erreur de reconstruction pondérée ($\mathcal{L}_{reg}$)}
+Cette composante ne concerne que les positions où une PDW valide est attendue (c'est-à-dire quand $MO=0$ et $MP=1$).
+L'erreur brute est une distance euclidienne normalisée par le nombre effectif d'éléments valides dans le batch :
+\begin{equation}
+\mathcal{L}{raw}(\hat{\mathbf{Y}}, \mathbf{Y}) = \frac{| (\hat{\mathbf{Y}} - \mathbf{Y}) \odot (1 - \mathbf{MO}) \odot \mathbf{MP} |2}{\sqrt{\sum{k,t} (1 - MO{k,t}) \cdot MP_{k,t} \cdot d_{feat}}}
+\end{equation}
+Pour équilibrer l'apprentissage face à la diversité des séquences, nous utilisons la version pondérée par l'erreur de référence $\mathcal{L}_{ref}$ (calculée sur la séquence dépliée cible, voir chapitre précédent) :
+\begin{equation}
+\mathcal{L}{reg} = \frac{\mathcal{L}{raw}}{\mathcal{L}_{ref}}
+\end{equation}
+\subsubsection{Erreur de classification par MCC différentiable ($\mathcal{L}_{class}$)}
+La seconde tête du réseau prédit une probabilité $p \in [0, 1]$ que la sortie soit un jeton \texttt{NEXT}. Il s'agit d'un problème de classification binaire déséquilibré. Pour évaluer et optimiser cette performance, nous utilisons le Coefficient de Corrélation de Matthews (MCC), reconnu pour sa robustesse sur les classes déséquilibrées.
+Le MCC classique n'étant pas dérivable, nous implémentons une version "soft" approximée ($\mathcal{L}_{MCC}$) pour la descente de gradient.
+Soient $y \in \{0,1\}$ les cibles (issues de $MO$) et $\hat{y} \in [0,1]$ les probabilités prédites. Nous calculons les éléments de la matrice de confusion de manière différentiable (où la somme s'effectue sur les éléments valides du masque $MP$) :
+\begin{align*}
+TP &= \sum y \cdot \hat{y} \cdot MP \\
+TN &= \sum (1-y) \cdot (1-\hat{y}) \cdot MP \\
+FP &= \sum (1-y) \cdot \hat{y} \cdot MP \\
+FN &= \sum y \cdot (1-\hat{y}) \cdot MP
+\end{align*}
+Le score MCC différentiable est alors donné par :
+\begin{equation}
+MCC_{soft} = \frac{TP \cdot TN - FP \cdot FN}{\sqrt{(TP+FP)(TP+FN)(TN+FP)(TN+FN) + \epsilon}}
+\end{equation}
+La perte de classification à minimiser est définie pour maximiser la corrélation :
+\begin{equation}
+\mathcal{L}{class} = 1 - MCC{soft}
+\end{equation}
+Cette quantité évolue naturellement entre 0 (classification parfaite) et 1 (classification aléatoire), s'alignant sur la dynamique de la perte de régression.
+La fonction de coût totale est une somme pondérée de ces deux composantes : $\mathcal{L}_{total} = \mathcal{L}_{reg} + \lambda \mathcal{L}_{class}$.
+
+
+
+
+\section{Extension des essaies}
+Cette section apporte des éléments supplémentaires à la discussion de la pertinence du dépliage des données. Nous réitérons les expériences présentés à CAID [ref] en ajoutant de nouvelles architectures : un CNN et un Transformer. Pourquoi faire ça ? On s'est en fait rendu compte que les séquences dépliées peuvent être traité par n'importe quelle architecture de traitement de séquence, à condition que l'architecture soit causale et qu'on génère les séquences de manière auto-regressive. De plus, ces architectures que sont le TCN (type de CNN) et Transformer font déjà l'objet de comparaison sur le seq2seq, c'est donc intéressant de les introduire ici pour de nouvelles comparaisons.
+
+Nous présenterons ici les architectures sélectionnées pour la comparaison, un postprocessing appliqué aux séquences pour les rendre compréhensibles
+par nos modèles (comme dans l'article avec de deltaT), la métrique évalué et minimisée et finalement nous présenterons nos résultats et nos conclusions.
+
+\subsection{Préparation des données}
+Nous présentons ici le pré-traitement nécessaire pour rendre les données exploitables par nos modèles [comme dans l'article avec le deltaT mais par un autre moyen]. Les informations pouvant nécessiter un pré-traitement sont les informations temporelles car [la fin de la phrase fait référence à une particularité de nos données que nous aurons expliqué dans un chapitre antérieur] nous avons mis en place des astuces pour ne pas stocker les informations temporelles sans avoir de valeurs croissantes avec la position : le temps d'arrivée des PDW incidentes correspond à la position dans la séquence (car on a un pb simplifié) et le temps d'arrivé des PDW interceptées est stocké en soustrayant à cette valeur la position du PDW dans la séquence des PDW interceptées, ce qui contrôle la croissance de la valeur stockée tant que le nombre d'impulsion incidente est du même ordre que le nombre d'impulsion interceptée [encore une fois c'est déjà expliqué mais un rappel peut être le bienvenu]. \\
+
+\begin{itemize}
+\item Le temps d'arrivé sur les impulsions incidentes : Heureusement, le dépliage ne détruit pas l'information du temps d'arrivé [contrairement au fenêtrage où l'information de temporalité est perdu si on observe les fenêtres indépendamment, fenêtre introduit et problème déjà expliqué dans un chapitre antérieur] car on peut "replier" la séquence et récupérer la séquence des impulsions incidentes à partir de la séquence dépliée. 
+\item Pour que le modèle puisse savoir les PDW à générer avant l'arrivée de la prochaine PDW incidente [normalement on a expliqué dans le processus de dépliage ce processus de génération, à vérifier], il faut qu'il ait une idée de la date d'arrivé de $PDW_{i+1}$ lorsqu'il traite $PDW_i$. On ajoute donc à la fin de $PDW_i$ l'information de la différence des temps d'arrivé entre $PDW_i$ et $PDW_{i+1}$. Ce n'est pas vraiment utile dans notre cas où un PDW arrive à chaque pas de temps mais ça permet d'anticiper le traitement de séquence où les PDW arrivent sur des temps continus de manière irrégulière, et aussi la distinction du PDW finale, en donnant une différence de temps grande permettant au modèle de comprendre qu'il faut générer tous les PDW qu'il lui reste en mémoire [j'espère que c'est clair].
+\item Le temps d'arrivé des impulsions interceptées : Comme pour les impulsions incidentes, le dépliage de détruit pas l'information du temps d'arrivé car l'opération est réversible. En revanche, pour prédire correctement ce paramètre à la 100eme (exemple) impulsion interceptée, il faudrait que le réseau tienne un compte de toute les impulsions interceptées déjà générées, tenir ce compte peut être complexe et va à l'encontre du principe de l'approche où on considérait plutôt que le réseau pouvait simplement copier le fonctionnement de mémoire du DCI : on considère donc que l'encodage du temps d'arrivée des impulsions interceptées était pertinent dans la configuration seq2seq où on n'a pas d'information de la synchronisation des flux entrée/sortie, mais ici avec la synchronisation, on préfère changer. L'information du temps d'arrivé comme il était encodé est remplacé par la différence du temps entre le temps d'arrivé de l'impulsion incidente encore traité (input 1) et le temps d'arrivé de l'impulsion intercepté en jeu (quelle soit en entrée : input 2, ou prédite : output). Ainsi on crée un encodage de l'information qui se décode de manière locale, ce qui devrait facilité le traitement pour les modèles qui ne regardent pas loin dans le passé (c'est l'esprit de l'approche).
 \end{itemize}
 
-\subsection{Résultats expérimentaux}
-[Les résultats concernent que la configuration "forcasting"]
-[est-ce qu'il faut expliquer comment c'est fait ? pour moi c'est tellement simple une fois que j'ai décrit la séquence d'input et la séquence d'output attendu que je ne vois pas quoi dire. On peut mentionner que les architectures ont subit une optimisation préalable des hyper-paramètres 
+Nous construisons aussi un masque ($MI$ pour mask input) permettant d'indiquer si l'input 2 est un jeton "next" (1) ou pas (0), et un masque ($MO$ pour mask output) permettant d'indiquer si la sortie attendue est un jeton "next" (1) ou pas (0). Un dernier masque ($MP$ pour mask padding) indique si la sortie attendue est à considérer dans l'erreur (1) ou pas (0), ce qui est le cas pour un nombre variable d'éléments à la fin des séquences, liée au comblage des séquences de sortie pour qu'elles fassent toutes la même taille.
+
+[on ajoutera un exemple avec une séquence très courte que l'on dépliera pour montrer dans chaque cas ce que vaut les différentes inputs, l'output, et les différents masques. Tu peux préparer le tableau pour une séquence de taille 4 (8 en dépliée)]0
+
+\subsubsection{Les architectures}
+Le Transformer est semblable à un encodeur de "attention is all you need" en remplaçant le bloc de self-attention par du masked-self-attention. [faire une explication comme si j'intégrais une image et que je faisais des références à un encodeur déjà présenté].
+Le réseau de convolution est une architecture nommée TCN, proposé dans une étude [ref] voulant montrer que [compléter un peu avec le contexte de l'introduction de cette architecture].
+Finalement, pour l'architecture récurrente, nous décidons de ne pas opter pour les variantes de réseau récurrent avec attention, car elle se rapproche du Transformer en ce sens et nous préférons garder des architectures "orthogonales" dans leurs principes. à la vue des résultats présentés [ref tableeau de la section précédente], nous optons pour le GRU qui semble être le meilleur dans cette configuration dépliée pour les séquences longues(plus de 20 PDW). 
+
+Les architectures tout comme les paramètres liées à l'apprentissage sont optimisés à l'aide d'entrainement court et d'une recherche des hyper-paramètres sur critère de minimisation de l'erreur finale. L'espace des hyper-paramètres est échantillonné grâce à un algorithme type TPESampler [expliquer en 2 lignes].
+Le tableau suivant expose les hyper-paramètres de la géométrie de chaque architecture [préparer un tableau avec des fausses valeurs pour nombre de couche, dimension latente, etc].
+
+Les architectures ont toutes la même structure en blocs et le même principe d'inférence: 
+\begin{itemize}
+\item un vecteur latent appris $next$ qui est la représentation latent du token next, qui sera placé aux endroits judicieux dans la séquence d'inputs
+\item un embedding prenant notre séquence d'input et la transformant de manière causale en une séquence de représentation latente
+\item le masque $MI$ permet de remplacer les représentations latentes dans les positions nécessaires en le token next
+\item le corps du modèle (GRU, TCN, Transformer) augmente de manière causale les informations présentes dans la représentation latente, faisant une séquence latente à haute teneur sémantique
+\item un decodeur transforme chaque élément de la dernière représentation latente en une prédiction et la retourne
+\item un comparateur calcule la similarité entre la dernière représentation latente et le token next (cosine similarity) et la retourne
+\end{itemize}
+
+\subsection{la métrique évaluée / la fonction de perte}
+[mettre les formes]
+On utilise deux métriques. 
+
+La première calcule une erreur de reconstruction. Cette erreur est calculé sur les éléments de la séquence devant correspondre à une PDW : on prend la séquence de prédiction, et on conserve uniquement les éléments aux positions où le masque $MO$ vaut 0 (ie ce n'est pas un token next) et le masque $MP$ vaut 1 (ie on n'est pas sur le padding). A cette séquence, on applique ensuite la formule [ref eq]. Cette formule fait intervenir la taille de la séquence, or dans notre cas, la taille de la séquence est en fait calculé par la valeur $sum((1 - MO) * MP)$ [rend ça plus formel], somme calculée aux indices de la séquence considérée. L'erreur de reconstruction brute est donc calculé entre une séquence prédite $\hat{\mathbf{Y}}_k$ et une séquence cible $\mathbf{Y}_k$, dont les masques sont $MO_k$ et $MP_k$:
+
+\begin{equation}
+    \mathcal{L}_{raw}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k) = \frac{\| \hat{\mathbf{Y}}_k - \mathbf{Y}_k \|_2}{\sqrt{\sum_{(mo, mp) \in (MO_k \times MP_k)} ((1 - mo) mp) \cdot d}}
+\end{equation}
+
+Et l'erreur de reconstruction pondérée, où $\mathcal{L}_{ref}$ est calculé avec le dépliage [ref : ça sera expliqué au chapitre précédent]
+\begin{equation}
+    \mathcal{L}_{weighted}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k) = \frac{\mathcal{L}_{raw}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k)}{\mathcal{L}_{ref}(\mathbf{Y}_k)}
+\end{equation}
+
+La seconde métrique évalue la capacité à discerner les token next des autres prédictions à travers la deuxième output de modèle (la similarité). Cette similarité s'étant de 0 (ce n'est pas le token next) à 1 (c'est le token next). Pour faire la distinction, nous choisissons judicieusement un seuil entre 0 et 1 pour séparer les deux classes, et nous évaluons la qualité de la séparation par le calcul des coefficients de corrélation de matthew (Matthew Correlation Coheficient - MCC). Cette quantité varie entre -1 (parfait opposition de corrélation) et 1 (parfaite corrélation) en passant par 0 (association aléatoire).
+
+[cherche et mets l'équation]
+
+Nous décidons donc de considérer une métrique qui calcule directement à partir des prédictions continues du modèle un score MCC différentiable $MCC_loss$. la quantité $1 - MCC_loss$ évoluera naturellement entre 1 (association aléatoire) et 0 (corrélation parfaite).
+
+%[mettre l'équation de la loss (1 - soft_mcc) dont voisi un calcul
+% def soft_mcc(probs, targets, mask, eps=1e-5):
+%    # Calcul des composantes "Soft"
+%    tp = torch.sum(targets * probs * mask, dim=[1, 2], keepdim=True)
+%    tn = torch.sum((1 - targets) * (1 - probs) * mask, dim=[1, 2], keepdim=True)
+%    fp = torch.sum((1 - targets) * probs * mask, dim=[1, 2], keepdim=True)
+%    fn = torch.sum(targets * (1 - probs) * mask, dim=[1, 2], keepdim=True)
+%
+%    # Formule du MCC
+%    numerator = (tp * tn) - (fp * fn)
+%    denominator = torch.sqrt(
+%        (tp + fp + eps) * (tp + fn + eps) * (tn + fp + eps) * (tn + fn + eps)
+%    )
+%
+%    mcc = numerator / denominator
+%
+%    return mcc
+%]
+    
+    
+    
+    
 
 
 
 
 
 
+
+ 

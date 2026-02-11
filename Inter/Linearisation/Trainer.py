@@ -295,7 +295,7 @@ if __name__ == '__main__':
 
                     err = (torch.norm((Prediction - OutputBatch) * (1 - NMOutputBatch) * OSMBatch / StdBatch, p=2) /
                            sqrt((torch.sum((1 - NMOutputBatch) * OSMBatch) - batch_size) * d_out))
-                    err_next = torch.mean((1 - soft_mcc(is_next, NMOutputBatch, OSMBatch)) / StdBatch) * torch.mean(StdBatch)
+                    err_next = torch.mean(1 - soft_mcc(is_next, NMOutputBatch, OSMBatch))
 
                     (param["mult_grad"] * ((1 - param['weight_error']) * err + param['weight_error'] * err_next)).backward()
                     optimizer.step()
