@@ -86,35 +86,57 @@
 \contentsline {subsection}{\numberline {6.3.2}Évaluation du modèle de référence}{61}{subsection.6.3.2}%
 \contentsline {subsection}{\numberline {6.3.3}Évaluation de la méthodologie proposée}{62}{subsection.6.3.3}%
 \contentsline {subsection}{\numberline {6.3.4}Synthèse et comparaison des architectures}{64}{subsection.6.3.4}%
-\contentsline {chapter}{\numberline {7}AVERTISSEMENT}{67}{chapter.7}%
-\contentsline {chapter}{\numberline {8}COMPOSITION GÉNÉRALE, CHARTE GRAPHIQUE}{69}{chapter.8}%
-\contentsline {section}{\numberline {8.1}COMPOSITION DU DOCUMENT}{69}{section.8.1}%
-\contentsline {section}{\numberline {8.2}QUELS LOGOS FAIRE FIGURER ?}{69}{section.8.2}%
-\contentsline {section}{\numberline {8.3}POLICES DE CARACTÈRES ET COULEURS}{69}{section.8.3}%
-\contentsline {chapter}{\numberline {9}INFORMATIONS GÉNÉRALES SUR LA PAGE DE COUVERTURE}{71}{chapter.9}%
-\contentsline {section}{\numberline {9.1}TITRE DE LA THÈSE ET LANGUE(S)}{71}{section.9.1}%
-\contentsline {section}{\numberline {9.2}SPÉCIALITÉ DE DOCTORAT}{71}{section.9.2}%
-\contentsline {section}{\numberline {9.3}UNITÉ DE RECHERCHE}{72}{section.9.3}%
-\contentsline {section}{\numberline {9.4}LE RÉFÉRENT}{72}{section.9.4}%
-\contentsline {section}{\numberline {9.5}GRADUATE SCHOOL}{73}{section.9.5}%
-\contentsline {section}{\numberline {9.6}ÉCOLE DOCTORALE}{73}{section.9.6}%
-\contentsline {section}{\numberline {9.7}LIEU ET DATE DE SOUTENANCE}{74}{section.9.7}%
-\contentsline {chapter}{\numberline {10}CIVILITÉ, FÉMINISATION DES TITRES ET FONCTIONS}{75}{chapter.10}%
-\contentsline {chapter}{\numberline {11}PRÉSENTATION DE LA DIRECTION DE LA THÈSE OU DE L’ÉQUIPE D’ENCADREMENT}{77}{chapter.11}%
-\contentsline {chapter}{\numberline {12}COMPOSITION DU JURY }{79}{chapter.12}%
-\contentsline {section}{\numberline {12.1}A QUOI SERVENT CES INFORMATIONS ?}{79}{section.12.1}%
-\contentsline {section}{\numberline {12.2}LÉGITIMITÉ ACADÉMIQUE}{79}{section.12.2}%
-\contentsline {section}{\numberline {12.3}INDÉPENDANCE}{80}{section.12.3}%
-\contentsline {section}{\numberline {12.4}FONCTION DANS LE JURY ET ORDRE DE CITATION}{81}{section.12.4}%
-\contentsline {subsection}{\numberline {12.4.1}Ordre de citation}{81}{subsection.12.4.1}%
-\contentsline {subsection}{\numberline {12.4.2}Les rapporteurs}{81}{subsection.12.4.2}%
-\contentsline {chapter}{\numberline {13}BIEN CITER SES SOURCES}{83}{chapter.13}%
-\contentsline {section}{\numberline {13.1}S'INFORMER SUR LE PLAGIAT}{83}{section.13.1}%
-\contentsline {section}{\numberline {13.2}LES IMAGES}{83}{section.13.2}%
-\contentsline {section}{\numberline {13.3}ARTICLES JOINTS A LA THÈSE}{83}{section.13.3}%
-\contentsline {chapter}{\numberline {14}DÉPOSER ET DIFFUSER SA THÈSE}{85}{chapter.14}%
-\contentsline {section}{\numberline {14.1}LES RESSOURCES A CONSULTER}{85}{section.14.1}%
-\contentsline {section}{\numberline {14.2}LES DÉMARCHES}{85}{section.14.2}%
-\contentsline {chapter}{\numberline {15}ANNEXE : LES LOGOS INSTITUTIONNELS}{87}{chapter.15}%
-\contentsline {section}{\numberline {15.1}LE LOGO DE L’UNIVERSITÉ PARIS-SACLAY}{87}{section.15.1}%
-\contentsline {section}{\numberline {15.2}LOGOS, NUMÉROS D’ACCRÉDITATION ET DÉNOMINATIONS DES ÉCOLES DOCTORALES}{87}{section.15.2}%
+\contentsline {chapter}{\numberline {7}Dépliement du problème : une approche événementielle}{67}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Motivation : Du traitement de séquence à la modélisation dynamique}{67}{section.7.1}%
+\contentsline {subsection}{\numberline {7.1.1}Le goulot d'étranglement des architectures Seq2Seq}{67}{subsection.7.1.1}%
+\contentsline {subsection}{\numberline {7.1.2}Le DCI comme système dynamique réactif}{67}{subsection.7.1.2}%
+\contentsline {section}{\numberline {7.2}Formalisation du problème "Flux-à-flux"}{68}{section.7.2}%
+\contentsline {subsection}{\numberline {7.2.1}Contraintes architecturales et choix de conception}{68}{subsection.7.2.1}%
+\contentsline {paragraph}{Contrainte 1 : Discrétisation de la réponse}{68}{paragraph*.21}%
+\contentsline {paragraph}{Contrainte 2 : Condition d'arrêt}{68}{paragraph*.22}%
+\contentsline {paragraph}{Contrainte 3 : Maintien du contexte}{68}{paragraph*.23}%
+\contentsline {section}{\numberline {7.3}Protocole de transformation des données}{69}{section.7.3}%
+\contentsline {subsection}{\numberline {7.3.1}Illustration du mécanisme}{69}{subsection.7.3.1}%
+\contentsline {section}{\numberline {7.4}Validation expérimentale sur architectures récurrentes}{69}{section.7.4}%
+\contentsline {subsection}{\numberline {7.4.1}Implémentation du protocole et architectures}{70}{subsection.7.4.1}%
+\contentsline {subsection}{\numberline {7.4.2}Stratégie d'évaluation : Traduction vs Prévision}{70}{subsection.7.4.2}%
+\contentsline {subsection}{\numberline {7.4.3}Analyse des résultats}{70}{subsection.7.4.3}%
+\contentsline {section}{\numberline {7.5}Validation expérimentale sur architectures récurrentes}{71}{section.7.5}%
+\contentsline {subsection}{\numberline {7.5.1}Protocole d'évaluation en mode "Forecasting"}{71}{subsection.7.5.1}%
+\contentsline {subsection}{\numberline {7.5.2}Comparaison des architectures}{71}{subsection.7.5.2}%
+\contentsline {section}{\numberline {7.6}Validation expérimentale sur architectures récurrentes}{72}{section.7.6}%
+\contentsline {subsection}{\numberline {7.6.1}Protocole d'évaluation en mode "Forecasting"}{72}{subsection.7.6.1}%
+\contentsline {subsection}{\numberline {7.6.2}Comparaison des architectures}{72}{subsection.7.6.2}%
+\contentsline {subsection}{\numberline {7.6.3}Rôle critique de l'optimisation des hyperparamètres}{73}{subsection.7.6.3}%
+\contentsline {chapter}{\numberline {8}AVERTISSEMENT}{75}{chapter.8}%
+\contentsline {chapter}{\numberline {9}COMPOSITION GÉNÉRALE, CHARTE GRAPHIQUE}{77}{chapter.9}%
+\contentsline {section}{\numberline {9.1}COMPOSITION DU DOCUMENT}{77}{section.9.1}%
+\contentsline {section}{\numberline {9.2}QUELS LOGOS FAIRE FIGURER ?}{77}{section.9.2}%
+\contentsline {section}{\numberline {9.3}POLICES DE CARACTÈRES ET COULEURS}{77}{section.9.3}%
+\contentsline {chapter}{\numberline {10}INFORMATIONS GÉNÉRALES SUR LA PAGE DE COUVERTURE}{79}{chapter.10}%
+\contentsline {section}{\numberline {10.1}TITRE DE LA THÈSE ET LANGUE(S)}{79}{section.10.1}%
+\contentsline {section}{\numberline {10.2}SPÉCIALITÉ DE DOCTORAT}{79}{section.10.2}%
+\contentsline {section}{\numberline {10.3}UNITÉ DE RECHERCHE}{80}{section.10.3}%
+\contentsline {section}{\numberline {10.4}LE RÉFÉRENT}{80}{section.10.4}%
+\contentsline {section}{\numberline {10.5}GRADUATE SCHOOL}{81}{section.10.5}%
+\contentsline {section}{\numberline {10.6}ÉCOLE DOCTORALE}{81}{section.10.6}%
+\contentsline {section}{\numberline {10.7}LIEU ET DATE DE SOUTENANCE}{82}{section.10.7}%
+\contentsline {chapter}{\numberline {11}CIVILITÉ, FÉMINISATION DES TITRES ET FONCTIONS}{83}{chapter.11}%
+\contentsline {chapter}{\numberline {12}PRÉSENTATION DE LA DIRECTION DE LA THÈSE OU DE L’ÉQUIPE D’ENCADREMENT}{85}{chapter.12}%
+\contentsline {chapter}{\numberline {13}COMPOSITION DU JURY }{87}{chapter.13}%
+\contentsline {section}{\numberline {13.1}A QUOI SERVENT CES INFORMATIONS ?}{87}{section.13.1}%
+\contentsline {section}{\numberline {13.2}LÉGITIMITÉ ACADÉMIQUE}{87}{section.13.2}%
+\contentsline {section}{\numberline {13.3}INDÉPENDANCE}{88}{section.13.3}%
+\contentsline {section}{\numberline {13.4}FONCTION DANS LE JURY ET ORDRE DE CITATION}{89}{section.13.4}%
+\contentsline {subsection}{\numberline {13.4.1}Ordre de citation}{89}{subsection.13.4.1}%
+\contentsline {subsection}{\numberline {13.4.2}Les rapporteurs}{89}{subsection.13.4.2}%
+\contentsline {chapter}{\numberline {14}BIEN CITER SES SOURCES}{91}{chapter.14}%
+\contentsline {section}{\numberline {14.1}S'INFORMER SUR LE PLAGIAT}{91}{section.14.1}%
+\contentsline {section}{\numberline {14.2}LES IMAGES}{91}{section.14.2}%
+\contentsline {section}{\numberline {14.3}ARTICLES JOINTS A LA THÈSE}{91}{section.14.3}%
+\contentsline {chapter}{\numberline {15}DÉPOSER ET DIFFUSER SA THÈSE}{93}{chapter.15}%
+\contentsline {section}{\numberline {15.1}LES RESSOURCES A CONSULTER}{93}{section.15.1}%
+\contentsline {section}{\numberline {15.2}LES DÉMARCHES}{93}{section.15.2}%
+\contentsline {chapter}{\numberline {16}ANNEXE : LES LOGOS INSTITUTIONNELS}{95}{chapter.16}%
+\contentsline {section}{\numberline {16.1}LE LOGO DE L’UNIVERSITÉ PARIS-SACLAY}{95}{section.16.1}%
+\contentsline {section}{\numberline {16.2}LOGOS, NUMÉROS D’ACCRÉDITATION ET DÉNOMINATIONS DES ÉCOLES DOCTORALES}{95}{section.16.2}%

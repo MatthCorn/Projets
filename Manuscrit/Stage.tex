@@ -1,0 +1,144 @@
+\chapter{Dépliement du problème : une approche événementielle}
+Ce chapitre introduit une méthodologie alternative pour le traitement des signaux radar. En rupture avec les approches globales de type \textit{sequence-to-sequence} (Seq2Seq) abordées précédemment, nous proposons ici une reformulation du problème axée sur la causalité et le traitement flux-à-flux (\textit{stream processing}). Cette approche vise à s'affranchir des limitations de longueur de séquence tout en mimant plus fidèlement le comportement physique du système de Détection et Caractérisation des Impulsions (DCI).
+\section{Motivation : Du traitement de séquence à la modélisation dynamique}
+L'approche classique consistant à traiter l'intégralité d'une séquence d'impulsions en une seule passe se heurte à deux obstacles majeurs : un goulot d'étranglement computationnel et une dissonance conceptuelle avec le système réel.
+\subsection{Le goulot d'étranglement des architectures Seq2Seq}
+Le premier obstacle est la difficulté intrinsèque des architectures neuronales actuelles à maintenir des dépendances temporelles sur de longs horizons :
+\begin{itemize}
+\item \textbf{Architectures récurrentes (RNN/LSTM) :} Ces modèles peinent à conserver une mémoire contextuelle pertinente au-delà d'une dizaine d'éléments. La propagation du gradient à travers le temps (Backpropagation Through Time) sur de longues séquences entraîne des problèmes de disparition ou d'explosion du gradient, rendant l'apprentissage instable.
+\item \textbf{Architectures attentionnelles (Transformers) :} Bien que plus robustes, elles présentent une complexité algorithmique quadratique $\mathcal{O}(N^2)$ en fonction de la longueur de la séquence. Au-delà de séquences de l'ordre de 1000 éléments, l'empreinte mémoire devient prohibitive.
+\end{itemize}
+Ces limitations imposent souvent des mécanismes de segmentation arbitraires (découpage de la scène en sous-blocs) qui brisent la continuité temporelle du signal et nuisent à la cohérence globale de la détection.
+\subsection{Le DCI comme système dynamique réactif}
+Le second obstacle est d'ordre conceptuel. Modéliser le DCI comme une fonction globale $f(\mathbf{X}_{total}) \to \mathbf{Y}_{total}$ est une approximation qui masque la réalité physique du module. Le DCI ne "voit" pas le futur ; il fonctionne intrinsèquement en mode événementiel.
+C'est un système dynamique réactif régis par deux types d'événements :
+\begin{enumerate}
+\item \textbf{L'arrivée d'une impulsion incidente} déclenche une mise à jour des corrélations et de l'état des mémoires internes.
+\item \textbf{L'émission d'une impulsion synthétisée} par le mécanisme de suivi provoque la libération de ressources mémoires.
+\end{enumerate}
+Il apparaît donc plus naturel de chercher à modéliser ce comportement "pas-à-pas". L'objectif est de transformer le problème de prédiction globale en un problème de prédiction locale causale : étant donné une impulsion incidente, le modèle doit prédire la cascade d'événements (émissions) qui surviennent avant l'arrivée de l'impulsion incidente suivante.
+\section{Formalisation du problème "Flux-à-flux"}
+Pour implémenter cette approche avec un réseau de neurones, nous devons transformer la structure des données. Cette transformation résulte de la confrontation entre la nature continue du flux radar et la nature discrète des réseaux de neurones. Nous détaillons ici les choix de conception nécessaires pour résoudre ce conflit.
+\subsection{Contraintes architecturales et choix de conception}
+Un réseau de neurones standard est une fonction $f: \mathcal{X} \to \mathcal{Y}$ qui associe un tenseur de sortie unique à un tenseur d'entrée unique. Cette définition rigide nous impose plusieurs contraintes pour le traitement d'un flux d'impulsions incidentes $\{I_k\}$ et d'impulsions émises (sorties) $\{O_k\}$ :
+\paragraph{Contrainte 1 : Discrétisation de la réponse}
+Le modèle ne peut pas "naturellement" générer un nombre variable d'impulsions de sortie pour une seule impulsion d'entrée sans modifier profondément son architecture.
+\begin{itemize}
+\item \textit{Choix de conception :} Nous adoptons une approche itérative. Nous interrogeons le réseau de manière répétée avec la même impulsion incidente tant qu'il reste des impulsions à générer pour ce créneau temporel.
+\end{itemize}
+\paragraph{Contrainte 2 : Condition d'arrêt}
+Puisque le nombre de sorties est variable (potentiellement nul), le modèle doit posséder un moyen explicite de signaler la fin de la séquence d'émission associée à l'impulsion incidente courante.
+\begin{itemize}
+\item \textit{Choix de conception :} Nous introduisons un jeton de contrôle spécial, noté \texttt{NEXT}. La prédiction de ce jeton par le réseau signifie "Il n'y a plus d'émission à générer, passez à l'impulsion incidente suivante".
+\end{itemize}
+\paragraph{Contrainte 3 : Maintien du contexte}
+Le modèle doit savoir où il se situe dans la séquence des émissions (doit-il prédire la première ou la troisième impulsion associée à $I_k$ ?).
+\begin{itemize}
+\item \textit{Choix de conception :} Nous optons pour une architecture à double entrée. Le modèle reçoit à chaque pas :
+\begin{enumerate}
+\item L'impulsion incidente courante $I_k$.
+\item La dernière prédiction effectuée $P_{t-1}$ (ou un jeton d'initialisation).
+\end{enumerate}
+\end{itemize}
+Ce dernier choix s'apparente à une approche auto-régressive guidée (Teacher Forcing), soulageant la mémoire interne du modèle en lui rappelant explicitement son état précédent.
+\section{Protocole de transformation des données}
+La combinaison de ces choix aboutit à un algorithme de "dépliement" des données. Une séquence temporelle d'événements est transformée en une série de couples $((\text{Entrées}), \text{Cible})$ indépendants.
+\subsection{Illustration du mécanisme}
+Considérons une chronologie mixte d'événements réels, triés par temps, impliquant 3 impulsions incidentes ($I$) et 5 impulsions émises ($O$) :
+\begin{equation}
+\text{Séquence Globale} : [I_1, \mathbf{O_1}, \mathbf{O_2}, \mathbf{O_3}, I_2, I_3, \mathbf{O_4}, \mathbf{O_5}]
+\end{equation}
+L'objectif est de prédire les événements en gras ($O$) en fonction des événements incidents ($I$). Le jeton \texttt{NEXT} est utilisé pour initialiser la boucle (entrée) et pour la clore (cible).
+Le processus de génération des données d'entraînement se déroule comme suit :
+\begin{enumerate}
+\item \textbf{Traitement de $I_1$ (3 émissions associées) :}
+\begin{itemize}
+\item \textit{Entrée :} $(I_1, \texttt{NEXT})$ $\rightarrow$ \textit{Cible :} $O_1$ (Première émission).
+\item \textit{Entrée :} $(I_1, O_1)$ $\rightarrow$ \textit{Cible :} $O_2$ (Le modèle sait qu'il a émis $O_1$).
+\item \textit{Entrée :} $(I_1, O_2)$ $\rightarrow$ \textit{Cible :} $O_3$ (Le modèle sait qu'il a émis $O_2$).
+\item \textit{Entrée :} $(I_1, O_3)$ $\rightarrow$ \textit{Cible :} \texttt{NEXT} (Fin des émissions pour $I_1$).
+\end{itemize}
+\item \textbf{Traitement de $I_2$ (0 émission associée) :}
+\begin{itemize}
+    \item L'impulsion suivante $I_3$ arrive avant toute émission.
+    \item \textit{Entrée :} $(I_2, \texttt{NEXT})$ $\rightarrow$ \textit{Cible :} \texttt{NEXT} (Passage immédiat à la suite).
+\end{itemize}
+
+\item \textbf{Traitement de $I_3$ (2 émissions associées) :}
+\begin{itemize}
+    \item \textit{Entrée :} $(I_3, \texttt{NEXT})$ $\rightarrow$ \textit{Cible :} $O_4$.
+    \item \textit{Entrée :} $(I_3, O_4)$ $\rightarrow$ \textit{Cible :} $O_5$.
+    \item \textit{Entrée :} $(I_3, O_5)$ $\rightarrow$ \textit{Cible :} \texttt{NEXT}.
+\end{itemize}
+\end{enumerate}
+Au final, la séquence temporelle initiale est convertie en un ensemble de 8 échantillons d'apprentissage. Cette transformation permet de ramener un problème de traitement de séquence complexe et long à une succession de tâches de régression locales de courte portée, parfaitement adaptées à l'entraînement d'un réseau de neurones récurrent supervisé.
+
+
+\section{Validation expérimentale sur architectures récurrentes}
+Afin de valider la pertinence de cette formulation événementielle (flux-à-flux), nous avons mené une étude comparative sur des architectures de type réseaux de neurones récurrents. Ces travaux, présentés lors de la conférence [Nom de la conf si tu veux, sinon "publiés récemment"], explorent la capacité de modèles tels que les RNN, LSTM et leurs variantes attentionnelles à apprendre cette dynamique causale.
+\subsection{Implémentation du protocole et architectures}
+Conformément au formalisme établi précédemment, l'entrée du décodeur à chaque pas de temps $s$ est construite en concaténant l'impulsion incidente courante $x_s$, la précédente prédiction $\tilde{y}_{s-1}$ et une information temporelle relative. Cette caractéristique temporelle, notée $\Delta t_s$, est cruciale pour le mode flux-à-flux : elle mesure le délai entre l'arrivée de la nouvelle impulsion et la fin de la précédente émission ($TOA(x_s) - TOE(\hat{y}_{s-1})$). Elle permet au modèle de s'affranchir des indices absolus et de traiter des séquences de longueur arbitraire, mimant le comportement "sans état" d'un capteur réel.
+Nous avons évalué plusieurs familles d'architectures sur ce protocole : \begin{itemize} \item Les baselines récurrentes : RNN, GRU et LSTM classiques. \item Les variantes augmentées par attention : L'ajout de mécanismes d'attention (type Bahdanau ou Luong) permet au modèle de requêter ses états passés pour affiner sa prédiction courante, compensant la perte de mémoire contextuelle sur les longues séquences. \end{itemize}
+\subsection{Stratégie d'évaluation : Traduction vs Prévision}
+Pour isoler les difficultés, nous avons comparé deux modes d'apprentissage: \begin{enumerate} \item La formulation "Traduction" (Translation) : Le modèle a accès à la totalité de la séquence d'entrée (futur inclus) via un encodeur bidirectionnel. Bien que non réaliste opérationnellement, ce mode sert de banc d'essai (benchmark) pour mesurer la capacité maximale de modélisation des architectures. \item La formulation "Prévision" (Forecasting) : C'est l'implémentation stricte de notre approche événementielle. Le modèle est purement causal et auto-régressif, ne voyant que le passé et le présent. C'est la configuration cible pour le déploiement. \end{enumerate}
+\subsection{Analyse des résultats}
+Les expérimentations, menées sur un jeu de données synthétique de 500 000 séquences, ont mis en évidence plusieurs dynamiques clés.
+Limites des récurrents simples : Dans la configuration cible (Forecasting), les architectures récurrentes basiques (RNN, GRU) montrent rapidement leurs limites. Le RNN sature dès les courtes séquences, et bien que le LSTM offre une bonne précision à court terme, il souffre de dérive (drift) sur les horizons longs (50 impulsions et plus).
+Apport décisif de l'attention : L'introduction de mécanismes d'attention change la donne. La variante LSTM avec attention de Luong s'impose comme la plus performante. En mode traduction, elle divise l'erreur par trois par rapport à un LSTM standard. En mode prévision, elle parvient à maintenir une stabilité remarquable sur les longues séquences, là où les autres modèles divergent. Cela confirme que la mémoire seule ne suffit pas ; la capacité à "relire" l'histoire récente est indispensable pour maintenir la cohérence du flux.
+Rôle de l'optimisation bayésienne : Il est important de noter que ces performances n'ont été atteintes que grâce à une stratégie d'optimisation des hyperparamètres rigoureuse. L'utilisation d'algorithmes bayésiens (TPE via Optuna) a permis d'identifier des configurations robustes (notamment sur le learning rate et le dropout), réduisant l'erreur de validation d'un facteur 4 par rapport aux recherches manuelles.
+En conclusion, ces travaux valident la faisabilité de l'approche événementielle "dépliée". Ils démontrent qu'un modèle LSTM augmenté par attention, correctement optimisé, est capable d'apprendre la logique causale du DCI et de générer des séquences d'impulsions cohérentes en flux continu.
+
+
+\section{Validation expérimentale sur architectures récurrentes}
+La formalisation du problème sous forme de flux causal, telle que définie dans la section précédente, a fait l'objet d'une validation expérimentale dédiée. Ces travaux, détaillés dans [CITER ARTICLE], visaient à identifier l'architecture récurrente la plus à même de modéliser la dynamique événementielle du DCI.
+Nous présentons ici le protocole expérimental mis en place et les résultats comparatifs obtenus sur des architectures de type RNN, GRU et LSTM.
+\subsection{Protocole d'évaluation en mode "Forecasting"}
+Pour coller à la réalité opérationnelle du système, l'entraînement et l'évaluation ont été réalisés exclusivement en mode prévision (Forecasting). Dans cette configuration, le modèle ne dispose d'aucune information sur le futur de la séquence. À chaque pas de temps $t$, l'entrée du réseau est construite par concaténation de trois éléments : \begin{enumerate} \item L'impulsion incidente courante $x_t$ (caractéristiques du signal radar). \item La prédiction précédente du modèle $\hat{y}_{t-1}$ (ou la vérité terrain lors de l'apprentissage avec Teacher Forcing). \item Une caractéristique temporelle relative $\Delta t$, mesurant le délai entre l'arrivée de l'impulsion courante et la fin de l'émission précédente. \end{enumerate} L'utilisation de $\Delta t$ est déterminante : elle permet au modèle de s'affranchir des références temporelles absolues et de traiter des flux de durée arbitraire, mimant le comportement "sans état" (stateless) du système physique .
+Les modèles ont été entraînés sur un jeu de données synthétique de 500 000 séquences, couvrant une large variété de densités d'impulsions et de scénarios d'interférence.
+\subsection{Comparaison des architectures}
+Trois familles d'architectures récurrentes ont été évaluées : les RNN classiques, les GRU (Gated Recurrent Units) et les LSTM (Long Short-Term Memory). De plus, pour pallier la dégradation potentielle de la mémoire sur les longues séquences, des variantes augmentées par des mécanismes d'attention (Attention additive et Attention de Luong) ont été testées .
+Les performances, mesurées en erreur quadratique moyenne normalisée (NRMSE) sur des horizons de prévision croissants, mettent en évidence une hiérarchie claire :
+\begin{itemize} \item Échec des modèles simples : Le RNN standard sature très vite, avec une erreur élevée (0.21) dès que l'horizon dépasse 20 impulsions. Le LSTM classique, bien que performant sur les courts horizons, souffre de dérive (drift) sur les séquences longues, perdant la cohérence du contexte. \item Robustesse du GRU : Le GRU offre un compromis intéressant, montrant une meilleure stabilité que le LSTM simple sur les longs horizons (erreur de 0.18 à 50 impulsions contre 0.20 pour le LSTM). \item Supériorité de l'Attention de Luong : L'architecture LSTM augmentée par l'attention de Luong (LSTMAT-L) surpasse toutes les autres configurations. Elle atteint l'erreur la plus faible sur les courts horizons (0.07 à 10 impulsions) et, surtout, maintient cette précision stable sur les longs horizons (0.15 à 50 impulsions). \end{itemize}
+Ces résultats démontrent que la mémoire récurrente seule est insuffisante pour modéliser la complexité du DCI sur la durée. La capacité du mécanisme d'attention à "relire" les états passés pour contextualiser la prédiction courante s'avère indispensable.
+
+
+\section{Validation expérimentale sur architectures récurrentes}
+La formalisation du problème sous forme de flux causal, telle que définie dans la section précédente, a fait l'objet d'une validation expérimentale dédiée. Ces travaux, détaillés dans [CITER VOTRE ARTICLE CAID], visaient à identifier l'architecture récurrente la plus à même de modéliser la dynamique événementielle du DCI dans un contexte de simulation.
+Nous présentons ici le protocole expérimental mis en place et les résultats comparatifs obtenus, en nous concentrant exclusivement sur la formulation "Forecasting" qui reflète les contraintes de causalité du système réel.
+\subsection{Protocole d'évaluation en mode "Forecasting"}
+Pour garantir la représentativité opérationnelle, l'entraînement et l'évaluation ont été réalisés en mode prévision causale (Forecasting). Dans cette configuration, le modèle ne dispose d'aucune information sur le futur de la séquence.
+À chaque pas de temps $s$, l'entrée du décodeur $z_s$ est construite par la concaténation de trois éléments: \begin{enumerate} \item L'impulsion incidente courante $x_s$. \item La prédiction précédente du modèle $\tilde{y}_{s-1}$ (ou la vérité terrain lors de l'apprentissage avec Teacher Forcing). \item Une caractéristique temporelle relative $\Delta t_s$, mesurant le délai entre l'arrivée de l'impulsion courante et la fin de l'émission précédente ($\Delta t_s = TOA(x_s) - TOE(\tilde{y}_{s-1})$). \end{enumerate}
+L'utilisation de $\Delta t_s$ est déterminante : normalisée par séquence, elle permet au modèle de s'affranchir des références temporelles absolues et de traiter des flux de durée arbitraire et de densité variable, mimant le comportement du système physique.
+Les modèles ont été entraînés sur un jeu de données synthétique de 500 000 séquences générées par un simulateur haute-fidélité, couvrant une large gamme de contextes opérationnels.
+\subsection{Comparaison des architectures}
+Trois familles d'architectures récurrentes ont été évaluées : les cellules classiques (RNN, GRU, LSTM) et leurs variantes augmentées par des mécanismes d'attention (Attention additive et Attention de Luong).
+Les performances, mesurées en erreur quadratique moyenne normalisée (NRMSE) sur des horizons de prévision croissants (10, 20 et 50 impulsions), mettent en évidence une hiérarchie claire:
+\begin{itemize} \item Instabilité des récurrents simples sur le long terme : Le RNN standard sature rapidement avec une erreur élevée (0.21) dès que l'horizon s'allonge. Le LSTM classique, bien que très performant sur les courts horizons (0.1146 à 10 impulsions), souffre de dérive (drift) sur les séquences plus longues (0.2001 à 50 impulsions). Le GRU offre une stabilité intermédiaire mais reste limité .
+\item **L'apport décisif de l'Attention de Luong :** L'architecture **LSTM augmentée par l'attention de Luong** (LSTMAT-L) surpasse toutes les autres configurations. Elle atteint l'erreur la plus faible sur les courts horizons (0.0744) et maintient une stabilité remarquable sur les longs horizons (0.1542 à 50 impulsions)[cite: 570].
+\end{itemize}
+Ces résultats confirment que pour reproduire la logique du "mesureur" radar, la mémoire récurrente seule est insuffisante ; la capacité du modèle à "relire" ses états passés via un mécanisme d'attention précis (bilinéaire type Luong) est indispensable pour maintenir la cohérence temporelle du flux.
+\subsection{Rôle critique de l'optimisation des hyperparamètres}
+Enfin, il convient de souligner que la convergence de ces modèles a nécessité une méthodologie d'optimisation rigoureuse. Les premières expérimentations manuelles plafonnaient à une erreur de validation élevée ($\approx 0.35$). L'adoption d'une stratégie d'optimisation bayésienne (TPE via le framework Optuna) a permis d'explorer efficacement l'espace des hyperparamètres. Cette approche a réduit l'erreur de validation d'un facteur 4, atteignant une performance optimale de 0.08. Ce constat établit que pour des tâches de modélisation dynamique complexe, l'optimisation automatisée n'est pas une option de confort mais une composante méthodologique critique pour débloquer le potentiel des architectures neuronales.
+
+\section{Validation de l'approche sur architectures récurrentes}
+Dans cette section, nous présentons les résultats publié à CAID [ref]. Cet article démontre que dans le cadre des architectures récurrentes, l'approche flux-à-flux est bien plus pertinente que l'approche séquences-ver- séquences. L'article établie aussi quelle architecture récurrente est la plus performante dans ce contexte. Cette section présente uniquement les résultats de montage dit "en mode prévision" qui correspond au mode flux-à-flux. Nous omettrons ici la description de la transformation précises des données pour les rendre exploitables par les architectures, ainsi que la métrique calculé pour l'optimisation et le suivi de l'apprentissage. En effet, ces informations sont présentes en détail dans l'article [ref]. De plus une transformation semblable, utilisée dans la section suivante qui présente une extension des expériences, est entièrement décrite dans la section suivante. La loss peut quand-à-elle être considérée identique à l'équation (4) mais où le terme de base (3) est calculé sur la séquence dépliée.
+
+\subsection{Les architectures}
+Les architectures évaluées sont des architectures classiques pour le traitement de séquences flux-à-flux. [dire pourquoi ces choix d'architectures est pertinent dans le cadre d'une comparaison (basé sur l'article + vérité générale)]:
+\begin{itemize}
+\item RNN : c'est l'architecture de base, de référence
+\item LSTM : c'est une amélioration aidant les longues dépendances
+\item GRU : [décrire en 2 mots]
+\item LSTMAT : [décrire]
+\item LSTMAT-L : [décrire]
+\end{itemize}
+
+\subsection{Résultats expérimentaux}
+[Les résultats concernent que la configuration "forcasting"]
+[est-ce qu'il faut expliquer comment c'est fait ? pour moi c'est tellement simple une fois que j'ai décrit la séquence d'input et la séquence d'output attendu que je ne vois pas quoi dire. On peut mentionner que les architectures ont subit une optimisation préalable des hyper-paramètres 
+
+
+
+
+
+

@@ -1,3 +1,4 @@
+from Inter.Linearisation.GRU import GRUNetwork
 from Inter.Linearisation.SpecialUtils import GetData
 from Inter.Linearisation.TCNetwork import TCNet
 from Inter.Linearisation.LSTMNetwork import LSTMWithAttention as LSTM
@@ -86,7 +87,7 @@ if __name__ == '__main__':
     if sys.platform == "win32":
         p.nice(psutil.HIGH_PRIORITY_CLASS)
     ################################################################################################################################################
-    Network = {'TCN': TCNet, 'LSTM': LSTM, 'Transformer': Transformer}[param['network']]
+    Network = {'TCN': TCNet, 'LSTM': LSTM, 'Transformer': Transformer, 'GRU': GRUNetwork}[param['network']]
 
     d_out = param['d_in']
 
