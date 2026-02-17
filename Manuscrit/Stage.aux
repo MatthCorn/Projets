@@ -37,8 +37,21 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {7.6.3}Fonction de perte et métriques d'évaluation}{76}{subsection.7.6.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {7.6.3.1}Erreur de reconstruction pondérée ($\mathcal  {L}_{reg}$)}{76}{subsubsection.7.6.3.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {7.6.3.2}Erreur de classification par MCC différentiable ($\mathcal  {L}_{class}$)}{77}{subsubsection.7.6.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.6.4}Résultats et Analyse Comparative}{77}{subsection.7.6.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.6.4.1}Performance globale et convergence}{77}{subsubsection.7.6.4.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7.1}{\ignorespaces Comparaison des dynamiques d'apprentissage. Le Transformer montre une convergence plus lente initialement mais atteint un plateau asymptotique plus bas que le GRU.}}{78}{figure.caption.28}\protected@file@percent }
+\newlabel{fig:learning_curves}{{7.1}{78}{Comparaison des dynamiques d'apprentissage. Le Transformer montre une convergence plus lente initialement mais atteint un plateau asymptotique plus bas que le GRU}{figure.caption.28}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {7.5}{\ignorespaces Performances comparées sur le jeu de test (valeurs fictives pour illustration). Le Transformer excelle en précision mais le GRU reste le plus rapide en inférence séquentielle.}}{78}{table.caption.29}\protected@file@percent }
+\newlabel{tab:global_results}{{7.5}{78}{Performances comparées sur le jeu de test (valeurs fictives pour illustration). Le Transformer excelle en précision mais le GRU reste le plus rapide en inférence séquentielle}{table.caption.29}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.6.4.2}Robustesse face à la longueur de séquence}{78}{subsubsection.7.6.4.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7.2}{\ignorespaces Évolution de la performance de régression en fonction de la longueur de la séquence traitée. Contrairement aux approches globales, les architectures auto-régressives maintiennent une performance stable sur le long terme.}}{79}{figure.caption.30}\protected@file@percent }
+\newlabel{fig:length_robustness}{{7.2}{79}{Évolution de la performance de régression en fonction de la longueur de la séquence traitée. Contrairement aux approches globales, les architectures auto-régressives maintiennent une performance stable sur le long terme}{figure.caption.30}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.6.4.3}Analyse qualitative des générations}{79}{subsubsection.7.6.4.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7.3}{\ignorespaces Exemple de reconstruction sur une fenêtre complexe. Le modèle identifie correctement qu'une impulsion incidente $I_k$ doit générer deux impulsions de sortie $O_a, O_b$ avant de passer à la suivante (prédiction correcte des tokens \texttt  {NEXT}).}}{79}{figure.caption.31}\protected@file@percent }
+\newlabel{fig:qualitative}{{7.3}{79}{Exemple de reconstruction sur une fenêtre complexe. Le modèle identifie correctement qu'une impulsion incidente $I_k$ doit générer deux impulsions de sortie $O_a, O_b$ avant de passer à la suivante (prédiction correcte des tokens \texttt {NEXT})}{figure.caption.31}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.6.5}Conclusion sur les extensions}{79}{subsection.7.6.5}\protected@file@percent }
 \@setckpt{Stage}{
-\setcounter{page}{78}
+\setcounter{page}{81}
 \setcounter{equation}{5}
 \setcounter{enumi}{3}
 \setcounter{enumii}{0}
@@ -49,12 +62,12 @@
 \setcounter{part}{0}
 \setcounter{chapter}{7}
 \setcounter{section}{6}
-\setcounter{subsection}{3}
-\setcounter{subsubsection}{2}
+\setcounter{subsection}{5}
+\setcounter{subsubsection}{0}
 \setcounter{paragraph}{0}
 \setcounter{subparagraph}{0}
-\setcounter{figure}{0}
-\setcounter{table}{4}
+\setcounter{figure}{3}
+\setcounter{table}{5}
 \setcounter{parentequation}{0}
 \setcounter{caption@flags}{2}
 \setcounter{continuedfloat}{0}
@@ -66,7 +79,7 @@
 \setcounter{section@level}{0}
 \setcounter{Item}{7}
 \setcounter{Hfootnote}{0}
-\setcounter{bookmark@seq@number}{73}
+\setcounter{bookmark@seq@number}{75}
 \setcounter{tabx@nest}{0}
 \setcounter{listtotal}{0}
 \setcounter{listcount}{0}

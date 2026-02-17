@@ -73,9 +73,11 @@ def PostProcess(Input, Output, Masks, len_in, len_out, n_data):
 
     ProcessedInput1 = torch.gather(Input, dim=1, index=Input_position.unsqueeze(-1).expand(*Input_position.shape, Input.shape[-1]))
     ProcessedInput2 = torch.gather(Output, dim=1, index=Output_position.unsqueeze(-1).expand(*Output_position.shape, Output.shape[-1]))
+    ProcessedOutput = torch.roll(ProcessedInput2, shifts=-1, dims=1)
+
     TOAInput1 = torch.gather(TOA_In, dim=1, index=Input_position)
     ProcessedInput2[..., -1] -= TOAInput1
-    ProcessedOutput = torch.roll(ProcessedInput2, shifts=-1, dims=1)
+    ProcessedOutput[..., -1] -= TOAInput1
 
     OnSequenceMask = (IsOutput_position + IsInput_position).unsqueeze(-1)
 
