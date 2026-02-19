@@ -1,4 +1,4 @@
-\chapter{Introduction}
+\chapter{Introduction (plan)}
 
 Le chapitre introduction comprendra les éléments suivants :
 \begin{itemize}
@@ -9,3 +9,79 @@ Le chapitre introduction comprendra les éléments suivants :
 \item Introduction succincte sur le domaine de l'IA
 \item Le plan de notre approche
 \end{itemize}
+
+\chapter{Introduction}
+\section{Contexte historique et technique de la guerre électronique}
+L'histoire de la guerre moderne est indissociable de la maîtrise du spectre électromagnétique. Dès lors que le radar est devenu le capteur principal des armées, assurant la surveillance aérienne et le guidage des armes, il est devenu simultanément une cible prioritaire. En émettant pour détecter, ces systèmes révèlent leur position et s'exposent à des contre-mesures. Cette vulnérabilité intrinsèque a donné naissance à la Guerre Électronique (GE), définie comme l'ensemble des actions visant à exploiter, réduire ou empêcher l'utilisation hostile du spectre électromagnétique tout en protégeant son utilisation par son propre camp.\\
+
+La synthèse historique et technique qui suit, décrivant l'évolution conjointe des radars et des systèmes de brouillage, est adaptée de l'ouvrage \textit{Fundamentals of electronic warfare} \cite{vakin_fundamentals_2001}. 
+
+\subsection{Genèse d'une course technologique} 
+L'émergence de la GE répond à une "dialectique du combat" entre les systèmes offensifs et défensifs. \\
+
+Les premières générations de radars, tels que les systèmes d'alerte ou de conduite de tir de la Seconde Guerre Mondiale (par exemple le Würzburg allemand), se caractérisaient par leur fréquence porteuse et leur période de répétition fixes. Les premières missions d'écoute aéroportées, connues sous le nom de vols Ferret et posant les fondations du Renseignement Électronique (Electronic Intelligence - ELINT), interceptèrent les signaux adverses pour en extraire la longueur d'onde et la cadence. Ce renseignement permit de concevoir des contre-mesures adaptées : lors du raid sur Hambourg en juillet 1943, le largage massif de bandelettes métalliques, taillées exactement à la demi-longueur d'onde des radars allemands, satura mécaniquement les écrans de défense. Ce brouillage passif doubla le taux de survivabilité des bombardiers alliés pendant de nombreux mois, forçant le radar à évoluer en retour.
+
+\subsection{La dynamique fréquentielle (Années 1950)} 
+Pour s'extraire de ce brouillage rudimentaire ciblé sur une fréquence connue, les radars ont été munis d'émetteurs pouvant modifier la fréquence de leur porteuse. Sur le plan offensif, le brouillage de barrage est apparu pour inonder une large bande spectrale, afin de couvrir toutes les fréquences de saut possibles. Sur le plan du renseignement, cette agilité a marqué la fin de l'écoute sur fréquence fixe : les intercepteurs ont dû évoluer vers des récepteurs à large bande instantanée, introduisant la notion de mesure de soutien électronique (Electronic Support Measures - ESM).
+
+\subsection{La cohérence, le Doppler et l'analyse fine (Années 1960-1970)} 
+L'avènement des radars cohérents a marqué un tournant technologique. En réalisant un filtrage Doppler, le radar est devenu capable d'annuler les échos fixes, rendant les nuages de bandelettes obsolètes. La GE a alors basculé dans l'ère du traitement fin du signal. Pour le brouillage, il a fallu développer des techniques de déception capables d'intercepter le signal, de le mettre en mémoire et de le réémettre avec des altérations précises de phase ou de retard pour créer de fausses cinématiques (leurrage en distance ou en vitesse). Pour la fonction ESM, la mission n'était plus simplement de mesurer l'enveloppe temporelle d'une impulsion mais aussi d'extraire et caractériser la modulation intra-impulsion (phase, fréquence) pour identifier la signature électromagnétique du radar adverse.
+
+\subsection{Complexité moderne et rôle de l'ELINT} 
+La phase actuelle se caractérise par l'utilisation d'antennes à balayage électronique et de formes d'onde discrètes, rendant les signaux difficiles à distinguer du bruit de fond.
+Dans ce contexte, la mission de Renseignement Électronique est double : détecter les émissions adverses pour permettre leur neutralisation, et analyser l'environnement de brouillage pour optimiser la protection de ses propres systèmes.
+
+\section{Du signal à l'information : le rôle du capteur ESM et du renseignement}
+Si l'évolution des architectures radar a façonné la complexité de l'environnement électromagnétique, c'est au capteur de Mesures de Soutien Électronique (ESM) qu'incombe la tâche de le décrypter. Contrairement au radar qui est un système actif, l'ESM opère de manière strictement passive pour écouter le spectre sans révéler la position du porteur. Son objectif est d'intercepter les émissions adverses pour transformer un flux analogique en données numériques structurées, ouvrant la voie à une exploitation tactique dans l'immédiat, puis une exploitation stratégique à plus long terme.
+
+\subsection{De l'onde à la donnée : intercepter et trier}
+Dans la réalité opérationnelle, une antenne de réception ne capte pas des signaux radar proprement isolés. Elle baigne en permanence dans un champ électromagnétique, où se superposent le bruit de fond naturel, les communications et les émissions simultanées de différents radars. Le premier rôle de la chaîne ESM est donc de scruter ce flux analogique pour extraire du bruit les brèves variations d'énergie correspondant à des impulsions incidentes.\\
+
+Lorsqu'une impulsion est ainsi détectée, elle est caractérisée numériquement sous la forme d'un vecteur compact appelé PDW (Pulse Descriptor Word). Un PDW résume la signature physique de l'impulsion à travers quelques paramètres clés :
+\begin{itemize}
+\item son temps d'arrivée (Time of arrival - ToA)
+\item sa durée (Longueur d'impulsion - LI)
+\item sa fréquence (Fréquence - Freq)
+\item son amplitude (Level - Lvl)
+\item sa direction d'arrivée (Direction of Arrival - DoA)\\
+\end{itemize} 
+
+Le flux continu de PDW mélangés est transmis à une unité de traitement chargée du désentrelacement. Cet algorithme cherche des corrélations fréquentielles dans le flux de PDW sur de courtes fenêtres temporelles, il sépare et regroupe les impulsions appartenant à un même radar pour former des regroupements élémentaires appelés \textit{plots}. Le flux de plots ainsi généré est transmis à une deuxième unité de traitement chargée du pistage. Cette fois à long terme mais sur un même principe de corrélation, les plots sont regroupés en différentes \textit{pistes} qui décrivent le comportement global de chaque émetteur (comme sa cadence d'observation ou le type de balayage de son antenne).
+
+\subsection{De l'alerte tactique à l'exploitation stratégique} 
+Une fois ces pistes reconstruites, la donnée est exploitée selon deux échelles de temps distinctes.
+
+En vol, le système opère à un niveau purement tactique. Le capteur ESM compare en temps réel les paramètres des pistes avec une base de données embarquée, communément appelée bibliothèque de menaces, pour identifier la classe du radar adverse. L'objectif ici est d'alerter l'équipage d'un accrochage potentiel et de déclencher automatiquement les contre-mesures adéquates, qu'il s'agisse de manœuvres évasives ou d'actions de brouillage.
+
+Les données ESM les plus complexes ou celles correspondant à des émissions inconnues de la bibliothèque sont enregistrées pour être analysées au sol. Des algorithmes lourds et des analystes spécialisés dépouillent ces enregistrements pour découvrir de nouveaux modes opératoires ou extraire des signatures matérielles uniques permettant d'identifier un émetteur spécifique. C'est cette boucle de renseignement différé qui permet de mettre à jour l'Ordre de Bataille Électronique et de reprogrammer les bibliothèques de toute la flotte, garantissant l'adaptation continue des forces face à l'évolution de la menace.
+
+
+\section{Le besoin de simulation et la problématique d'accélération}
+
+La chaîne de traitement de la Guerre Électronique, depuis la détection de l'impulsion par le capteur ESM jusqu'à l'identification de la menace, s'appuie sur une succession de différents algorithmes : désentrelacement, pistage, classification. Garantir la fiabilité opérationnelle de ces algorithmes exige de les tester intensivement lors des phases de développement et de validation.
+
+\subsection{L'impératif de la simulation numérique}
+
+Idéalement, ces algorithmes devraient être évalués sur des données réelles issues d'essais en vol. Néanmoins, les campagnes de vol se heurtent à des contraintes logistiques et financières majeures, tout en n'offrant qu'une représentativité limitée face à l'infinité des scénarios tactiques possibles. De plus, lors d'un vol réel, la "vérité terrain" absolue, c'est-à-dire la position et l'activité exactes de tous les émetteurs de la zone, n'est jamais parfaitement connue. Cette incertitude empêche d'évaluer objectivement si les algorithmes ont fonctionné comme voulu.
+
+Pour s'affranchir de ces limites, le recours à la simulation est souvent la solution privilégiée, et c'est celle employée dans notre cas d'étude. Grâce à un environnement virtuel auquel on fournit un scénario tactique décrivant parfaitement la vérité terrain (la cinématique et les modes de chaque radar), l'ensemble de la chaîne de l'information est modélisé : l'émission des impulsions par les radars adverses, les effets de propagation, l'impact des antennes, jusqu'au processus interne de détection du capteur ESM. À l'issue de cette simulation, un flux de PDW est généré, tel qu'il aurait été produit par un véritable équipement matériel. L'avantage de cette approche réside dans la maîtrise absolue de la vérité terrain. Elle permet de boucler le cycle de validation en confrontant directement au scénario initial les résultats reconstruits par les algorithmes situés en aval de la génération des PDW.
+
+\subsection{Problématique : le goulot d'étranglement temporel}
+
+Bien que cet environnement virtuel offre une capacité de génération de données maîtrisée et en grande quantité, sa mécanique de modélisation s'avère particulièrement lente. Cette lenteur devient problématique lors de la simulation de scénarios complexes impliquant un grand nombre de radars. De surcroît, elle interdit toute exécution en temps réel, un cas d'usage pourtant indispensable pour la formation des opérateurs sur des simulateurs interactifs, où l'humain doit pouvoir modifier la situation tactique en direct, par exemple en initiant des manœuvres d'évitement.
+
+Nos travaux de recherche s'inscrivent précisément dans ce contexte. L'objectif de cette thèse est d'identifier le goulot d'étranglement de l'environnement virtuel et d'étudier comment l'intelligence artificielle peut s'y substituer pour accélérer la génération des données en conservant la même représentativité. Le chapitre suivant s'attachera à détailler l'architecture interne de cet environnement virtuel afin de formaliser techniquement cette problématique.
+
+\section{Organisation du manuscrit}
+
+Pour répondre à cette problématique d'accélération par l'intelligence artificielle, nos travaux s'articulent autour d'une analyse progressive, allant de la compréhension physique du système jusqu'à l'élaboration d'architectures neuronales avancées. Ce manuscrit est ainsi structuré en cinq chapitres principaux :
+
+Le Chapitre 1 pose le cadre formel et technique de notre problématique. Il détaille le principe de fonctionnement du capteur ESM réel et de son homologue virtuel afin d'isoler précisément le goulot d'étranglement computationnel. Cette analyse nous permettra de traduire le besoin opérationnel d'accélération en un problème mathématique d'apprentissage automatique, d'en exposer les difficultés intrinsèques, et de définir les axes de recherche qui guideront nos contributions.
+
+Le Chapitre 2 est consacré à l'état de l'art. Il s'ouvre sur une clarification terminologique essentielle distinguant la notion d'environnement numérique de celle, souvent employée à tort, de "jumeau numérique". Nous introduirons ensuite les concepts fondamentaux de l'intelligence artificielle, de l'apprentissage automatique et de l'apprentissage profond, qui constituent la colonne vertébrale de nos solutions. La suite du chapitre dresse un panorama de l'IA appliquée à la simulation, en ciblant spécifiquement deux domaines qui se recoupent au cœur de nos travaux : l'IA générative et les architectures dédiées au traitement de séquences.
+
+Le Chapitre 3 présente notre première contribution méthodologique, dont les résultats ont fait l'objet d'une publication à la conférence EUSIPCO. Ce chapitre introduit les fondations de notre approche d'apprentissage adaptées aux spécificités des signaux radar. Nous y proposerons notamment une méthode inédite de pondération de l'erreur ainsi qu'une stratégie d'apprentissage spécifique qui serviront de socle et de référence (baseline) pour la suite de nos recherches.
+
+Le Chapitre 4 expose la contribution principale de cette thèse. Nous y démontrerons comment les architectures de type \textit{Transformers} peuvent être adaptées pour générer des séquences d'impulsions avec une grande précision. Pour surmonter les limites de ces modèles face à des flux de données continus, nous introduirons un principe de fenêtrage dynamique, permettant de traiter et de générer des séquences extrêmement longues, répondant ainsi aux exigences de densité des environnements électromagnétiques modernes.
+
+Enfin, le Chapitre 5 explore une approche alternative et complémentaire basée sur le "dépliement" des séquences. L'objectif de cette contribution est de repenser la représentation de la donnée en entrée pour se rapprocher de la réalité des traitements de Détection et Caractérisation des Impulsions (DCI). Cette nouvelle modélisation du problème permet de réintégrer dans la course des architectures neuronales qui s'avéraient jusqu'alors inadaptées, ouvrant ainsi de nouvelles perspectives d'optimisation pour la simulation de la Guerre Électronique.

@@ -1,39 +1,39 @@
 \relax 
 \providecommand\zref@newlabel[2]{}
 \providecommand\hyper@newdestlabel[2]{}
-\@writefile{toc}{\contentsline {chapter}{\numberline {6}Capacité de discernement des modèles}{55}{chapter.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {7}Capacité de discernement des modèles}{61}{chapter.7}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\@writefile{toc}{\contentsline {section}{\numberline {6.1}Génération des données et protocole de construction}{55}{section.6.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1.1}Règle d'ordonnancement implicite}{56}{subsection.6.1.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.1}{\ignorespaces Diagramme de la procédure de tri décrite. Les différentes étapes sont visibles de haut en bas : départ de la séquence désordonnée, association d'un score par élément, ordonnancement par critère de score croissant et enfin restitution de la séquence ordonnée.}}{56}{figure.caption.16}\protected@file@percent }
-\newlabel{fig:sort}{{6.1}{56}{Diagramme de la procédure de tri décrite. Les différentes étapes sont visibles de haut en bas : départ de la séquence désordonnée, association d'un score par élément, ordonnancement par critère de score croissant et enfin restitution de la séquence ordonnée}{figure.caption.16}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1.2}Définition de la difficulté et invariances}{56}{subsection.6.1.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1.3}Algorithme de génération sous contrainte}{57}{subsection.6.1.3}\protected@file@percent }
-\newlabel{eq:projection}{{6.3}{57}{Algorithme de génération sous contrainte}{equation.6.3}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {6.2}Stratégie d'apprentissage et architectures neuronales}{58}{section.6.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2.1}Fonction de coût normalisée}{58}{subsection.6.2.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2.2}Métrique d'évaluation : La Justesse Positionnelle}{59}{subsection.6.2.2}\protected@file@percent }
-\newlabel{just}{{6.8}{59}{Métrique d'évaluation : La Justesse Positionnelle}{equation.6.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2.3}Apprentissage progressif}{59}{subsection.6.2.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2.4}Architectures évaluées}{60}{subsection.6.2.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6.3}Résultats expérimentaux et analyse}{60}{section.6.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.3.1}Protocole de visualisation}{60}{subsection.6.3.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.1.1}Cartographies de performance}{60}{subsubsection.6.3.1.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.2}{\ignorespaces Cartographie des performances du Transformer de référence (Baseline). Le modèle est entraîné directement sur l'intégralité du domaine ($[\mu _{min}, \mu _{max}] = [-10, 10]$ et $[\sigma _{min}, \sigma _{max}] = [10^{-4}, 5]$) durant 1600 itérations (500 000 séquences). L'erreur de reconstruction est représenté à gauche, la justesse est représenté à droite. On observe un échec sur les zones de faible séparabilité (gauche de chaque image). La décorrélation entre les images visible au centre gauche (zone violette de faible erreur apparente mais de justesse nulle) illustre l'incapacité de la fonction de coût standard non pondérée à guider l'apprentissage sur des séquences de faible amplitude.}}{61}{figure.caption.17}\protected@file@percent }
-\newlabel{fig:cartobase}{{6.2}{61}{Cartographie des performances du Transformer de référence (Baseline). Le modèle est entraîné directement sur l'intégralité du domaine ($[\mu _{min}, \mu _{max}] = [-10, 10]$ et $[\sigma _{min}, \sigma _{max}] = [10^{-4}, 5]$) durant 1600 itérations (500 000 séquences). L'erreur de reconstruction est représenté à gauche, la justesse est représenté à droite. On observe un échec sur les zones de faible séparabilité (gauche de chaque image). La décorrélation entre les images visible au centre gauche (zone violette de faible erreur apparente mais de justesse nulle) illustre l'incapacité de la fonction de coût standard non pondérée à guider l'apprentissage sur des séquences de faible amplitude}{figure.caption.17}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.1.2}Analyse statistique par diagrammes en boîte}{61}{subsubsection.6.3.1.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.3.2}Évaluation du modèle de référence}{61}{subsection.6.3.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.3.3}Évaluation de la méthodologie proposée}{62}{subsection.6.3.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.3}{\ignorespaces Évolution de la performance globale en fonction de la difficulté ($\lambda $). Les courbes pleines comparent les performances moyennes (Erreur à gauche et Justesse à droite) du CNN et du Transformer entraînés en 1600 itérations sur $500000$ séquences distribuées sur $[\mu _{min}, \mu _{max}] = [-10, 10]$ et $[\sigma _{min}, \sigma _{max}] = [\lambda , 5]$. Les diagrammes en boîte (représentés uniquement pour le Transformer par souci de lisibilité) mettent en évidence une disparité croissante des capacités de traitement : à mesure que la difficulté augmente ($\lambda $ diminue vers $10^{-4}$), la distribution des résultats s'étale considérablement, confirmant que le modèle échoue sur les séquences les plus complexes devenues prépondérantes.}}{63}{figure.caption.18}\protected@file@percent }
-\newlabel{fig:perfbase}{{6.3}{63}{Évolution de la performance globale en fonction de la difficulté ($\lambda $). Les courbes pleines comparent les performances moyennes (Erreur à gauche et Justesse à droite) du CNN et du Transformer entraînés en 1600 itérations sur $500000$ séquences distribuées sur $[\mu _{min}, \mu _{max}] = [-10, 10]$ et $[\sigma _{min}, \sigma _{max}] = [\lambda , 5]$. Les diagrammes en boîte (représentés uniquement pour le Transformer par souci de lisibilité) mettent en évidence une disparité croissante des capacités de traitement : à mesure que la difficulté augmente ($\lambda $ diminue vers $10^{-4}$), la distribution des résultats s'étale considérablement, confirmant que le modèle échoue sur les séquences les plus complexes devenues prépondérantes}{figure.caption.18}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6.4}{\ignorespaces Performance du Transformer à différentes étapes de l'apprentissage (de gauche à droit) : après la $2^e$, la $4^e$, la $8^e$ et la $10^e$ fenêtres. L'erreur est présenté à gauche, la justesse à droite. La ligne noire verticale représente la limite de la dernière fenêtre d'entrainement, ce qui permet d'identifier la propagation des performances du modèle vers les zones de faible séparabilité.}}{64}{figure.caption.19}\protected@file@percent }
-\newlabel{fig:cartomethod}{{6.4}{64}{Performance du Transformer à différentes étapes de l'apprentissage (de gauche à droit) : après la $2^e$, la $4^e$, la $8^e$ et la $10^e$ fenêtres. L'erreur est présenté à gauche, la justesse à droite. La ligne noire verticale représente la limite de la dernière fenêtre d'entrainement, ce qui permet d'identifier la propagation des performances du modèle vers les zones de faible séparabilité}{figure.caption.19}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.3.4}Synthèse et comparaison des architectures}{64}{subsection.6.3.4}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.5}{\ignorespaces Performance finale avec stratégie d'apprentissage progressif et pondération. Les courbes présentent l'évolution de l'erreur (gauche) et de la justesse (droite) à l'issue du protocole d'apprentissage progressif sur les mêmes fenêtres de difficulté ($\lambda $ variant de $1$ à $10^{-4}$). Contrairement au cas de référence \ref {fig:perfbase}, les diagrammes en boîte du Transformer révèlent une dispersion minime même lorsque la difficulté est maximale. Cette homogénéité appuie l'efficacité de l'approche.}}{65}{figure.caption.20}\protected@file@percent }
-\newlabel{fig:perfmethod}{{6.5}{65}{Performance finale avec stratégie d'apprentissage progressif et pondération. Les courbes présentent l'évolution de l'erreur (gauche) et de la justesse (droite) à l'issue du protocole d'apprentissage progressif sur les mêmes fenêtres de difficulté ($\lambda $ variant de $1$ à $10^{-4}$). Contrairement au cas de référence \ref {fig:perfbase}, les diagrammes en boîte du Transformer révèlent une dispersion minime même lorsque la difficulté est maximale. Cette homogénéité appuie l'efficacité de l'approche}{figure.caption.20}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7.1}Génération des données et protocole de construction}{61}{section.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1.1}Règle d'ordonnancement implicite}{62}{subsection.7.1.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7.1}{\ignorespaces Diagramme de la procédure de tri décrite. Les différentes étapes sont visibles de haut en bas : départ de la séquence désordonnée, association d'un score par élément, ordonnancement par critère de score croissant et enfin restitution de la séquence ordonnée.}}{62}{figure.caption.16}\protected@file@percent }
+\newlabel{fig:sort}{{7.1}{62}{Diagramme de la procédure de tri décrite. Les différentes étapes sont visibles de haut en bas : départ de la séquence désordonnée, association d'un score par élément, ordonnancement par critère de score croissant et enfin restitution de la séquence ordonnée}{figure.caption.16}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1.2}Définition de la difficulté et invariances}{62}{subsection.7.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1.3}Algorithme de génération sous contrainte}{63}{subsection.7.1.3}\protected@file@percent }
+\newlabel{eq:projection}{{7.3}{63}{Algorithme de génération sous contrainte}{equation.7.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7.2}Stratégie d'apprentissage et architectures neuronales}{64}{section.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2.1}Fonction de coût normalisée}{64}{subsection.7.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2.2}Métrique d'évaluation : La Justesse Positionnelle}{65}{subsection.7.2.2}\protected@file@percent }
+\newlabel{just}{{7.8}{65}{Métrique d'évaluation : La Justesse Positionnelle}{equation.7.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2.3}Apprentissage progressif}{65}{subsection.7.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2.4}Architectures évaluées}{66}{subsection.7.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7.3}Résultats expérimentaux et analyse}{66}{section.7.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3.1}Protocole de visualisation}{66}{subsection.7.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.3.1.1}Cartographies de performance}{66}{subsubsection.7.3.1.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7.2}{\ignorespaces Cartographie des performances du Transformer de référence (Baseline). Le modèle est entraîné directement sur l'intégralité du domaine ($[\mu _{min}, \mu _{max}] = [-10, 10]$ et $[\sigma _{min}, \sigma _{max}] = [10^{-4}, 5]$) durant 1600 itérations (500 000 séquences). L'erreur de reconstruction est représenté à gauche, la justesse est représenté à droite. On observe un échec sur les zones de faible séparabilité (gauche de chaque image). La décorrélation entre les images visible au centre gauche (zone violette de faible erreur apparente mais de justesse nulle) illustre l'incapacité de la fonction de coût standard non pondérée à guider l'apprentissage sur des séquences de faible amplitude.}}{67}{figure.caption.17}\protected@file@percent }
+\newlabel{fig:cartobase}{{7.2}{67}{Cartographie des performances du Transformer de référence (Baseline). Le modèle est entraîné directement sur l'intégralité du domaine ($[\mu _{min}, \mu _{max}] = [-10, 10]$ et $[\sigma _{min}, \sigma _{max}] = [10^{-4}, 5]$) durant 1600 itérations (500 000 séquences). L'erreur de reconstruction est représenté à gauche, la justesse est représenté à droite. On observe un échec sur les zones de faible séparabilité (gauche de chaque image). La décorrélation entre les images visible au centre gauche (zone violette de faible erreur apparente mais de justesse nulle) illustre l'incapacité de la fonction de coût standard non pondérée à guider l'apprentissage sur des séquences de faible amplitude}{figure.caption.17}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.3.1.2}Analyse statistique par diagrammes en boîte}{67}{subsubsection.7.3.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3.2}Évaluation du modèle de référence}{67}{subsection.7.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3.3}Évaluation de la méthodologie proposée}{68}{subsection.7.3.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7.3}{\ignorespaces Évolution de la performance globale en fonction de la difficulté ($\lambda $). Les courbes pleines comparent les performances moyennes (Erreur à gauche et Justesse à droite) du CNN et du Transformer entraînés en 1600 itérations sur $500000$ séquences distribuées sur $[\mu _{min}, \mu _{max}] = [-10, 10]$ et $[\sigma _{min}, \sigma _{max}] = [\lambda , 5]$. Les diagrammes en boîte (représentés uniquement pour le Transformer par souci de lisibilité) mettent en évidence une disparité croissante des capacités de traitement : à mesure que la difficulté augmente ($\lambda $ diminue vers $10^{-4}$), la distribution des résultats s'étale considérablement, confirmant que le modèle échoue sur les séquences les plus complexes devenues prépondérantes.}}{69}{figure.caption.18}\protected@file@percent }
+\newlabel{fig:perfbase}{{7.3}{69}{Évolution de la performance globale en fonction de la difficulté ($\lambda $). Les courbes pleines comparent les performances moyennes (Erreur à gauche et Justesse à droite) du CNN et du Transformer entraînés en 1600 itérations sur $500000$ séquences distribuées sur $[\mu _{min}, \mu _{max}] = [-10, 10]$ et $[\sigma _{min}, \sigma _{max}] = [\lambda , 5]$. Les diagrammes en boîte (représentés uniquement pour le Transformer par souci de lisibilité) mettent en évidence une disparité croissante des capacités de traitement : à mesure que la difficulté augmente ($\lambda $ diminue vers $10^{-4}$), la distribution des résultats s'étale considérablement, confirmant que le modèle échoue sur les séquences les plus complexes devenues prépondérantes}{figure.caption.18}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7.4}{\ignorespaces Performance du Transformer à différentes étapes de l'apprentissage (de gauche à droit) : après la $2^e$, la $4^e$, la $8^e$ et la $10^e$ fenêtres. L'erreur est présenté à gauche, la justesse à droite. La ligne noire verticale représente la limite de la dernière fenêtre d'entrainement, ce qui permet d'identifier la propagation des performances du modèle vers les zones de faible séparabilité.}}{70}{figure.caption.19}\protected@file@percent }
+\newlabel{fig:cartomethod}{{7.4}{70}{Performance du Transformer à différentes étapes de l'apprentissage (de gauche à droit) : après la $2^e$, la $4^e$, la $8^e$ et la $10^e$ fenêtres. L'erreur est présenté à gauche, la justesse à droite. La ligne noire verticale représente la limite de la dernière fenêtre d'entrainement, ce qui permet d'identifier la propagation des performances du modèle vers les zones de faible séparabilité}{figure.caption.19}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3.4}Synthèse et comparaison des architectures}{70}{subsection.7.3.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7.5}{\ignorespaces Performance finale avec stratégie d'apprentissage progressif et pondération. Les courbes présentent l'évolution de l'erreur (gauche) et de la justesse (droite) à l'issue du protocole d'apprentissage progressif sur les mêmes fenêtres de difficulté ($\lambda $ variant de $1$ à $10^{-4}$). Contrairement au cas de référence \ref {fig:perfbase}, les diagrammes en boîte du Transformer révèlent une dispersion minime même lorsque la difficulté est maximale. Cette homogénéité appuie l'efficacité de l'approche.}}{71}{figure.caption.20}\protected@file@percent }
+\newlabel{fig:perfmethod}{{7.5}{71}{Performance finale avec stratégie d'apprentissage progressif et pondération. Les courbes présentent l'évolution de l'erreur (gauche) et de la justesse (droite) à l'issue du protocole d'apprentissage progressif sur les mêmes fenêtres de difficulté ($\lambda $ variant de $1$ à $10^{-4}$). Contrairement au cas de référence \ref {fig:perfbase}, les diagrammes en boîte du Transformer révèlent une dispersion minime même lorsque la difficulté est maximale. Cette homogénéité appuie l'efficacité de l'approche}{figure.caption.20}{}}
 \@setckpt{EUSIPCO}{
-\setcounter{page}{66}
+\setcounter{page}{72}
 \setcounter{equation}{9}
 \setcounter{enumi}{0}
 \setcounter{enumii}{0}
@@ -42,7 +42,7 @@
 \setcounter{footnote}{0}
 \setcounter{mpfootnote}{0}
 \setcounter{part}{0}
-\setcounter{chapter}{6}
+\setcounter{chapter}{7}
 \setcounter{section}{3}
 \setcounter{subsection}{4}
 \setcounter{subsubsection}{0}
@@ -61,7 +61,7 @@
 \setcounter{section@level}{0}
 \setcounter{Item}{0}
 \setcounter{Hfootnote}{0}
-\setcounter{bookmark@seq@number}{56}
+\setcounter{bookmark@seq@number}{69}
 \setcounter{tabx@nest}{0}
 \setcounter{listtotal}{0}
 \setcounter{listcount}{0}
@@ -71,7 +71,7 @@
 \setcounter{citetotal}{0}
 \setcounter{multicitecount}{0}
 \setcounter{multicitetotal}{0}
-\setcounter{instcount}{112}
+\setcounter{instcount}{113}
 \setcounter{maxnames}{3}
 \setcounter{minnames}{1}
 \setcounter{maxitems}{3}
