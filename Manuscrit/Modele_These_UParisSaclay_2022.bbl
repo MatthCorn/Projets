@@ -709,6 +709,1241 @@
       \endverb
       \keyw{Computer Science - Machine Learning,Computer Science - Artificial Intelligence}
     \endentry
+    \entry{dauphin_identifying_2014}{article}{}{}
+      \name{author}{6}{}{%
+        {{hash=ea1ca71b064fbb7ec15bd2e49e287ea9}{%
+           family={Dauphin},
+           familyi={D\bibinitperiod},
+           given={Yann\bibnamedelima N.},
+           giveni={Y\bibinitperiod\bibinitdelim N\bibinitperiod}}}%
+        {{hash=7045b009b04d57bd2e19b5dfa0864d4f}{%
+           family={Pascanu},
+           familyi={P\bibinitperiod},
+           given={Razvan},
+           giveni={R\bibinitperiod}}}%
+        {{hash=2adc0c92c308f233c731321d55efe58f}{%
+           family={Gulcehre},
+           familyi={G\bibinitperiod},
+           given={Caglar},
+           giveni={C\bibinitperiod}}}%
+        {{hash=3da7501a79d9346572c7fd6e41b615df}{%
+           family={Cho},
+           familyi={C\bibinitperiod},
+           given={Kyunghyun},
+           giveni={K\bibinitperiod}}}%
+        {{hash=05b3e391388084df874ede60f2210c12}{%
+           family={Ganguli},
+           familyi={G\bibinitperiod},
+           given={Surya},
+           giveni={S\bibinitperiod}}}%
+        {{hash=40a8e4774982146adc2688546f54efb2}{%
+           family={Bengio},
+           familyi={B\bibinitperiod},
+           given={Yoshua},
+           giveni={Y\bibinitperiod}}}%
+      }
+      \strng{namehash}{91d61729ce47b72febc33bd9db02bdac}
+      \strng{fullhash}{ed383fe3b9caf384b339905974cb1155}
+      \strng{fullhashraw}{ed383fe3b9caf384b339905974cb1155}
+      \strng{bibnamehash}{91d61729ce47b72febc33bd9db02bdac}
+      \strng{authorbibnamehash}{91d61729ce47b72febc33bd9db02bdac}
+      \strng{authornamehash}{91d61729ce47b72febc33bd9db02bdac}
+      \strng{authorfullhash}{ed383fe3b9caf384b339905974cb1155}
+      \strng{authorfullhashraw}{ed383fe3b9caf384b339905974cb1155}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Advances in neural information processing systems}
+      \field{title}{Identifying and attacking the saddle point problem in high-dimensional non-convex optimization}
+      \field{urlday}{23}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{volume}{27}
+      \field{year}{2014}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://proceedings.neurips.cc/paper_files/paper/2014/file/17e23e50bedc63b4095e3d8204ce063b-Paper.pdf
+      \endverb
+      \verb{url}
+      \verb https://proceedings.neurips.cc/paper_files/paper/2014/file/17e23e50bedc63b4095e3d8204ce063b-Paper.pdf
+      \endverb
+    \endentry
+    \entry{choromanska_loss_2015}{inproceedings}{}{}
+      \name{author}{5}{}{%
+        {{hash=42734e7439f4dc927fc1e15d7379725e}{%
+           family={Choromanska},
+           familyi={C\bibinitperiod},
+           given={Anna},
+           giveni={A\bibinitperiod}}}%
+        {{hash=401562d96db136e78effff95552f584b}{%
+           family={Henaff},
+           familyi={H\bibinitperiod},
+           given={Mikael},
+           giveni={M\bibinitperiod}}}%
+        {{hash=c8e0f85f89c92f05a8a7ee998755b202}{%
+           family={Mathieu},
+           familyi={M\bibinitperiod},
+           given={Michael},
+           giveni={M\bibinitperiod}}}%
+        {{hash=60a34f21c33a761c3008c927606f799b}{%
+           family={Arous},
+           familyi={A\bibinitperiod},
+           given={Gérard\bibnamedelima Ben},
+           giveni={G\bibinitperiod\bibinitdelim B\bibinitperiod}}}%
+        {{hash=6a1aa6b7eab12b931ca7c7e3f927231d}{%
+           family={{LeCun}},
+           familyi={L\bibinitperiod},
+           given={Yann},
+           giveni={Y\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {PMLR}%
+      }
+      \strng{namehash}{391318cd13f20b8f5be00d1f414c9711}
+      \strng{fullhash}{d2b79d5c529f49894de89da0ae354028}
+      \strng{fullhashraw}{d2b79d5c529f49894de89da0ae354028}
+      \strng{bibnamehash}{391318cd13f20b8f5be00d1f414c9711}
+      \strng{authorbibnamehash}{391318cd13f20b8f5be00d1f414c9711}
+      \strng{authornamehash}{391318cd13f20b8f5be00d1f414c9711}
+      \strng{authorfullhash}{d2b79d5c529f49894de89da0ae354028}
+      \strng{authorfullhashraw}{d2b79d5c529f49894de89da0ae354028}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Artificial intelligence and statistics}
+      \field{title}{The loss surfaces of multilayer networks}
+      \field{urlday}{23}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2015}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{192\bibrangedash 204}
+      \range{pages}{13}
+      \verb{file}
+      \verb Available Version (via Google Scholar):C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\7ACPVXQD\\Choromanska et al. - 2015 - The loss surfaces of multilayer networks.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb http://proceedings.mlr.press/v38/choromanska15
+      \endverb
+      \verb{url}
+      \verb http://proceedings.mlr.press/v38/choromanska15
+      \endverb
+    \endentry
+    \entry{hinton_distilling_2015}{misc}{}{}
+      \name{author}{3}{}{%
+        {{hash=9a8750ccdb2a4cf14d2655face1ce016}{%
+           family={Hinton},
+           familyi={H\bibinitperiod},
+           given={Geoffrey},
+           giveni={G\bibinitperiod}}}%
+        {{hash=494b568c5dc85ba8f3f409635f9c5f25}{%
+           family={Vinyals},
+           familyi={V\bibinitperiod},
+           given={Oriol},
+           giveni={O\bibinitperiod}}}%
+        {{hash=62f954323339abeba6c6a240e9d2855b}{%
+           family={Dean},
+           familyi={D\bibinitperiod},
+           given={Jeff},
+           giveni={J\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {arXiv}%
+      }
+      \strng{namehash}{ffe4fa3a93a3b1a8ca1d3c8b76f864d7}
+      \strng{fullhash}{ffe4fa3a93a3b1a8ca1d3c8b76f864d7}
+      \strng{fullhashraw}{ffe4fa3a93a3b1a8ca1d3c8b76f864d7}
+      \strng{bibnamehash}{ffe4fa3a93a3b1a8ca1d3c8b76f864d7}
+      \strng{authorbibnamehash}{ffe4fa3a93a3b1a8ca1d3c8b76f864d7}
+      \strng{authornamehash}{ffe4fa3a93a3b1a8ca1d3c8b76f864d7}
+      \strng{authorfullhash}{ffe4fa3a93a3b1a8ca1d3c8b76f864d7}
+      \strng{authorfullhashraw}{ffe4fa3a93a3b1a8ca1d3c8b76f864d7}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{A very simple way to improve the performance of almost any machine learning algorithm is to train many different models on the same data and then to average their predictions. Unfortunately, making predictions using a whole ensemble of models is cumbersome and may be too computationally expensive to allow deployment to a large number of users, especially if the individual models are large neural nets. Caruana and his collaborators have shown that it is possible to compress the knowledge in an ensemble into a single model which is much easier to deploy and we develop this approach further using a different compression technique. We achieve some surprising results on {MNIST} and we show that we can significantly improve the acoustic model of a heavily used commercial system by distilling the knowledge in an ensemble of models into a single model. We also introduce a new type of ensemble composed of one or more full models and many specialist models which learn to distinguish fine-grained classes that the full models confuse. Unlike a mixture of experts, these specialist models can be trained rapidly and in parallel.}
+      \field{day}{9}
+      \field{eprinttype}{arxiv}
+      \field{month}{3}
+      \field{number}{{arXiv}:1503.02531}
+      \field{title}{Distilling the Knowledge in a Neural Network}
+      \field{urlday}{23}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2015}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{doi}
+      \verb 10.48550/arXiv.1503.02531
+      \endverb
+      \verb{eprint}
+      \verb 1503.02531 [stat]
+      \endverb
+      \verb{file}
+      \verb Preprint PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\6W46IJSH\\Hinton et al. - 2015 - Distilling the Knowledge in a Neural Network.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/1503.02531
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/1503.02531
+      \endverb
+      \keyw{Computer Science - Machine Learning,Computer Science - Neural and Evolutionary Computing,Statistics - Machine Learning}
+    \endentry
+    \entry{deepseek-ai_deepseek-r1_2025}{article}{}{}
+      \name{author}{200}{}{%
+        {{hash=d597faee5c847cfbb2346d3b8725ba38}{%
+           family={{DeepSeek}-{AI}},
+           familyi={D\bibinitperiod}}}%
+        {{hash=a65b6db35516aecf6dcadd97221ae4cf}{%
+           family={Guo},
+           familyi={G\bibinitperiod},
+           given={Daya},
+           giveni={D\bibinitperiod}}}%
+        {{hash=39ba26b2f24e305fc74063eeb50e3758}{%
+           family={Yang},
+           familyi={Y\bibinitperiod},
+           given={Dejian},
+           giveni={D\bibinitperiod}}}%
+        {{hash=8cb1dcd229cb02dbc21ed4c6bc6bce8a}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Haowei},
+           giveni={H\bibinitperiod}}}%
+        {{hash=1fe78774ca64f7faf5c4146809895eda}{%
+           family={Song},
+           familyi={S\bibinitperiod},
+           given={Junxiao},
+           giveni={J\bibinitperiod}}}%
+        {{hash=87a8cdc413eb9ae298d444f4939e351f}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Peiyi},
+           giveni={P\bibinitperiod}}}%
+        {{hash=2e0f6670310682601840be6267950e06}{%
+           family={Zhu},
+           familyi={Z\bibinitperiod},
+           given={Qihao},
+           giveni={Q\bibinitperiod}}}%
+        {{hash=1921948240c259729e2ec8093fcf848b}{%
+           family={Xu},
+           familyi={X\bibinitperiod},
+           given={Runxin},
+           giveni={R\bibinitperiod}}}%
+        {{hash=e2b49c18158617c0fd76406ee1a75a0c}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Ruoyu},
+           giveni={R\bibinitperiod}}}%
+        {{hash=a6d41a11337a0171f523504345057a93}{%
+           family={Ma},
+           familyi={M\bibinitperiod},
+           given={Shirong},
+           giveni={S\bibinitperiod}}}%
+        {{hash=762edc61728d98f1821f6020a1203986}{%
+           family={Bi},
+           familyi={B\bibinitperiod},
+           given={Xiao},
+           giveni={X\bibinitperiod}}}%
+        {{hash=7f5e988254e37d0ed483e48e78086635}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Xiaokang},
+           giveni={X\bibinitperiod}}}%
+        {{hash=d605ad0205be9f8a6d85e1de2b914ef7}{%
+           family={Yu},
+           familyi={Y\bibinitperiod},
+           given={Xingkai},
+           giveni={X\bibinitperiod}}}%
+        {{hash=497a9e1774032d32e4123020bfd16b7a}{%
+           family={Wu},
+           familyi={W\bibinitperiod},
+           given={Yu},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=37d7606036a1b69d8686c280798b4e13}{%
+           family={Wu},
+           familyi={W\bibinitperiod},
+           given={Z.\bibnamedelimi F.},
+           giveni={Z\bibinitperiod\bibinitdelim F\bibinitperiod}}}%
+        {{hash=52cd29c6fb35d98987dcfdffbcebb908}{%
+           family={Gou},
+           familyi={G\bibinitperiod},
+           given={Zhibin},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=76ff010a59ccc9f5f1a0018fc1f1f34b}{%
+           family={Shao},
+           familyi={S\bibinitperiod},
+           given={Zhihong},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=aa612b2ce912bb45fb35f9f7d7055004}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Zhuoshu},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=4ebddcf44d6604e0560b6e146250b81c}{%
+           family={Gao},
+           familyi={G\bibinitperiod},
+           given={Ziyi},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=c6a4393b5b754f1dae75c3c7e28eeceb}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={Aixin},
+           giveni={A\bibinitperiod}}}%
+        {{hash=5ef459c2d19ba2eb901e63e3eb6e2d20}{%
+           family={Xue},
+           familyi={X\bibinitperiod},
+           given={Bing},
+           giveni={B\bibinitperiod}}}%
+        {{hash=57b86752fc01fd03ef1d586787bd20bf}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Bingxuan},
+           giveni={B\bibinitperiod}}}%
+        {{hash=9e1059ffe0003978f5788009e71e1c6b}{%
+           family={Wu},
+           familyi={W\bibinitperiod},
+           given={Bochao},
+           giveni={B\bibinitperiod}}}%
+        {{hash=f42eeb873e51afb4efe1efa361491fb1}{%
+           family={Feng},
+           familyi={F\bibinitperiod},
+           given={Bei},
+           giveni={B\bibinitperiod}}}%
+        {{hash=0269e37fa31d952f00ebf443030cd77d}{%
+           family={Lu},
+           familyi={L\bibinitperiod},
+           given={Chengda},
+           giveni={C\bibinitperiod}}}%
+        {{hash=39a28d0a27295f630a0891a68e965ce3}{%
+           family={Zhao},
+           familyi={Z\bibinitperiod},
+           given={Chenggang},
+           giveni={C\bibinitperiod}}}%
+        {{hash=8cad2158d47cfb944945cc9343f58ea9}{%
+           family={Deng},
+           familyi={D\bibinitperiod},
+           given={Chengqi},
+           giveni={C\bibinitperiod}}}%
+        {{hash=f70925006b60552baffdcdcb46b9e579}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Chenyu},
+           giveni={C\bibinitperiod}}}%
+        {{hash=12770c27bf5805aa57e6450c268b1dac}{%
+           family={Ruan},
+           familyi={R\bibinitperiod},
+           given={Chong},
+           giveni={C\bibinitperiod}}}%
+        {{hash=ae4bae1c69a7578313fbd880107aa29c}{%
+           family={Dai},
+           familyi={D\bibinitperiod},
+           given={Damai},
+           giveni={D\bibinitperiod}}}%
+        {{hash=0f59312af35da1f26d823cb378550d26}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Deli},
+           giveni={D\bibinitperiod}}}%
+        {{hash=e685fc04e0a906fd1dacf3ee0c7f790c}{%
+           family={Ji},
+           familyi={J\bibinitperiod},
+           given={Dongjie},
+           giveni={D\bibinitperiod}}}%
+        {{hash=c6aa72fbfeb8edffeac1d0ee2b77b182}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Erhang},
+           giveni={E\bibinitperiod}}}%
+        {{hash=1b59fab07b665282ea200bf68d9a9822}{%
+           family={Lin},
+           familyi={L\bibinitperiod},
+           given={Fangyun},
+           giveni={F\bibinitperiod}}}%
+        {{hash=2b08767301daada1bd84936fc30b6d18}{%
+           family={Dai},
+           familyi={D\bibinitperiod},
+           given={Fucong},
+           giveni={F\bibinitperiod}}}%
+        {{hash=25c88fe2586976a61f6ffeb334b4e54a}{%
+           family={Luo},
+           familyi={L\bibinitperiod},
+           given={Fuli},
+           giveni={F\bibinitperiod}}}%
+        {{hash=4603b727e01154f3895c03398f35cd0c}{%
+           family={Hao},
+           familyi={H\bibinitperiod},
+           given={Guangbo},
+           giveni={G\bibinitperiod}}}%
+        {{hash=7ffcf6dff623ffef44fb37ca98089bde}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Guanting},
+           giveni={G\bibinitperiod}}}%
+        {{hash=7c3bd854f0fa5794a5d0bc2d5d44ef64}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Guowei},
+           giveni={G\bibinitperiod}}}%
+        {{hash=32e563370422457790db030ab2c13183}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={H.},
+           giveni={H\bibinitperiod}}}%
+        {{hash=891f65259ec1b5f8827b3cbbfd9ecf13}{%
+           family={Bao},
+           familyi={B\bibinitperiod},
+           given={Han},
+           giveni={H\bibinitperiod}}}%
+        {{hash=c802339f10dc1033435b48341714bfc6}{%
+           family={Xu},
+           familyi={X\bibinitperiod},
+           given={Hanwei},
+           giveni={H\bibinitperiod}}}%
+        {{hash=f53586ae736882b0dd9f1d87d839c691}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Haocheng},
+           giveni={H\bibinitperiod}}}%
+        {{hash=b913563fa405ceea7d977323011dc2cc}{%
+           family={Ding},
+           familyi={D\bibinitperiod},
+           given={Honghui},
+           giveni={H\bibinitperiod}}}%
+        {{hash=2da17d8c8ab27762982b8732a8cfe89e}{%
+           family={Xin},
+           familyi={X\bibinitperiod},
+           given={Huajian},
+           giveni={H\bibinitperiod}}}%
+        {{hash=93ba1e360be20dcfd7cb307968accf39}{%
+           family={Gao},
+           familyi={G\bibinitperiod},
+           given={Huazuo},
+           giveni={H\bibinitperiod}}}%
+        {{hash=8239f29a307e4055626323cfe78548f4}{%
+           family={Qu},
+           familyi={Q\bibinitperiod},
+           given={Hui},
+           giveni={H\bibinitperiod}}}%
+        {{hash=9b1528d0b6c9bc88bfd8c569f290bcec}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Hui},
+           giveni={H\bibinitperiod}}}%
+        {{hash=869d7bd821ca0b331316451fd351fdf5}{%
+           family={Guo},
+           familyi={G\bibinitperiod},
+           given={Jianzhong},
+           giveni={J\bibinitperiod}}}%
+        {{hash=91960f7a9cd377acd057fb7944047ab3}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Jiashi},
+           giveni={J\bibinitperiod}}}%
+        {{hash=c6961bd158d76284f709982cd75007a0}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Jiawei},
+           giveni={J\bibinitperiod}}}%
+        {{hash=21429935bd6d7abdcad16bf3b915359e}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Jingchang},
+           giveni={J\bibinitperiod}}}%
+        {{hash=ef141a61dbaf496d7cb3e913da997d53}{%
+           family={Yuan},
+           familyi={Y\bibinitperiod},
+           given={Jingyang},
+           giveni={J\bibinitperiod}}}%
+        {{hash=0c6228315a30267eaff3db4a85a1a454}{%
+           family={Qiu},
+           familyi={Q\bibinitperiod},
+           given={Junjie},
+           giveni={J\bibinitperiod}}}%
+        {{hash=c511a244c2c5323007d280767387057a}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Junlong},
+           giveni={J\bibinitperiod}}}%
+        {{hash=30d2bd8e62c8c6200b191327a70020c8}{%
+           family={Cai},
+           familyi={C\bibinitperiod},
+           given={J.\bibnamedelimi L.},
+           giveni={J\bibinitperiod\bibinitdelim L\bibinitperiod}}}%
+        {{hash=ece51be1cc7b3d7b8948c3c2861d2cd3}{%
+           family={Ni},
+           familyi={N\bibinitperiod},
+           given={Jiaqi},
+           giveni={J\bibinitperiod}}}%
+        {{hash=1de74db71a4d1b32e65f7e99b492ba92}{%
+           family={Liang},
+           familyi={L\bibinitperiod},
+           given={Jian},
+           giveni={J\bibinitperiod}}}%
+        {{hash=42990f77d0dad790e7a9f0d77aa2d3b0}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Jin},
+           giveni={J\bibinitperiod}}}%
+        {{hash=107ca53156ed7ec174865368d0d19a0b}{%
+           family={Dong},
+           familyi={D\bibinitperiod},
+           given={Kai},
+           giveni={K\bibinitperiod}}}%
+        {{hash=6940e4ce7b698b8c57830928491d309f}{%
+           family={Hu},
+           familyi={H\bibinitperiod},
+           given={Kai},
+           giveni={K\bibinitperiod}}}%
+        {{hash=f3a5270048554f6710ed3f238a4b1707}{%
+           family={Gao},
+           familyi={G\bibinitperiod},
+           given={Kaige},
+           giveni={K\bibinitperiod}}}%
+        {{hash=87322ed5e4e6621981090b18c27d04ff}{%
+           family={Guan},
+           familyi={G\bibinitperiod},
+           given={Kang},
+           giveni={K\bibinitperiod}}}%
+        {{hash=20b2c9f80d5574f01211ed9ecca40a92}{%
+           family={Huang},
+           familyi={H\bibinitperiod},
+           given={Kexin},
+           giveni={K\bibinitperiod}}}%
+        {{hash=12664260d2d21342d742711f38009467}{%
+           family={Yu},
+           familyi={Y\bibinitperiod},
+           given={Kuai},
+           giveni={K\bibinitperiod}}}%
+        {{hash=c28cce01f65f2bdb022e9c3f4c5b6250}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Lean},
+           giveni={L\bibinitperiod}}}%
+        {{hash=d2291b7029105f99ab08ca8b7088a135}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Lecong},
+           giveni={L\bibinitperiod}}}%
+        {{hash=1f1b5a611871b013dd18b84a54bbb23f}{%
+           family={Zhao},
+           familyi={Z\bibinitperiod},
+           given={Liang},
+           giveni={L\bibinitperiod}}}%
+        {{hash=499571d7099bd153fb7069c69012efd2}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Litong},
+           giveni={L\bibinitperiod}}}%
+        {{hash=8474cd37b88de9cc54282c0a24ca7c39}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Liyue},
+           giveni={L\bibinitperiod}}}%
+        {{hash=8988e4206730ffa0ecb54886c691cb99}{%
+           family={Xu},
+           familyi={X\bibinitperiod},
+           given={Lei},
+           giveni={L\bibinitperiod}}}%
+        {{hash=ea359511d330a1ee76abb4eb6ff24159}{%
+           family={Xia},
+           familyi={X\bibinitperiod},
+           given={Leyi},
+           giveni={L\bibinitperiod}}}%
+        {{hash=812d3dc5af2363482ace273325f5509d}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Mingchuan},
+           giveni={M\bibinitperiod}}}%
+        {{hash=da130d0617e5df897ed1e4a1454e9db3}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Minghua},
+           giveni={M\bibinitperiod}}}%
+        {{hash=07c400f9487b1c8f214512056941a85a}{%
+           family={Tang},
+           familyi={T\bibinitperiod},
+           given={Minghui},
+           giveni={M\bibinitperiod}}}%
+        {{hash=122748fbd1766f07a1685dde181113ca}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Meng},
+           giveni={M\bibinitperiod}}}%
+        {{hash=bd318a9da107a916f2bdf075ce10c58c}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Miaojun},
+           giveni={M\bibinitperiod}}}%
+        {{hash=64ef8c8749b4ac4d8c1fccaf2480314a}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Mingming},
+           giveni={M\bibinitperiod}}}%
+        {{hash=054f6973a79d0857235b4c574f913711}{%
+           family={Tian},
+           familyi={T\bibinitperiod},
+           given={Ning},
+           giveni={N\bibinitperiod}}}%
+        {{hash=59b98916bb297a2b832a817e28ae7555}{%
+           family={Huang},
+           familyi={H\bibinitperiod},
+           given={Panpan},
+           giveni={P\bibinitperiod}}}%
+        {{hash=f189b293bd3263254702f8c5fe1d714b}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Peng},
+           giveni={P\bibinitperiod}}}%
+        {{hash=574d7edd326eb9d33d05f28685beeed3}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Qiancheng},
+           giveni={Q\bibinitperiod}}}%
+        {{hash=d68451938ff41dda1944fadcba84dfdb}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Qinyu},
+           giveni={Q\bibinitperiod}}}%
+        {{hash=1676c1d643ce708f9fd03afb4a010f6b}{%
+           family={Du},
+           familyi={D\bibinitperiod},
+           given={Qiushi},
+           giveni={Q\bibinitperiod}}}%
+        {{hash=95dadabec8a984010b9d90274d51f99c}{%
+           family={Ge},
+           familyi={G\bibinitperiod},
+           given={Ruiqi},
+           giveni={R\bibinitperiod}}}%
+        {{hash=f202d93724465316d338319451d0e0a0}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Ruisong},
+           giveni={R\bibinitperiod}}}%
+        {{hash=97fa94915cc6dcb81a978243f9112da4}{%
+           family={Pan},
+           familyi={P\bibinitperiod},
+           given={Ruizhe},
+           giveni={R\bibinitperiod}}}%
+        {{hash=4198ae3abac6cd77a9dfc2e4c1a2ca6d}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Runji},
+           giveni={R\bibinitperiod}}}%
+        {{hash=78325ddf6dd2527a8d1bc74e8b0ba634}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={R.\bibnamedelimi J.},
+           giveni={R\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=a5728bf4cdce10832e71d9151c34b9bb}{%
+           family={Jin},
+           familyi={J\bibinitperiod},
+           given={R.\bibnamedelimi L.},
+           giveni={R\bibinitperiod\bibinitdelim L\bibinitperiod}}}%
+        {{hash=5d76f704529533374de99ce52cf3c301}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Ruyi},
+           giveni={R\bibinitperiod}}}%
+        {{hash=112e0c4120db21addd4fed38f56c516c}{%
+           family={Lu},
+           familyi={L\bibinitperiod},
+           given={Shanghao},
+           giveni={S\bibinitperiod}}}%
+        {{hash=ebc0fcfc951a98a37d66da7d53d60e5f}{%
+           family={Zhou},
+           familyi={Z\bibinitperiod},
+           given={Shangyan},
+           giveni={S\bibinitperiod}}}%
+        {{hash=36cfa5545bbc7bdb0d7eb8477f1f5788}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Shanhuang},
+           giveni={S\bibinitperiod}}}%
+        {{hash=23fa8c3b8709f052a2c5871cac4bbfda}{%
+           family={Ye},
+           familyi={Y\bibinitperiod},
+           given={Shengfeng},
+           giveni={S\bibinitperiod}}}%
+        {{hash=8c23fdbe9467d8a9fb05caa4b245e273}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Shiyu},
+           giveni={S\bibinitperiod}}}%
+        {{hash=48a68e01cf61ed364887aa1aee02fb52}{%
+           family={Yu},
+           familyi={Y\bibinitperiod},
+           given={Shuiping},
+           giveni={S\bibinitperiod}}}%
+        {{hash=a8eac93deffb52501988fd46173dd665}{%
+           family={Zhou},
+           familyi={Z\bibinitperiod},
+           given={Shunfeng},
+           giveni={S\bibinitperiod}}}%
+        {{hash=6bb921031c45d2b4e1d94b6351549c5c}{%
+           family={Pan},
+           familyi={P\bibinitperiod},
+           given={Shuting},
+           giveni={S\bibinitperiod}}}%
+        {{hash=3bc50ffdd6b0d541f45af39d5fdcbd9c}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={S.\bibnamedelimi S.},
+           giveni={S\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+        {{hash=7ade473ecaf5ec3cbf68737ceffb8f7d}{%
+           family={Zhou},
+           familyi={Z\bibinitperiod},
+           given={Shuang},
+           giveni={S\bibinitperiod}}}%
+        {{hash=df8dc083c57ba5e3ff3e14c1020f8373}{%
+           family={Wu},
+           familyi={W\bibinitperiod},
+           given={Shaoqing},
+           giveni={S\bibinitperiod}}}%
+        {{hash=23fa8c3b8709f052a2c5871cac4bbfda}{%
+           family={Ye},
+           familyi={Y\bibinitperiod},
+           given={Shengfeng},
+           giveni={S\bibinitperiod}}}%
+        {{hash=78a43d3ce8b9a9aea4a896b55d3b96bc}{%
+           family={Yun},
+           familyi={Y\bibinitperiod},
+           given={Tao},
+           giveni={T\bibinitperiod}}}%
+        {{hash=2d74310a227f62221624a8eb915a5013}{%
+           family={Pei},
+           familyi={P\bibinitperiod},
+           given={Tian},
+           giveni={T\bibinitperiod}}}%
+        {{hash=ffd84ffd57c8e257d5949618dcbbae72}{%
+           family={Sun},
+           familyi={S\bibinitperiod},
+           given={Tianyu},
+           giveni={T\bibinitperiod}}}%
+        {{hash=2ca38ebc0e0cb8064a936205d2da287f}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={T.},
+           giveni={T\bibinitperiod}}}%
+        {{hash=a2b9a9347bf8ab271f334c2a379a256f}{%
+           family={Zeng},
+           familyi={Z\bibinitperiod},
+           given={Wangding},
+           giveni={W\bibinitperiod}}}%
+        {{hash=fcb38e9712d2346dbe69c076305bed9f}{%
+           family={Zhao},
+           familyi={Z\bibinitperiod},
+           given={Wanjia},
+           giveni={W\bibinitperiod}}}%
+        {{hash=4d7b40882a0f3cad65155854ac2add23}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={Wen},
+           giveni={W\bibinitperiod}}}%
+        {{hash=a375c0aa591cd8365d91339148c732fc}{%
+           family={Liang},
+           familyi={L\bibinitperiod},
+           given={Wenfeng},
+           giveni={W\bibinitperiod}}}%
+        {{hash=aa14cbe5f6e0337df4d630e9492c8c32}{%
+           family={Gao},
+           familyi={G\bibinitperiod},
+           given={Wenjun},
+           giveni={W\bibinitperiod}}}%
+        {{hash=9707e9c1e3066da0aff806ff5ae9fff3}{%
+           family={Yu},
+           familyi={Y\bibinitperiod},
+           given={Wenqin},
+           giveni={W\bibinitperiod}}}%
+        {{hash=617c3dfefd9eb92b86137977ec96fa36}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Wentao},
+           giveni={W\bibinitperiod}}}%
+        {{hash=0577e26ba41d7aa834505c45fa9c85fd}{%
+           family={Xiao},
+           familyi={X\bibinitperiod},
+           given={W.\bibnamedelimi L.},
+           giveni={W\bibinitperiod\bibinitdelim L\bibinitperiod}}}%
+        {{hash=adfff3b9d9e0ddb59be6db943f558b9c}{%
+           family={An},
+           familyi={A\bibinitperiod},
+           given={Wei},
+           giveni={W\bibinitperiod}}}%
+        {{hash=b881686cdf68b52745dbcb6374b8008b}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={Xiaodong},
+           giveni={X\bibinitperiod}}}%
+        {{hash=cff37329ba828df7b7ffba7f6da650ef}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Xiaohan},
+           giveni={X\bibinitperiod}}}%
+        {{hash=e7d0935684bd85a2f77c51839d706ad5}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Xiaokang},
+           giveni={X\bibinitperiod}}}%
+        {{hash=d061b07cc0945b1660473129c6918918}{%
+           family={Nie},
+           familyi={N\bibinitperiod},
+           given={Xiaotao},
+           giveni={X\bibinitperiod}}}%
+        {{hash=2103a5725c16de31b6a666c9227f848e}{%
+           family={Cheng},
+           familyi={C\bibinitperiod},
+           given={Xin},
+           giveni={X\bibinitperiod}}}%
+        {{hash=4f1e33032cdd17c1c4c17fe05bd0772d}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={Xin},
+           giveni={X\bibinitperiod}}}%
+        {{hash=575a5ee21fb18fa9d777a9a1a1c55273}{%
+           family={Xie},
+           familyi={X\bibinitperiod},
+           given={Xin},
+           giveni={X\bibinitperiod}}}%
+        {{hash=d53ef2e8b31ba793777ed523666df345}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={Xingchao},
+           giveni={X\bibinitperiod}}}%
+        {{hash=23bf696850651da86de72745f1c8cbc1}{%
+           family={Yang},
+           familyi={Y\bibinitperiod},
+           given={Xinyu},
+           giveni={X\bibinitperiod}}}%
+        {{hash=53d952d56435e41f1f757f1a99e5dad3}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Xinyuan},
+           giveni={X\bibinitperiod}}}%
+        {{hash=6705c6d571a577d5e7c32f739ee4d782}{%
+           family={Su},
+           familyi={S\bibinitperiod},
+           given={Xuecheng},
+           giveni={X\bibinitperiod}}}%
+        {{hash=0431a94dfd5d9cb6fd78c3051960b8d7}{%
+           family={Lin},
+           familyi={L\bibinitperiod},
+           given={Xuheng},
+           giveni={X\bibinitperiod}}}%
+        {{hash=6ac7a4bfc51836a9d9b209e2d6094659}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={X.\bibnamedelimi Q.},
+           giveni={X\bibinitperiod\bibinitdelim Q\bibinitperiod}}}%
+        {{hash=260ced9c0a136a1dc27334092cac796b}{%
+           family={Jin},
+           familyi={J\bibinitperiod},
+           given={Xiangyue},
+           giveni={X\bibinitperiod}}}%
+        {{hash=a59833a1345886f1afae24be7f9055a0}{%
+           family={Shen},
+           familyi={S\bibinitperiod},
+           given={Xiaojin},
+           giveni={X\bibinitperiod}}}%
+        {{hash=a52fe7b8c3ca1886edc7b6ec952afcd7}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Xiaosha},
+           giveni={X\bibinitperiod}}}%
+        {{hash=d287a2c234cbc465444249d6f2a02293}{%
+           family={Sun},
+           familyi={S\bibinitperiod},
+           given={Xiaowen},
+           giveni={X\bibinitperiod}}}%
+        {{hash=3dd87f3c4b6b8e5811f85aeb34238e44}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Xiaoxiang},
+           giveni={X\bibinitperiod}}}%
+        {{hash=f5bb5e4e32f39e9ec5ce19b22c87130d}{%
+           family={Song},
+           familyi={S\bibinitperiod},
+           given={Xinnan},
+           giveni={X\bibinitperiod}}}%
+        {{hash=ddd6ceff96e70d0c817fc28c95d6b2c4}{%
+           family={Zhou},
+           familyi={Z\bibinitperiod},
+           given={Xinyi},
+           giveni={X\bibinitperiod}}}%
+        {{hash=80dfe7a58a581e6e353204c19b2f4f42}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Xianzu},
+           giveni={X\bibinitperiod}}}%
+        {{hash=e929376f321e5f081b6599e613b0612d}{%
+           family={Shan},
+           familyi={S\bibinitperiod},
+           given={Xinxia},
+           giveni={X\bibinitperiod}}}%
+        {{hash=0ccf1f56ca1014c387c912bb2c760441}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Y.\bibnamedelimi K.},
+           giveni={Y\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+        {{hash=929eb9abf04ca2d0c2ca4371eb2c6be2}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Y.\bibnamedelimi Q.},
+           giveni={Y\bibinitperiod\bibinitdelim Q\bibinitperiod}}}%
+        {{hash=157e7a6e4ee393fcec9e834cb71c604f}{%
+           family={Wei},
+           familyi={W\bibinitperiod},
+           given={Y.\bibnamedelimi X.},
+           giveni={Y\bibinitperiod\bibinitdelim X\bibinitperiod}}}%
+        {{hash=e760d38078aff4a5b24c867aa5178c26}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Yang},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=df1e2e6effdf921e2dd75c5e8613c1dc}{%
+           family={Xu},
+           familyi={X\bibinitperiod},
+           given={Yanhong},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=3142078ae7703c528cd37e12ceedddf3}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Yao},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=5150da6c54dbb181303e4feed7ea53f1}{%
+           family={Zhao},
+           familyi={Z\bibinitperiod},
+           given={Yao},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=e839906d70c0c25114f8fb9d86fe79a9}{%
+           family={Sun},
+           familyi={S\bibinitperiod},
+           given={Yaofeng},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=85c44b90af7ae0ab0977c70ccd95a900}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Yaohui},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=916378086e2e03d46164f07e1684afe6}{%
+           family={Yu},
+           familyi={Y\bibinitperiod},
+           given={Yi},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=6e69ccfb8ad3bcef3071d629209f1311}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Yichao},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=6dc4c7018d106703feadd3a957c35470}{%
+           family={Shi},
+           familyi={S\bibinitperiod},
+           given={Yifan},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=54af66fb3be546ea8e19859dcf16fc59}{%
+           family={Xiong},
+           familyi={X\bibinitperiod},
+           given={Yiliang},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=1f1042f5dd309cbf69ff60a2b59cb378}{%
+           family={He},
+           familyi={H\bibinitperiod},
+           given={Ying},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=d699e1a0a11af50da56fc59f61476d7e}{%
+           family={Piao},
+           familyi={P\bibinitperiod},
+           given={Yishi},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=6ba06f2a5bc95800c6a535193cc3bf3b}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Yisong},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=50d1341bf7057d70cbd04aff68bc64ca}{%
+           family={Tan},
+           familyi={T\bibinitperiod},
+           given={Yixuan},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=2c6cebb44da950bc8c74884ca913a0cd}{%
+           family={Ma},
+           familyi={M\bibinitperiod},
+           given={Yiyang},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=5bafc5a705b505933b280b496f6b9e7e}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={Yiyuan},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=bb91ff5eed749e0f64aa45486d0f0069}{%
+           family={Guo},
+           familyi={G\bibinitperiod},
+           given={Yongqiang},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=bc94e71022ed5f97f16670a8741ad962}{%
+           family={Ou},
+           familyi={O\bibinitperiod},
+           given={Yuan},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=8c868c6b1b57aebdc58d9f0ea7a4df2c}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Yuduan},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=80d7a36aa0eeaa88ed9e4a1721615ce8}{%
+           family={Gong},
+           familyi={G\bibinitperiod},
+           given={Yue},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=8f13b3d755598ac0c3e37d8c1350ed8a}{%
+           family={Zou},
+           familyi={Z\bibinitperiod},
+           given={Yuheng},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=280359edba8c4babdf43601a71b408a9}{%
+           family={He},
+           familyi={H\bibinitperiod},
+           given={Yujia},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=8c32c4d86339b5b7530ebe2662100adc}{%
+           family={Xiong},
+           familyi={X\bibinitperiod},
+           given={Yunfan},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=28d57aa49ed6b36f6cbf905eec75ad64}{%
+           family={Luo},
+           familyi={L\bibinitperiod},
+           given={Yuxiang},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=35166dc32bdb9394b8c96eaf2560959c}{%
+           family={You},
+           familyi={Y\bibinitperiod},
+           given={Yuxiang},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=1ac206357de6fd8dc5a35bc9c7435b34}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={Yuxuan},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=d193e922eec12fbd11abe7086e9030f2}{%
+           family={Zhou},
+           familyi={Z\bibinitperiod},
+           given={Yuyang},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=9a84165e4a9e93dde1810f286d3c7d4b}{%
+           family={Zhu},
+           familyi={Z\bibinitperiod},
+           given={Y.\bibnamedelimi X.},
+           giveni={Y\bibinitperiod\bibinitdelim X\bibinitperiod}}}%
+        {{hash=df1e2e6effdf921e2dd75c5e8613c1dc}{%
+           family={Xu},
+           familyi={X\bibinitperiod},
+           given={Yanhong},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=346a2c7017c020c4a8448409f0e3daf7}{%
+           family={Huang},
+           familyi={H\bibinitperiod},
+           given={Yanping},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=b78ed485e90f02261aac647ed28f0ad7}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Yaohui},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=9e6af3ce4c5063ff98977528f367e685}{%
+           family={Zheng},
+           familyi={Z\bibinitperiod},
+           given={Yi},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=187dbb52f5972c38059c28bbc664dd78}{%
+           family={Zhu},
+           familyi={Z\bibinitperiod},
+           given={Yuchen},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=a870016a67540dc1d9bae8e725082efa}{%
+           family={Ma},
+           familyi={M\bibinitperiod},
+           given={Yunxian},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=b5bb8ccdbe06fbe93bb25a47935a68cb}{%
+           family={Tang},
+           familyi={T\bibinitperiod},
+           given={Ying},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=0383aa9c59f04704d1ca9054402a4fdc}{%
+           family={Zha},
+           familyi={Z\bibinitperiod},
+           given={Yukun},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=c3ee7195ad543f5932238dd9be789c76}{%
+           family={Yan},
+           familyi={Y\bibinitperiod},
+           given={Yuting},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=608aac3364a845124f1f26ec4cf66985}{%
+           family={Ren},
+           familyi={R\bibinitperiod},
+           given={Z.\bibnamedelimi Z.},
+           giveni={Z\bibinitperiod\bibinitdelim Z\bibinitperiod}}}%
+        {{hash=83feb9517d010346b3d4395681e6aea8}{%
+           family={Ren},
+           familyi={R\bibinitperiod},
+           given={Zehui},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=fb666be713dcd47ab94a8f8b00d7cf27}{%
+           family={Sha},
+           familyi={S\bibinitperiod},
+           given={Zhangli},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=df45e6c3a602cdbea1dca9a79d9a214d}{%
+           family={Fu},
+           familyi={F\bibinitperiod},
+           given={Zhe},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=4d772b9785023ef4ad1f49e6b8364af1}{%
+           family={Xu},
+           familyi={X\bibinitperiod},
+           given={Zhean},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=e63c890d46cbd4706041cef78be38fa7}{%
+           family={Xie},
+           familyi={X\bibinitperiod},
+           given={Zhenda},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=27c7fad66da172aaa64e08e3539ff172}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Zhengyan},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=9c8af596d2613606d041a959805ab53c}{%
+           family={Hao},
+           familyi={H\bibinitperiod},
+           given={Zhewen},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=7996f720f1500a78aba3c6c9921a6d0c}{%
+           family={Ma},
+           familyi={M\bibinitperiod},
+           given={Zhicheng},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=569fb846899102bcdcb56577f869880f}{%
+           family={Yan},
+           familyi={Y\bibinitperiod},
+           given={Zhigang},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=cb225ee0c8703418ecb6b1be8e58b946}{%
+           family={Wu},
+           familyi={W\bibinitperiod},
+           given={Zhiyu},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=af2a6e2b4bae3d2480b446aa15c33e73}{%
+           family={Gu},
+           familyi={G\bibinitperiod},
+           given={Zihui},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=eefcf9fccdb17879d606c2ee4f810199}{%
+           family={Zhu},
+           familyi={Z\bibinitperiod},
+           given={Zijia},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=be7e32879aea1bbc88e94a38c871cac2}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={Zijun},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=51f8e6c0fb56d3fa07356d8ec7158f83}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Zilin},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=ebf0e33c6f2095838ad01a618de1b57f}{%
+           family={Xie},
+           familyi={X\bibinitperiod},
+           given={Ziwei},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=11d82543c31828262553b04a51d96783}{%
+           family={Song},
+           familyi={S\bibinitperiod},
+           given={Ziyang},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=13b736a8697a8d063d6c2a80eeec89c6}{%
+           family={Pan},
+           familyi={P\bibinitperiod},
+           given={Zizheng},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=1a0371e0a62b44d30cc131417169cf7c}{%
+           family={Huang},
+           familyi={H\bibinitperiod},
+           given={Zhen},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=7e5205f10a23b331234e3a60218d1ef6}{%
+           family={Xu},
+           familyi={X\bibinitperiod},
+           given={Zhipeng},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=7edd495c0adc64155d032313909ead05}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Zhongyu},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=4be62463c6bbd4876f8fceaf19e1edcf}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Zhen},
+           giveni={Z\bibinitperiod}}}%
+      }
+      \strng{namehash}{5fdab74d243b9b82fe0d349e46676941}
+      \strng{fullhash}{d3571116ee0ecebf7054c394e2a9228a}
+      \strng{fullhashraw}{d3571116ee0ecebf7054c394e2a9228a}
+      \strng{bibnamehash}{5fdab74d243b9b82fe0d349e46676941}
+      \strng{authorbibnamehash}{5fdab74d243b9b82fe0d349e46676941}
+      \strng{authornamehash}{5fdab74d243b9b82fe0d349e46676941}
+      \strng{authorfullhash}{d3571116ee0ecebf7054c394e2a9228a}
+      \strng{authorfullhashraw}{d3571116ee0ecebf7054c394e2a9228a}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{General reasoning represents a long-standing and formidable challenge in artificial intelligence. Recent breakthroughs, exemplified by large language models ({LLMs}) and chain-of-thought prompting, have achieved considerable success on foundational reasoning tasks. However, this success is heavily contingent upon extensive human-annotated demonstrations, and models' capabilities are still insufficient for more complex problems. Here we show that the reasoning abilities of {LLMs} can be incentivized through pure reinforcement learning ({RL}), obviating the need for human-labeled reasoning trajectories. The proposed {RL} framework facilitates the emergent development of advanced reasoning patterns, such as self-reflection, verification, and dynamic strategy adaptation. Consequently, the trained model achieves superior performance on verifiable tasks such as mathematics, coding competitions, and {STEM} fields, surpassing its counterparts trained via conventional supervised learning on human demonstrations. Moreover, the emergent reasoning patterns exhibited by these large-scale models can be systematically harnessed to guide and enhance the reasoning capabilities of smaller models.}
+      \field{day}{18}
+      \field{eprinttype}{arxiv}
+      \field{issn}{0028-0836, 1476-4687}
+      \field{journaltitle}{Nature}
+      \field{month}{9}
+      \field{number}{8081}
+      \field{shortjournal}{Nature}
+      \field{shorttitle}{{DeepSeek}-R1}
+      \field{title}{{DeepSeek}-R1: Incentivizing Reasoning Capability in {LLMs} via Reinforcement Learning}
+      \field{urlday}{23}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{volume}{645}
+      \field{year}{2025}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{633\bibrangedash 638}
+      \range{pages}{6}
+      \verb{doi}
+      \verb 10.1038/s41586-025-09422-z
+      \endverb
+      \verb{eprint}
+      \verb 2501.12948 [cs]
+      \endverb
+      \verb{file}
+      \verb Preprint PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\7SUF9NTQ\\DeepSeek-AI et al. - 2025 - DeepSeek-R1 Incentivizing Reasoning Capability in LLMs via Reinforcement Learning.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/2501.12948
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/2501.12948
+      \endverb
+      \keyw{Computer Science - Artificial Intelligence,Computer Science - Computation and Language,Computer Science - Machine Learning}
+    \endentry
     \entry{mildenhall_nerf_2022}{article}{}{}
       \name{author}{6}{}{%
         {{hash=a3567364ab52973659adf74ee0c6e6f3}{%
@@ -750,8 +1985,8 @@
       \strng{authornamehash}{094342ecc1d4c7df1a909882dd0a89cd}
       \strng{authorfullhash}{9bee638bba28fb3cd739399aa8dc9983}
       \strng{authorfullhashraw}{9bee638bba28fb3cd739399aa8dc9983}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{shorttitle}
       \field{abstract}{We present a method that achieves state-of-the-art results for synthesizing novel views of complex scenes by optimizing an underlying continuous volumetric scene function using a sparse set of input views. Our algorithm represents a scene using a fully connected (nonconvolutional) deep network, whose input is a single continuous 5D coordinate (spatial location ( x , y , z ) and viewing direction ( θ, ϕ )) and whose output is the volume density and view-dependent emitted radiance at that spatial location. We synthesize views by querying 5D coordinates along camera rays and use classic volume rendering techniques to project the output colors and densities into an image. Because volume rendering is naturally differentiable, the only input required to optimize our representation is a set of images with known camera poses. We describe how to effectively optimize neural radiance fields to render photorealistic novel views of scenes with complicated geometry and appearance, and demonstrate results that outperform prior work on neural rendering and view synthesis.}
@@ -816,8 +2051,8 @@
       \strng{authornamehash}{ac68b03d9bae4f1b128311bafa44418d}
       \strng{authorfullhash}{5ee9a8053cd04c40f99a57f291d2c4a8}
       \strng{authorfullhashraw}{5ee9a8053cd04c40f99a57f291d2c4a8}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{abstract}{Neural graphics primitives, parameterized by fully connected neural networks, can be costly to train and evaluate. We reduce this cost with a versatile new input encoding that permits the use of a smaller network without sacrificing quality, thus significantly reducing the number of floating point and memory access operations: a small neural network is augmented by a multiresolution hash table of trainable feature vectors whose values are optimized through stochastic gradient descent. The multiresolution structure allows the network to disambiguate hash collisions, making for a simple architecture that is trivial to parallelize on modern {GPUs}. We leverage this parallelism by implementing the whole system using fully-fused {CUDA} kernels with a focus on minimizing wasted bandwidth and compute operations. We achieve a combined speedup of several orders of magnitude, enabling training of high-quality neural graphics primitives in a matter of seconds, and rendering in tens of milliseconds at a resolution of 1920×1080.}
@@ -881,8 +2116,8 @@
       \strng{authornamehash}{38ed96775a79b080a25e1e45e0aaa88a}
       \strng{authorfullhash}{36d84a8a291db8ba20b3f78b93a2eeee}
       \strng{authorfullhashraw}{36d84a8a291db8ba20b3f78b93a2eeee}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{{ACM} Trans. Graph.}
@@ -1363,8 +2598,8 @@
       \strng{authornamehash}{4ccacac34637df06f749428b6ec5052e}
       \strng{authorfullhash}{930fe4d98807aae6b03560dd3fa31998}
       \strng{authorfullhashraw}{930fe4d98807aae6b03560dd3fa31998}
-      \field{sortinit}{2}
-      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{nature}
@@ -1417,8 +2652,8 @@
       \strng{authornamehash}{f4513f1e634320b31d41567b19d72d91}
       \strng{authorfullhash}{3f77caf625d66b7e43ea979c5b5d0705}
       \strng{authorfullhashraw}{3f77caf625d66b7e43ea979c5b5d0705}
-      \field{sortinit}{2}
-      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{shorttitle}
       \field{journaltitle}{Johns Hopkins {APL} Technical Digest}
@@ -1488,8 +2723,8 @@
       \strng{authornamehash}{2c42dddd45e1ea280a64e08c9a87d720}
       \strng{authorfullhash}{59127397f3045b880071f52e5e66fdf5}
       \strng{authorfullhashraw}{59127397f3045b880071f52e5e66fdf5}
-      \field{sortinit}{2}
-      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{booktitle}{2017 {IEEE}/{RSJ} international conference on intelligent robots and systems ({IROS})}
@@ -1547,8 +2782,8 @@
       \strng{authorfullhash}{b8768a4c7ddbed4ab8050e86e3889eef}
       \strng{authorfullhashraw}{b8768a4c7ddbed4ab8050e86e3889eef}
       \field{extraname}{2}
-      \field{sortinit}{2}
-      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{shorttitle}
       \field{abstract}{While the history of machine learning so far largely encompasses a series of problems posed by researchers and algorithms that learn their solutions, an important question is whether the problems themselves can be generated by the algorithm at the same time as they are being solved. Such a process would in effect build its own diverse and expanding curricula, and the solutions to problems at various stages would become stepping stones towards solving even more challenging problems later in the process. The Paired Open-Ended Trailblazer ({POET}) algorithm introduced in this paper does just that: it pairs the generation of environmental challenges and the optimization of agents to solve those challenges. It simultaneously explores many different paths through the space of possible problems and solutions and, critically, allows these stepping-stone solutions to transfer between problems if better, catalyzing innovation. The term open-ended signifies the intriguing potential for algorithms like {POET} to continue to create novel and increasingly complex capabilities without bound. Our results show that {POET} produces a diverse range of sophisticated behaviors that solve a wide range of environmental challenges, many of which cannot be solved by direct optimization alone, or even through a direct-path curriculum-building control algorithm introduced to highlight the critical role of open-endedness in solving ambitious challenges. The ability to transfer solutions from one environment to another proves essential to unlocking the full potential of the system as a whole, demonstrating the unpredictable nature of fortuitous stepping stones. We hope that {POET} will inspire a new push towards open-ended discovery across many domains, where algorithms like {POET} can blaze a trail through their interesting possible manifestations and solutions.}
@@ -1941,8 +3176,8 @@
       \strng{authornamehash}{dd9b478c7b76d20d978868251cf3ad35}
       \strng{authorfullhash}{18664a8c078ce7dff4c499de4e40bf2f}
       \strng{authorfullhashraw}{18664a8c078ce7dff4c499de4e40bf2f}
-      \field{sortinit}{3}
-      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{booktitle}{Proceedings of the {IEEE} conference on computer vision and pattern recognition}
@@ -1996,8 +3231,8 @@
       \strng{authornamehash}{6e611b79622d9dcb205c92d4232f9dc5}
       \strng{authorfullhash}{45c584c885efca3bc3b36970fc7b2390}
       \strng{authorfullhashraw}{45c584c885efca3bc3b36970fc7b2390}
-      \field{sortinit}{3}
-      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{shorttitle}
       \field{abstract}{We propose a temporally coherent generative model addressing the super-resolution problem for fluid flows. Our work represents a first approach to synthesize four-dimensional physics fields with neural networks. Based on a conditional generative adversarial network that is designed for the inference of three-dimensional volumetric data, our model generates consistent and detailed results by using a novel temporal discriminator, in addition to the commonly used spatial one. Our experiments show that the generator is able to infer more realistic high-resolution details by using additional physical quantities, such as low-resolution velocities or vorticities. Besides improvements in the training process and in the generated outputs, these inputs offer means for artistic control as well. We additionally employ a physics-aware data augmentation step, which is crucial to avoid overfitting and to reduce memory requirements. In this way, our network learns to generate adverted quantities with highly detailed, realistic, and temporally coherent features. Our method works instantaneously, using only a single time-step of low-resolution fluid data. We demonstrate the abilities of our method using a variety of complex inputs and applications in two and three dimensions.}
@@ -2066,8 +3301,8 @@
       \strng{authornamehash}{ba6e625a46287ebf30dd9d9f3c07087b}
       \strng{authorfullhash}{9c08ae1a9d19a2750d4f50c36df0039b}
       \strng{authorfullhashraw}{9c08ae1a9d19a2750d4f50c36df0039b}
-      \field{sortinit}{3}
-      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{booktitle}{International conference on machine learning}
@@ -2116,8 +3351,8 @@
       \strng{authornamehash}{1ef17e0fed8d834b029ebb1c6adf76b4}
       \strng{authorfullhash}{1ef17e0fed8d834b029ebb1c6adf76b4}
       \strng{authorfullhashraw}{1ef17e0fed8d834b029ebb1c6adf76b4}
-      \field{sortinit}{3}
-      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{Advances in neural information processing systems}
@@ -2544,8 +3779,8 @@
       \strng{authornamehash}{72308762399d6ab62bbd9391c64c7bfd}
       \strng{authorfullhash}{72308762399d6ab62bbd9391c64c7bfd}
       \strng{authorfullhashraw}{72308762399d6ab62bbd9391c64c7bfd}
-      \field{sortinit}{4}
-      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{shorttitle}
       \field{journaltitle}{{arXiv} preprint {arXiv}:2010.11929}
@@ -2586,8 +3821,8 @@
       \strng{authornamehash}{536c91678d1dde76c9acd47047556291}
       \strng{authorfullhash}{536c91678d1dde76c9acd47047556291}
       \strng{authorfullhashraw}{536c91678d1dde76c9acd47047556291}
-      \field{sortinit}{4}
-      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{The Bell system technical journal}
@@ -2646,8 +3881,8 @@
       \strng{authornamehash}{a889686a50c7749def33de6826e92748}
       \strng{authorfullhash}{73d0cc2792e602f1e990aa353e1752fd}
       \strng{authorfullhashraw}{73d0cc2792e602f1e990aa353e1752fd}
-      \field{sortinit}{4}
-      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{shorttitle}
       \field{shorttitle}{Time series analysis}
@@ -2697,8 +3932,8 @@
       \strng{authornamehash}{74f081000c9044b4a4873d99960f7bd9}
       \strng{authorfullhash}{74f081000c9044b4a4873d99960f7bd9}
       \strng{authorfullhashraw}{74f081000c9044b4a4873d99960f7bd9}
-      \field{sortinit}{4}
-      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{booktitle}{International conference on machine learning}
@@ -3112,8 +4347,8 @@
       \strng{authornamehash}{25d2f3c4577a6632d37f0126cc781232}
       \strng{authorfullhash}{25d2f3c4577a6632d37f0126cc781232}
       \strng{authorfullhashraw}{25d2f3c4577a6632d37f0126cc781232}
-      \field{sortinit}{5}
-      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{abstract}{In this work we investigate the effect of the convolutional network depth on its accuracy in the large-scale image recognition setting. Our main contribution is a thorough evaluation of networks of increasing depth using an architecture with very small (3x3) convolution filters, which shows that a significant improvement on the prior-art configurations can be achieved by pushing the depth to 16-19 weight layers. These findings were the basis of our {ImageNet} Challenge 2014 submission, where our team secured the first and the second places in the localisation and classification tracks respectively. We also show that our representations generalise well to other datasets, where they achieve state-of-the-art results. We have made our two best-performing {ConvNet} models publicly available to facilitate further research on the use of deep visual representations in computer vision.}
@@ -3176,8 +4411,8 @@
       \strng{authornamehash}{6edb98fe38401d2fe4a026f5ce6e8451}
       \strng{authorfullhash}{42c4b52dc3a62cebabbc11c73e1afb53}
       \strng{authorfullhashraw}{42c4b52dc3a62cebabbc11c73e1afb53}
-      \field{sortinit}{5}
-      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{booktitle}{Proceedings of the {IEEE} conference on computer vision and pattern recognition}
@@ -3258,8 +4493,8 @@
       \strng{editornamehash}{7d63d752dc1fd3abad4ee5f250821c1c}
       \strng{editorfullhash}{33938a515d73fb8b00fd2bd7509d5e86}
       \strng{editorfullhashraw}{33938a515d73fb8b00fd2bd7509d5e86}
-      \field{sortinit}{5}
-      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{shorttitle}
       \field{booktitle}{Medical Image Computing and Computer-Assisted Intervention – {MICCAI} 2015}
@@ -3331,8 +4566,8 @@
       \strng{authornamehash}{98b1946f9c70d83b3f5d709affbe8612}
       \strng{authorfullhash}{0181841339a9deced55f5de1473c7319}
       \strng{authorfullhashraw}{0181841339a9deced55f5de1473c7319}
-      \field{sortinit}{5}
-      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{shorttitle}
       \field{journaltitle}{{arXiv} preprint {arXiv}:1404.1869}
@@ -3772,8 +5007,8 @@
       \strng{authornamehash}{a8692c505f8cc4c4daa5496d9430ba8c}
       \strng{authorfullhash}{a8692c505f8cc4c4daa5496d9430ba8c}
       \strng{authorfullhashraw}{a8692c505f8cc4c4daa5496d9430ba8c}
-      \field{sortinit}{6}
-      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{shorttitle}
       \field{booktitle}{2016 fourth international conference on 3D vision (3DV)}
@@ -3813,8 +5048,8 @@
       \strng{authornamehash}{22927ff197605f4571ef75c5daaab765}
       \strng{authorfullhash}{22927ff197605f4571ef75c5daaab765}
       \strng{authorfullhashraw}{22927ff197605f4571ef75c5daaab765}
-      \field{sortinit}{6}
-      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{{arXiv} preprint {arXiv}:1609.02907}
@@ -3861,8 +5096,8 @@
       \strng{authornamehash}{ee15cf77dd3b94f8a78a3121ad64fb3f}
       \strng{authorfullhash}{ee15cf77dd3b94f8a78a3121ad64fb3f}
       \strng{authorfullhashraw}{ee15cf77dd3b94f8a78a3121ad64fb3f}
-      \field{sortinit}{6}
-      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{Advances in neural information processing systems}
@@ -3915,8 +5150,8 @@
       \strng{authornamehash}{92c732efc89d7036522dee434c5f7ad5}
       \strng{authorfullhash}{f4c64fb080defbd3a7f582f9846ac682}
       \strng{authorfullhashraw}{f4c64fb080defbd3a7f582f9846ac682}
-      \field{sortinit}{6}
-      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{shorttitle}
       \field{journaltitle}{Advances in neural information processing systems}
@@ -4204,8 +5439,8 @@
       \strng{authornamehash}{8e4a2f2eae3c5bfdb3949738a6e69d9e}
       \strng{authorfullhash}{8a78922d0caf9427c042fe85ad4a9a61}
       \strng{authorfullhashraw}{8a78922d0caf9427c042fe85ad4a9a61}
-      \field{sortinit}{7}
-      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{sortinit}{8}
+      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{shorttitle}
       \field{journaltitle}{Advances in neural information processing systems}
@@ -4259,8 +5494,8 @@
       \strng{authornamehash}{7f1105c096dcd1290eba6a5a667b32d3}
       \strng{authorfullhash}{7f1105c096dcd1290eba6a5a667b32d3}
       \strng{authorfullhashraw}{7f1105c096dcd1290eba6a5a667b32d3}
-      \field{sortinit}{7}
-      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{sortinit}{8}
+      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{abstract}{A central goal of sequence modeling is designing a single principled model that can address sequence data across a range of modalities and tasks, particularly on long-range dependencies. Although conventional models including {RNNs}, {CNNs}, and Transformers have specialized variants for capturing long dependencies, they still struggle to scale to very long sequences of \$10000\$ or more steps. A promising recent approach proposed modeling sequences by simulating the fundamental state space model ({SSM}) {\textbackslash}( x'(t) = Ax(t) + Bu(t), y(t) = Cx(t) + Du(t) {\textbackslash}), and showed that for appropriate choices of the state matrix {\textbackslash}( A {\textbackslash}), this system could handle long-range dependencies mathematically and empirically. However, this method has prohibitive computation and memory requirements, rendering it infeasible as a general sequence modeling solution. We propose the Structured State Space sequence model (S4) based on a new parameterization for the {SSM}, and show that it can be computed much more efficiently than prior approaches while preserving their theoretical strengths. Our technique involves conditioning {\textbackslash}( A {\textbackslash}) with a low-rank correction, allowing it to be diagonalized stably and reducing the {SSM} to the well-studied computation of a Cauchy kernel. S4 achieves strong empirical results across a diverse range of established benchmarks, including (i) 91{\textbackslash}\% accuracy on sequential {CIFAR}-10 with no data augmentation or auxiliary losses, on par with a larger 2-D {ResNet}, (ii) substantially closing the gap to Transformers on image and language modeling tasks, while performing generation \$60{\textbackslash}times\$ faster (iii) {SoTA} on every task from the Long Range Arena benchmark, including solving the challenging Path-X task of length 16k that all prior work fails on, while being as efficient as all competitors.}
@@ -4313,8 +5548,8 @@
       \strng{authornamehash}{babde771e7de935487275312d2f755a5}
       \strng{authorfullhash}{babde771e7de935487275312d2f755a5}
       \strng{authorfullhashraw}{babde771e7de935487275312d2f755a5}
-      \field{sortinit}{7}
-      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{sortinit}{8}
+      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{shorttitle}
       \field{booktitle}{First conference on language modeling}
@@ -4362,8 +5597,8 @@
       \strng{authornamehash}{d60494862bf48faf76d925f3780a6aee}
       \strng{authorfullhash}{d60494862bf48faf76d925f3780a6aee}
       \strng{authorfullhashraw}{d60494862bf48faf76d925f3780a6aee}
-      \field{sortinit}{7}
-      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{sortinit}{8}
+      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{Advances in neural information processing systems}
@@ -4877,8 +6112,8 @@
       \strng{authornamehash}{ccf5ebef61998aaab5ec6eace8f4564d}
       \strng{authorfullhash}{ccf5ebef61998aaab5ec6eace8f4564d}
       \strng{authorfullhashraw}{ccf5ebef61998aaab5ec6eace8f4564d}
-      \field{sortinit}{8}
-      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{{arXiv} preprint {arXiv}:1409.0473}
@@ -4925,8 +6160,8 @@
       \strng{authornamehash}{a442a9bbb26362f27b11afa1b7ac9582}
       \strng{authorfullhash}{a442a9bbb26362f27b11afa1b7ac9582}
       \strng{authorfullhashraw}{a442a9bbb26362f27b11afa1b7ac9582}
-      \field{sortinit}{8}
-      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{Advances in neural information processing systems}
@@ -5194,8 +6429,8 @@
       \strng{authornamehash}{93aba8e9bb746e2d8ac216494b952014}
       \strng{authorfullhash}{21f7721b75bba06d59f9d5ce222a34a5}
       \strng{authorfullhashraw}{21f7721b75bba06d59f9d5ce222a34a5}
-      \field{sortinit}{9}
-      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{Journal of machine learning research}
@@ -5269,8 +6504,8 @@
       \strng{authornamehash}{027634cbc965faacd865d772c14b4f69}
       \strng{authorfullhash}{4bbd3cec9a79a08a24618a35ca0b0e57}
       \strng{authorfullhashraw}{4bbd3cec9a79a08a24618a35ca0b0e57}
-      \field{sortinit}{9}
-      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{shorttitle}
       \field{abstract}{Transformers have achieved superior performances in many tasks in natural language processing and computer vision, which also triggered great interest in the time series community. Among multiple advantages of Transformers, the ability to capture long-range dependencies and interactions is especially attractive for time series modeling, leading to exciting progress in various time series applications. In this paper, we systematically review Transformer schemes for time series modeling by highlighting their strengths as well as limitations. In particular, we examine the development of time series Transformers in two perspectives. From the perspective of network structure, we summarize the adaptations and modifications that have been made to Transformers in order to accommodate the challenges in time series analysis. From the perspective of applications, we categorize time series Transformers based on common tasks including forecasting, anomaly detection, and classification. Empirically, we perform robust analysis, model size analysis, and seasonal-trend decomposition analysis to study how Transformers perform in time series. Finally, we discuss and suggest future directions to provide useful research guidance. To the best of our knowledge, this paper is the first work to comprehensively and systematically summarize the recent advances of Transformers for modeling time series data. We hope this survey will ignite further research interests in time series Transformers.}
@@ -5349,8 +6584,8 @@
       \strng{authornamehash}{fd1f7c12e5bef04a5e71b623a18fadec}
       \strng{authorfullhash}{116045fd64aa9173a259ff5ef8541d4b}
       \strng{authorfullhashraw}{116045fd64aa9173a259ff5ef8541d4b}
-      \field{sortinit}{9}
-      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{shorttitle}
       \field{booktitle}{Proceedings of the {AAAI} conference on artificial intelligence}

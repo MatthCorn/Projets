@@ -1,4 +1,4 @@
-\chapter{État de l'art : PLAN (à supprimer après rédaction)}
+\chapter*{État de l'art : PLAN (à supprimer après rédaction)}
 
 Le chapitre sur l'état de l'art se découpe en 4 parties.
 
@@ -82,12 +82,12 @@ Cette section met en avant les difficultés liées à l'apprentissage automatiqu
 
 
 \chapter{État de l'art}
-Ce chapitre présente les concepts et méthodes fondamentaux sur lesquels s'appuie cette thèse. Nous commencerons par définir la notion d'Environnement Numérique ainsi que les différents apports de l'IA à la simulation. Nous exposerons ensuite les approches d'IA générative, avant de nous concentrer sur les méthodes de traitement de séquence, en détaillant particulièrement l'architecture Transformer. Enfin, nous conclurons par une analyse des défis inhérents à l'entraînement de ces modèles profonds, en passant en revue les solutions techniques existantes pour garantir leur stabilité, leur efficacité calculatoire et leur interprétabilité.
+Ce chapitre présente les concepts et méthodes fondamentaux sur lesquels s'appuie cette thèse. Nous commencerons par définir la notion d'Environnement Numérique, avant de poser les principes mathématiques de l'apprentissage profond qui nous permettront d'introduire les différents apports de l'IA à la simulation. Nous exposerons ensuite les approches d'IA générative, pour enfin nous concentrer sur les méthodes de traitement de séquence, en détaillant particulièrement l'architecture Transformer. Nous conclurons par une analyse des défis inhérents à l'entraînement de ces modèles profonds, en passant en revue les solutions techniques existantes pour garantir leur stabilité, leur efficacité calculatoire et leur interprétabilité.
 
 
 \section{Introduction : Environnements Numériques et typologie des apports de l'IA}
 
-Portée par l'augmentation de la puissance de calcul et la disponibilité croissante des données, l'utilisation de représentations virtuelles pour l'analyse et l'optimisation des systèmes physiques s'est généralisée. Dans ce contexte, les notions de « jumeau numérique » et « environnement numérique » sont souvent employés de manière interchangeable, engendrant une confusion sémantique que cette section a pour objectif de démêler. Nous retracerons dans un premier temps l'origine et les définitions, tant idéales que pragmatiques, du jumeau numérique. Dans un second temps, nous présenterons une définition unificatrice et fonctionnelle de l'environnement numérique. Enfin, une synthèse comparative nous permettra d'établir une distinction claire basée sur les flux de données et le critère d'individualisation, et de justifier le positionnement terminologique adopté dans le cadre de cette étude.
+L'utilisation de représentations virtuelles pour l'analyse et l'optimisation des systèmes physiques s'est aujourd'hui largement généralisée. Dans ce contexte, les termes de « jumeau numérique » et d'« environnement numérique » sont souvent employés de manière interchangeable. Cette première sous-section a pour objectif de démêler cette confusion sémantique. Afin d'introduire rigoureusement les outils capables de modéliser et d'animer ces environnements virtuels, nous formaliserons ensuite les principes mathématiques de l'apprentissage profond. Enfin, nous dresserons une typologie des apports de l'Intelligence Artificielle à la simulation, structurée autour de trois axes d'intervention : la constitution géométrique et visuelle, la représentation des phénomènes physiques, et les capacités d'interaction dynamique.
 
 \subsection{Cadre Conceptuel : Environnement Virtuel et Jumeau Numérique}
 Le concept de jumeau numérique, popularisé et formalisé dès le début des années 2000 par les travaux de Michael Grieves dans le domaine manufacturier \cite{grieves_digital_2014}, puis théorisé comme un pilier des systèmes cyber-physiques (CPS) par des auteurs comme Negri et al. \cite{negri_review_2017}, a connu une adoption rapide et variée à travers l'industrie.
@@ -104,6 +104,50 @@ Cette définition permet de tracer une ligne de démarcation nette avec le conce
 
 Ainsi clarifiée, la notion de VE couvre un spectre étendu, allant du monde immersif interactif au simulateur technique. Dans le contexte spécifique du développement algorithmique, qui est le nôtre, le VE devient un outil de prototypage et de validation indispensable : il permet de reproduire des situations expérimentales complexes, de générer des données synthétiques massives et de tester des modèles de manière intensive, sûre et économique, sans les contraintes logistiques des dispositifs physiques réels. Pour structurer l'état de l'art des méthodes d'Intelligence Artificielle au service de ces environnements, nous organiserons la suite de notre analyse selon trois axes d'intervention distincts : la constitution géométrique et visuelle de l'environnement, la représentation des phénomènes physiques par apprentissage, et enfin les capacités d'interaction et d'adaptation dynamique.
 
+\subsection{Principes mathématiques de l'Apprentissage Profond}
+Avant d'explorer les architectures génératives et séquentielles avancées, il convient de formaliser les fondements mathématiques de l'apprentissage profond (\textit{Deep Learning}). Si le vocabulaire associé à l'intelligence artificielle emprunte souvent à la biologie, son mécanisme relève en réalité de l'optimisation mathématique de fonctions paramétriques.
+
+\subsubsection{Risque théorique, risque empirique et surapprentissage}
+Un réseau de neurones artificiels n'est autre qu'une fonction mathématique paramétrique $f_\theta$, qui associe une donnée d'entrée $x$ à une prédiction $\hat{y}$. La spécificité de cette fonction réside dans sa structure : elle est construite comme la composition successive de $L$ fonctions plus simples, appelées couches. La fonction globale s'écrit ainsi :
+$$f_\theta(x) = f_L(f_{L-1}(\dots f_1(x; \theta_1) \dots ; \theta_{L-1}); \theta_L)$$
+
+C'est de cet enchevêtrement de couches que le modèle tire son qualificatif de "profond" (\textit{deep}). L'ensemble des paramètres $\theta = \{\theta_1, \dots, \theta_L\}$ (les poids et les biais de chaque couche $(f_l)_{1 \leq l \leq L}$) peut se compter en millions, voire milliards.\\
+
+L'objectif de l'apprentissage est de trouver le jeu de paramètres optimal $\theta^*$ qui minimise le risque théorique, caractérisant la qualité de reconstruction des prédictions futures en les comparant à la vérité terrain. La qualité de reconstruction est calculé via la fonction de perte notée $\mathcal{L}(\hat{y}, y)$, qui mesure l’écart entre la prédiction $\hat{y}$ et la référence $y$. Le problème d'optimisation se formule comme la minimisation du risque théorique, c'est-à-dire l'espérance de la perte $\mathcal{L}$ sur la distribution de probabilité conjointe $P(x,y)$ régissant le phénomène physique étudié :
+$$\theta^* = \arg\min_\theta \mathbb{E}_{(x,y) \sim P}[\mathcal{L}(f_\theta(x), y)]$$
+
+Cependant, la distribution $P$ étant inconnue, cette espérance ne peut être calculée analytiquement. La stratégie consiste alors à approximer cette espérance par une moyenne calculée sur un jeu de données d'entraînement fini, constitué de $N$ exemples $(x_i, y_i)$. Le problème se transforme ainsi en la minimisation du risque empirique :
+$$\hat{\theta}^* = \arg\min_\theta \frac{1}{N} \sum_{i=1}^N \mathcal{L}(f_\theta(x_i), y_i)$$
+
+Cette substitution de l'espérance par une moyenne empirique met en lumière l'une des limites fondamentales de l'apprentissage automatique : le surapprentissage (\textit{overfitting}) : si l'espace des solutions modélisables est trop permissif, le réseau parvient à exploiter ses nombreux degrés de liberté pour mémoriser parfaitement l'échantillon d'entraînement. Le risque empirique tombe strictement à zéro, mais au prix d'oscillations extrêmes et aberrantes entre ces points, faisant diverger le risque théorique.\\
+
+Cette divergence trouve son illustration la plus canonique dans la régression polynomiale : lorsqu'un polynôme possède un degré supérieur ou égal au nombre de points d'entraînement, l'espace des solutions autorise une interpolation parfaite. Le risque empirique tombe strictement à zéro, mais au prix d'oscillations extrêmes et aberrantes entre ces points, faisant exploser le véritable risque théorique.\\
+
+En pratique, on constitue un échantillon de données indépendant, tenu à l'écart de la phase d'optimisation, appelé ensemble de validation. Cet ensemble ne pourra donc pas être influencé positivement par un sur-apprentissage et permet évaluer la capacité de généralisation d'un modèle.
+
+\subsubsection{L'optimisation par descente de gradient et la règle de la chaîne}
+Cette minimisation du risque empirique est strictement identique à celle d'un problème d'apprentissage élémentaire tel que la régression linéaire. Cependant, dans une régression linéaire, les approximations sont de simples projections affines et la fonction de perte forme un paysage d'optimisation strictement convexe. Cette simplicité permet de trouver le minimum global de manière directe grâce à une solution analytique exacte (l'équation normale $\theta = (X^T X)^{-1} X^T y$).\\
+
+Dans le cadre de l'apprentissage profond, la succession des couches $(f_1, \dots, f_L)$ est systématiquement entrelacée de fonctions d'activation non-linéaires. Cette non-linéarité est essentielle pour modéliser des phénomènes complexes, mais elle rend le paysage d'optimisation non-convexe. Il devient indispensable de recourir à une méthode d'optimisation itérative : la descente de gradient. À chaque itération, les paramètres sont mis à jour dans la direction opposée au gradient de l'erreur, selon un pas d'apprentissage $\alpha$ :
+$$\theta \leftarrow \theta - \alpha \nabla_\theta \mathcal{L}$$
+
+Pour évaluer ce gradient sur un réseau profond, on formalise le flux d'information par une suite d'états intermédiaires. En posant $a_0 = x$ comme vecteur d'entrée, la sortie de chaque couche $l$ se définit par la récurrence $a_l = f_l(a_{l-1}; \theta_l)$. La sortie de la dernière couche correspond ainsi à la prédiction finale du modèle : $a_L = \hat{y}$. \\
+
+Le calcul du gradient $\nabla_\theta \mathcal{L}$ pour une matrice de paramètres spécifique $\theta_l$, située dans les couches profondes, repose sur la formule de dérivation des fonctions composées (\textit{chain rule}). La dérivée s'exprime alors comme le produit des matrices Jacobiennes successives le long du graphe de calcul :
+
+$$\frac{\partial \mathcal{L}}{\partial \theta_l} = \frac{\partial \mathcal{L}}{\partial a_L} \frac{\partial a_L}{\partial a_{L-1}} \dots \frac{\partial a_{l+1}}{\partial a_l} \frac{\partial a_l}{\partial \theta_l}$$
+
+Son implémentation algorithmique, connue sous le nom de rétropropagation du gradient (\textit{backpropagation}), permet de calculer ces termes informatiquement et efficacement en remontant la chaîne de dérivées partielles de la sortie vers l'entrée du réseau .
+
+\subsubsection{Géométrie de l'optimisation}
+
+La nature itérative et non-convexe de l'optimisation a longtemps nourri la crainte de voir l'algorithme d'apprentissage se bloquer irrémédiablement dans un "minimum local" de mauvaise qualité. Cette intuition, issue de notre perception des espaces géométriques à deux ou trois dimensions, s'avère toutefois trompeuse pour les réseaux profonds.\\
+
+Des travaux  \cite{dauphin_identifying_2014}, \cite{choromanska_loss_2015} ont démontré qu’en très haute dimension, la probabilité de rencontrer un véritable minimum local de mauvaise qualité est très faible. En réalité, l'écrasante majorité des obstacles rencontrés en apprentissage sont des "points-selles" : des configurations formant des plateaux instables, où la gradient tend vers zéro, provoquant un ralentissement de l'apprentissage. L'emploie d'optimiseurs avancés (comme la méthode Adam) permet de conserver une inertie temporelle (le \textit{momentum}) et de s'échapper de ces zones.\\
+
+Cette dynamique d'optimisation en régime sur-paramétré éclaire une pratique centrale de l'IA moderne : l'apprentissage se fait désormais sur des gros modèles, dont les connaissances sont ensuite transférées à des modèles plus petits par distillation \cite{hinton_distilling_2015} . Les recherches récentes confirment que cette stratégie n'est pas qu'un artifice d'ingénierie : elle repose sur le constat que l'apprentissage est plus efficace sur les grands modèles, qui capturent des représentations riches que les petits modèles, entraînés seuls, ne peuvent atteindre. Ainsi, un modèle de 6 à 7 milliards de paramètres distillé peut égaler, voire surpasser sur certaines tâches, un modèle de 175 milliards non distillé, tout en offrant des performances opérationnelles très supérieures en vitesse et en coût \cite{deepseek-ai_deepseek-r1_2025}.\\
+
+Bien que nous n'aspirons pas à construire des modèles immenses, ces faits nous permettent d'envisager une solution dans le domaine de l'apprentissage profond en gardant l'esprit serein.
 
 \subsection{L'IA pour la constitution géométrique et visuelle de l'environnement}
 
