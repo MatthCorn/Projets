@@ -19,19 +19,33 @@ Ce chapitre reprend les résultats de nos travaux publiés à la conférence EUS
 Cette section détaille la méthodologie de construction des ensembles de données synthétiques utilisés pour l'apprentissage supervisé. L'objectif est de générer des couples $(\mathbf{X}, \mathbf{Y})$ où $\mathbf{X}$ est une séquence de $N=10$ vecteurs $\{V_1, \dots, V_N\}$ de $\mathbb{R}^5$ et $\mathbf{Y}$ est la séquence cible ordonnée correspondante.
 
 \subsection{Règle d'ordonnancement implicite}
-L'ordre des vecteurs est déterminé par une règle latente, inconnue du modèle lors de l'apprentissage. Cette règle repose sur la projection des vecteurs sur un hyperparamètre directeur $U \in \mathbb{R}^5$, unitaire ($\|U\|_2 = 1$). Pour chaque vecteur $V_i$, un score scalaire $S_i$ est calculé selon :
+
+Afin d'évaluer la capacité du modèle à extraire une relation d'ordre dans un espace continu, nous formalisons le problème de tri de la manière générale suivante. Soit une séquence d'entrée désordonnée $\mathbf{X} = (V_1, V_2, \dots, V_{N})$ composée de $N$ vecteurs appartenant à un espace continu $\mathbb{R}^d$. L'ordre cible de cette séquence est déterminé par une règle latente, strictement inconnue du réseau de neurones lors de l'apprentissage.\\
+
+Cette règle repose sur la projection géométrique de chaque élément sur un vecteur directeur caché, noté $U \in \mathbb{R}^d$, de norme unitaire ($\|U\|_2 = 1$). Pour chaque vecteur $V_i$, un score scalaire $S_i$ est ainsi calculé via le produit scalaire :
 \begin{equation}
-    S_i = \langle V_i, U \rangle
+S_i = \langle V_i, U \rangle
 \end{equation}
-La tâche du modèle consiste à prédire l'ordonnancement des vecteurs $V_i$ induit par le tri croissant des scores $S_i$, en se basant uniquement sur l'observation des données, sans connaissance a priori de la règle d'ordonnancement. Ce principe est illustré dans la figure \ref{fig:sort}.
+
+Ce score unidimensionnel définit l'ordre absolu des éléments. Le processus d'ordonnancement consiste alors à trouver la permutation $\sigma$ des indices $\{1, \dots, N\}$ garantissant que les scores soient triés par ordre croissant :
+\begin{equation}
+S_{\sigma(1)} \le S_{\sigma(2)} \le \dots \le S_{\sigma(N)}
+\end{equation}
+
+La séquence triée correspondante, que le modèle doit apprendre à générer, est donc la séquence des vecteurs d'entrée réorganisés selon cette permutation exacte :
+$$\mathbf{Y} = (V_{\sigma(1)}, V_{\sigma(2)}, \dots, V_{\sigma(N)})$$
+
+Ce principe global de cette transformation, du calcul du score jusqu'à la restitution de la séquence ordonnée, est illustré dans la figure \ref{fig:sort}. \\
 
 \begin{figure}[htbp]
-\begin{center} 
+\begin{center}
 \includegraphics[scale=0.4]{Sorting.png}
 \end{center}
-\caption{Diagramme de la procédure de tri décrite. Les différentes étapes sont visibles de haut en bas : départ de la séquence désordonnée, association d'un score par élément, ordonnancement par critère de score croissant et enfin restitution de la séquence ordonnée.}
+\caption{Diagramme de la procédure de tri. Les différentes étapes sont visibles de haut en bas : réception de la séquence désordonnée, projection et association d'un score par élément, détermination de la permutation $\sigma$ par tri croissant des scores, et enfin restitution de la séquence vectorielle ordonnée.}
 \label{fig:sort}
 \end{figure}
+
+La tâche du modèle consiste à prédire la séquence ordonnée de vecteurs $\mathbf{Y}$ à partir de $\mathbf{X}$, en se basant uniquement sur l'observation des données, sans connaissance a priori de la règle d'ordonnancement donnant naissance à $\sigma$, ce qui oblige l'architecture à développer une capacité de discernement fin entre des vecteurs très proches dans l'espace multidimensionnel. Dans le cadre spécifique de nos expérimentations, nous avons instancié ce problème général pour des séquences de $N=10$ éléments évoluant dans un espace de dimension $d=5$. 
 
 \subsection{Définition de la difficulté et invariances}
 Afin d'évaluer la robustesse du modèle, nous introduisons une mesure quantifiant la difficulté intrinsèque de tri d'une séquence. Intuitivement, une séquence est difficile à trier si les scores de ses éléments sont proches les uns des autres relativement à l'étendue globale des valeurs possibles.

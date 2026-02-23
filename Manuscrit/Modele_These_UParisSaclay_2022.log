@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.11.20)  23 FEB 2026 16:47
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.11.20)  23 FEB 2026 17:54
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1254,13 +1254,8 @@ File: TS1opensans-TOsF.fd 2019/06/24 Font definitions for TS1/opensans-TOsF.
 )
 LaTeX Font Info:    Font shape `TS1/opensans-TOsF/m/n' will be
 (Font)              scaled to size 11.39996pt on input line 13.
- (Introduction.aux) (Problematique.aux) (Etat de l art.aux) (EUSIPCO.aux) (Stag
-e.aux) (AVERTISSEMENT.aux) (COMPOSITION GENERALE et CHARTE GRAPHIQUE.aux) (INFO
-RMATIONS GENERALES SUR LA PAGE DE COUVERTURE.aux)
-(CIVILITE FEMINISATION DES TITRES ET FONCTIONS.aux)
-(PRESENTATION DE LA DIRECTION DE LA THESE OU DE L EQUIPE D ENCADREMENT.aux)
-(COMPOSITION DU JURY.aux) (BIEN CITER SES SOURCES.aux)
-(DEPOSER ET DIFFUSER SA THESE.aux) (ANNEXE LES LOGOS INSTITUTIONNELS.aux))
+ (Introduction.aux) (Problematique.aux) (Etat de l art.aux) (EUSIPCO.aux) (Gros
+TAF.aux) (Stage.aux))
 \openout1 = `Modele_These_UParisSaclay_2022.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 67.
@@ -1400,7 +1395,7 @@ Package biblatex Info: Reference segment=0 on input line 67.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-<Frame-ups.pdf, id=474, 303.38344pt x 849.92531pt>
+<Frame-ups.pdf, id=350, 303.38344pt x 849.92531pt>
 File: Frame-ups.pdf Graphic file (type pdf)
 <use Frame-ups.pdf>
 Package pdftex.def Info: Frame-ups.pdf  used on input line 75.
@@ -1412,7 +1407,7 @@ LaTeX Font Info:    Font shape `T1/opensans-TOsF/m/n' will be
 LaTeX Font Warning: Font shape `T1/opensans-TOsF/m/sc' undefined
 (Font)              using `T1/opensans-TOsF/m/n' instead on input line 85.
 
-<logo2.png, id=475, 194.97844pt x 87.32625pt>
+<logo2.png, id=351, 194.97844pt x 87.32625pt>
 File: logo2.png Graphic file (type png)
 <use logo2.png>
 Package pdftex.def Info: logo2.png  used on input line 94.
@@ -1490,7 +1485,7 @@ h/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/opensans/a_p2vepx.enc} <./Frame
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-<logo_ups_EOBE.png, id=491, 1734.48pt x 397.485pt>
+<logo_ups_EOBE.png, id=367, 1734.48pt x 397.485pt>
 File: logo_ups_EOBE.png Graphic file (type png)
 <use logo_ups_EOBE.png>
 Package pdftex.def Info: logo_ups_EOBE.png  used on input line 173.
@@ -1536,11 +1531,11 @@ Package mdframed Info: mdframed works in twoside mode on input line 194.
 (Modele_These_UParisSaclay_2022.toc [3
 
 
-] [4] [5])
+] [4])
 \tf@toc=\write6
 \openout6 = `Modele_These_UParisSaclay_2022.toc'.
 
- [6]
+ [5]
 *geometry* verbose mode - [ newgeometry ] result:
 * driver: pdftex
 * paper: a4paper
@@ -1575,15 +1570,15 @@ Package mdframed Info: mdframed works in twoside mode on input line 194.
 
 \openout2 = `Introduction.aux'.
 
- (Introduction.tex
+ (Introduction.tex [6
+
+
+
+]
 LaTeX Font Info:    Font shape `TS1/opensans-TOsF/m/n' will be
 (Font)              scaled to size 10.40245pt on input line 4.
- [7
-
-
-
-{C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/opensans/a_nvvucy
-.enc}] [8
+ [7{C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/opensans/a_nvv
+ucy.enc}] [8
 
 ]
 Chapitre 1.
@@ -1609,7 +1604,32 @@ Underfull \hbox (badness 10000) in paragraph at lines 46--47
 
  []
 
-[11] [12]) [13]
+[11]
+Underfull \hbox (badness 10000) in paragraph at lines 77--78
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 79--80
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 81--82
+
+ []
+
+[12]
+Underfull \hbox (badness 10000) in paragraph at lines 83--84
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 85--86
+
+ []
+
+) [13]
 \openout2 = `Problematique.aux'.
 
  (Problematique.tex [14
@@ -1621,7 +1641,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 46--47
 
 ]
 Chapitre 2.
-<apport_tactic.png, id=680, 985.43156pt x 302.63063pt>
+<apport_tactic.png, id=525, 985.43156pt x 302.63063pt>
 File: apport_tactic.png Graphic file (type png)
 <use apport_tactic.png>
 Package pdftex.def Info: apport_tactic.png  used on input line 22.
@@ -1636,7 +1656,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 29--31
  []
 
 [17]
-<env.png, id=687, 1323.44438pt x 657.2053pt>
+<env.png, id=532, 1323.44438pt x 657.2053pt>
 File: env.png Graphic file (type png)
 <use env.png>
 Package pdftex.def Info: env.png  used on input line 36.
@@ -1656,12 +1676,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 49--51
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [20]
-<dragon.png, id=720, 1324.95pt x 502.12593pt>
+<dragon.png, id=565, 1324.95pt x 502.12593pt>
 File: dragon.png Graphic file (type png)
 <use dragon.png>
 Package pdftex.def Info: dragon.png  used on input line 59.
 (pdftex.def)             Requested size: 397.48807pt x 150.63893pt.
-<IOexemple.png, id=721, 1300.1072pt x 544.28343pt>
+<IOexemple.png, id=566, 1300.1072pt x 544.28343pt>
 File: IOexemple.png Graphic file (type png)
 <use IOexemple.png>
 Package pdftex.def Info: IOexemple.png  used on input line 68.
@@ -1832,12 +1852,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 281--283
 
  []
 
-<BasicConvolution.png, id=956, 1152.55594pt x 533.74406pt>
+<BasicConvolution.png, id=801, 1152.55594pt x 533.74406pt>
 File: BasicConvolution.png Graphic file (type png)
 <use BasicConvolution.png>
 Package pdftex.def Info: BasicConvolution.png  used on input line 286.
 (pdftex.def)             Requested size: 288.13828pt x 133.43568pt.
-<ComparaisonConvolution.png, id=959, 941.76843pt x 399.74344pt>
+<ComparaisonConvolution.png, id=804, 941.76843pt x 399.74344pt>
 File: ComparaisonConvolution.png Graphic file (type png)
 <use ComparaisonConvolution.png>
 Package pdftex.def Info: ComparaisonConvolution.png  used on input line 296.
@@ -1858,12 +1878,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 341--343
  []
 
 [49]
-<BasicRNN.png, id=1030, 770.12718pt x 249.93375pt>
+<BasicRNN.png, id=875, 770.12718pt x 249.93375pt>
 File: BasicRNN.png Graphic file (type png)
 <use BasicRNN.png>
 Package pdftex.def Info: BasicRNN.png  used on input line 346.
 (pdftex.def)             Requested size: 269.54854pt x 87.47812pt.
-<ComparaisonRNN.png, id=1033, 1030.60031pt x 338.01282pt>
+<ComparaisonRNN.png, id=878, 1030.60031pt x 338.01282pt>
 File: ComparaisonRNN.png Graphic file (type png)
 <use ComparaisonRNN.png>
 Package pdftex.def Info: ComparaisonRNN.png  used on input line 356.
@@ -1883,23 +1903,23 @@ Underfull \hbox (badness 10000) in paragraph at lines 384--385
 
  []
 
-<simple_transformer.png, id=1081, 538.26094pt x 271.0125pt>
+<simple_transformer.png, id=926, 538.26094pt x 271.0125pt>
 File: simple_transformer.png Graphic file (type png)
 <use simple_transformer.png>
 Package pdftex.def Info: simple_transformer.png  used on input line 389.
 (pdftex.def)             Requested size: 296.04443pt x 149.05733pt.
-<full_transformer.png, id=1083, 715.17188pt x 608.2725pt>
+<full_transformer.png, id=928, 715.17188pt x 608.2725pt>
 File: full_transformer.png Graphic file (type png)
 <use full_transformer.png>
 Package pdftex.def Info: full_transformer.png  used on input line 398.
 (pdftex.def)             Requested size: 286.06367pt x 243.30469pt.
 [53]
-<enc_transformer.png, id=1093, 721.19438pt x 590.205pt>
+<enc_transformer.png, id=938, 721.19438pt x 590.205pt>
 File: enc_transformer.png Graphic file (type png)
 <use enc_transformer.png>
 Package pdftex.def Info: enc_transformer.png  used on input line 408.
 (pdftex.def)             Requested size: 288.47264pt x 236.0778pt.
-<dec_transformer.png, id=1095, 854.44218pt x 615.80063pt>
+<dec_transformer.png, id=940, 854.44218pt x 615.80063pt>
 File: dec_transformer.png Graphic file (type png)
 <use dec_transformer.png>
 Package pdftex.def Info: dec_transformer.png  used on input line 418.
@@ -1972,7 +1992,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 471--472
  []
 
 [57]
-<cross_attention.png, id=1137, 1087.06125pt x 599.23875pt>
+<cross_attention.png, id=982, 1087.06125pt x 599.23875pt>
 File: cross_attention.png Graphic file (type png)
 <use cross_attention.png>
 Package pdftex.def Info: cross_attention.png  used on input line 475.
@@ -1994,7 +2014,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 489--491
 
  []
 
-<self_attention.png, id=1150, 1090.82532pt x 588.69937pt>
+<self_attention.png, id=995, 1090.82532pt x 588.69937pt>
 File: self_attention.png Graphic file (type png)
 <use self_attention.png>
 Package pdftex.def Info: self_attention.png  used on input line 497.
@@ -2031,72 +2051,81 @@ Underfull \hbox (badness 10000) in paragraph at lines 9--10
 
 
 ]
-<Sorting.png, id=1217, 657.05475pt x 386.6445pt>
+Underfull \hbox (badness 10000) in paragraph at lines 23--24
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 38--39
+
+ []
+
+<Sorting.png, id=1062, 657.05475pt x 386.6445pt>
 File: Sorting.png Graphic file (type png)
 <use Sorting.png>
-Package pdftex.def Info: Sorting.png  used on input line 30.
+Package pdftex.def Info: Sorting.png  used on input line 42.
 (pdftex.def)             Requested size: 262.81725pt x 154.65506pt.
 
-Overfull \hbox (1.94693pt too wide) in paragraph at lines 39--40
+Overfull \hbox (1.94693pt too wide) in paragraph at lines 53--54
 []\T1/opensans-TOsF/m/sc/10.95 Pour ca-rac-té-ri-ser cette me-sure de dif-fi-cu
 lté, nous dé-fi-nis-sons deux mé-triques in-ter-mé-diaires
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 44--45
+Underfull \hbox (badness 10000) in paragraph at lines 58--59
 
  []
 
 
-Overfull \hbox (21.80388pt too wide) in paragraph at lines 46--47
+Overfull \hbox (21.80388pt too wide) in paragraph at lines 60--61
 \T1/opensans-TOsF/m/sc/10.95 fixée pour la gé-né-ra-tion des don-nées, cor-res-
 pon-dant à l'in-ter-valle dans le-quel les $\OML/cmm/m/it/10.95 ^^V[]$ \T1/open
 sans-TOsF/m/sc/10.95 sont contraintes
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 46--47
+Underfull \hbox (badness 10000) in paragraph at lines 60--61
 
  []
 
-[64 <./Sorting.png>]
-Overfull \hbox (1.82877pt too wide) in paragraph at lines 48--49
+[64]
+Overfull \hbox (1.82877pt too wide) in paragraph at lines 62--63
 []\T1/opensans-TOsF/m/sc/10.95 Nous pou-vons à pré-sent in-tro-duire le \T1/ope
 nsans-TOsF/b/n/10.95 ra-tio de sé-pa-ra-bi-lité $\OML/cmm/m/it/10.95 r$ \T1/ope
 nsans-TOsF/m/sc/10.95 d'une sé-quence, dé-fi-nit comme
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 59--60
+Underfull \hbox (badness 10000) in paragraph at lines 73--74
 
  []
 
-[65] [66]
-Underfull \hbox (badness 10000) in paragraph at lines 112--113
+[65 <./Sorting.png>] [66]
+Underfull \hbox (badness 10000) in paragraph at lines 126--127
 
  []
 
 LaTeX Font Info:    Trying to load font information for U+dsrom on input line 1
-22.
+36.
 (C:\Users\Matth\AppData\Local\Programs\MiKTeX\tex/latex/doublestroke\udsrom.fd
 File: Udsrom.fd 1995/08/01 v0.1 Double stroke roman font definitions
-)
-Underfull \hbox (badness 10000) in paragraph at lines 133--134
+) [67]
+Underfull \hbox (badness 10000) in paragraph at lines 147--148
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 135--136
+Underfull \hbox (badness 10000) in paragraph at lines 149--150
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 137--138
+Underfull \hbox (badness 10000) in paragraph at lines 151--152
 
  []
 
-[67]
-Overfull \hbox (133.02666pt too wide) in paragraph at lines 139--140
+
+Overfull \hbox (133.02666pt too wide) in paragraph at lines 153--154
 \T1/opensans-TOsF/m/sc/10.95 tra-vers 9 fe-nêtres suc-ces-sives, sui-vant la su
 ite de va-leurs $\OML/cmm/m/it/10.95 ^^U \OMS/cmsy/m/n/10.95 2 \OT1/cmr/m/n/10.
 95 [1; 3\OML/cmm/m/it/10.95 :\OT1/cmr/m/n/10.95 10[]; 1\OML/cmm/m/it/10.95 :\OT
@@ -2107,69 +2136,79 @@ cmr/m/n/10.95 10[]; 1\OML/cmm/m/it/10.95 :\OT1/cmr/m/n/10.95 10[]]$\T1/opensans
 -TOsF/m/sc/10.95 ,
  []
 
-
-Overfull \hbox (1.17519pt too wide) in paragraph at lines 145--146
+[68]
+Overfull \hbox (1.17519pt too wide) in paragraph at lines 159--160
 []\T1/opensans-TOsF/m/sc/10.95 Cette sec-tion pré-sente l'éva-lua-tion des per-
 for-mances des mo-dèles sur la tâche de tri continu. 
  []
 
-[68]
-<CartoBaseline.png, id=1256, 864.831pt x 397.485pt>
+<CartoBaseline.png, id=1101, 864.831pt x 397.485pt>
 File: CartoBaseline.png Graphic file (type png)
 <use CartoBaseline.png>
-Package pdftex.def Info: CartoBaseline.png  used on input line 155.
+Package pdftex.def Info: CartoBaseline.png  used on input line 169.
 (pdftex.def)             Requested size: 345.92627pt x 158.99118pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 165--166
+Underfull \hbox (badness 10000) in paragraph at lines 179--180
 
  []
 
-[69 <./CartoBaseline.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 167--168
+[69]
+Underfull \hbox (badness 10000) in paragraph at lines 181--182
 
  []
 
-<PerfBaseline.png, id=1266, 462.528pt x 238.491pt>
+[70 <./CartoBaseline.png>]
+<PerfBaseline.png, id=1117, 462.528pt x 238.491pt>
 File: PerfBaseline.png Graphic file (type png)
 <use PerfBaseline.png>
-Package pdftex.def Info: PerfBaseline.png  used on input line 173.
+Package pdftex.def Info: PerfBaseline.png  used on input line 187.
 (pdftex.def)             Requested size: 370.02289pt x 190.79305pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 180--181
+Underfull \hbox (badness 10000) in paragraph at lines 194--195
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 182--183
+Underfull \hbox (badness 10000) in paragraph at lines 196--197
 
  []
 
-<CartoMethod.png, id=1268, 1377.948pt x 712.46175pt>
+<CartoMethod.png, id=1119, 1377.948pt x 712.46175pt>
 File: CartoMethod.png Graphic file (type png)
 <use CartoMethod.png>
-Package pdftex.def Info: CartoMethod.png  used on input line 186.
+Package pdftex.def Info: CartoMethod.png  used on input line 200.
 (pdftex.def)             Requested size: 413.38759pt x 213.74017pt.
-<PerfMethod.png, id=1270, 462.528pt x 250.0542pt>
+[71 <./PerfBaseline.png>]
+<PerfMethod.png, id=1128, 462.528pt x 250.0542pt>
 File: PerfMethod.png Graphic file (type png)
 <use PerfMethod.png>
-Package pdftex.def Info: PerfMethod.png  used on input line 196.
+Package pdftex.def Info: PerfMethod.png  used on input line 210.
 (pdftex.def)             Requested size: 370.02289pt x 200.04361pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 203--204
+Underfull \hbox (badness 10000) in paragraph at lines 217--218
 
  []
 
-[70] [71 <./PerfBaseline.png>]) [72 <./CartoMethod.png>] [73 <./PerfMethod.png>
-]
-\openout2 = `Stage.aux'.
+) [72 <./CartoMethod.png>] [73 <./PerfMethod.png>]
+\openout2 = `GrosTAF.aux'.
 
- (Stage.tex [74
+ (GrosTAF.tex [74
 
 
 
 
 ]
 Chapitre 5.
+) [75]
+\openout2 = `Stage.aux'.
+
+ (Stage.tex [76
+
+
+
+
+]
+Chapitre 6.
 
 Underfull \hbox (badness 10000) in paragraph at lines 18--19
 
@@ -2181,12 +2220,12 @@ Overfull \hbox (0.75357pt too wide) in paragraph at lines 27--28
  : \T1/opensans-TOsF/m/sc/10.95 Bien que plus ro-bustes, elles pré-sentent
  []
 
-[75] [76] [77] [78] [79]
+[77] [78] [79] [80] [81]
 Underfull \hbox (badness 10000) in paragraph at lines 144--146
 
  []
 
-[80]
+[82]
 Underfull \hbox (badness 10000) in paragraph at lines 154--155
 
  []
@@ -2201,12 +2240,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 160--162
 
  []
 
-[81]
+[83]
 Underfull \hbox (badness 10000) in paragraph at lines 175--176
 
  []
 
-[82]
+[84]
 Underfull \hbox (badness 10000) in paragraph at lines 216--217
 
  []
@@ -2216,12 +2255,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 231--232
 
  []
 
-[83]
+[85]
 Underfull \hbox (badness 10000) in paragraph at lines 257--258
 
  []
 
-[84]
+[86]
 Underfull \hbox (badness 10000) in paragraph at lines 270--271
 
  []
@@ -2257,1026 +2296,158 @@ Underfull \hbox (badness 10000) in paragraph at lines 328--329
 
  []
 
-[85]
+[87]
 Underfull \hbox (badness 10000) in paragraph at lines 334--335
 
  []
 
-[86]
+[88]
 Underfull \hbox (badness 10000) in paragraph at lines 383--384
 
  []
 
-[87]) [88]
-\openout2 = `AVERTISSEMENT.aux'.
-
- (AVERTISSEMENT.tex
-Chapitre 6.
-
-Underfull \hbox (badness 10000) in paragraph at lines 3--3
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 4--4
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 5--5
-
- []
-
-) [89
-
-
-
-
-]
-\openout2 = `"COMPOSITION GENERALE et CHARTE GRAPHIQUE.aux"'.
-
- (COMPOSITION GENERALE et CHARTE GRAPHIQUE.tex [90
-
-
-
-
-]
-Chapitre 7.
-
-Underfull \hbox (badness 10000) in paragraph at lines 3--3
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 4--4
-
- []
-
-LaTeX Font Info:    Font shape `T1/opensans-TOsF/m/n' will be
-(Font)              scaled to size 6.76152pt on input line 5.
-
-Underfull \hbox (badness 10000) in paragraph at lines 7--7
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 8--9
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 12--12
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 13--13
-
- []
-
-[91]
-<Charte_graphique_ups.png, id=1417, 534.19576pt x 186.6975pt>
-File: Charte_graphique_ups.png Graphic file (type png)
-<use Charte_graphique_ups.png>
-Package pdftex.def Info: Charte_graphique_ups.png  used on input line 17.
-(pdftex.def)             Requested size: 320.51993pt x 112.01935pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 21--21
-
- []
-
-) [92 <./Charte_graphique_ups.png>]
-\openout2 = `"INFORMATIONS GENERALES SUR LA PAGE DE COUVERTURE.aux"'.
-
-
-(INFORMATIONS GENERALES SUR LA PAGE DE COUVERTURE.tex
-Chapitre 8.
-
-Underfull \hbox (badness 10000) in paragraph at lines 4--4
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 5--5
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 6--6
-[][][]\T1/opensans-TOsF/m/n/10 .[][][][]$\T1/cmtt/m/n/10 https : / / www . gala
-xie . enseignementsup-[]recherche . gouv . fr / ensup / pdf / EC _ pays _
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 8--8
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 9--9
-
- []
-
-[93
-
-
-
-
-]
-Underfull \hbox (badness 10000) in paragraph at lines 13--13
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 24--24
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 25--25
-
- []
-
-[94] [95]
-Underfull \hbox (badness 10000) in paragraph at lines 97--97
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 98--98
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 99--99
-
- []
-
-) [96]
-\openout2 = `"CIVILITE FEMINISATION DES TITRES ET FONCTIONS.aux"'.
-
- (CIVILITE FEMINISATION DES TITRES ET FONCTIONS.tex
-Chapitre 9.
-
-Underfull \hbox (badness 10000) in paragraph at lines 2--2
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 3--3
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 4--4
-
- []
-
-) [97
-
-
-
-
-]
-\openout2 = `"PRESENTATION DE LA DIRECTION DE LA THESE OU DE L EQUIPE D ENCADRE
-MENT.aux"'.
-
-
-(PRESENTATION DE LA DIRECTION DE LA THESE OU DE L EQUIPE D ENCADREMENT.tex
-[98
-
-
-
-
-]
-Chapitre 10.
-
-Underfull \hbox (badness 10000) in paragraph at lines 2--2
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 3--3
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 4--4
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 5--5
-
- []
-
-) [99]
-\openout2 = `"COMPOSITION DU JURY.aux"'.
-
- (COMPOSITION DU JURY.tex [100
-
-
-
-
-]
-Chapitre 11.
-
-Underfull \hbox (badness 10000) in paragraph at lines 2--2
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 15--15
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 16--16
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 18--18
-
- []
-
-LaTeX Font Info:    Font shape `TS1/opensans-TOsF/m/n' will be
-(Font)              scaled to size 9.49997pt on input line 18.
-
-Underfull \hbox (badness 7047) in paragraph at lines 18--18
-[]\T1/opensans-TOsF/b/n/10 Arrêté du 10 fé-vrier 2011 \T1/opensans-TOsF/m/n/10 
-re-la-tif à la grille d'équi-va-lence des titres, tra-vaux et fonc-
- []
-
-
-Underfull \hbox (badness 2600) in paragraph at lines 18--18
-\T1/opensans-TOsF/m/n/10 tions des enseignants-chercheurs men-tion-née aux ar-t
-icles 22 et 43 du dé-cret n\TS1/opensans-TOsF/m/n/10 ° \T1/opensans-TOsF/m/n/10
- 84-431 du 6
- []
-
-
-Underfull \hbox (badness 4001) in paragraph at lines 18--18
-\T1/opensans-TOsF/m/n/10 juin 1984 fixant les dis-po-si-tions sta-tu-taires com
--munes ap-pli-cables aux enseignants-chercheurs
- []
-
-
-Underfull \hbox (badness 1824) in paragraph at lines 18--18
-\T1/opensans-TOsF/m/n/10 et por-tant sta-tut par-ti-cu-lier du corps des pro-fe
-s-seurs des uni-ver-si-tés et du corps des maîtres
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 17--18
-
- []
-
-[101]
-Underfull \hbox (badness 10000) in paragraph at lines 22--23
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 24--24
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 25--25
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 26--26
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 27--27
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 28--28
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 29--29
-
- []
-
-[102]
-Underfull \hbox (badness 10000) in paragraph at lines 33--33
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 36--36
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 39--39
-
- []
-
-) [103]
-\openout2 = `"BIEN CITER SES SOURCES.aux"'.
-
- (BIEN CITER SES SOURCES.tex [104
-
-
-
-
-]
-Chapitre 12.
-
-Overfull \hbox (38.47482pt too wide) in paragraph at lines 4--4
-\T1/opensans-TOsF/m/sc/10.95 giat, vo-lon-taires ou non : [][]$\T1/cmtt/m/n/10.
-95 https : / / infotrack . unige . ch / comment-[]reconnaitre-[]les-[]cas-[]de-
-[]plagiat)$[][] 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 4--4
-
- []
-
-
-Overfull \hbox (9.30699pt too wide) in paragraph at lines 5--6
-[]\T1/opensans-TOsF/m/sc/10.95 Chaque dis-ci-pline pos-sède ses propres normes 
-en termes de ci-ta-tion des sources. Renseignez-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 8--8
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 11--11
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 12--12
-
- []
-
-[105]) [106]
-\openout2 = `"DEPOSER ET DIFFUSER SA THESE.aux"'.
-
- (DEPOSER ET DIFFUSER SA THESE.tex
-Chapitre 13.
-
-Underfull \hbox (badness 10000) in paragraph at lines 2--2
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 13--13
-
- []
-
-[107
-
-
-
-
-]
-*geometry* verbose mode - [ newgeometry ] result:
-* driver: pdftex
-* paper: a4paper
-* layout: <same size as paper>
-* layoutoffset:(h,v)=(0.0pt,0.0pt)
-* modes: twoside 
-* h-part:(L,W,R)=(113.81102pt, 369.88583pt, 113.81102pt)
-* v-part:(T,H,B)=(113.81102pt, 617.4248pt, 113.81102pt)
-* \paperwidth=597.50787pt
-* \paperheight=845.04684pt
-* \textwidth=369.88583pt
-* \textheight=617.4248pt
-* \oddsidemargin=41.54103pt
-* \evensidemargin=41.54103pt
-* \topmargin=9.66724pt
-* \headheight=12.0pt
-* \headsep=19.8738pt
-* \topskip=12.0pt
-* \footskip=30.0pt
-* \marginparwidth=88.0pt
-* \marginparsep=7.0pt
-* \columnsep=10.0pt
-* \skip\footins=10.8pt plus 4.0pt minus 2.0pt
-* \hoffset=0.0pt
-* \voffset=0.0pt
-* \mag=1000
-* \@twocolumnfalse
-* \@twosidetrue
-* \@mparswitchtrue
-* \@reversemarginfalse
-* (1in=72.27pt=25.4mm, 1cm=28.453pt)
-
-)
-\openout2 = `"ANNEXE LES LOGOS INSTITUTIONNELS.aux"'.
-
- (ANNEXE LES LOGOS INSTITUTIONNELS.tex [108
-
-
-
-
-
-]
-Chapitre 14.
-<Logo_ups.png, id=1520, 380.17032pt x 160.34906pt>
-File: Logo_ups.png Graphic file (type png)
-<use Logo_ups.png>
-Package pdftex.def Info: Logo_ups.png  used on input line 3.
-(pdftex.def)             Requested size: 152.06543pt x 64.13847pt.
-
-Overfull \hbox (7.38887pt too wide) in paragraph at lines 4--4
-|[] \T1/opensans-TOsF/b/n/12 LO-GOS, NU-MÉ-ROS D'AC-CRÉ-DI-TA-TION ET DÉ-NO-MI-
-NA-TIONS DES
- []
-
-LaTeX Font Info:    Font shape `TS1/opensans-TOsF/b/n' will be
-(Font)              scaled to size 10.40245pt on input line 6.
-<logo_usp_AAIF.png, id=1521, 372.8475pt x 85.41pt>
-File: logo_usp_AAIF.png Graphic file (type png)
-<use logo_usp_AAIF.png>
-Package pdftex.def Info: logo_usp_AAIF.png  used on input line 7.
-(pdftex.def)             Requested size: 260.99147pt x 59.78658pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 6--8
-
- []
-
-<logo_usp_SEIF.png, id=1522, 341.64pt x 85.41pt>
-File: logo_usp_SEIF.png Graphic file (type png)
-<use logo_usp_SEIF.png>
-Package pdftex.def Info: logo_usp_SEIF.png  used on input line 10.
-(pdftex.def)             Requested size: 239.14636pt x 59.78658pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 9--11
-
- []
-
-<logo_usp_PIF.png, id=1523, 362.3355pt x 85.41pt>
-File: logo_usp_PIF.png Graphic file (type png)
-<use logo_usp_PIF.png>
-Package pdftex.def Info: logo_usp_PIF.png  used on input line 12.
-(pdftex.def)             Requested size: 253.6331pt x 59.78658pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 12--13
-
- []
-
-<logo_usp_SSMMH.png, id=1524, 372.8475pt x 85.41pt>
-File: logo_usp_SSMMH.png Graphic file (type png)
-<use logo_usp_SSMMH.png>
-Package pdftex.def Info: logo_usp_SSMMH.png  used on input line 15.
-(pdftex.def)             Requested size: 260.99147pt x 59.78658pt.
-
-Overfull \hbox (3.49548pt too wide) in paragraph at lines 14--16
-[]\TS1/opensans-TOsF/b/n/10.95 ^^Y[] \T1/opensans-TOsF/m/sc/10.95 n\TS1/opensan
-s-TOsF/m/n/10.95 °\T1/opensans-TOsF/m/sc/10.95 566 : sciences du sport, de la m
-o-tri-cité et du mou-ve-ment hu-main (SSMMH) 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 14--16
-
- []
-
-[109 <./Logo_ups.png> <./logo_usp_AAIF.png> <./logo_usp_SEIF.png> <./logo_usp_P
-IF.png> <./logo_usp_SSMMH.png>]
-<logo_usp_SEVE.png, id=1536, 482.7636pt x 110.814pt>
-File: logo_usp_SEVE.png Graphic file (type png)
-<use logo_usp_SEVE.png>
-Package pdftex.def Info: logo_usp_SEVE.png  used on input line 18.
-(pdftex.def)             Requested size: 265.52078pt x 60.94788pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 17--19
-
- []
-
-<logo_usp_BIOSIGNE.png, id=1537, 372.8475pt x 85.41pt>
-File: logo_usp_BIOSIGNE.png Graphic file (type png)
-<use logo_usp_BIOSIGNE.png>
-Package pdftex.def Info: logo_usp_BIOSIGNE.png  used on input line 21.
-(pdftex.def)             Requested size: 260.99147pt x 59.78658pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 20--22
-
- []
-
-<logo_usp_ITFA.png, id=1538, 372.8475pt x 85.41pt>
-File: logo_usp_ITFA.png Graphic file (type png)
-<use logo_usp_ITFA.png>
-Package pdftex.def Info: logo_usp_ITFA.png  used on input line 23.
-(pdftex.def)             Requested size: 260.99147pt x 59.78658pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 23--24
-
- []
-
-<logo_usp_EDSP.png, id=1539, 372.8475pt x 85.41pt>
-File: logo_usp_EDSP.png Graphic file (type png)
-<use logo_usp_EDSP.png>
-Package pdftex.def Info: logo_usp_EDSP.png  used on input line 26.
-(pdftex.def)             Requested size: 260.99147pt x 59.78658pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 25--27
-
- []
-
-<logo_usp_2MIB.png, id=1540, 372.8475pt x 85.41pt>
-File: logo_usp_2MIB.png Graphic file (type png)
-<use logo_usp_2MIB.png>
-Package pdftex.def Info: logo_usp_2MIB.png  used on input line 29.
-(pdftex.def)             Requested size: 260.99147pt x 59.78658pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 28--30
-
- []
-
-<logo_usp_EDOM.png, id=1541, 372.8475pt x 85.41pt>
-File: logo_usp_EDOM.png Graphic file (type png)
-<use logo_usp_EDOM.png>
-Package pdftex.def Info: logo_usp_EDOM.png  used on input line 32.
-(pdftex.def)             Requested size: 260.99147pt x 59.78658pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 31--33
-
- []
-
-[110 <./logo_usp_SEVE.png> <./logo_usp_BIOSIGNE.png> <./logo_usp_ITFA.png> <./l
-ogo_usp_EDSP.png> <./logo_usp_2MIB.png> <./logo_usp_EDOM.png>]
-<logo_usp_INTERFACES.png, id=1552, 477.9456pt x 112.7412pt>
-File: logo_usp_INTERFACES.png Graphic file (type png)
-<use logo_usp_INTERFACES.png>
-Package pdftex.def Info: logo_usp_INTERFACES.png  used on input line 35.
-(pdftex.def)             Requested size: 255.70201pt x 60.31679pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 34--36
-
- []
-
-<logo_usp_EDMH.png, id=1553, 352.152pt x 85.41pt>
-File: logo_usp_EDMH.png Graphic file (type png)
-<use logo_usp_EDMH.png>
-Package pdftex.def Info: logo_usp_EDMH.png  used on input line 38.
-(pdftex.def)             Requested size: 246.5047pt x 59.78658pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 37--39
-
- []
-
-File: logo_ups_EOBE.png Graphic file (type png)
-<use logo_ups_EOBE.png>
-Package pdftex.def Info: logo_ups_EOBE.png  used on input line 41.
-(pdftex.def)             Requested size: 260.16077pt x 59.62016pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 40--42
-
- []
-
-<logo_usp_PHENIICS.png, id=1554, 408.3255pt x 85.41pt>
-File: logo_usp_PHENIICS.png Graphic file (type png)
-<use logo_usp_PHENIICS.png>
-Package pdftex.def Info: logo_usp_PHENIICS.png  used on input line 44.
-(pdftex.def)             Requested size: 285.8259pt x 59.78658pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 43--45
-
- []
-
-<logo_usp_SDSV.png, id=1555, 372.8475pt x 85.41pt>
-File: logo_usp_SDSV.png Graphic file (type png)
-<use logo_usp_SDSV.png>
-Package pdftex.def Info: logo_usp_SDSV.png  used on input line 47.
-(pdftex.def)             Requested size: 260.99147pt x 59.78658pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 46--48
-
- []
-
-<logo_usp_SMEMAG.png, id=1556, 372.8475pt x 85.41pt>
-File: logo_usp_SMEMAG.png Graphic file (type png)
-<use logo_usp_SMEMAG.png>
-Package pdftex.def Info: logo_usp_SMEMAG.png  used on input line 50.
-(pdftex.def)             Requested size: 260.99147pt x 59.78658pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 49--51
-
- []
-
-[111 <./logo_usp_INTERFACES.png> <./logo_usp_EDMH.png> <./logo_usp_PHENIICS.png
-> <./logo_usp_SDSV.png> <./logo_usp_SMEMAG.png>]
-<logo_usp_STIC.png, id=1566, 372.8475pt x 85.41pt>
-File: logo_usp_STIC.png Graphic file (type png)
-<use logo_usp_STIC.png>
-Package pdftex.def Info: logo_usp_STIC.png  used on input line 53.
-(pdftex.def)             Requested size: 260.99147pt x 59.78658pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 52--54
-
- []
-
-<logo_usp_ABIES.png, id=1567, 362.3355pt x 85.41pt>
-File: logo_usp_ABIES.png Graphic file (type png)
-<use logo_usp_ABIES.png>
-Package pdftex.def Info: logo_usp_ABIES.png  used on input line 56.
-(pdftex.def)             Requested size: 253.6331pt x 59.78658pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 55--57
-
- []
-
-<logo_usp_CBMS.png, id=1568, 372.8475pt x 85.41pt>
-File: logo_usp_CBMS.png Graphic file (type png)
-<use logo_usp_CBMS.png>
-Package pdftex.def Info: logo_usp_CBMS.png  used on input line 59.
-(pdftex.def)             Requested size: 260.99147pt x 59.78658pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 58--60
-
- []
-
-<logo_usp_SSH.png, id=1569, 352.152pt x 85.41pt>
-File: logo_usp_SSH.png Graphic file (type png)
-<use logo_usp_SSH.png>
-Package pdftex.def Info: logo_usp_SSH.png  used on input line 62.
-(pdftex.def)             Requested size: 246.5047pt x 59.78658pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 61--63
-
- []
-
-<logo_usp_DEM.png, id=1570, 369.5625pt x 85.41pt>
-File: logo_usp_DEM.png Graphic file (type png)
-<use logo_usp_DEM.png>
-Package pdftex.def Info: logo_usp_DEM.png  used on input line 65.
-(pdftex.def)             Requested size: 258.69199pt x 59.78658pt.
-)
-Underfull \hbox (badness 10000) in paragraph at lines 64--261
-
- []
-
-[112 <./logo_usp_STIC.png> <./logo_usp_ABIES.png> <./logo_usp_CBMS.png> <./logo
-_usp_SSH.png> <./logo_usp_DEM.png>]
+[89]) [90]
 LaTeX Font Info:    Font shape `T1/opensans-TOsF/m/it' will be
-(Font)              scaled to size 11.39996pt on input line 263.
+(Font)              scaled to size 11.39996pt on input line 247.
 
-Overfull \hbox (4.07385pt too wide) in paragraph at lines 264--264
-[]\T1/opensans-TOsF/m/sc/12 Michael []Grieves[]. ``Di-gi-tal twin : ma-nu-fac-t
-u-ring ex-cel-lence through
+Overfull \hbox (3.47374pt too wide) in paragraph at lines 248--248
+\T1/opensans-TOsF/m/sc/12 Ar-tech, 2001. url : [][]$\T1/cmtt/m/n/12 https : / /
+ ieeexplore . ieee . org / abstract / document / 9101100/$[][]
  []
 
-
-Overfull \hbox (6.04253pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 sciencedirect . com / science / article / pii / S23519789173040
-67$[][]
- []
-
-[113
+[91
 
 
 
 ]
-Overfull \hbox (37.90999pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 Reality+ : +Interface ,[] +Application ,[] +and + Design & ots 
-= QT0icdfR4U &
+Overfull \hbox (1.93965pt too wide) in paragraph at lines 248--248
+\T1/cmtt/m/n/12 Virtual + Reality+ : +Interface ,[] +Application ,[] +and + Des
+ign & ots = QT0icdfR4U &
  []
 
 
-Overfull \hbox (6.04253pt too wide) in paragraph at lines 264--264
+Overfull \hbox (26.72424pt too wide) in paragraph at lines 248--248
 \T1/cmtt/m/n/12 Modelica & ots = cZ60scKEkN & sig = SxTVWzN56d47byaUV6l _ Qq0vZ
-oE$[][]
+oE$[][] \T1/opensans-TOsF/m/sc/12 (vi-sité le 26/11/2025). 
  []
 
 
-Overfull \hbox (1.79317pt too wide) in paragraph at lines 264--264
-[]\T1/opensans-TOsF/m/sc/12 Yann N. []Dauphin []et al. ``Iden-ti-fying and at-t
-a-cking the saddle point
+Overfull \hbox (8.70377pt too wide) in paragraph at lines 248--248
+\T1/cmtt/m/n/12 20for % 20Real -[] Time % 20Radiance % 20Field % 20Rendering . 
+pdf$[][] \T1/opensans-TOsF/m/sc/12 (vi-sité le 26/11/2025). 
  []
 
-[114]
-Overfull \hbox (8.07318pt too wide) in paragraph at lines 264--264
-[]\T1/opensans-TOsF/m/sc/12 Ben []Poole []et al. \T1/opensans-TOsF/m/it/12 Drea
-m-Fu-sion : Text-to-3D using 2D Dif-fu-sion\T1/opensans-TOsF/m/sc/12 . 29 sept.
-
- []
-
-
-Overfull \hbox (1.12234pt too wide) in paragraph at lines 264--264
-\T1/opensans-TOsF/m/sc/12 2022. doi : [][]$\T1/cmtt/m/n/12 10 . 48550 / arXiv .
- 2209 . 14988$[][]\T1/opensans-TOsF/m/sc/12 . arXiv : [][]$\T1/cmtt/m/n/12 2209
- . 14988[cs]$[][]\T1/opensans-TOsF/m/sc/12 .
+[92]
+Overfull \hbox (38.4806pt too wide) in paragraph at lines 248--248
+\T1/cmtt/m/n/12 / / proceedings . neurips . cc / paper / 2019 / hash / 26cd8eca
+dce0d4efd6cc8a8725cbd1f8 -[]
  []
 
 
-Overfull \hbox (25.563pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 paper / 2023 / hash / 1a87980b9853e84dfb295855b425c262 -[] Abst
-ract -[]
+Overfull \hbox (236.03236pt too wide) in paragraph at lines 248--248
+\T1/cmtt/m/n/12 token = uxVzaLwHPRIAAAAA : ABf8yG3mit_ -[] tnl5ZCgrjrpH2A _ BCl
+8nsu5zAdIGdvnCQ2HUA0cQqPyuGJEWgDg4MSMrH4DvTYUcfmSITqw$[][]
+ []
+
+[93]
+Overfull \hbox (131.80363pt too wide) in paragraph at lines 248--248
+\T1/opensans-TOsF/m/sc/12 (2019). url : [][]$\T1/cmtt/m/n/12 https : / / procee
+dings . neurips . cc / paper / 2019 / hash / 5f8e2fa1718d1bbcadf1cd9c7a54fb8c -
+[]
  []
 
 
-Overfull \hbox (23.5137pt too wide) in paragraph at lines 264--264
-\T1/opensans-TOsF/m/it/12 chine lear-ning\T1/opensans-TOsF/m/sc/12 . PMLR, 2020
-, p. 8459-8468. url : [][]$\T1/cmtt/m/n/12 https : / / proceedings .
+Overfull \hbox (8.5417pt too wide) in paragraph at lines 248--248
+[]\T1/opensans-TOsF/m/sc/12 David []Ha []et Jür-gen []Schmidhuber[]. ``World mo
+-dels''. In : \T1/opensans-TOsF/m/it/12 arXiv pre-print arXiv :1803.10122
+ []
+
+[94]
+Overfull \hbox (125.81981pt too wide) in paragraph at lines 248--248
+\T1/opensans-TOsF/m/sc/12 6851. url : [][]$\T1/cmtt/m/n/12 https : / / proceedi
+ngs . neurips . cc / paper / 2020 / hash / 4c5bcfec8584af0d967f1ab10179ca4b -[]
+
  []
 
 
-Overfull \hbox (0.23795pt too wide) in paragraph at lines 264--264
-[]\T1/opensans-TOsF/m/sc/12 Maziar []Raissi[], Pa-ris []Perdikaris []et George 
-E. []Karniadakis[]. ``Physics-
+Overfull \hbox (9.32771pt too wide) in paragraph at lines 248--248
+[]\T1/opensans-TOsF/m/sc/12 Alec []Radford []et al. ``Im-pro-ving lan-guage un-
+ders-tan-ding by ge-ne-ra-tive pre-training''.
+ []
+
+[95]
+Overfull \hbox (2.53027pt too wide) in paragraph at lines 248--248
+\T1/cmtt/m/n/12 hash / c399862d3b9d6b76c8436e924a68c45b -[] Abstract . html$[][
+] \T1/opensans-TOsF/m/sc/12 (vi-sité le 26/11/2025). 
  []
 
 
-Overfull \hbox (0.95966pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 science / article / pii / S0021999118307125$[][] \T1/opensans-T
-OsF/m/sc/12 (vi-sité le 26/11/2025). 
+Overfull \hbox (4.12482pt too wide) in paragraph at lines 248--248
+[]\T1/opensans-TOsF/m/sc/12 Karen []Simonyan []et An-drew []Zisserman[]. \T1/op
+ensans-TOsF/m/it/12 Very Deep Convo-lu-tio-nal Net-works for Large-
  []
 
-[115]
-Overfull \hbox (284.34969pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 uxVzaLwHPRIAAAAA : ABf8yG3mit_ -[] tnl5ZCgrjrpH2A _ BCl8nsu5zAd
-IGdvnCQ2HUA0cQqPyuGJEWgDg4MSMrH4DvTYUcfmSITqw$[][]
+[96]
+Overfull \hbox (3.38264pt too wide) in paragraph at lines 248--248
+[]\T1/opensans-TOsF/m/sc/12 Du []Tran []et al. ``Lear-ning spa-tio-tem-po-ral f
+ea-tures with 3d convo-lu-tio-nal net-works''.
  []
 
 
-Overfull \hbox (5.40936pt too wide) in paragraph at lines 264--264
-\T1/opensans-TOsF/m/it/12 Ge-ne-ra-ting In-crea-sin-gly Com-plex and Di-verse L
-ear-ning En-vi-ron-ments
+Overfull \hbox (5.75339pt too wide) in paragraph at lines 248--248
+\T1/opensans-TOsF/m/sc/12 In : \T1/opensans-TOsF/m/it/12 Pro-cee-dings of the I
+EEE in-ter-na-tio-nal confe-rence on com-pu-ter vi-sion\T1/opensans-TOsF/m/sc/1
+2 . 2015, p. 4489-
  []
 
-[116]
-Overfull \hbox (18.73921pt too wide) in paragraph at lines 264--264
+
+Overfull \hbox (75.52156pt too wide) in paragraph at lines 248--248
+[][]$\T1/cmtt/m/n/12 https : / / proceedings . neurips . cc / paper / 2017 / ha
+sh / 5dd9db5e033da9c6fb5ba83c7a7ebea9 -[]
+ []
+
+[97] [98]
+Overfull \hbox (26.13362pt too wide) in paragraph at lines 248--248
+\T1/cmtt/m/n/12 neurips . cc / paper _ files / paper / 2015 / hash / 29921001f2
+f04bd3baee84a12e98098f -[]
+ []
+
+
+Overfull \hbox (36.0551pt too wide) in paragraph at lines 248--248
+\T1/opensans-TOsF/m/it/12 no-lo-gies, vo-lume 1 (long and short pa-pers)\T1/ope
+nsans-TOsF/m/sc/12 . 2019, p. 4171-4186. url : [][]$\T1/cmtt/m/n/12 https : / /
+ aclanthology .
+ []
+
+
+Overfull \hbox (186.64442pt too wide) in paragraph at lines 248--248
+\T1/cmtt/m/n/12 medium = email & _hsenc = p2ANqtz -[] _m9bbH _ 7ECE1h3lZ3D61TYg
+52rKpifVNjL4fvJ85uqggrXsWDBTB7YooFLJeNXHWqhvOyC$[][]
+ []
+
+
+Overfull \hbox (1.23154pt too wide) in paragraph at lines 248--248
 \T1/opensans-TOsF/m/it/12 in-for-ma-tion pro-ces-sing sys-tems \T1/opensans-TOs
-F/m/sc/12 32 (2019). url : [][]$\T1/cmtt/m/n/12 https : / / proceedings .
+F/m/sc/12 33 (2020), p. 1877-1901. url : [][]$\T1/cmtt/m/n/12 https : / / proce
+edings .
  []
 
 
-Overfull \hbox (37.40999pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 neurips . cc / paper / 2019 / hash / 5f8e2fa1718d1bbcadf1cd9c7a
-54fb8c -[]
+Overfull \hbox (26.13362pt too wide) in paragraph at lines 248--248
+\T1/cmtt/m/n/12 neurips . cc / paper _ files / paper / 2020 / hash / 1457c0d6bf
+cb4967418bfb8ac142f64a -[]
  []
 
-
-Overfull \hbox (1.06908pt too wide) in paragraph at lines 264--264
-[]\T1/opensans-TOsF/m/sc/12 Ian []Goodfellow []et al. ``Ge-ne-ra-tive ad-ver-sa
--rial net-works''. In : \T1/opensans-TOsF/m/it/12 Com-
+[99]
+Overfull \hbox (132.28244pt too wide) in paragraph at lines 248--248
+\T1/opensans-TOsF/m/sc/12 15097. url : [][]$\T1/cmtt/m/n/12 https : / / proceed
+ings . neurips . cc / paper / 2021 / hash / 7f489f642a0ddb10272b5c31057f0663 -[
+]
  []
 
-
-Overfull \hbox (39.34775pt too wide) in paragraph at lines 264--264
-\T1/opensans-TOsF/m/it/12 on ma-chine lear-ning\T1/opensans-TOsF/m/sc/12 . pmlr
-, 2015, p. 2256-2265. url : [][]$\T1/cmtt/m/n/12 http : / / proceedings .
- []
-
-
-Overfull \hbox (37.40999pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 neurips . cc / paper / 2020 / hash / 4c5bcfec8584af0d967f1ab101
-79ca4b -[]
- []
-
-[117]
-Overfull \hbox (5.93971pt too wide) in paragraph at lines 264--264
-[]\T1/opensans-TOsF/m/sc/12 Alex []Graves[]. \T1/opensans-TOsF/m/it/12 Ge-ne-ra
--ting Se-quences With Re-cur-rent Neu-ral Net-works\T1/opensans-TOsF/m/sc/12 .
- []
-
-
-Overfull \hbox (111.4919pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 proceedings . neurips . cc / paper / 2017 / hash / 3f5ee243547d
-ee91fbd053c1c4a845aa -[]
- []
-
-
-Overfull \hbox (25.33937pt too wide) in paragraph at lines 264--264
-\T1/opensans-TOsF/m/sc/12 mers for image re-cog-ni-tion at sca-le''. In : \T1/o
-pensans-TOsF/m/it/12 arXiv pre-print arXiv :2010.11929
- []
-
-
-Overfull \hbox (31.77126pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 DL73yTjVXD & sig = ww98YPoC8MLPySQkm3VscO1CtKI$[][] \T1/opensan
-s-TOsF/m/sc/12 (vi-sité le 01/12/2025). 
- []
-
-
-Overfull \hbox (0.9038pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 proceedings . mlr . press / v48 / oord16 . html$[][] \T1/opensa
-ns-TOsF/m/sc/12 (vi-sité le 01/12/2025). 
- []
-
-
-Overfull \hbox (10.48051pt too wide) in paragraph at lines 264--264
-\T1/opensans-TOsF/m/sc/12 Key-points''. In : \T1/opensans-TOsF/m/it/12 In-ter-n
-a-tio-nal Jour-nal of Com-pu-ter Vi-sion \T1/opensans-TOsF/m/sc/12 60.2 (1$[]$ 
-nov.
- []
-
-
-Overfull \hbox (14.28879pt too wide) in paragraph at lines 264--264
-\T1/opensans-TOsF/m/sc/12 2004), p. 91-110. issn : 1573-1405. doi : [][]$\T1/cm
-tt/m/n/12 10 . 1023 / B : VISI . 0000029664 .
- []
-
-
-Overfull \hbox (1.71011pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 99615 . 94$[][]\T1/opensans-TOsF/m/sc/12 . url : [][]$\T1/cmtt/
-m/n/12 https : / / doi . org / 10 . 1023 / B : VISI . 0000029664 .
- []
-
-[118]
-Overfull \hbox (2.3613pt too wide) in paragraph at lines 264--264
-\T1/opensans-TOsF/m/it/12 Com-pu-ter Vi-sion and Pat-tern Re-cog-ni-tion (CV-PR
-'05)\T1/opensans-TOsF/m/sc/12 . 2005 IEEE Com-
- []
-
-
-Overfull \hbox (1.71011pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 CVPR . 2005 . 177$[][]\T1/opensans-TOsF/m/sc/12 . url : [][]$\T
-1/cmtt/m/n/12 https : / / ieeexplore . ieee . org / abstract /
- []
-
-
-Overfull \hbox (160.87984pt too wide) in paragraph at lines 264--264
-[][]$\T1/cmtt/m/n/12 https : / / proceedings . neurips . cc / paper / 2012 / ha
-sh / c399862d3b9d6b76c8436e924a68c45b -[]
- []
-
-
-Overfull \hbox (9.6184pt too wide) in paragraph at lines 264--264
-[]\T1/opensans-TOsF/m/sc/12 Olaf []Ronneberger[], Phi-lipp []Fischer []et Tho-m
-as []Brox[]. ``U-Net : Convo-
- []
-
-[119]
-Overfull \hbox (7.04253pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 _A _ GENERATIVE _ MODEL _ FOR _ RAW _ AUDIO_ -[] _1609 . 034992
-0200120 -[]
- []
-
-
-Overfull \hbox (28.40387pt too wide) in paragraph at lines 264--264
-\T1/opensans-TOsF/m/it/12 rence on com-pu-ter vi-sion\T1/opensans-TOsF/m/sc/12 
-. 2015, p. 4489-4497. url : [][]$\T1/cmtt/m/n/12 http : / / openaccess .
- []
-
-
-Overfull \hbox (5.88368pt too wide) in paragraph at lines 264--264
-\T1/opensans-TOsF/m/sc/12 Fully convo-lu-tio-nal neu-ral net-works for vo-lu-me
--tric me-di-cal image
- []
-
-[120]
-Overfull \hbox (37.40999pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 neurips . cc / paper / 2017 / hash / 5dd9db5e033da9c6fb5ba83c7a
-7ebea9 -[]
- []
-
-
-Overfull \hbox (111.4919pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 proceedings . neurips . cc / paper / 2017 / hash / d8bf84be3800
-d12f74d8b05e9b89836f -[]
- []
-
-
-Overfull \hbox (19.48013pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 wiley . com / doi / 10 . 1207 / s15516709cog1402 _ 1$[][] \T1/o
-pensans-TOsF/m/sc/12 (vi-sité le 27/11/2025). 
- []
-
-
-Overfull \hbox (2.9237pt too wide) in paragraph at lines 264--264
-\T1/opensans-TOsF/m/sc/12 mo-ry''. In : \T1/opensans-TOsF/m/it/12 Neu-ral com-p
-u-ta-tion \T1/opensans-TOsF/m/sc/12 9.8 (1997), p. 1735-1780. url : [][]$\T1/cm
-tt/m/n/12 https :
- []
-
-
-Overfull \hbox (111.4919pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 neurips . cc / paper _ files / paper / 2020 / hash / 102f0bb6ef
-b3a6128a3c750dd16729be -[]
- []
-
-[121]
-Overfull \hbox (3.86536pt too wide) in paragraph at lines 264--264
-[]\T1/opensans-TOsF/m/sc/12 Ilya []Sutskever[], Oriol []Vinyals []et Quoc V. []
-Le[]. ``Se-quence to se-quence
- []
-
-
-Overfull \hbox (0.22517pt too wide) in paragraph at lines 264--264
-\T1/opensans-TOsF/m/sc/12 2016. doi : [][]$\T1/cmtt/m/n/12 10 . 48550 / arXiv .
- 1609 . 08144$[][]\T1/opensans-TOsF/m/sc/12 . arXiv : [][]$\T1/cmtt/m/n/12 1609
- . 08144[cs]$[][]\T1/opensans-TOsF/m/sc/12 .
- []
-
-
-Overfull \hbox (25.39456pt too wide) in paragraph at lines 264--264
-[]\T1/opensans-TOsF/m/sc/12 Pantelis R. []Vlachas []et al. ``Data-driven fo-re-
-cas-ting of high-dimensional
- []
-
-
-Overfull \hbox (5.84427pt too wide) in paragraph at lines 264--264
-\T1/opensans-TOsF/m/it/12 cas-ting \T1/opensans-TOsF/m/sc/12 36.3 (2020), p. 11
-81-1191. url : [][]$\T1/cmtt/m/n/12 https : / / www . sciencedirect .
- []
-
-
-Overfull \hbox (25.65363pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 com / science / article / pii / S0169207019301888$[][] \T1/open
-sans-TOsF/m/sc/12 (vi-sité le 27/11/2025). 
- []
-
-[122]
-Overfull \hbox (25.063pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 paper / 2015 / hash / 29921001f2f04bd3baee84a12e98098f -[] Abst
-ract .
- []
-
-
-Overfull \hbox (30.58478pt too wide) in paragraph at lines 264--264
-\T1/opensans-TOsF/m/it/12 (long and short pa-pers)\T1/opensans-TOsF/m/sc/12 . 2
-019, p. 4171-4186. url : [][]$\T1/cmtt/m/n/12 https : / / aclanthology .
- []
-
-
-Overfull \hbox (55.43047pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 7ECE1h3lZ3D61TYg52rKpifVNjL4fvJ85uqggrXsWDBTB7YooFLJeNXHWqhvOyC
-$[][]
- []
-
-
-Overfull \hbox (10.04272pt too wide) in paragraph at lines 264--264
-\T1/opensans-TOsF/m/it/12 Ad-vances in neu-ral in-for-ma-tion pro-ces-sing sys-
-tems \T1/opensans-TOsF/m/sc/12 33 (2020), p. 1877-
- []
-
-
-Overfull \hbox (25.063pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 paper / 2020 / hash / 1457c0d6bfcb4967418bfb8ac142f64a -[] Abst
-ract .
- []
-
-
-Overfull \hbox (1.82915pt too wide) in paragraph at lines 264--264
-\T1/opensans-TOsF/m/sc/12 2023. doi : [][]$\T1/cmtt/m/n/12 10 . 48550 / arXiv .
- 2202 . 07125$[][]\T1/opensans-TOsF/m/sc/12 . arXiv : [][]$\T1/cmtt/m/n/12 2202
- . 07125[cs]$[][]\T1/opensans-TOsF/m/sc/12 .
- []
-
-[123]
-Overfull \hbox (1.6106pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 Using _ Shifted _ Windows _ ICCV _ 2021 _ paper$[][] \T1/opensa
-ns-TOsF/m/sc/12 (vi-sité le 30/11/2025). 
- []
-
-
-Overfull \hbox (8.6784pt too wide) in paragraph at lines 264--264
-\T1/opensans-TOsF/m/sc/12 with Al-pha-Fol-d''. In : \T1/opensans-TOsF/m/it/12 n
-a-ture \T1/opensans-TOsF/m/sc/12 596.7873 (2021), p. 583-589. url : [][]$\T1/cm
-tt/m/n/12 https :
- []
-
-
-Overfull \hbox (20.22052pt too wide) in paragraph at lines 264--264
-\T1/opensans-TOsF/m/it/12 ces-sing sys-tems \T1/opensans-TOsF/m/sc/12 34 (2021)
-, p. 15084-15097. url : [][]$\T1/cmtt/m/n/12 https : / / proceedings .
- []
-
-
-Overfull \hbox (37.40999pt too wide) in paragraph at lines 264--264
-\T1/cmtt/m/n/12 neurips . cc / paper / 2021 / hash / 7f489f642a0ddb10272b5c3105
-7f0663 -[]
- []
-
-[124]
-Overfull \hbox (0.46771pt too wide) in paragraph at lines 264--264
-[]\T1/opensans-TOsF/m/sc/12 Einar []Urdshals []et Jas-mina []Urdshals[]. \T1/op
-ensans-TOsF/m/it/12 Struc-ture De-ve-lop-ment in List-
- []
-
-
-Overfull \hbox (57.55746pt too wide) in paragraph at lines 264--264
-\T1/opensans-TOsF/m/it/12 Fixed-Length Lists by Mat-thew-Bag-gins\T1/opensans-T
-OsF/m/sc/12 . itch.io. url : [][]$\T1/cmtt/m/n/12 https : / / matthewbaggins .
- []
-
-[125] (Modele_These_UParisSaclay_2022.aux (Introduction.aux) (Problematique.aux
-) (Etat de l art.aux) (EUSIPCO.aux) (Stage.aux) (AVERTISSEMENT.aux)
-(COMPOSITION GENERALE et CHARTE GRAPHIQUE.aux)
-(INFORMATIONS GENERALES SUR LA PAGE DE COUVERTURE.aux)
-(CIVILITE FEMINISATION DES TITRES ET FONCTIONS.aux)
-(PRESENTATION DE LA DIRECTION DE LA THESE OU DE L EQUIPE D ENCADREMENT.aux)
-(COMPOSITION DU JURY.aux) (BIEN CITER SES SOURCES.aux)
-(DEPOSER ET DIFFUSER SA THESE.aux) (ANNEXE LES LOGOS INSTITUTIONNELS.aux))
+[100] [101] (Modele_These_UParisSaclay_2022.aux (Introduction.aux)
+(Problematique.aux) (Etat de l art.aux) (EUSIPCO.aux) (GrosTAF.aux) (Stage.aux)
+)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-10-24>
@@ -3287,50 +2458,49 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 Package rerunfilecheck Info: File `Modele_These_UParisSaclay_2022.out' has not 
 changed.
-(rerunfilecheck)             Checksum: 1BDD369B91DACA255C7A3CCB5A440C31;30988.
+(rerunfilecheck)             Checksum: 35B90BF7846AC28F60549E25600B9908;24614.
 Package logreq Info: Writing requests to 'Modele_These_UParisSaclay_2022.run.xm
 l'.
 \openout1 = `Modele_These_UParisSaclay_2022.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 35764 strings out of 467871
- 704306 string characters out of 5418375
- 1655750 words of memory out of 5000000
- 63526 multiletter control sequences out of 15000+600000
- 660335 words of font info for 144 fonts, out of 8000000 for 9000
+ 35288 strings out of 467871
+ 687273 string characters out of 5418375
+ 1632073 words of memory out of 5000000
+ 63170 multiletter control sequences out of 15000+600000
+ 654707 words of font info for 123 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  102i,15n,117p,2577b,2269s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\Matth\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ectt
-1000.pk> <C:\Users\Matth\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi60
-0\ectt1200.pk> <C:\Users\Matth\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec
-/dpi600\ectt1095.pk><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/a
-scender/opensans/OpenSans-Bold.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTe
-X/fonts/type1/ascender/opensans/OpenSans-Italic.pfb><C:/Users/Matth/AppData/Loc
-al/Programs/MiKTeX/fonts/type1/ascender/opensans/OpenSans-Regular.pfb><C:/Users
-/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb>
-<C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cm
-bx8.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfon
-ts/cm/cmex10.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/publ
-ic/amsfonts/cm/cmmi10.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/t
-ype1/public/amsfonts/cm/cmmi12.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTe
-X/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/Matth/AppData/Local/Progra
-ms/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/Matth/AppData/Loca
-l/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmib10.pfb><C:/Users/Matth/Ap
-pData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/
-Matth/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C
-:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8
-.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/
-cm/cmss10.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/public/
-amsfonts/cm/cmsy10.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/type
-1/public/amsfonts/cm/cmsy6.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fo
-nts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/Matth/AppData/Local/Programs/M
-iKTeX/fonts/type1/public/doublestroke/dsrom10.pfb><C:/Users/Matth/AppData/Local
-/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on Modele_These_UParisSaclay_2022.pdf (125 pages, 6885455 bytes)
+1200.pk> <C:\Users\Matth\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi60
+0\ectt1095.pk><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/ascende
+r/opensans/OpenSans-Bold.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/font
+s/type1/ascender/opensans/OpenSans-Italic.pfb><C:/Users/Matth/AppData/Local/Pro
+grams/MiKTeX/fonts/type1/ascender/opensans/OpenSans-Regular.pfb><C:/Users/Matth
+/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Us
+ers/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx8.pf
+b><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
+cmex10.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
+fonts/cm/cmmi10.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/p
+ublic/amsfonts/cm/cmmi12.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/font
+s/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/Matth/AppData/Local/Programs/MiK
+TeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/Matth/AppData/Local/Prog
+rams/MiKTeX/fonts/type1/public/amsfonts/cm/cmmib10.pfb><C:/Users/Matth/AppData/
+Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/Matth/
+AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/User
+s/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><
+C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cms
+s10.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfon
+ts/cm/cmsy10.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/publ
+ic/amsfonts/cm/cmsy6.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/ty
+pe1/public/amsfonts/cm/cmsy8.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/
+fonts/type1/public/doublestroke/dsrom10.pfb><C:/Users/Matth/AppData/Local/Progr
+ams/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on Modele_These_UParisSaclay_2022.pdf (101 pages, 5733245 bytes)
 .
 PDF statistics:
- 2297 PDF objects out of 2487 (max. 8388607)
- 457 named destinations out of 1000 (max. 500000)
- 1169 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1808 PDF objects out of 2073 (max. 8388607)
+ 400 named destinations out of 1000 (max. 500000)
+ 811 words of extra memory for PDF output out of 10000 (max. 10000000)
 
