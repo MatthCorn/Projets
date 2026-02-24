@@ -1,5 +1,29 @@
 \chapter{Capacité de discernement des modèles}
 
+\textbf{Apprentissage de relations d'ordre en espace continu : fondations méthodologiques} \\
+ 
+Comme établi dans le chapitre consacré à la problématique, l'objectif central de nos travaux consiste à substituer le bloc de Détection et Caractérisation des Impulsions (DCI) par une intelligence artificielle. Ce défi, formulé comme un problème de transduction de séquence à séquence (\textit{Seq2Seq}), sera l'objet du chapitre suivant. Toutefois, avant d'aborder cette modélisation globale, il convient d'évaluer la viabilité conceptuelle d'une telle approche et d'estimer les chances de succès des architectures neuronales envisagées.\\
+
+En analysant la mécanique interne du module DCI, nous observons que son fonctionnement repose sur un traitement itératif (palier par palier) structuré en trois phases séquentielles : l'extraction des Détections Non-Ambiguës (DNA) parmi les impulsions incidentes, la mise à jour des pistes mémoires en fonction des corrélations avec ces DNA, et enfin la publication éventuelle des PDW. Bien que la séquence finale de PDW interceptés ne conserve qu'une trace subtile et intriquée de ces opérations, un réseau de neurones \textit{Seq2Seq} performant devra implicitement développer la capacité de reproduire ces logiques sous-jacentes.\\
+
+L'étape d'extraction des DNA s'avère particulièrement révélatrice. C'est elle qui régit l'interaction entre les impulsions concurrentes et qui engendre la majorité des artefacts structurels observés dans les données (masquages, fusions, scissions). Sa résolution exige de fortes capacités de discernement, car elle repose sur l'évaluation fine de proximités fréquentielles et la comparaison de niveaux d'énergie par rapport à des seuils matériels. Évaluer notre IA sur cette tâche spécifique constituerait donc un indicateur robuste de son potentiel à traiter le problème \textit{Seq2Seq} complet.\\
+
+Néanmoins, cette évaluation prospective impose une contrainte stricte : pour être représentatif de la transduction finale — où la logique interne du DCI agit comme une boîte noire — l'entraînement du modèle doit être strictement agnostique. L'architecture ne doit intégrer aucun biais inductif facilitant ces comparaisons ; le réseau doit apprendre à extraire les règles uniquement à partir des données.\\
+
+Or, nous ne disposons d'aucune donnée intermédiaire isolant cette étape précise d'extraction des DNA. Pour pallier cette absence, nous proposons d'étudier un problème de substitution exigeant des capacités de discernement géométrique et cognitif strictement analogues : un problème d'ordonnancement (ou tri) supervisé. Le modèle reçoit en entrée une séquence de vecteurs désordonnés évoluant dans un espace continu $\mathbb{R}^d$ et doit prédire la séquence correspondante réordonnée selon une règle implicite, en minimisant l'erreur d'apprentissage.\\
+
+Cette démarche s'inscrit directement dans le domaine de l'interprétabilité mécaniste (\textit{mechanistic interpretability}, \cite{olah_zoom_2020}), qui analyse les capacités algorithmiques fondamentales des réseaux de neurones. Si le problème du tri assisté par l'IA suscite un intérêt croissant, la littérature s'est jusqu'à présent concentrée sur des espaces discrets. Des études récentes ont par exemple exploité des tâches de tri pour analyser le fonctionnement interne des Transformers (\cite{urdshals_structure_2025}, \cite{baginski_one_2023}), tandis que d'autres architectures ont été entraînées pour prédire les indices d'une séquence triée \cite{kim_generalized_2024}. Toutefois, ces travaux opèrent exclusivement sur des ensembles d'entiers finis, permettant l'usage de méthodes d'encodage catégoriel comme le \textit{one-hot encoding} \cite{cornu_learning_2025}. Ces approches séparent artificiellement chaque valeur possible, une facilité mathématique inapplicable dans le domaine continu et dense où évoluent nos données physiques, rendant la tâche de discernement considérablement plus ardue \cite{cornu_learning_2025}.\\
+
+Constituant la première contribution de ce manuscrit, ce chapitre reprend et étend les résultats de nos travaux publiés à la conférence EUSIPCO \cite{cornu_learning_2025}. Nous y démontrons qu'il est possible d'apprendre une relation d'ordre dans un espace continu dense, à condition de repenser l'approche d'optimisation standard. Nous y détaillons spécifiquement deux contributions méthodologiques majeures :\\
+\begin{itemize}
+\item une fonction de coût pondérée équilibrant l'impact de chaque séquence dans l'apprentissage, indépendamment de son amplitude naturelle ;
+\item une stratégie d'apprentissage progressif par fenêtrage (curriculum), guidant le modèle des cas d'ordonnancement triviaux vers les configurations les plus ambiguës.
+\end{itemize}
+
+Les deux méthodes d'optimisation présentées dans ce chapitre (la pondération de l'erreur et le curriculum) ne sont pas circonscrites à cette seule expérience de tri : elles valident les capacités de discernement de notre modèle et constituent le socle méthodologique qui sera systématiquement réinvesti dans les chapitres suivants pour entraîner nos modèles sur les véritables flux de données radar.\\\\
+
+
+
 La fidélité de la modélisation par intelligence artificielle du bloc de Détection et Caractérisation des Impulsions (DCI) dépend intrinsèquement de la capacité du modèle à discerner et comparer finement les éléments d'une séquence. Contrairement aux applications de Traitement du Langage Naturel (NLP) où les données (mots ou tokens) appartiennent à un ensemble fini, les signaux radar évoluent dans des espaces continus. Par conséquent, l'espace latent du modèle est densément peuplé de représentations vectorielles qu'il est complexe de séparer sans ambiguïté (à l'inverse du NLP).\\
 
 Pour évaluer et valider les capacités de discernement de nos architectures dans ce contexte continu, nous avons défini une tâche de référence : un problème d'ordonnancement supervisé. Le modèle reçoit en entrée une séquence de vecteurs et doit prédire une nouvelle séquence qui doit correspondre à l'entrée réordonnée selon une règle implicite afin de minimiser l'erreur d'apprentissage. L'objectif est de mesurer l'aptitude générale d'un réseau de neurones à identifier les caractéristiques pertinentes et à établir des comparaisons fines entre les éléments pour construire une sortie cohérente. 
@@ -39,7 +63,7 @@ Ce principe global de cette transformation, du calcul du score jusqu'à la resti
 
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[scale=0.4]{Sorting.png}
+\includegraphics[scale=0.55]{Sorting.png}
 \end{center}
 \caption{Diagramme de la procédure de tri. Les différentes étapes sont visibles de haut en bas : réception de la séquence désordonnée, projection et association d'un score par élément, détermination de la permutation $\sigma$ par tri croissant des scores, et enfin restitution de la séquence vectorielle ordonnée.}
 \label{fig:sort}
@@ -99,7 +123,7 @@ Ce protocole assure une double propriété statistique à l'ensemble de données
 La génération de données synthétiques nous permet de produire des séquences de difficulté arbitraire, mais l'entraînement d'un réseau de neurones sur ces données requiert une méthodologie spécifique. Comme nous l'avons exposé dans nos travaux précédents, l'approche standard de minimisation de l'erreur quadratique moyenne s'avère insuffisante face à la dynamique des scores dans un espace continu. Cette section détaille la fonction de coût pondérée et la stratégie de curriculum mises en place pour permettre la convergence des modèles.
 
 \subsection{Fonction de coût normalisée}
-Nous détaillons ici la fonction de coût utilisée lors de l'entraînement de nos modèles, telle que présentée dans l'article [CITE]. Cette métrique se base initialement sur une erreur de reconstruction brute $\mathcal{L}_{raw}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k)$ entre une séquence prédite $\hat{\mathbf{Y}}_k$ et une séquence cible ordonnée $\mathbf{Y}_k$ :
+Nous détaillons ici la fonction de coût utilisée lors de l'entraînement de nos modèles, telle que présentée dans l'article \cite{cornu_learning_2025}. Cette métrique se base initialement sur une erreur de reconstruction brute $\mathcal{L}_{raw}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k)$ entre une séquence prédite $\hat{\mathbf{Y}}_k$ et une séquence cible ordonnée $\mathbf{Y}_k$ :
 
 \begin{equation}
     \mathcal{L}_{raw}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k) = \frac{\| \hat{\mathbf{Y}}_k - \mathbf{Y}_k \|_2}{\sqrt{N \cdot d}}

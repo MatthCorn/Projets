@@ -16,7 +16,7 @@ if __name__ == '__main__':
 
     # Copie du chemin de la base à l'intérieur du dossier
     db_path = os.path.join(RUN_DIR, "optuna.db")
-    storage = f"sqlite:///{db_path}"
+    storage = f"sqlite:///{db_path}?timeout=30&journal_mode=WAL"
 
     # Crée la base et l'étude si elles n'existent pas
     study = optuna.create_study(
