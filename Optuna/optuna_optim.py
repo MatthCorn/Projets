@@ -156,7 +156,7 @@ if __name__ == "__main__":
 
     # Définir le chemin de la base de données dans ce dossier
     db_path = os.path.join(run_dir, "optuna.db")
-    storage = f"sqlite:///{db_path}"
+    storage = f"sqlite:///{db_path}?timeout=30&journal_mode=WAL"
 
     sampler = optuna.samplers.TPESampler(
         multivariate=True,
