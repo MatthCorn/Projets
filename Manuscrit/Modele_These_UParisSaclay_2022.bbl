@@ -893,7 +893,7 @@
       \verb{url}
       \verb http://arxiv.org/abs/1503.02531
       \endverb
-      \keyw{Computer Science - Machine Learning,Computer Science - Neural and Evolutionary Computing,Statistics - Machine Learning}
+      \keyw{Computer Science - Machine Learning,Statistics - Machine Learning,Computer Science - Neural and Evolutionary Computing}
     \endentry
     \entry{deepseek-ai_deepseek-r1_2025}{article}{}{}
       \name{author}{200}{}{%
@@ -1942,7 +1942,7 @@
       \verb{url}
       \verb http://arxiv.org/abs/2501.12948
       \endverb
-      \keyw{Computer Science - Artificial Intelligence,Computer Science - Computation and Language,Computer Science - Machine Learning}
+      \keyw{Computer Science - Machine Learning,Computer Science - Artificial Intelligence,Computer Science - Computation and Language}
     \endentry
     \entry{mildenhall_nerf_2022}{article}{}{}
       \name{author}{6}{}{%
@@ -7097,6 +7097,255 @@
       \verb https://proceedings.neurips.cc/paper/2021/hash/7f489f642a0ddb10272b5c31057f0663-Abstract.html
       \endverb
     \endentry
+    \entry{kraska_case_2018}{inproceedings}{}{}
+      \name{author}{5}{}{%
+        {{hash=06236ad5a15ffd4505a97a20555a384b}{%
+           family={Kraska},
+           familyi={K\bibinitperiod},
+           given={Tim},
+           giveni={T\bibinitperiod}}}%
+        {{hash=af12cc8ca94c1e303f4ae44f22264508}{%
+           family={Beutel},
+           familyi={B\bibinitperiod},
+           given={Alex},
+           giveni={A\bibinitperiod}}}%
+        {{hash=594b2be737e055817db9ad276b6bf05a}{%
+           family={Chi},
+           familyi={C\bibinitperiod},
+           given={Ed\bibnamedelima H.},
+           giveni={E\bibinitperiod\bibinitdelim H\bibinitperiod}}}%
+        {{hash=4aecfb0cc2e1e3b7899129fa2a94e2b8}{%
+           family={Dean},
+           familyi={D\bibinitperiod},
+           given={Jeffrey},
+           giveni={J\bibinitperiod}}}%
+        {{hash=3fbf8f431994ec626b8f15908523b01d}{%
+           family={Polyzotis},
+           familyi={P\bibinitperiod},
+           given={Neoklis},
+           giveni={N\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Houston {TX} {USA}}%
+      }
+      \list{publisher}{1}{%
+        {ACM}%
+      }
+      \strng{namehash}{16ecbb1eab59edd84311cf3d5fca6427}
+      \strng{fullhash}{14493fc154f55cdf218cd5625fc94b51}
+      \strng{fullhashraw}{14493fc154f55cdf218cd5625fc94b51}
+      \strng{bibnamehash}{16ecbb1eab59edd84311cf3d5fca6427}
+      \strng{authorbibnamehash}{16ecbb1eab59edd84311cf3d5fca6427}
+      \strng{authornamehash}{16ecbb1eab59edd84311cf3d5fca6427}
+      \strng{authorfullhash}{14493fc154f55cdf218cd5625fc94b51}
+      \strng{authorfullhashraw}{14493fc154f55cdf218cd5625fc94b51}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 2018 International Conference on Management of Data}
+      \field{day}{27}
+      \field{eventtitle}{{SIGMOD}/{PODS} '18: International Conference on Management of Data}
+      \field{isbn}{978-1-4503-4703-7}
+      \field{langid}{english}
+      \field{month}{5}
+      \field{title}{The Case for Learned Index Structures}
+      \field{urlday}{25}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2018}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{489\bibrangedash 504}
+      \range{pages}{16}
+      \verb{doi}
+      \verb 10.1145/3183713.3196909
+      \endverb
+      \verb{file}
+      \verb Available Version (via Google Scholar):C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\TPR9V3AF\\Kraska et al. - 2018 - The Case for Learned Index Structures.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://dl.acm.org/doi/10.1145/3183713.3196909
+      \endverb
+      \verb{url}
+      \verb https://dl.acm.org/doi/10.1145/3183713.3196909
+      \endverb
+    \endentry
+    \entry{zhu_deep_2024}{inproceedings}{}{}
+      \name{author}{4}{}{%
+        {{hash=b81868ae21661e59cead6a0a777b1d9c}{%
+           family={Zhu},
+           familyi={Z\bibinitperiod},
+           given={Xiaoke},
+           giveni={X\bibinitperiod}}}%
+        {{hash=16a6bb056f6786baa492ae9c2e59ac22}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Qi},
+           giveni={Q\bibinitperiod}}}%
+        {{hash=c7905d3683e86c148202145e4b6e5b7c}{%
+           family={Zhou},
+           familyi={Z\bibinitperiod},
+           given={Wei},
+           giveni={W\bibinitperiod}}}%
+        {{hash=1c17a20c4acfa6f32b73321fc505433b}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={Ling},
+           giveni={L\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {IEEE}%
+      }
+      \strng{namehash}{03140b09a93b08b9429bc4d9a56f7653}
+      \strng{fullhash}{4f3baa4bbc2f7ef6c57a41d98185da1a}
+      \strng{fullhashraw}{4f3baa4bbc2f7ef6c57a41d98185da1a}
+      \strng{bibnamehash}{03140b09a93b08b9429bc4d9a56f7653}
+      \strng{authorbibnamehash}{03140b09a93b08b9429bc4d9a56f7653}
+      \strng{authornamehash}{03140b09a93b08b9429bc4d9a56f7653}
+      \strng{authorfullhash}{4f3baa4bbc2f7ef6c57a41d98185da1a}
+      \strng{authorfullhashraw}{4f3baa4bbc2f7ef6c57a41d98185da1a}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{2024 {IEEE} International Conference on Big Data ({BigData})}
+      \field{title}{Deep Learning Service for Efficient Data Distribution Aware Sorting}
+      \field{urlday}{25}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2024}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{1508\bibrangedash 1515}
+      \range{pages}{8}
+      \verb{file}
+      \verb Available Version (via Google Scholar):C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\NQNEW92Z\\Zhu et al. - 2024 - Deep Learning Service for Efficient Data Distribution Aware Sorting.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://ieeexplore.ieee.org/abstract/document/10825633/
+      \endverb
+      \verb{url}
+      \verb https://ieeexplore.ieee.org/abstract/document/10825633/
+      \endverb
+    \endentry
+    \entry{ferragina_balanced_2024}{misc}{}{}
+      \name{author}{2}{}{%
+        {{hash=a56d83e896383417c553388f0e01ad7a}{%
+           family={Ferragina},
+           familyi={F\bibinitperiod},
+           given={Paolo},
+           giveni={P\bibinitperiod}}}%
+        {{hash=9d99412b1300f86998b1aff62e8bd185}{%
+           family={Odorisio},
+           familyi={O\bibinitperiod},
+           given={Mattia},
+           giveni={M\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {arXiv}%
+      }
+      \strng{namehash}{a8c52871ec45bc523db9fb7faa2dc7a7}
+      \strng{fullhash}{a8c52871ec45bc523db9fb7faa2dc7a7}
+      \strng{fullhashraw}{a8c52871ec45bc523db9fb7faa2dc7a7}
+      \strng{bibnamehash}{a8c52871ec45bc523db9fb7faa2dc7a7}
+      \strng{authorbibnamehash}{a8c52871ec45bc523db9fb7faa2dc7a7}
+      \strng{authornamehash}{a8c52871ec45bc523db9fb7faa2dc7a7}
+      \strng{authorfullhash}{a8c52871ec45bc523db9fb7faa2dc7a7}
+      \strng{authorfullhashraw}{a8c52871ec45bc523db9fb7faa2dc7a7}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{This paper aims to better understand the strengths and limitations of adopting learned-based approaches in sequential sorting numerical data, via two main research steps. First, we study different learned models for distribution-based sorting, starting from some known ones (i.e., two-layer {RMI} or simple linear models) and then introducing some novel models that either improve the two-layer {RMI} or are fully new in their algorithmic structure thus resulting space efficient, monotonic, and very fast in building balanced buckets. We test those models over 11 synthetic datasets drawn from different distributions of 200M 64-bit floating-point items, so deriving hints about their ultimate performance and usefulness in designing a sorting algorithm. Based on these findings, we select and plug the best models from above in a new learned-based algorithmic scheme and devise three new sorters that we will test against other 6 sequential sorters (5 classic and 1 learned, known and new ones) over 33 datasets (11 synthetic and 22 real), whose size will be up to 800M items. Our experimental figures will show that our learned sorters achieve superior performance on 31 out of all 33 datasets (synthetic and real). In conclusion, these experimental results provide, on the one hand, a comprehensive answer to the main question: Which algorithmic structure for distribution-based sorting is suited to leverage a learned model in order to achieve efficient performance? and, on the other hand, they leave open several other research and engineering questions about the design of a highly performing sequential sorter that is robust over different input distributions.}
+      \field{day}{2}
+      \field{eprinttype}{arxiv}
+      \field{month}{7}
+      \field{number}{{arXiv}:2407.00734}
+      \field{shorttitle}{Balanced Learned Sort}
+      \field{title}{Balanced Learned Sort: a new learned model for fast and balanced item bucketing}
+      \field{urlday}{25}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2024}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{doi}
+      \verb 10.48550/arXiv.2407.00734
+      \endverb
+      \verb{eprint}
+      \verb 2407.00734 [cs]
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/2407.00734
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/2407.00734
+      \endverb
+      \keyw{Computer Science - Data Structures and Algorithms}
+    \endentry
+    \entry{kim_generalized_2024}{misc}{}{}
+      \name{author}{3}{}{%
+        {{hash=f3a5b588b00bf3d8184c654d5ba97d6b}{%
+           family={Kim},
+           familyi={K\bibinitperiod},
+           given={Jungtaek},
+           giveni={J\bibinitperiod}}}%
+        {{hash=4df144632f2618b20a2c41d288682395}{%
+           family={Yoon},
+           familyi={Y\bibinitperiod},
+           given={Jeongbeen},
+           giveni={J\bibinitperiod}}}%
+        {{hash=ec91f41664699edf33e62a7260bf3f59}{%
+           family={Cho},
+           familyi={C\bibinitperiod},
+           given={Minsu},
+           giveni={M\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {arXiv}%
+      }
+      \strng{namehash}{d17b1e3f13fa4fad0211eee7d1fd1c06}
+      \strng{fullhash}{d17b1e3f13fa4fad0211eee7d1fd1c06}
+      \strng{fullhashraw}{d17b1e3f13fa4fad0211eee7d1fd1c06}
+      \strng{bibnamehash}{d17b1e3f13fa4fad0211eee7d1fd1c06}
+      \strng{authorbibnamehash}{d17b1e3f13fa4fad0211eee7d1fd1c06}
+      \strng{authornamehash}{d17b1e3f13fa4fad0211eee7d1fd1c06}
+      \strng{authorfullhash}{d17b1e3f13fa4fad0211eee7d1fd1c06}
+      \strng{authorfullhashraw}{d17b1e3f13fa4fad0211eee7d1fd1c06}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Sorting is a fundamental operation of all computer systems, having been a long-standing significant research topic. Beyond the problem formulation of traditional sorting algorithms, we consider sorting problems for more abstract yet expressive inputs, e.g., multi-digit images and image fragments, through a neural sorting network. To learn a mapping from a high-dimensional input to an ordinal variable, the differentiability of sorting networks needs to be guaranteed. In this paper we define a softening error by a differentiable swap function, and develop an error-free swap function that holds a non-decreasing condition and differentiability. Furthermore, a permutation-equivariant Transformer network with multi-head attention is adopted to capture dependency between given inputs and also leverage its model capacity with self-attention. Experiments on diverse sorting benchmarks show that our methods perform better than or comparable to baseline methods.}
+      \field{day}{14}
+      \field{eprinttype}{arxiv}
+      \field{month}{3}
+      \field{number}{{arXiv}:2310.07174}
+      \field{title}{Generalized Neural Sorting Networks with Error-Free Differentiable Swap Functions}
+      \field{urlday}{25}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2024}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{doi}
+      \verb 10.48550/arXiv.2310.07174
+      \endverb
+      \verb{eprint}
+      \verb 2310.07174 [cs]
+      \endverb
+      \verb{file}
+      \verb Preprint PDF:C\:\\Users\\Matth\\Documents\\Projets\\Biblio\\Zotero\\storage\\MD6TAMQM\\Kim et al. - 2024 - Generalized Neural Sorting Networks with Error-Free Differentiable Swap Functions.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/2310.07174
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/2310.07174
+      \endverb
+      \keyw{Computer Science - Machine Learning,Statistics - Machine Learning}
+    \endentry
     \entry{olah_zoom_2020}{article}{}{}
       \name{author}{6}{}{%
         {{hash=78be47e08348476a254b1217fd9041ca}{%
@@ -7216,53 +7465,6 @@
       \endverb
       \keyw{Computer Science - Machine Learning,Computer Science - Artificial Intelligence,Computer Science - Neural and Evolutionary Computing}
     \endentry
-    \entry{cornu_learning_2025}{article}{}{}
-      \name{author}{3}{}{%
-        {{hash=5884abdada0dfaef09c28c03bf6bcdfb}{%
-           family={{CORNU}},
-           familyi={C\bibinitperiod},
-           given={Matthieu},
-           giveni={M\bibinitperiod}}}%
-        {{hash=4c7700dca8fb36a7a19a9b2f7ea807db}{%
-           family={{ENDERLI}},
-           familyi={E\bibinitperiod},
-           given={Cyrille},
-           giveni={C\bibinitperiod}}}%
-        {{hash=44ba0df8d1e9df6de26184315cbeca4b}{%
-           family={{RODET}},
-           familyi={R\bibinitperiod},
-           given={Thomas},
-           giveni={T\bibinitperiod}}}%
-      }
-      \list{location}{1}{%
-        {Palermo, Italy}%
-      }
-      \strng{namehash}{269714fa235be82bf10d2960c79c08e6}
-      \strng{fullhash}{269714fa235be82bf10d2960c79c08e6}
-      \strng{fullhashraw}{269714fa235be82bf10d2960c79c08e6}
-      \strng{bibnamehash}{269714fa235be82bf10d2960c79c08e6}
-      \strng{authorbibnamehash}{269714fa235be82bf10d2960c79c08e6}
-      \strng{authornamehash}{269714fa235be82bf10d2960c79c08e6}
-      \strng{authorfullhash}{269714fa235be82bf10d2960c79c08e6}
-      \strng{authorfullhashraw}{269714fa235be82bf10d2960c79c08e6}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{Proceedings of the 2025 33rd European Signal Processing Conference ({EUSIPCO})}
-      \field{title}{Learning to Sort in Continuous Spaces: Neural Architectures and Iterative Training Strategies}
-      \field{volume}{{SiG}-{DML}-P5.2}
-      \field{year}{2025}
-      \field{dateera}{ce}
-      \field{pages}{1902}
-      \range{pages}{1}
-      \verb{urlraw}
-      \verb https://eusipco2025.org/wp-content/uploads/pdfs/0001902.pdf
-      \endverb
-      \verb{url}
-      \verb https://eusipco2025.org/wp-content/uploads/pdfs/0001902.pdf
-      \endverb
-    \endentry
     \entry{matthew_one_nodate}{online}{}{}
       \name{author}{1}{}{%
         {{hash=81b26b79611ce08fc52f2f2880710ada}{%
@@ -7300,9 +7502,54 @@
       \verb https://matthewbaggins.itch.io/one-attention-head-is-all-you-need-for-sorting-fixed-length-lists
       \endverb
     \endentry
+    \entry{cornu_learning_2025}{article}{}{}
+      \name{author}{3}{}{%
+        {{hash=d629c7443f7af3eb07cc5182071b8f39}{%
+           family={Cornu},
+           familyi={C\bibinitperiod},
+           given={Matthieu},
+           giveni={M\bibinitperiod}}}%
+        {{hash=4d7c5d3ffd3dc469eddebc80c8a77553}{%
+           family={Enderli},
+           familyi={E\bibinitperiod},
+           given={Cyrille},
+           giveni={C\bibinitperiod}}}%
+        {{hash=fb9b215966b9465e1f9d1735213ded6a}{%
+           family={Rodet},
+           familyi={R\bibinitperiod},
+           given={Thomas},
+           giveni={T\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Palermo, Italy}%
+      }
+      \strng{namehash}{2f695b25813ef8a9fe179287c081d785}
+      \strng{fullhash}{2f695b25813ef8a9fe179287c081d785}
+      \strng{fullhashraw}{2f695b25813ef8a9fe179287c081d785}
+      \strng{bibnamehash}{2f695b25813ef8a9fe179287c081d785}
+      \strng{authorbibnamehash}{2f695b25813ef8a9fe179287c081d785}
+      \strng{authornamehash}{2f695b25813ef8a9fe179287c081d785}
+      \strng{authorfullhash}{2f695b25813ef8a9fe179287c081d785}
+      \strng{authorfullhashraw}{2f695b25813ef8a9fe179287c081d785}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Proceedings of the 2025 33rd European Signal Processing Conference ({EUSIPCO})}
+      \field{title}{Learning to Sort in Continuous Spaces: Neural Architectures and Iterative Training Strategies}
+      \field{volume}{{SiG}-{DML}-P5.2}
+      \field{year}{2025}
+      \field{dateera}{ce}
+      \field{pages}{1902}
+      \range{pages}{1}
+      \verb{urlraw}
+      \verb https://eusipco2025.org/wp-content/uploads/pdfs/0001902.pdf
+      \endverb
+      \verb{url}
+      \verb https://eusipco2025.org/wp-content/uploads/pdfs/0001902.pdf
+      \endverb
+    \endentry
   \enddatalist
-  \missing{baginski_one_2023}
-  \missing{kim_generalized_2024}
 \endrefsection
 \endinput
 

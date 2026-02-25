@@ -1,56 +1,56 @@
 \relax 
 \providecommand\zref@newlabel[2]{}
 \providecommand\hyper@newdestlabel[2]{}
-\@writefile{toc}{\contentsline {chapter}{\numberline {6}Dépliage du problème : une approche événementielle}{79}{chapter.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {6}Dépliage du problème : une approche événementielle}{77}{chapter.6}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\@writefile{toc}{\contentsline {section}{\numberline {6.1}Motivation : Du traitement de séquence à la modélisation dynamique}{79}{section.6.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1.1}Le goulot d'étranglement des architectures Seq2Seq}{79}{subsection.6.1.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1.2}Le DCI comme système dynamique réactif}{80}{subsection.6.1.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6.2}Formalisation du problème "Flux-à-flux"}{80}{section.6.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2.1}Contraintes architecturales et choix de conception}{80}{subsection.6.2.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Contrainte 1 : Discrétisation de la réponse}{80}{paragraph*.24}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Contrainte 2 : Condition d'arrêt}{81}{paragraph*.25}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Contrainte 3 : Maintien du contexte}{81}{paragraph*.26}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6.3}Protocole de transformation des données}{81}{section.6.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.3.1}Illustration du mécanisme}{81}{subsection.6.3.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6.4}Validation de l'approche sur architectures récurrentes}{82}{section.6.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.4.1}Les architectures}{82}{subsection.6.4.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.4.2}Résultats expérimentaux}{83}{subsection.6.4.2}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {6.1}{\ignorespaces Configurations optimales des architectures évaluées (issues de l'annexe de l'article [ref]).}}{83}{table.caption.27}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {6.2}{\ignorespaces Comparaison des performances (NRMSE) en mode Forecasting en fonction de la longueur de la séquence.}}{83}{table.caption.28}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.4.3}Conclusion}{84}{subsection.6.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6.5}Extension des essais : Généralisation à d'autres architectures}{84}{section.6.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.5.1}Préparation des données et ingénierie des caractéristiques}{84}{subsection.6.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.5.1.1}Encodage relatif local du temps}{85}{subsubsection.6.5.1.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.5.1.2}Gestion des masques et exemple de dépliage}{86}{subsubsection.6.5.1.2}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {6.3}{\ignorespaces Exemple de construction des données et des masques pour une séquence courte dépliée.}}{86}{table.caption.29}\protected@file@percent }
-\newlabel{tab:unfolding_example}{{6.3}{86}{Exemple de construction des données et des masques pour une séquence courte dépliée}{table.caption.29}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.5.2}Sélection des architectures}{86}{subsection.6.5.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.5.2.1}Le Transformer (Attention Mechanism)}{86}{subsubsection.6.5.2.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.5.2.2}Le TCN (Temporal Convolutional Network)}{87}{subsubsection.6.5.2.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.5.2.3}Le GRU (Recurrent Network)}{87}{subsubsection.6.5.2.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.5.2.4}Structure commune et hyper-paramètres}{87}{subsubsection.6.5.2.4}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {6.4}{\ignorespaces Hyper-paramètres géométriques retenus pour chaque architecture.}}{88}{table.caption.30}\protected@file@percent }
-\newlabel{tab:hyperparams}{{6.4}{88}{Hyper-paramètres géométriques retenus pour chaque architecture}{table.caption.30}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.5.3}Fonction de perte et métriques d'évaluation}{88}{subsection.6.5.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.5.3.1}Erreur de reconstruction pondérée ($\mathcal  {L}_{reg}$)}{88}{subsubsection.6.5.3.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.5.3.2}Erreur de classification par MCC différentiable ($\mathcal  {L}_{class}$)}{89}{subsubsection.6.5.3.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.5.4}Résultats et Analyse Comparative}{89}{subsection.6.5.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.5.4.1}Performance globale et convergence}{89}{subsubsection.6.5.4.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.1}{\ignorespaces Comparaison des dynamiques d'apprentissage. Le Transformer montre une convergence plus lente initialement mais atteint un plateau asymptotique plus bas que le GRU.}}{90}{figure.caption.31}\protected@file@percent }
-\newlabel{fig:learning_curves}{{6.1}{90}{Comparaison des dynamiques d'apprentissage. Le Transformer montre une convergence plus lente initialement mais atteint un plateau asymptotique plus bas que le GRU}{figure.caption.31}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {6.5}{\ignorespaces Performances comparées sur le jeu de test (valeurs fictives pour illustration). Le Transformer excelle en précision mais le GRU reste le plus rapide en inférence séquentielle.}}{90}{table.caption.32}\protected@file@percent }
-\newlabel{tab:global_results}{{6.5}{90}{Performances comparées sur le jeu de test (valeurs fictives pour illustration). Le Transformer excelle en précision mais le GRU reste le plus rapide en inférence séquentielle}{table.caption.32}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.5.4.2}Robustesse face à la longueur de séquence}{90}{subsubsection.6.5.4.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.2}{\ignorespaces Évolution de la performance de régression en fonction de la longueur de la séquence traitée. Contrairement aux approches globales, les architectures auto-régressives maintiennent une performance stable sur le long terme.}}{91}{figure.caption.33}\protected@file@percent }
-\newlabel{fig:length_robustness}{{6.2}{91}{Évolution de la performance de régression en fonction de la longueur de la séquence traitée. Contrairement aux approches globales, les architectures auto-régressives maintiennent une performance stable sur le long terme}{figure.caption.33}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.5.4.3}Analyse qualitative des générations}{91}{subsubsection.6.5.4.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.3}{\ignorespaces Exemple de reconstruction sur une fenêtre complexe. Le modèle identifie correctement qu'une impulsion incidente $I_k$ doit générer deux impulsions de sortie $O_a, O_b$ avant de passer à la suivante (prédiction correcte des tokens \texttt  {NEXT}).}}{91}{figure.caption.34}\protected@file@percent }
-\newlabel{fig:qualitative}{{6.3}{91}{Exemple de reconstruction sur une fenêtre complexe. Le modèle identifie correctement qu'une impulsion incidente $I_k$ doit générer deux impulsions de sortie $O_a, O_b$ avant de passer à la suivante (prédiction correcte des tokens \texttt {NEXT})}{figure.caption.34}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.5.5}Conclusion sur les extensions}{91}{subsection.6.5.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6.1}Motivation : Du traitement de séquence à la modélisation dynamique}{77}{section.6.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1.1}Le goulot d'étranglement des architectures Seq2Seq}{77}{subsection.6.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1.2}Le DCI comme système dynamique réactif}{78}{subsection.6.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6.2}Formalisation du problème "Flux-à-flux"}{78}{section.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2.1}Contraintes architecturales et choix de conception}{78}{subsection.6.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Contrainte 1 : Discrétisation de la réponse}{78}{paragraph*.25}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Contrainte 2 : Condition d'arrêt}{79}{paragraph*.26}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Contrainte 3 : Maintien du contexte}{79}{paragraph*.27}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6.3}Protocole de transformation des données}{79}{section.6.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3.1}Illustration du mécanisme}{79}{subsection.6.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6.4}Validation de l'approche sur architectures récurrentes}{80}{section.6.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4.1}Les architectures}{80}{subsection.6.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4.2}Résultats expérimentaux}{81}{subsection.6.4.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {6.1}{\ignorespaces Configurations optimales des architectures évaluées (issues de l'annexe de l'article [ref]).}}{81}{table.caption.28}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {6.2}{\ignorespaces Comparaison des performances (NRMSE) en mode Forecasting en fonction de la longueur de la séquence.}}{81}{table.caption.29}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4.3}Conclusion}{82}{subsection.6.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6.5}Extension des essais : Généralisation à d'autres architectures}{82}{section.6.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.5.1}Préparation des données et ingénierie des caractéristiques}{82}{subsection.6.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.5.1.1}Encodage relatif local du temps}{83}{subsubsection.6.5.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.5.1.2}Gestion des masques et exemple de dépliage}{84}{subsubsection.6.5.1.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {6.3}{\ignorespaces Exemple de construction des données et des masques pour une séquence courte dépliée.}}{84}{table.caption.30}\protected@file@percent }
+\newlabel{tab:unfolding_example}{{6.3}{84}{Exemple de construction des données et des masques pour une séquence courte dépliée}{table.caption.30}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.5.2}Sélection des architectures}{84}{subsection.6.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.5.2.1}Le Transformer (Attention Mechanism)}{84}{subsubsection.6.5.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.5.2.2}Le TCN (Temporal Convolutional Network)}{85}{subsubsection.6.5.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.5.2.3}Le GRU (Recurrent Network)}{85}{subsubsection.6.5.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.5.2.4}Structure commune et hyper-paramètres}{85}{subsubsection.6.5.2.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {6.4}{\ignorespaces Hyper-paramètres géométriques retenus pour chaque architecture.}}{86}{table.caption.31}\protected@file@percent }
+\newlabel{tab:hyperparams}{{6.4}{86}{Hyper-paramètres géométriques retenus pour chaque architecture}{table.caption.31}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.5.3}Fonction de perte et métriques d'évaluation}{86}{subsection.6.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.5.3.1}Erreur de reconstruction pondérée ($\mathcal  {L}_{reg}$)}{86}{subsubsection.6.5.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.5.3.2}Erreur de classification par MCC différentiable ($\mathcal  {L}_{class}$)}{87}{subsubsection.6.5.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.5.4}Résultats et Analyse Comparative}{87}{subsection.6.5.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.5.4.1}Performance globale et convergence}{87}{subsubsection.6.5.4.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6.1}{\ignorespaces Comparaison des dynamiques d'apprentissage. Le Transformer montre une convergence plus lente initialement mais atteint un plateau asymptotique plus bas que le GRU.}}{88}{figure.caption.32}\protected@file@percent }
+\newlabel{fig:learning_curves}{{6.1}{88}{Comparaison des dynamiques d'apprentissage. Le Transformer montre une convergence plus lente initialement mais atteint un plateau asymptotique plus bas que le GRU}{figure.caption.32}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {6.5}{\ignorespaces Performances comparées sur le jeu de test (valeurs fictives pour illustration). Le Transformer excelle en précision mais le GRU reste le plus rapide en inférence séquentielle.}}{88}{table.caption.33}\protected@file@percent }
+\newlabel{tab:global_results}{{6.5}{88}{Performances comparées sur le jeu de test (valeurs fictives pour illustration). Le Transformer excelle en précision mais le GRU reste le plus rapide en inférence séquentielle}{table.caption.33}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.5.4.2}Robustesse face à la longueur de séquence}{88}{subsubsection.6.5.4.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6.2}{\ignorespaces Évolution de la performance de régression en fonction de la longueur de la séquence traitée. Contrairement aux approches globales, les architectures auto-régressives maintiennent une performance stable sur le long terme.}}{89}{figure.caption.34}\protected@file@percent }
+\newlabel{fig:length_robustness}{{6.2}{89}{Évolution de la performance de régression en fonction de la longueur de la séquence traitée. Contrairement aux approches globales, les architectures auto-régressives maintiennent une performance stable sur le long terme}{figure.caption.34}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.5.4.3}Analyse qualitative des générations}{89}{subsubsection.6.5.4.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6.3}{\ignorespaces Exemple de reconstruction sur une fenêtre complexe. Le modèle identifie correctement qu'une impulsion incidente $I_k$ doit générer deux impulsions de sortie $O_a, O_b$ avant de passer à la suivante (prédiction correcte des tokens \texttt  {NEXT}).}}{89}{figure.caption.35}\protected@file@percent }
+\newlabel{fig:qualitative}{{6.3}{89}{Exemple de reconstruction sur une fenêtre complexe. Le modèle identifie correctement qu'une impulsion incidente $I_k$ doit générer deux impulsions de sortie $O_a, O_b$ avant de passer à la suivante (prédiction correcte des tokens \texttt {NEXT})}{figure.caption.35}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.5.5}Conclusion sur les extensions}{89}{subsection.6.5.5}\protected@file@percent }
 \@setckpt{Stage}{
-\setcounter{page}{93}
+\setcounter{page}{91}
 \setcounter{equation}{5}
 \setcounter{enumi}{3}
 \setcounter{enumii}{0}

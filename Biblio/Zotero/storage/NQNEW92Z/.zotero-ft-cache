@@ -1,0 +1,499 @@
+Deep Learning Service for Efficient Data
+Distribution Aware Sorting
+Xiaoke Zhu† Beihang University China zhuxk@buaa.edu.cn
+Qi Zhang Meta Platforms USA qizhang@meta.com
+Wei Zhou*
+Yunnan University China zwei@ynu.edu.cn
+Ling Liu
+Georgia Institute of Technology USA ling.liu@cc.gatech.edu
+Abstract—In this paper, we present a neural network-enabled data distribution aware sorting method, coined as NN-sort. Our approach explores the potential of developing deep learning techniques to speed up large-scale sort operations, enabling data distribution aware sorting as a deep learning service. Compared to traditional pairwise comparison-based sorting algorithms, which sort data elements by performing pairwise operations, NNsort leverages the neural network model to learn the data distribution and uses it to map large-scale data elements into ordered ones. Our experiments demonstrate the significant advantage of using NN-sort. Measurements on both synthetic and real-world datasets show that NN-sort yields 2.18× to 10× performance improvement over traditional sorting algorithms.
+I. INTRODUCTION
+Sorting is a fundamental operation in the realm of big data, powering everything from database systems [1] to bigdata analysis [2]. As the scale of data continues to grow, traditional sorting algorithms face increasing limitations in performance. While methods such as Quick Sort family [3], Merge Sort family [4], and Radix Sort family [5], [6] have long been relied upon, their comparison-based and non-comparison-based optimizations appear to be reaching its bottleneck. Recent research [7]–[10] has extensively explored how deep learning models can enhance the performance of traditional big data systems and algorithms. For instance, Tim Kraska et al. introduced a learned index [9] that leverages an empirical cumulative distribution function (CDF) to improve the performance of traditional data structures. They also proposed a learned approach [10], [11] to improve sorting performance. Their method, known as SageDB Sort, utilizes a learned model to generate a roughly ordered state of elements by predicting (mapping) the positions of elements, and then refined it by a traditional sorting algorithm like Quick Sort. However, this approach has limitations. Conflicts often arise when converting the learned model’s output, such as multiple elements being mapped to the same position, leading to performance bottlenecks (see Section IV). Resolving these conflicts (especially when numerous) can be time-consuming, making it less efficient than traditional algorithms. The question of how to design an effective deep learningbased sorting algorithm remains unanswered. Specifically, key issues include determining which type of neural network per
+†work done while author was with Yunnan University *corresponding author
+forms best for sorting, understanding the complexity of neural network-based sorting, dealing with conflicts, and minimizing operations such as data comparison and movement during the sorting process. To address these issues, this work presents NN-sort, a neural network-based sorting algorithm designed to move beyond traditional sorting paradigms. Instead of relying solely on comparisons or inherent data characteristics, NN-sort harnesses the power of neural networks to create a data distributionaware sorting method. By training a model on historical data to predict the sorted positions of new data, NN-sort offers a novel approach that achieves efficient and scalable sorting while incorporating an effective conflict-handling mechanism. The architecture of NN-sort consists of three distinct phases: the input phase, where data is transformed into neural networkcompatible vectors; the sorting phase, where a learned neural network iteratively refines the data order; and the polish phase, where traditional methods finalize the sorting (i.e., ensuring the output is correct). This layered approach enables NN-sort to handle large datasets efficiently, minimizing the computational overhead from conflicts—a primary performance bottleneck in SageDB Sort. Moreover, we systematically explored the potential of NN-sort, discussed its complexity, performance, and advantages over traditional algorithms. Through rigorous experiments on both synthetic and real-world datasets, we justify the effective of NN-sort. The contributions of this paper are summarized as follows: (a) we investigate the opportunities and challenges of enhancing traditional sorting processes by leveraging neural networkbased learning approaches; (b) we develop NN-sort, a novel neural network-based sorting method that utilizes historical data to train a data distribution-aware model. This trained model performs high-performance sorting on incoming data iteratively, with an additional touch-up process to ensure the correctness of the final result. In contrast to state-of-the-art learned sorting methods, e.g.,SageDB Sort, NN-sort scales effectively by reducing conflicts during CDF mapping; (c) we provide a formal analysis of NN-sort’s complexity using a cost model that clarifies the intrinsic relationship between model accuracy and sorting performance. (d) we evaluate NNsort’s performance on both synthetic and real-world datasets. Experimental results demonstrate that NN-sort achieves up to an order of magnitude speed-up in sorting time compared to
+arXiv:1907.08817v4 [cs.DS] 13 Dec 2024
+
+
+Input Phase
+f
+w
+f
+O1
+...
+f
+Ot
+...
+...
+quick sort
+Sorting Phase Polish Phase
+Ot
+O1
+Roughly ordered
+(unordered) (ordered)
+...
+...
+Records Round(row_pos)
+t
+2
+ww
+w
+Roughly ordered
+O2 Roughly
+ordered
+O1
+O2
+Ot
+Output: A’ (ordered)
+O2
+Polish
+Input data elements (A[0], A[1], ..., A[n‐1])
+Value
+Out put data elements
+(A’[0], A’[1], ..., A’[n‐1])
+Value
+1
+Fig. 1: NN-sort architecture
+state-of-the-art sorting algorithms. The rest of the paper is organized as follows: the design of NN-sort is presented in Section II. The complexity of NN-sort is discussed in Section III. The experimental results are presented and analyzed in Section IV. Related work is reviewed in Section V, and the paper is concluded in Section VI.
+II. NEURAL NETWORK BASED SORT
+In this section, we discuss the design of NN-sort, including how to use a neural network model for effective sorting, as well as how such a neural network model can be trained.
+Challenges. Sorting involves mapping elements from an unsorted state to a sorted state. Rather than relying on traditional comparison-based methods (e.g., Quick Sort), this mapping can be achieved through a data distribution-aware model that takes each element as input and returns its expected position within the sorted array. Given an ideal function f and distinct elements x, y ∈ A such that x < y, the function would ideally satisfy f (x) < f (y). While such a ”magic” function may not always hold perfectly, it can still accelerate sorting, with greater accuracy leading to more effective acceleration. Before discussing the methods, several challenges must be addressed to ensure both effectiveness and accuracy. (1) first, for correctness, the model must precisely reflect the order among input data elements, producing results consistent with those of traditional sorting algorithms. However, it is impossible to have that function f , especially if we train the model just based on samples from the input data; (2) second, for effectiveness, the model ideally should sort large volumes of data in a single pass. Achieving this requires a model to be both complex and accurate enough to capture the exact order of all elements, which can result in significant training cost and inference cost. Thus, a balance between model accuracy and sorting performance is crucial. (3) third, conflicts arise when multiple input elements are mapped to the same output position, i.e., f (a) = f (b) where a, b ∈ A and a ̸= b. Effectively managing these conflicts is crucial for both the correctness and efficiency of the learned sorting approach. SageDB Sort addresses these collisions using traditional sorting algorithms, such as Quick Sort, which incurs computational overhead when collisions is
+Procedure NN-sort
+Input: A: the array of data elements f : the learned model m: the relaxation factor ε the predefined iteration limit τ the predefined threshold Output: A′: the array of data elements after sorted 1. w ← translate(A) 2. init O ← ∅, i ← 0 3. while 0 < i < ε and count(w) > τ do 4. init oi ← ∅, c ← ∅ 5. w_pos ← w.map(f )
+6. for idx in count(w) do
+7. pos ← round(w_pos[idx] ∗ m) 8. if oi[pos] is empty do 9. oi[pos] ← w[idx] 10. else
+11. c.append(w[idx]) 12. O.append(oi) 13. w ← c 14. ++i
+15. QuickSort(w) 16. A′ ← polish(O, w) 17. Return A′
+Fig. 2: Algorithm NN-sort
+too large. That is to said, there is still room for improvement.
+NN-sort Design. In response to these challenges, we designed an iterative neural network-based sorting method. Unlike SageDB Sort, which employs a complex model to sort data in a single round, our approach utilizes a simpler model to sort over multiple rounds. Each round generates a roughly sorted array, with conflicts carried forward to the next iteration. This process continues until the conflicts in that iteration fall below a predefined threshold or a number of iterations is reached. The final small conflict array is then sorted using a traditional method like Quick Sort and merged with the roughly sorted arrays. After a final traversal to ensure correctness, a fully
+2
+
+
+Procedure polish(O)
+Input: O = {o1, o2, ...}: array of roughly sorted arrays. w: strictly sorted array. Output: A′: the array of data elements after sorted 1. A′ ← w
+2. for oi ∈ O do
+3. A′ ← InsertSort(A′, oi) 4. Return A′
+Fig. 3: Algorithm polish
+sorted result is obtained. The benefits are two folds: (1) using a simpler model reduces both inference and training costs; (2) the learned model can be applied repeatedly, avoiding direct sorting of conflicting elements with traditional methods. Figure 1 illustrates this approach, where the input array A is sorted into A′. The process is divided into three phases: Input, Sorting, and Polish. Figure 2 details the workflow of NN-sort, with Line 1 addressing the input phase, Lines 2-15 covering the sorting phase, and Line 16 corresponding to the polish phase.
+Input Phase. The input phase prepares the data for the neural network by encoding it appropriately, ensuring compatibility for processing. For example, string-type data is converted into ASCII values. This encoding step is crucial, as it standardizes the data format and enables the neural network to interpret and process a wide variety of input types, such as integers, floating-point numbers, or categorical data, in a structured and efficient manner. For simplicity, we denoted such operations as w ← translate(A) (line 1, Figure 2).
+Sorting Phase. In the sorting phase, a learned model f iteratively organizes unordered data into approximately sorted arrays. First, the learned model f maps each element to its expected position (line 5, Figure 2). Then, oi stores elements of w based on their value in w pos, where i denotes the iteration number. If a collision occurs in oi—where multiple elements map to the same position—only the first element is stored in oi, while subsequent elements are placed in a temporary conflict array c (line 8-11, Figure 2). In the following iteration, elements in c are reprocessed by learned model f (line 13, Figure 3). This process continues until either a predefined maximum number of iterations ε is reached or the size of c drops below a threshold τ , at which point it is sorted using a traditional algorithm. It is worth mentioning that, each element in w pos represents the expected position of corresponding elements of w within the final sorted array. Instead of using w pos[idx], which is the direct output of f , we use round(w pos[idx]∗m), a rounded value, to represent the position of w[idx]. The reasons are two folds: (1) the outputs of f are decimals while the positions need to be integers. (2) with relaxation factor m the input data elements can be mapped into a larger space, thereby reducing the number of conflicts. In addition, all conflicting data elements are stored in a conflict array c and
+1 6 31 38 60 81 88 37 92 3 91 32
+3 37 91 32 59
+1 3 6 31 32 37 38 59 60 81 88 91 92
+32 31 1 81 6 60 38 37 3 59 88 92 91
+<latexitsha1_base64="1b5EDj64PlsE9fy0UUpd52hcSO0=">AAAB6nicbZC5TgMxEIbHnCFc4ehoLBIkqmiXItARiQLKIMghJavI63gTK17vyvYihVUegYYChGipqXgSOkreBOcoIOGXLH36/xl5ZvxYcG0c5wstLC4tr6xm1rLrG5tb27md3ZqOEkVZlUYiUg2faCa4ZFXDjWCNWDES+oLV/f7FKK/fMaV5JG/NIGZeSLqSB5wSY62bQlBo5/JO0RkLz4M7hfz5x/335ft+WmnnPludiCYhk4YKonXTdWLjpUQZTgUbZluJZjGhfdJlTYuShEx76XjUIT6yTgcHkbJPGjx2f3ekJNR6EPq2MiSmp2ezkflf1kxMcOalXMaJYZJOPgoSgU2ER3vjDleMGjGwQKjidlZMe0QRaux1svYI7uzK81A7KbqlYunazZcdmCgDB3AIx+DCKZThCipQBQpdeIAneEYCPaIX9DopXUDTnj34I/T2A6TxkQ4=</latexit> f
+Step 1. Mapping elements by learned model
+Step 2. Re‐mapping elements by learned mode
+<latexitsha1_base64="1b5EDj64PlsE9fy0UUpd52hcSO0=">AAAB6nicbZC5TgMxEIbHnCFc4ehoLBIkqmiXItARiQLKIMghJavI63gTK17vyvYihVUegYYChGipqXgSOkreBOcoIOGXLH36/xl5ZvxYcG0c5wstLC4tr6xm1rLrG5tb27md3ZqOEkVZlUYiUg2faCa4ZFXDjWCNWDES+oLV/f7FKK/fMaV5JG/NIGZeSLqSB5wSY62bQlBo5/JO0RkLz4M7hfz5x/335ft+WmnnPludiCYhk4YKonXTdWLjpUQZTgUbZluJZjGhfdJlTYuShEx76XjUIT6yTgcHkbJPGjx2f3ekJNR6EPq2MiSmp2ezkflf1kxMcOalXMaJYZJOPgoSgU2ER3vjDleMGjGwQKjidlZMe0QRaux1svYI7uzK81A7KbqlYunazZcdmCgDB3AIx+DCKZThCipQBQpdeIAneEYCPaIX9DopXUDTnj34I/T2A6TxkQ4=</latexit> f
+Step 4. Merge & Polishing Step 3. QuickSort
+59
+92
+Fig. 4: Example
+used as input to f for the next iteration. If the model f does not perform effectively, i.e., the conflicting array may never shrink below τ or may decrease too slowly, potentially resulting in higher overhead than traditional sorting algorithms. To prevent this, a threshold ε limits the maximum number of iterations. As we will show in the experimental section, ε = 2 or ε = 3 are good enough for accelerating sorting. There is a clearly decreased edge effect on the number of iterations.
+Polish Phase. The polish phase refines the roughly sorted arrays O = {o1, o2, ...} to ensure the correctness of the output. Figure 3 outlines this process, where the arrays in O are polished and merged with the strictly ordered array A′. The algorithm iterates over each array in O, merging them with A′ one by one. Elements in oi are either appended or inserted into the result, depending on their order relative to A′ (i.e., Insert Sort).
+Remark. Since oi is only roughly ordered, out-of-order elements are inserted into their correct positions in A′, ensuring NN-sort’s reliability despite potential errors from the learned model. Though insertion is costlier than appending, it is limited to out-of-order elements. As model accuracy improves, the polish phase incurs acceptable overhead. Section III discusses NN-sort’s complexity, with experimental results showing few out-of-order elements, yielding nearly linear performance.
+Example 1: Figure 4 illustrates how NN-sort sorting. Given thresholds τ = 2, ε = 2 and an unordered array A = {32, 60, 31, 1, 81, 6, 88, 38, 3, 59, 37, 92, 91}, NN-sort first checks if A’s size is below τ ; if so, a traditional sorting method is applied. Otherwise, learned sorting begins. Here, NN-sort processes A in two rounds with a learned model. A conflict arises between elements 37 and 38, as f maps them to the same position, placing 37 in a conflict array c. At the end of the first iteration, elements 92, 3, 91, 32, and 59 are also in the conflict array. After the first iteration, since w’s size exceed τ and the iteration count is below ε, all elements in c = {37, 92, 3, 91, 32, 59} are reprocessed by f in a second iteration, yielding a new sorted array o2 = {3, 37, 91, 92} and a smaller conflict array c = {32, 59}. Then a traditional sorting algorithm (e.g., Quick Sort) is applied to c, and finally, o1, o2, and sorted c are merged in the polish phase, producing a fully ordered result.
+2
+3
+
+
+TABLE I: Notations
+symbols notations
+n the amount of data elements to be sorted σi collision rate per iteration
+ei
+the number of data elements that were out-of-order in the i-th iteration ε the predefined limit of iterations t the number of completed iterations θ The operations required for data to pass through f
+Training. While training time is not the focus, all our models—whether shallow neural networks or simple linear/multivariate regression models—train quickly and perform well, as perfect position mapping (i.e., no conflicts or out-of-order elements) is unnecessary. The training and test data can differ; any learned order relationships help the model understand the sorting task.
+III. MODEL ANALYSIS
+This section establishes the time complexity of NN-sort by analyzing key operations—moving, mapping, and comparing data elements. A cost model is introduced to highlight relationships among factors like conflict rate, model scale, iteration count, out-of-order rate, data volume, and required operations. The total operations of NN-sort is expressed as a T (n, e, σ, t, θ), where: n is the number of data elements to be sorted, e = {e1, ..., et} is the set of probabilities, with ei denoting the proportion of out-of-order elements in the i-th iteration, σ = {σ1, ..., σt} is the set of conflict rates, where σi represents the conflict rate in the i-th iteration, t is the number of iterations completed, θ denotes the number of operations required for each data element to pass through the neural network. These basic notations are summarized in Table I. As shown in Eq 1, the number of operations for NN-sort to sort n (n > 1) data elements is C1n2 + C2nlogn + C3n.
+T (n, e, σ, t, θ) = 1, if n = 1
+C1n2 + C2nlogn + C3n, if n > 1
+(1)
+C1 = [ 1
+2
+t
+X
+i=1
+ei(1 − σi)(
+i−1
+Y
+j=1
+σj )2]
+C2 =
+t
+Y
+j=1
+σj
+C3 =
+t
+X
+i=1
+[θ
+i
+X
+j=1
+σj + (1 − ei)(1 − αi)
+i−1
+Y
+j=1
+σj +
+i
+Y
+j=1
+σj ]
++(
+t
+Y
+j=1
+σj )log(
+t
+Y
+j=1
+σj )
+In NN-sort, the majority of the cost is spent in the Sorting and Polish phases. Let s(n) represent the time spent in the Sorting phase and p(n) represent the time spent in the Polish
+phase, we now formally analyze the complexity of NN-sort. s(n) consists of two kinds of operations: iteratively feeding the data elements into a learned model f and sorting the array w at the last iterations using traditional sorting algorithms (e.g., QuickSort), the time complexity of which is nlogn. If n > 1, then θ Pi
+j=1 σjn operations are required to feed data into model f in the i-th iteration. An additional (
+Qt
+j=1 σj )nlog(Qt
+j=1 σj)n operations are required to keep w order, since the size of conflicting array w updated in the last
+iteration is (Qt
+j=1 σj)n. Therefore, at the end of the algorithm,
+the total operations of s(n) is (Qt
+j=1 σj )nlog(Qt
+j=1 σj )n +
+θ
+Pt i=1
+Pi
+j=1 σj n.
+T (n) = s(n) + p(n) , (n > 1)
+=(
+t
+Y
+j=1
+σj )nlog(
+t
+Y
+j=1
+σj)n + θ
+t
+X
+i=1
+i
+X
+j=1
+σjn + p(n)
+=(
+t
+Y
+j=1
+σj )nlog(
+t
+Y
+j=1
+σj)n + θ
+t
+X
+i=1
+i
+X
+j=1
+σj n
++
+t
+X
+i=1
+[ei(1 − σi)
+i−1
+Y
+j=1
+σjn ×
+Qi−1
+j=1 σj n
+2
++ (1 − ei)(1 − σi)
+i−1
+Y
+j=1
+σjn +
+i
+Y
+j=1
+σj n]
+=[ 1
+2
+t
+X
+i=1
+ei(1 − σi)(
+i−1
+Y
+j=1
+σj )2]n2 +
+t
+Y
+j=1
+σj nlogn
++{
+t
+X
+i=1
+[θ
+i
+X
+n=1
+σj + (1 − ei)(1 − αi)
+i−1
+Y
+j=1
+σj
++
+i
+Y
+j=1
+σj] + (
+t
+Y
+j=1
+σj )log(
+t
+Y
+j=1
+σj )}n
+p(n) involves two tasks: correcting any out-of-order elements and merging the intermediate arrays (i.e., o1, ..., ot and w). If no elements are out of order in oi, NN-sort only needs to traverse the data once to merge them. However, in practice, out-of-order elements are almost inevitable, as the model f is unlikely to be 100% accurate. For the ordered elements in oi, NN-sort only requires appending it, with a time complexity of time complexity of O(1). Therefore, in the i-th iteration, at most Qi−1
+j=1 σj n operations are required to complete the insertion, and at least one operation is needed to insert out-of-order elements. While, for
+an out-of-order element in the i-th merge iteration,
+Qi−1
+j=1 σj n 2
+operations are required to insert it into the final ordered result. Theoretically, assume that there are ei(1 − σi) Qi−1
+j=1 σj n outof-order elements in the i-th iteration. It takes a total of ei(1 − σi) Qi−1
+j=1 σj n ×
+Qi−1
+j=1 σj n
+2 operations to process these
+elements. Correspondingly, (1−ei)(1−σi) Qi−1
+j=1 σjn elements
+in oi and Qi
+j=1 σjn elements in w remain ordered. Thus in
+the i-th merge iteration, a total of Qi
+j=1 σjn + (1 − ei)(1 −
+4
+
+
+σi) Qi−1
+j=1 σjn operations are required to append the ordered elements to the final result. Overall, NN-sort requires a total
+of Pt
+i=1[ei(1 − σi) Qi−1
+j=1 σj n ×
+Qi−1
+j=1 σj n
+2 + (1 − ei)(1 −
+σi) Qi−1
+j=1 σj n + Qi
+j=1 σjn] to sort n data elements (We show the detail in Equation 1).
+IV. EXPERIMENTAL STUDY
+Using real and synthetic data, we conducted five experiments to evaluate (1) overall sorting performance, (2) iteration impact, and (3) effects of changing data distribution.
+A. Experimental setup
+Datasets. The datasets used in this section are generated from the most commonly observed distributions in the real world, such as uniform distribution, normal distribution, and lognormal distribution. The models used in the experiments are trained over a subset of the testing data. The sizes of the testing dataset vary from 200MB to 500MB and each data element is 64 bits wide floating number. To verify the performance of the NN-sort under the real-world dataset. We use the QuickDraw game dataset from Google Creative Lab [12], which consists of 50, 426, 265 records of schema {’key-id’, ’word’, ’country code’, ’timestamp’, ’recognized’, ’drawing’}. Sorting is perform on ’key-id’.
+Baselines. We compared with five baselines (1) Quick Sort [13]: This algorithm divides the input dataset into two independent partitions, such that all the data elements in the first partition are smaller than those in the second partition. Then, the dataset in each partition is sorted recursively. The time complexity of Quick Sort can achieve O(nlogn) in the best case while O(n2) in the worst case. (2) std::sort [14]: std::sort is one of the most widely used sorting algorithms from c++ standard library, and its time complexity is O(nlogn) (3) std::heap sort [14]: std::heap sort is another sorting algorithm from c++ standard library, and it guarantees to perform at O(nlogn) time complexity. (4) Redis Sort [15]: Redis Sort is a sorting method based on a data structure named sortSet. To sort M data elements in a sortSet of size N , the efficiency of Redis Sort is O(N + M log(M )). In addition, we also compared NN-sort with (5) SageDB Sort [10], [11], leading performance DNN-based sorting method.The relaxation factor m is set to 1.25 for learned sorting methods to reduce conflicts.
+Measurements. We used sorting time and sorting rate of Equation 2 to evaluate the overall performance.
+sorting rate = elements
+time to finish sorting (2)
+We also used traditional sorting rate to evaluate learned-based sorting methods which is described in Equation 3. This rate indicates how many data elements still require traditional sorting due to model inaccuracy in the learning-based approach. Ideally, a lower traditional sorting rate signifies the better performance of learning-based sorting.
+TABLE II: Evaluation under real-world data
+Algorithm
+name Time (sec.) Sorting Rate
+(elements/sec.)
+The traditional sorting rate (%)
+Quick Sort 10.86 4666.14 std::heap sort 13.46 3746.44 std::sort 23.71 2127.19 Redis Sort 63.14 798.6320 SageDB Sort 10.53 4790.125 9.16 NN-sort 8.47 5950.186 0.4
+Traditional sorting rate = size(last conflicting array w)
+size of the original array A (3)
+Environment. Experiments were conducted on a machine with 64GB RAM, a 2.6GHz Intel i7 processor, and a GTX1080Ti GPU with 16GB memory, running RedHat Enterprise Server 6.3. Each result reported is the median of ten runs.
+Training details. We employed a regression model with three hidden layers, containing 2, 6, and 1 neurons, respectively. A rounding function is used to determine each element’s final position. Adam [16] was the chosen optimizer. The training was conducted using a GPU and is performed offline, so training time is excluded from the runtime.
+lossδ =
+1
+2 (f (xi) − labeli)2, if |f (xi) − labeli| ≤ δ,
+δ|f (xi) − labeli| − 1
+2 δ2, otherwise
+(4) To avoid the impact of outliers during training, the model used in experiments is trained according to the Huber loss [17] as shown in Equation 4. The batch size for training is set to 128. For all environments, we use the Adam optimizer with a learning rate of 0.001.
+B. Experimental results.
+Exp-1: Overall Sorting Performance. Figure 5 presents a performance comparison of NN-sort against traditional sorting algorithms across various datasets with increasing sizes. Figures 5(a)–(c) show the total sorting time, while Figures 5(d)–(f) illustrate the sorting rates. Figures 5(g)–(i) highlight the traditional sorting rate comparison between NNsort and SageDB sort, as defined in Equation 3. we observe the following: NN-sort exhibits notable advantages over traditional sorting algorithms. As shown in Figure 5 (d), its sort rate for a lognormal distribution dataset reaches nearly 8,300 elements per second, outperforming std::heap sort by 2.8×, Redis Sort by 10.9×, std::sort by 4.78×, and Quick Sort by 218%. It also exceeds SageDB Sort by 15%. The dataset’s value range—defined by its maximum and minimum values—affects NN-sort ’s performance. As shown in Figure 5 (h), a slight decline in sorting rate occurs with highly concentrated values, which create more conflicts and reduce efficiency. In contrast, fewer records within the same range enhance sorting perfor
+5
+
+
+200 250 300 350 400 450 500 Data size (MB)
+10000
+20000
+30000
+40000
+50000
+Time (sec.)
+(a) Time to finish sorting: log-normal
+200 250 300 350 400 450 500 Data size (MB)
+10000
+20000
+30000
+40000
+50000
+Time (sec.)
+(b) Time to finish sorting: normal
+200 250 300 350 400 450 500 Data size (MB)
+10000
+20000
+30000
+40000
+50000
+Time (sec.)
+(c) Time to finish sorting: uniform
+200 250 300 350 400 450 500 Data size (MB)
+1000
+2000
+3000
+4000
+5000
+6000
+7000
+Records per ms.
+(d) Sorting rate: log-normal
+200 250 300 350 400 450 500 Data size (MB)
+1000
+2000
+3000
+4000
+5000
+6000
+7000
+Records per ms.
+(e) Sorting rate: normal
+200 250 300 350 400 450 500 Data size (MB)
+2000
+4000
+6000
+8000
+Records per ms.
+(f) Sorting rate: uniform
+200 250 300 350 400 450 500 Data size (MB)
+0.0
+0.1
+0.2
+0.3
+0.4
+Rate
+(g) Conflicting rate: log-normal
+200 250 300 350 400 450 500 Data size (MB)
+0.0
+0.1
+0.2
+0.3
+0.4
+Rate
+(h) Conflicting rate: normal
+200 250 300 350 400 450 500 Data size (MB)
+0.00
+0.05
+0.10
+0.15
+0.20
+0.25
+0.30
+Rate
+(i) Conflicting rate: uniform
+NN-sort quick sort std::heap sort SageDB sort std::sort Redis sort
+Fig. 5: Overall performance evaluation
+mance.
+NN-sort achieves optimal performance with uniformly distributed data, reaching a sorting rate of approximately 8,000 records per second—about 1.3× higher than with a normal distribution—due to fewer conflicts in uniformly distributed records.
+Compared to SageDB Sort, NN-sort consistently reduces reliance on traditional sorting. A larger proportion of elements are accurately sorted by NN-sort’s neural model, minimizing the need for the more time-consuming traditional sorting and contributing to NN-sort ’s superior performance over SageDB Sort.
+Exp-2: Evaluation on real-word Dataset. Using the model trained in previous sections on uniformly distributed data, we evaluated NN-sort ’s performance on the real-world dataset QuickDraw. As shown in Table II, NN-sort delivers significant performance gains over traditional sorting algorithms on realworld data. With a sorting rate of 5,950 elements per second, NN-sort outperforms std::sort by 2.72× and Redis Sort by
+0 20 40 60 80 100 Percentage of noice data (%)
+2000
+2500
+3000
+3500
+4000
+4500
+5000
+Time (ms.)
+NN-sort Elapse time of std::sort
+Fig. 6: The impact of data distribution on NN-sort performance
+7.34×, and is also 58% faster than std::heap sort. Additionally, NN-sort surpasses SageDB Sort in both traditional sorting rate and overall sorting rate.
+Exp-3: Impact of the Changing Data Distribution. As
+6
+
+
+12345 The number of Iterations
+11000
+12000
+Time (ms.)
+(a) log-normal
+12345 The number of Iterations
+12000
+13000
+14000
+Time (ms.)
+(b) normal
+12345 The number of Iterations
+8000
+9000
+10000
+11000
+Time (ms.)
+(c) uniform
+0
+1
+2
+array size
+1e7
+0
+1
+2
+3
+array size
+1e7
+0
+1
+2
+array size
+1e7
+Sort time The size of last overflow array
+Fig. 7: Impact of Iterations
+shown in previous experiments, NN-sort performs optimally when the distribution of the sorting data resembles that of the training data. But how does it perform when faced with a different data distribution? To explore this, we trained a model using a 100MB uniformly distributed dataset, then applied it to sort datasets with varying distributions. Specifically, the test dataset combined uniformly and normally distributed data, with the latter considered ”noisy.” Sorting time was measured to assess NN-sort ’s effectiveness, as shown in Figure 6. Results indicate that as noise in the dataset increases, NN-sort’s effectiveness declines due to a growing number of conflicts elements generated in each iteration when the test data distribution diverges from the training data. These elements must then be handled by traditional algorithms during the polish phase. Nonetheless, NN-sort shows resilience to distributional changes, outperforming the widely-used std::sort algorithm even with up to 45
+Exp-4: Impact of Iterations. NN-sort ’s sorting performance is influenced by both the size of the final conflicting array and the number of iterations. Increasing the number of iterations reduces the size of the remaining conflicting array that requires traditional sorting, yet also extends model processing time. Conversely, fewer iterations leave a larger conflicting array, increasing the time required for traditional sorting. In this set of experiments, we quantify these factors to guide users in optimizing NN-sort for improved performance. In Figure 7, the rhombus-dotted line represents the size of the final conflicting array, while the round-dotted line indicates total sorting time. Results show that while additional iterations reduce the size of the final conflicting array, they don’t necessarily improve performance, as each iteration requires the model to process all input data elements. Our experiments suggest that 2-3 iterations provide an optimal balance between conflicting array size and sorting time.
+Exp-5: Evaluation of sorting accuracy. A more complex neural network generally enhances model expressibility, resulting in lower conflict rates, and fewer out-of-order elements, but higher inference times. Thus, understanding the impact of these factors on NN-sort’s overall time complexity is essential. In this section, we use a cost curve to illustrate how model quality—represented by the conflict rate σi and out
+0.0x107
+0.2x107
+0.5x107
+0.8x107
+1.0x107
+1.2x107
+1.5x107
+1.8x107
+2.0x107
+The number of data elements to be sorted (n)
+0.0x108
+1.0x108
+2.0x108
+3.0x108
+4.0x108
+5.0x108
+The number of operations to sort n elements
+Quick Sort NN-sort in which 10% of the elements collide or are misordered NN-sort in which 5% of the elements collide or are misordered
+Fig. 8: Comparison of operations between traditional sorting algorithm and NN-sort with different model qualities.
+of-order rate ei in each sorting iteration—affects NN-sort ’s performance. Figure 8 compares the number of operations required by NN-sort to sort n elements against Quick Sort’s baseline complexity (O(n log n)). To illustrate performance variations, we adjust NN-sort ’s model quality. This analysis assumes NN-sort performs up to five iterations (t = 5), with a model scale θ of 32 neurons, and equal conflict and out-of-order rates (σi = ei) that remain constant across iterations. Results show that NN-sort substantially outperforms Quick Sort when conflict and out-of-order rates are at 10%, with even greater performance gains as these rates drop to 5 In summary, fewer conflicts and misordered elements result in more efficient sorting with NN-sort. A well-trained model with a misorder rate of 10% or lower can outperform traditional sorting algorithms in terms of computational efficiency.
+V. RELATED WORK
+Sorting is one of the most fundamental algorithms in computing. We identify two key research areas: methods to reduce sorting time complexity and neural network-based data structures.
+Methods for reducing the sorting time complexity. Many researchers have focused on accelerating sorting by reducing its time complexity. Traditional comparison-based sorting algorithms like Quick Sort, Merge Sort, and Heap Sort require at least logn! ≈ nlogn − 1.44n operations to sort n
+7
+
+
+elements [18]. Among these, Quick Sort achieves O(nlogn) average complexity but degrades to O(n2) in the worst case. Merge Sort, while guaranteeing a worst-case of nlogn−0.91n, requires additional linear space relative to the number of elements [18]. To mitigate the drawbacks of these algorithms and further reduce sorting time, researchers have combined different sorting techniques to leverage their strengths. Tim Sort [19], the default sorting algorithm in Java and Python, combines Merge Sort and Insertion Sort [13] to achieve fewer than nlogn comparisons on partially sorted arrays. Stefan Edelkamp et al. proposed Quickx Sort [20], which uses at most nlogn − 0.8358n + O(logn) operations for in-place sorting. They also introduced a median-of-medians variant of Quick Merge Sort [18], which employs the median-of-medians algorithm for pivot selection, reducing the operation count to nlogn + 1.59n + O(n0.8).
+Redis Sort [15] is a build-in sorting method of the Redis database based on the sortSet data structure. It sorts M elements in a sortSet of size N with an efficiency of O(N + M log(M )).
+Unlike previous work, this approach uses a learned model complexity to map an unordered array to a roughly ordered state, reducing overall operations. In the worst case, NN-sort has complexity O(n2) if all elements map to the same position, though practical operations remain lower than traditional sorting, This is validated by our experiment in Figure 8.
+Learned data structures and algorithms. This thread of research is to explore the potential of using the neural networkbased learned data structures to improve the performance of systems. Tim Kraska [9], [10] discussed the benefits of learned data structures and suggested that R-tree can be optimized by learned data structures. Xiang et al. [8] proposed an LSTM-based inverted index structure. By learning the empirical distribution function, their learned inverted index structure led to fewer average look-ups when compared with traditional inverted index structures. Alex Galakatos et al. [21] presented a data-aware index structure called FITingTree, which can approximate an index using piece-wise linear functions with a bounded error specified at construction time. Michael Mitzenmacher [22] proposed a learned sandwiching bloom filter structure, while the learned model is sensitive to data distributions.
+Unlike the research mentioned above, our approach integrates sorting with learning by training a model to enhance sorting performance. Additionally, we employ an iterationbased mechanism to further optimize performance by minimizing conflicts. We also provide a formal analysis of the time complexity of our approach and present a cost model to balance model accuracy with sorting performance. A closely related work is SageDB Sort [11], [21], which leverages deep neural networks for sorting. Our approach improves upon SageDB Sort by offering a more efficient solution for handling position conflicts generated by the learned model.
+VI. CONCLUSION
+Sorting is fundamental in big data processing. We introduce NN-sort, a neural network-based sorting method that uses historical data to sort new data, iteratively reducing sorting conflicts—a key bottleneck in learned sorting. Our analysis includes complexity, a cost model, and the balance between model accuracy and performance. Experiments show NN-sort outperforms traditional algorithms. Future work includes enhancing NN-sort’s adaptability to changing data distributions.
+REFERENCES
+[1] G. Graefe, “Implementing sorting in database systems,” ACM Comput. Surv., vol. 38, no. 3, p. 10, 2006. [2] R. Hilker, C. Sickinger, C. N. Pedersen, and J. Stoye, “UniMoG—a unifying framework for genomic distance calculation and sorting based on DCJ,” Bioinformatics, vol. 28, no. 19, pp. 2509–2511, 2012. [3] D. Cederman and P. Tsigas, “A practical quicksort algorithm for graphics processors,” in Algorithms - ESA 2008, D. Halperin and K. Mehlhorn, Eds., 2008, pp. 246–258. [4] A. Andersson, T. Hagerup, S. Nilsson, and R. Raman, “Sorting in linear time?” Journal of Computer and System Sciences, vol. 57, no. 1, pp. 74–93, 1998. [5] S. Bandyopadhyay and S. Sahni, “GRS - GPU radix sort for multifield records,” in HiPC, 2010, pp. 1–10. [6] J. Tang and X. Zhou, “Cardinality sorting and its bit-based operationbased optimization (in chinese),” JOURNAL OF NANJINGUNIVERSITY OF TECHNOLOGY, vol. 20, 2006.
+[7] X. Zhu, Q. Zhang, T. Cheng, L. Liu, W. Zhou, and J. He, “Dlb: deep learning based load balancing,” in CLOUD, 2021. [8] W. Xiang, H. Zhang, R. Cui, X. Chu, K. Li, and W. Zhou, “Pavo: A rnn-based learned inverted index, supervised or unsupervised?” IEEE Access, vol. 7, pp. 293–303, 2019. [9] T. Kraska, A. Beutel, E. H. Chi, J. Dean, and N. Polyzotis, “The case for learned index structures,” in SIGMOD, 2018, pp. 489–504. [10] T. Kraska, M. Alizadeh, A. Beutel, E. H. Chi, A. Kristo, G. Leclerc, S. Madden, H. Mao, and V. Nathan, “Sagedb: A learned database system,” in CIDR, 2019. [11] J. Ding, R. Marcus, A. Kipf, V. Nathan, A. Nrusimha, K. Vaidya, A. van Renen, and T. Kraska, “Sagedb: An instance-optimized data analytics system,” PVLDB, vol. 15, no. 13, 2022. [12] Google, “Google creative lab,” Available: https://github.com/ googlecreativelab, google Creative Lab [Online].
+[13] T. H. Cormen, Introduction to Algorithms, 3rd Edition. Press.
+[14] “C++ resources network,” http://www.cplusplus.com/, general information about the C++ programming language, including non-technical documents and descriptions. [15] “Redis,” https://redis.io/, redis is an open source (BSD licensed), inmemory data structure store, used as a database, cache and message broker. [16] D. P. Kingma and J. Ba, “Adam: A method for stochastic optimization,” in ICLR , 2015. [17] P. J. Huber, “Robust estimation of a location parameter,” Annals of Mathematical Statistics, vol. 35, no. 1, pp. 73–101, 1964. [18] S. Edelkamp and A. Weiß, “Worst-case efficient sorting with quickmergesort,” in ALENEX, 2019, pp. 1–14. [19] “Python resources network,” https://www.python.org/, general information about the Python programming language, including non-technical documents and descriptions. [20] S. Edelkamp and A. Weiß, “Quickxsort: Efficient sorting with n logn - 1.399n + o(n) comparisons on average,” in International Computer Science Symposium in Russia, 2014, pp. 139–152.
+[21] A. Galakatos, M. Markovitch, C. Binnig, R. Fonseca, and T. Kraska, “Fiting-tree: A data-aware index structure,” in SIGMOD, 2019. [22] M. Mitzenmacher, “A model for learned bloom filters, and optimizing by sandwiching,” CoRR, vol. abs/1901.00902, 2019. [Online]. Available: http://arxiv.org/abs/1901.00902
+8
