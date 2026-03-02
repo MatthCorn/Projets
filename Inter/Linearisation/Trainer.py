@@ -21,44 +21,47 @@ if __name__ == '__main__':
     ################################################################################################################################################
     # création des paramètres de la simulation
 
-    param = {"n_layers": 3,
-             "mem_length": 5,
-             "kernel_size": 3,
-             "n_head": 4,
-             "len_in": 20,
-             "len_out": 25,
-             "n_pulse_plateau": 6,
-             "n_sat": 5,
-             "n_mes": 6,
-             "sensitivity": 0.1,
-             "d_in": 10,
-             "d_att": 128,
-             "dropout": 0,
-             "optim": "Adam",
-             "network": "Transformer",
-             "lr_option": {
-                 "value": 1e-5,
-                 "reset": "y",
-                 "type": "cos"
-             },
-             "mult_grad": 10000,
-             "weight_decay": 1e-3,
-             "NDataT": 200000,
-             "NDataV": 1000,
-             "batch_size": 1000,
-             "n_iter": 30,
-             "training_strategy": [
-                 {"mean": [-5, 5], "std": [0.2, 1]},
-             ],
-             "distrib": "log",
-             "plot_distrib": "log",
-             "error_weighting": "y",
-             "weight_error": 0.5,
-             "max_lr": 5,
-             "warmup": 5,
-             "resume_from": "r",
-             "period_checkpoint": 15 * 60,  # en seconde
-             }
+    param = {"n_layers": 12,
+		"mem_length": 1,
+		"kernel_size": 2,
+		"len_in": 28,
+		"len_out": 35,
+		"n_pulse_plateau": 6,
+		"n_sat": 5,
+		"n_mes": 6,
+		"sensitivity": 0.1,
+		"d_in": 10,
+		"d_att": 300,
+		"widths_embedding": [80],
+		"width_FF": [256],
+		"n_heads": 4,
+		"dropout": 0.0,
+		"norm": "post",
+		"optim": "Adam",
+		"network": "Transformer",
+		"lr_option": {
+			"value": 1e-3,
+			"reset": "y",
+			"type": "cos"
+			},
+		"mult_grad": 3500,
+		"weight_decay": 1e-2,
+		"NDataT": 500000,
+		"NDataV": 1000,
+		"batch_size": ["suggest", "categorical", [200, 400, 700]],
+		"n_iter": 80,
+		"training_strategy": [
+			{"mean": [-5, 5], "std": [1, 5]},
+			{"mean": [-5, 5], "std": [0.2, 5]}
+			],
+		"distrib": "log",
+		"plot_distrib": "log",
+		"error_weighting": "y",
+		"weight_error": 1e-2,
+		"max_lr": 5,
+		"period_checkpoint": -1,
+		"warmup": 5,
+		}
 
     try:
         import json
@@ -105,7 +108,7 @@ if __name__ == '__main__':
         param['d_att'],
         param['d_in'],
         n_layers=param['n_layers'],
-        n_head=param['n_head'],
+        n_head=param['n_heads'],
         mem_length=param['mem_length'],
         max_len=param['len_in'] + param['len_out'],
         kernel_size=param['kernel_size'],
@@ -113,6 +116,7 @@ if __name__ == '__main__':
     )
 
     N.to(device)
+    print(sum(p.numel() for p in N.parameters()))
 
     NDataT = param['NDataT']
     NDataV = param['NDataV']

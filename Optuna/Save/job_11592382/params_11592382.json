@@ -1,6 +1,6 @@
 	{
 		"n_layers": ["suggest", "int", [1, 10]],
-		"mem_lenght": 1,
+		"mem_length": 1,
 		"kernel_size": 2,
 		"len_in": 28,
 		"len_out": 35,
