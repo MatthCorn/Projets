@@ -17,16 +17,16 @@
 \contentsline {section}{\numberline {2.2}Description de l'intégration du capteur de Mesures de Soutien Électronique et son fonctionnement}{17}{section.2.2}%
 \contentsline {subsection}{\numberline {2.2.1}Contexte opérationnel : La maîtrise du spectre électromagnétique}{17}{subsection.2.2.1}%
 \contentsline {subsection}{\numberline {2.2.2}Chaîne de traitement de l'information}{17}{subsection.2.2.2}%
-\contentsline {subsection}{\numberline {2.2.3}Architecture et fonctionnement du capteur}{18}{subsection.2.2.3}%
+\contentsline {subsection}{\numberline {2.2.3}Architecture et fonctionnement du capteur}{19}{subsection.2.2.3}%
 \contentsline {section}{\numberline {2.3}Description de l'environnement virtuel}{22}{section.2.3}%
 \contentsline {subsection}{\numberline {2.3.1}Motivations}{22}{subsection.2.3.1}%
 \contentsline {subsection}{\numberline {2.3.2}Architecture et fonctionnement de l'environnement virtuel}{23}{subsection.2.3.2}%
 \contentsline {section}{\numberline {2.4}Identification du goulot d'étranglement et limites opérationnelles}{24}{section.2.4}%
 \contentsline {subsection}{\numberline {2.4.1}L'impératif de temps réel et le coût de la simulation}{24}{subsection.2.4.1}%
-\contentsline {subsection}{\numberline {2.4.2}Analyse de la complexité et localisation du verrou}{25}{subsection.2.4.2}%
-\contentsline {section}{\numberline {2.5}Formalisation et complexité du problème d'apprentissage}{25}{section.2.5}%
-\contentsline {subsection}{\numberline {2.5.1}Nature des données et définition formelle de la tâche}{25}{subsection.2.5.1}%
-\contentsline {subsection}{\numberline {2.5.2}Une double problématique : Traitement de séquence et Génération}{26}{subsection.2.5.2}%
+\contentsline {subsection}{\numberline {2.4.2}Analyse de la complexité et localisation du verrou}{26}{subsection.2.4.2}%
+\contentsline {section}{\numberline {2.5}Formalisation et complexité du problème d'apprentissage}{26}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}Nature des données et définition formelle de la tâche}{26}{subsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.5.2}Une double problématique : Traitement de séquence et Génération}{27}{subsection.2.5.2}%
 \contentsline {section}{\numberline {2.6}Introduction}{29}{section.2.6}%
 \contentsline {section}{\numberline {2.7}IA générative}{29}{section.2.7}%
 \contentsline {section}{\numberline {2.8}Méthodes pour le traitement de séquence}{29}{section.2.8}%
@@ -100,16 +100,21 @@
 \contentsline {subsection}{\numberline {4.3.2}Évaluation du modèle de référence}{71}{subsection.4.3.2}%
 \contentsline {subsection}{\numberline {4.3.3}Évaluation de la méthodologie proposée}{72}{subsection.4.3.3}%
 \contentsline {subsection}{\numberline {4.3.4}Synthèse et comparaison des architectures}{73}{subsection.4.3.4}%
-\contentsline {chapter}{\numberline {5}Le coeur de ma thèse ici}{75}{chapter.5}%
+\contentsline {chapter}{\numberline {5}L'approche séquence vers séquence}{75}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Description du problème}{75}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Architectures employées}{75}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Traitement de séquence entière}{75}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Fenêtrage}{75}{section.5.4}%
+\contentsline {section}{\numberline {5.5}Discussion}{75}{section.5.5}%
 \contentsline {chapter}{\numberline {6}Dépliage du problème : une approche événementielle}{77}{chapter.6}%
 \contentsline {section}{\numberline {6.1}Motivation : Du traitement de séquence à la modélisation dynamique}{77}{section.6.1}%
 \contentsline {subsection}{\numberline {6.1.1}Le goulot d'étranglement des architectures Seq2Seq}{77}{subsection.6.1.1}%
 \contentsline {subsection}{\numberline {6.1.2}Le DCI comme système dynamique réactif}{78}{subsection.6.1.2}%
 \contentsline {section}{\numberline {6.2}Formalisation du problème "Flux-à-flux"}{78}{section.6.2}%
 \contentsline {subsection}{\numberline {6.2.1}Contraintes architecturales et choix de conception}{78}{subsection.6.2.1}%
-\contentsline {paragraph}{Contrainte 1 : Discrétisation de la réponse}{78}{paragraph*.25}%
-\contentsline {paragraph}{Contrainte 2 : Condition d'arrêt}{79}{paragraph*.26}%
-\contentsline {paragraph}{Contrainte 3 : Maintien du contexte}{79}{paragraph*.27}%
+\contentsline {paragraph}{Contrainte 1 : Discrétisation de la réponse}{78}{paragraph*.28}%
+\contentsline {paragraph}{Contrainte 2 : Condition d'arrêt}{79}{paragraph*.29}%
+\contentsline {paragraph}{Contrainte 3 : Maintien du contexte}{79}{paragraph*.30}%
 \contentsline {section}{\numberline {6.3}Protocole de transformation des données}{79}{section.6.3}%
 \contentsline {subsection}{\numberline {6.3.1}Illustration du mécanisme}{79}{subsection.6.3.1}%
 \contentsline {section}{\numberline {6.4}Validation de l'approche sur architectures récurrentes}{80}{section.6.4}%

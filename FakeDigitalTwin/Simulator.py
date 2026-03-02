@@ -117,7 +117,7 @@ class DigitalTwin():
             self.PDWs.append(PDW)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__' and False:
     import numpy as np
     TOA = 0
     Dt = 0
@@ -285,4 +285,154 @@ if __name__ == '__main__':
     ax2.view_init(elev=90, azim=-90)
     plt.show()
 
+    print('end')
+
+if __name__ == '__main__':
+    import numpy as np
+
+    # Supposons que Pulse et DigitalTwin sont déjà importés/définis
+
+    TOA = 0
+    Dt = 0
+    AntP = []
+    for k in range(15):
+        DF = 0
+        F = 10 + 1 * np.random.random()
+        AntP.append(Pulse(TOA=TOA, LI=0.5 + 3 * np.random.random(), FreqStart=F, FreqEnd=F + DF,
+                          Level=5.5 * np.random.random()))
+        TOA += np.random.random()
+
+    Param = {
+        'Fe_List': [5.1, 5, 4.9, 4.8],
+        'Duree_max_impulsion': 4,
+        'Seuil_mono': 10,
+        'Seuil_harmo': 8,
+        'Seuil_IM': 8,
+        'Seuil_sensi_traitement': 6,
+        'Seuil_sensi': 1,
+        'Contraste_geneur': 0.2,
+        'Nint': 500,
+        'Contraste_geneur_2': 1,
+        'M1_aveugle': 2,
+        'M2_aveugle': 2,
+        'M_local': 5,
+        'N_DetEl': 12,
+        'Seuil_ecart_freq': 5e-3,
+        'Duree_maintien_max': 0.2,
+        'N_mesureurs_max': 8,
+        'PDW_tries': True,
+    }
+
+    DT = DigitalTwin(Param)
+    DT.forward(AntPulses=AntP)
+
+    import matplotlib.pyplot as plt
+    from matplotlib.patches import Polygon
+    from matplotlib import colors
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+
+    def value_to_rgb(value, min_val=0, max_val=5.5, colormap='plasma'):
+        # Normalize the value between 0 and 1
+        normalized_value = (value - min_val) / (max_val - min_val)
+        # Clip the normalized value to ensure it stays within [0, 1]
+        normalized_value = np.clip(normalized_value, 0, 1)
+        # Get the colormap
+        cmap = plt.get_cmap(colormap)
+        # Map the normalized value to an RGB color (Returns RGBA)
+        return cmap(normalized_value)
+
+        # --- INITIALISATION FIGURE (1 ligne, 2 colonnes, AXES LIÉS) ---
+
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5), sharex=True, sharey=True)
+
+    # Variables pour calculer l'échelle automatiquement
+    y_min_data = float('inf')
+    y_max_data = float('-inf')
+    x_max_data = float('-inf')
+
+    df = Param['M_local'] * Param['Fe_List'][1] / Param['Nint']
+
+    # --- 1. PLOT ENTREE (GAUCHE) ---
+    for pulse in AntP:
+        T1 = pulse.TOA
+        T2 = T1 + pulse.LI
+        F1 = pulse.FreqStart
+        F2 = pulse.FreqEnd
+        N = pulse.Level
+
+        # Mise à jour min/max pour les axes
+        y_min_data = min(y_min_data, F1 - df, F2 - df)
+        y_max_data = max(y_max_data, F1 + df, F2 + df)
+        x_max_data = max(x_max_data, T2)
+
+        r, g, b, a = value_to_rgb(N, min_val=0, max_val=5.5)
+
+        # Utilisation d'un Polygon pour gérer l'écart de fréquence (F1 != F2)
+        sommets = [
+            (T1, F1 - df),
+            (T1, F1 + df),
+            (T2, F2 + df),
+            (T2, F2 - df)
+        ]
+
+        poly = Polygon(sommets, facecolor=(r, g, b, 0.8), edgecolor='k', linewidth=0.3)
+        ax1.add_patch(poly)
+
+    # --- 2. PLOT SORTIE (DROITE) ---
+    R = DT.PDWs
+    for pulse in R:
+        # Attention: R contient des dictionnaires, pas des objets
+        T1 = pulse['TOA']
+        T2 = T1 + pulse['LI']
+        F = (pulse['FreqMin'] + pulse['FreqMax']) / 2
+        N = pulse['Level']
+
+        # Mise à jour min/max
+        y_min_data = min(y_min_data, F - df)
+        y_max_data = max(y_max_data, F + df)
+        x_max_data = max(x_max_data, T2)
+
+        r, g, b, a = value_to_rgb(N, min_val=0, max_val=5.5)
+
+        # Les sorties ont une fréquence constante, mais on garde le Polygon pour être raccord
+        sommets = [
+            (T1, F - df),
+            (T1, F + df),
+            (T2, F + df),
+            (T2, F - df)
+        ]
+
+        poly = Polygon(sommets, facecolor=(r, g, b, 0.8), edgecolor='k', linewidth=0.3)
+        ax2.add_patch(poly)
+
+    # --- REGLAGE DES LIMITES ---
+    margin_y = 5 * df
+    margin_x = 0.5
+
+    # L'application des limites sur ax1 affecte ax2 grâce à sharex/sharey
+    ax1.set_xlim(-0.1, x_max_data + margin_x)
+    ax1.set_ylim(y_min_data - margin_y, y_max_data + margin_y)
+
+    # Labels et Titres
+    ax1.set_xlabel('Temps')
+    ax1.set_ylabel('Fréquence')
+    ax1.set_title("Impulsions d'entrée")
+
+    ax2.set_xlabel('Temps')
+    ax2.set_title("Impulsions de sortie")
+
+    # --- COLORBAR (Unique à droite) ---
+    cmap = plt.get_cmap('plasma')
+    norm = colors.Normalize(vmin=0, vmax=5.5)
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+    sm.set_array([])
+
+    divider = make_axes_locatable(ax2)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    plt.colorbar(sm, cax=cax, label='Level')
+
+    plt.tight_layout()
+    plt.show()
     print('end')
