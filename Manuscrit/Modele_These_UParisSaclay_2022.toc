@@ -108,33 +108,33 @@
 \contentsline {section}{\numberline {5.5}Discussion}{75}{section.5.5}%
 \contentsline {chapter}{\numberline {6}Dépliage du problème : une approche événementielle}{77}{chapter.6}%
 \contentsline {section}{\numberline {6.1}Motivation : Du traitement de séquence à la modélisation dynamique}{77}{section.6.1}%
-\contentsline {subsection}{\numberline {6.1.1}Le goulot d'étranglement des architectures Seq2Seq}{77}{subsection.6.1.1}%
+\contentsline {subsection}{\numberline {6.1.1}Le goulot d'étranglement des architectures pour le Seq2Seq}{77}{subsection.6.1.1}%
 \contentsline {subsection}{\numberline {6.1.2}Le DCI comme système dynamique réactif}{78}{subsection.6.1.2}%
 \contentsline {section}{\numberline {6.2}Formalisation du problème "Flux-à-flux"}{78}{section.6.2}%
-\contentsline {subsection}{\numberline {6.2.1}Contraintes architecturales et choix de conception}{78}{subsection.6.2.1}%
-\contentsline {paragraph}{Contrainte 1 : Discrétisation de la réponse}{78}{paragraph*.28}%
+\contentsline {subsection}{\numberline {6.2.1}Contraintes architecturales et choix de conception}{79}{subsection.6.2.1}%
+\contentsline {paragraph}{Contrainte 1 : Discrétisation de la réponse}{79}{paragraph*.28}%
 \contentsline {paragraph}{Contrainte 2 : Condition d'arrêt}{79}{paragraph*.29}%
 \contentsline {paragraph}{Contrainte 3 : Maintien du contexte}{79}{paragraph*.30}%
-\contentsline {section}{\numberline {6.3}Protocole de transformation des données}{79}{section.6.3}%
-\contentsline {subsection}{\numberline {6.3.1}Illustration du mécanisme}{79}{subsection.6.3.1}%
+\contentsline {section}{\numberline {6.3}Protocole de transformation des données}{80}{section.6.3}%
+\contentsline {subsection}{\numberline {6.3.1}Illustration du mécanisme}{80}{subsection.6.3.1}%
 \contentsline {section}{\numberline {6.4}Validation de l'approche sur architectures récurrentes}{80}{section.6.4}%
-\contentsline {subsection}{\numberline {6.4.1}Les architectures}{80}{subsection.6.4.1}%
+\contentsline {subsection}{\numberline {6.4.1}Les architectures}{81}{subsection.6.4.1}%
 \contentsline {subsection}{\numberline {6.4.2}Résultats expérimentaux}{81}{subsection.6.4.2}%
 \contentsline {subsection}{\numberline {6.4.3}Conclusion}{82}{subsection.6.4.3}%
-\contentsline {section}{\numberline {6.5}Extension des essais : Généralisation à d'autres architectures}{82}{section.6.5}%
-\contentsline {subsection}{\numberline {6.5.1}Préparation des données et ingénierie des caractéristiques}{82}{subsection.6.5.1}%
+\contentsline {section}{\numberline {6.5}Extension des essais : Généralisation à d'autres architectures}{83}{section.6.5}%
+\contentsline {subsection}{\numberline {6.5.1}Préparation des données et ingénierie des caractéristiques}{83}{subsection.6.5.1}%
 \contentsline {subsubsection}{\numberline {6.5.1.1}Encodage relatif local du temps}{83}{subsubsection.6.5.1.1}%
 \contentsline {subsubsection}{\numberline {6.5.1.2}Gestion des masques et exemple de dépliage}{84}{subsubsection.6.5.1.2}%
-\contentsline {subsection}{\numberline {6.5.2}Sélection des architectures}{84}{subsection.6.5.2}%
-\contentsline {subsubsection}{\numberline {6.5.2.1}Le Transformer (Attention Mechanism)}{84}{subsubsection.6.5.2.1}%
+\contentsline {subsection}{\numberline {6.5.2}Sélection des architectures}{85}{subsection.6.5.2}%
+\contentsline {subsubsection}{\numberline {6.5.2.1}Le Transformer (Attention Mechanism)}{85}{subsubsection.6.5.2.1}%
 \contentsline {subsubsection}{\numberline {6.5.2.2}Le TCN (Temporal Convolutional Network)}{85}{subsubsection.6.5.2.2}%
 \contentsline {subsubsection}{\numberline {6.5.2.3}Le GRU (Recurrent Network)}{85}{subsubsection.6.5.2.3}%
-\contentsline {subsubsection}{\numberline {6.5.2.4}Structure commune et hyper-paramètres}{85}{subsubsection.6.5.2.4}%
+\contentsline {subsubsection}{\numberline {6.5.2.4}Structure commune et hyper-paramètres}{86}{subsubsection.6.5.2.4}%
 \contentsline {subsection}{\numberline {6.5.3}Fonction de perte et métriques d'évaluation}{86}{subsection.6.5.3}%
-\contentsline {subsubsection}{\numberline {6.5.3.1}Erreur de reconstruction pondérée ($\mathcal {L}_{reg}$)}{86}{subsubsection.6.5.3.1}%
+\contentsline {subsubsection}{\numberline {6.5.3.1}Erreur de reconstruction pondérée ($\mathcal {L}_{reg}$)}{87}{subsubsection.6.5.3.1}%
 \contentsline {subsubsection}{\numberline {6.5.3.2}Erreur de classification par MCC différentiable ($\mathcal {L}_{class}$)}{87}{subsubsection.6.5.3.2}%
-\contentsline {subsection}{\numberline {6.5.4}Résultats et Analyse Comparative}{87}{subsection.6.5.4}%
-\contentsline {subsubsection}{\numberline {6.5.4.1}Performance globale et convergence}{87}{subsubsection.6.5.4.1}%
-\contentsline {subsubsection}{\numberline {6.5.4.2}Robustesse face à la longueur de séquence}{88}{subsubsection.6.5.4.2}%
+\contentsline {subsection}{\numberline {6.5.4}Résultats et Analyse Comparative}{88}{subsection.6.5.4}%
+\contentsline {subsubsection}{\numberline {6.5.4.1}Performance globale et convergence}{88}{subsubsection.6.5.4.1}%
+\contentsline {subsubsection}{\numberline {6.5.4.2}Robustesse face à la longueur de séquence}{89}{subsubsection.6.5.4.2}%
 \contentsline {subsubsection}{\numberline {6.5.4.3}Analyse qualitative des générations}{89}{subsubsection.6.5.4.3}%
-\contentsline {subsection}{\numberline {6.5.5}Conclusion sur les extensions}{89}{subsection.6.5.5}%
+\contentsline {subsection}{\numberline {6.5.5}Conclusion sur les extensions}{90}{subsection.6.5.5}%

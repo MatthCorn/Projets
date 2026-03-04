@@ -32,7 +32,7 @@ class MHSA(nn.Module):
 
             batch_size, len_seq, *_ = K.shape
 
-            Kt = RoPE(K).permute(0, 2, 3, 1)
+            Kt = RoPE(K.transpose(1, 2)).transpose(2, 3)
             # Kt.shape = (batch_size, n_heads, d_head, len_seq)
             V = torch.cat([past_v, self.value(x).reshape(batch_size, -1, self.n_heads, self.d_head).transpose(1, 2)], dim=2)
             # V.shape = (batch_size, n_heads, len_seq, d_head)
@@ -44,7 +44,7 @@ class MHSA(nn.Module):
             # len_seq = len_input
             batch_size, len_seq, _ = x.shape
 
-            Kt = RoPE(self.key(x)).reshape(batch_size, len_seq, self.n_heads, self.d_head).permute(0, 2, 3, 1)
+            Kt = RoPE(self.key(x).reshape(batch_size, len_seq, self.n_heads, self.d_head).transpose(1, 2)).transpose(2, 3)
             # Kt.shape = (batch_size, n_heads, d_head, len_seq)
             V = self.value(x).reshape(batch_size, len_seq, self.n_heads, self.d_head).transpose(1, 2)
             # V.shape = (batch_size, n_heads, len_seq, d_head)
@@ -53,7 +53,7 @@ class MHSA(nn.Module):
             mask = mask[:, :, -len_input:, -len_seq:]
             # mask.shape = (1, 1, len_input, len_seq)
 
-        Q = RoPE(self.query(x)).reshape(batch_size, len_input, self.n_heads, self.d_head).transpose(1, 2)
+        Q = RoPE(self.query(x).reshape(batch_size, len_input, self.n_heads, self.d_head).transpose(1, 2))
         # Q.shape = (batch_size, n_heads, len_input, d_head)
 
         SA = self.SelfAttention(Q, Kt, V, mask=mask)

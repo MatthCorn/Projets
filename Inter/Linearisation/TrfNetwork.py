@@ -3,7 +3,7 @@ import torch.nn as nn
 from Complete.Transformer.MultiHeadSelfAttention import MHSA
 from Complete.Transformer.EasyFeedForward import FeedForward
 from Complete.Transformer.LearnableModule import LearnableParameters
-from Complete.Transformer.PositionalEncoding import PositionalEncoding
+from Complete.Transformer.PositionalEncoding import StandardRotary as RoPE
 from Tools.MCCutils import CosineDetector
 
 class CausalEncoderLayer(nn.Module):
@@ -18,15 +18,19 @@ class CausalEncoderLayer(nn.Module):
         self.mask_self_attention = MHSA(d_att, n_heads, dropout=dropout_A)
         self.feed_forward = FeedForward(d_att, d_att, widths=width_FF, dropout=dropout_FF)
 
-    def forward(self, input, mask, RoPE=lambda u: u, past_kv=None):
+    def forward(self, input, mask, RoPE=None, past_kv=None, RoPE_offset=None):
+        if RoPE is None:
+            def RoPE_(x): return x
+        else:
+            def RoPE_(x): return RoPE(x, seq_offset=RoPE_offset)
         if self.norm == 'pre':
-            y = self.mask_self_attention(self.first_layer_norm(input), mask=mask, RoPE=RoPE, past_kv=past_kv) + input
+            y = self.mask_self_attention(self.first_layer_norm(input), mask=mask, RoPE=RoPE_, past_kv=past_kv) + input
             y = self.feed_forward(self.third_layer_norm(y)) + y
         elif self.norm == 'post':
-            y = self.first_layer_norm(self.mask_self_attention(input, mask=mask, RoPE=RoPE, past_kv=past_kv) + input)
+            y = self.first_layer_norm(self.mask_self_attention(input, mask=mask, RoPE=RoPE_, past_kv=past_kv) + input)
             y = self.third_layer_norm(self.feed_forward(y) + y)
         else:
-            y = self.mask_self_attention(input, mask=mask, RoPE=RoPE, past_kv=past_kv) + input
+            y = self.mask_self_attention(input, mask=mask, RoPE=RoPE_, past_kv=past_kv) + input
             y = self.feed_forward(y) + y
         return y
 
@@ -48,7 +52,7 @@ class Transformer(nn.Module):
         self.hidden_dim = hidden_dim
         self.n_heads = n_head
         self.d_head = hidden_dim // n_head
-        self.pos_encoding = PositionalEncoding(d_att=hidden_dim, dropout=dropout, max_len=max_len)
+        self.pos_encoding = RoPE(dim=self.d_head, max_seq_len=max_len)
 
         # --- 1. EMBEDDINGS (Votre logique spécifique) ---
         self.embedding_1 = nn.Sequential(
@@ -99,10 +103,9 @@ class Transformer(nn.Module):
 
         # Fusion -> [Batch, Time, Hidden]
         x = self.merge_embeddings(torch.cat([x_1, x_2], dim=-1))
-        x = self.pos_encoding(x)
 
         for layer in self.transformer_core:
-            x = layer(x, self.mask)
+            x = layer(x, self.mask, RoPE=self.pos_encoding)
 
         # C. Sortie directe (Pas d'attention, pas de combinaison complexe)
         pred = self.head(x)
@@ -136,10 +139,12 @@ class Transformer(nn.Module):
 
         # x : [Batch, 1, Hidden]
         x = self.merge_embeddings(torch.cat([x_1, x_2], dim=-1))
-        x = self.pos_encoding(x, stride=self.past_kv[0][0].shape[1])
+
+        # 3. Calcul de l'offset une seule fois pour tout le pas de temps
+        current_offset = self.past_kv[0][0].shape[1] + x.shape[1]
 
         for i, layer in enumerate(self.transformer_core):
-            x = layer(x, self.mask, past_kv=self.past_kv[i])
+            x = layer(x, self.mask, RoPE=self.pos_encoding, past_kv=self.past_kv[i], RoPE_offset=current_offset)
 
         # C. Sortie directe (Pas d'attention, pas de combinaison complexe)
         pred = self.head(x)
@@ -158,7 +163,7 @@ if __name__ == '__main__':
         10,
         64,
         5,
-        n_layers=5,
+        n_layers=2,
         n_head=4,
         max_len=100,
         dropout=0.0,

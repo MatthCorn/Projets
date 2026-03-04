@@ -29,11 +29,11 @@ class MHCA(nn.Module):
         # OR
         # x_target.shape = (1, len_target, d_latent)
         _, len_target, d_latent = x_target.shape
-        Kt = RoPE_K(self.key(x_source)).reshape(batch_size, len_source, self.n_heads, -1).permute(0, 2, 3, 1)
+        Kt = RoPE_K(self.key(x_source).reshape(batch_size, len_source, self.n_heads, -1).transpose(1, 2)).transpose(2, 3)
         # Kt.shape = (batch_size, n_heads, d_head, len_source)
         V = self.value(x_source).reshape(batch_size, len_source, self.n_heads, -1).transpose(1, 2)
         # V.shape = (batch_size, n_heads, len_source, d_head)
-        Q = RoPE_Q(self.query(x_target)).reshape(-1, len_target, self.n_heads, self.d_head).transpose(1, 2)
+        Q = RoPE_Q(self.query(x_target).reshape(-1, len_target, self.n_heads, self.d_head).transpose(1, 2))
         # Q.shape = (batch_size, n_heads, len_target, d_head)
         # OR
         # Q.shape = (1, n_heads, len_target, d_head)

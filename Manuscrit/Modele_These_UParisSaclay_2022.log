@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.11.20)  2 MAR 2026 14:25
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.11.20)  4 MAR 2026 09:23
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -2250,19 +2250,21 @@ Underfull \hbox (badness 10000) in paragraph at lines 18--19
 
  []
 
-
-Overfull \hbox (0.75357pt too wide) in paragraph at lines 27--28
-[]\T1/opensans-TOsF/b/n/10.95 Architectures at-ten-tion-nelles (Trans-for-mers)
- : \T1/opensans-TOsF/m/sc/10.95 Bien que plus ro-bustes, elles pré-sentent
+[77]
+Overfull \hbox (2.4456pt too wide) in paragraph at lines 35--36
+[]\T1/opensans-TOsF/b/n/10.95 L'émission d'une im-pul-sion in-ter-cep-tée \T1/o
+pensans-TOsF/m/sc/10.95 pro-voque la li-bé-ra-tion de res-sources mé-moires. 
  []
 
-[77] [78] [79] [80] [81]
-Underfull \hbox (badness 10000) in paragraph at lines 144--146
 
- []
+LaTeX Warning: Reference `fig:window' on page 78 undefined on input line 37.
 
-[82]
-Underfull \hbox (badness 10000) in paragraph at lines 154--155
+[78] [79] [80]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[81] [82]
+Underfull \hbox (badness 10000) in paragraph at lines 146--148
 
  []
 
@@ -2272,77 +2274,82 @@ Underfull \hbox (badness 10000) in paragraph at lines 156--157
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 160--162
+Underfull \hbox (badness 10000) in paragraph at lines 158--159
 
  []
 
 [83]
-Underfull \hbox (badness 10000) in paragraph at lines 175--176
-
- []
-
-[84]
-Underfull \hbox (badness 10000) in paragraph at lines 216--217
+Underfull \hbox (badness 10000) in paragraph at lines 162--164
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 231--232
+Underfull \hbox (badness 10000) in paragraph at lines 177--178
 
- []
-
-[85]
-Underfull \hbox (badness 10000) in paragraph at lines 257--258
-
- []
-
-[86]
-Underfull \hbox (badness 10000) in paragraph at lines 270--271
-
- []
-
-
-Overfull \hbox (4.06923pt too wide) in paragraph at lines 291--292
-[]\T1/opensans-TOsF/m/sc/10.95 Cette sec-tion pré-sente les per-for-mances com-
-pa-rées des trois ar-chi-tec-tures (GRU, TCN, Trans-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 311--312
-
- []
-
-
-Overfull \hbox (9.40222pt too wide) in paragraph at lines 315--324
- [][] 
  []
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
+[84]
+Underfull \hbox (badness 10000) in paragraph at lines 218--219
 
-Overfull \hbox (6.79599pt too wide) in paragraph at lines 328--329
+ []
+
+[85]
+Underfull \hbox (badness 10000) in paragraph at lines 233--234
+
+ []
+
+[86]
+Underfull \hbox (badness 10000) in paragraph at lines 259--260
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 272--273
+
+ []
+
+[87]
+Overfull \hbox (4.06923pt too wide) in paragraph at lines 293--294
+[]\T1/opensans-TOsF/m/sc/10.95 Cette sec-tion pré-sente les per-for-mances com-
+pa-rées des trois ar-chi-tec-tures (GRU, TCN, Trans-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 313--314
+
+ []
+
+
+Overfull \hbox (9.40222pt too wide) in paragraph at lines 317--326
+ [][] 
+ []
+
+
+Overfull \hbox (6.79599pt too wide) in paragraph at lines 330--331
 []\T1/opensans-TOsF/m/sc/10.95 On ob-serve que l'ar-chi-tec-ture Trans-for-mer 
 offre la meilleure fi-dé-lité de re-cons-truc-tion ($\OMS/cmsy/m/n/10.95 L[] \O
 T1/cmr/m/n/10.95 =
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 328--329
-
- []
-
-[87]
-Underfull \hbox (badness 10000) in paragraph at lines 334--335
+Underfull \hbox (badness 10000) in paragraph at lines 330--331
 
  []
 
 [88]
-Underfull \hbox (badness 10000) in paragraph at lines 383--384
+Underfull \hbox (badness 10000) in paragraph at lines 336--337
 
  []
 
-[89]) [90]
+[89]
+Underfull \hbox (badness 10000) in paragraph at lines 385--386
+
+ []
+
+) [90]
 LaTeX Font Info:    Font shape `T1/opensans-TOsF/m/it' will be
 (Font)              scaled to size 11.39996pt on input line 247.
 
@@ -2498,19 +2505,22 @@ L3 programming layer <2025-10-24>
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
+
+LaTeX Warning: There were undefined references.
+
 Package rerunfilecheck Info: File `Modele_These_UParisSaclay_2022.out' has not 
 changed.
-(rerunfilecheck)             Checksum: B072F36D75A1E5A63BD3ED5C02727B12;24841.
+(rerunfilecheck)             Checksum: 93E98EF21D0B5A48A4BF4821858C3281;24887.
 Package logreq Info: Writing requests to 'Modele_These_UParisSaclay_2022.run.xm
 l'.
 \openout1 = `Modele_These_UParisSaclay_2022.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 35344 strings out of 467871
- 688420 string characters out of 5418375
- 1638026 words of memory out of 5000000
- 63215 multiletter control sequences out of 15000+600000
+ 35348 strings out of 467871
+ 688469 string characters out of 5418375
+ 1638159 words of memory out of 5000000
+ 63218 multiletter control sequences out of 15000+600000
  654707 words of font info for 123 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  102i,15n,117p,2577b,2269s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -2539,10 +2549,10 @@ ic/amsfonts/cm/cmsy6.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/ty
 pe1/public/amsfonts/cm/cmsy8.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/
 fonts/type1/public/doublestroke/dsrom10.pfb><C:/Users/Matth/AppData/Local/Progr
 ams/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on Modele_These_UParisSaclay_2022.pdf (101 pages, 6580337 bytes)
+Output written on Modele_These_UParisSaclay_2022.pdf (101 pages, 6582602 bytes)
 .
 PDF statistics:
- 1866 PDF objects out of 2073 (max. 8388607)
- 411 named destinations out of 1000 (max. 500000)
+ 1870 PDF objects out of 2073 (max. 8388607)
+ 412 named destinations out of 1000 (max. 500000)
  871 words of extra memory for PDF output out of 10000 (max. 10000000)
 

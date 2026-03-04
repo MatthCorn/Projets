@@ -17,33 +17,34 @@
 \end{itemize}
 \; \\
 
-Ce chapitre introduit une méthodologie alternative pour le traitement des signaux radar. En rupture avec les approches globales de type \textit{sequence-to-sequence} (Seq2Seq) abordées précédemment, nous proposons ici une reformulation du problème axée sur la causalité et le traitement flux-à-flux (\textit{stream processing}). Cette approche vise à s'affranchir des limitations de longueur de séquence tout en mimant plus fidèlement le comportement physique du système de Détection et Caractérisation des Impulsions (DCI).
+Ce chapitre introduit une méthodologie alternative pour la reproduction par IA du mécanisme de Détection et Caractérisation des Impulsions (DCI). En rupture avec l'approche de type \textit{sequence-to-sequence} (Seq2Seq) abordées dans le chapitre précédent \ref{chap:seq2seq}, nous proposons ici une reformulation du problème axée sur la causalité et le traitement flux-à-flux (\textit{stream processing}). 
 \section{Motivation : Du traitement de séquence à la modélisation dynamique}
-L'approche classique consistant à traiter l'intégralité d'une séquence d'impulsions en une seule passe se heurte à deux obstacles majeurs : un goulot d'étranglement computationnel et une dissonance conceptuelle avec le système réel.
-\subsection{Le goulot d'étranglement des architectures Seq2Seq}
-Le premier obstacle est la difficulté intrinsèque des architectures neuronales actuelles à maintenir des dépendances temporelles sur de longs horizons :
+L'approche Seq2Seq consiste à traiter l'intégralité d'une séquence d'impulsions source dans un encodeur avant l'utilisation de l'information issue de ce traitement par un décodeur pour produire itérativement la séquence d'impulsions cible. Cette approche se heurte alors à deux obstacles majeurs. Premièrement, le traitement de la séquence source entière par un encodeur constitue un goulot d'étranglement calculatoire problématique pour les séquences longues. Deuxièmement, l'inférence de ce modèle est dissonante avec le mécanisme de traitement du système réel, qui lui n'attend pas la fin des impulsions incidentes pour publier des interceptions, et exploite une mémoire locale. L'approche flux-à-flux, que nous formalisons dans cette section, vise à reproduire ce mécanisme de production d'interceptions en direct présent dans le DCI, en forçant l'exploitation d'une information locale et causale de la séquence source pour les prédictions.
+\subsection{Le goulot d'étranglement des architectures pour le Seq2Seq}
+Le premier obstacle à l'approche Seq2Seq est la difficulté à traiter des séquences longues, bien que la cause varie en fonction de l'architecture : neuronales actuelles à maintenir des dépendances temporelles sur de longs horizons :
 \begin{itemize}
-\item \textbf{Architectures récurrentes (RNN/LSTM) :} Ces modèles peinent à conserver une mémoire contextuelle pertinente au-delà d'une dizaine d'éléments. La propagation du gradient à travers le temps (Backpropagation Through Time) sur de longues séquences entraîne des problèmes de disparition ou d'explosion du gradient, rendant l'apprentissage instable.
-\item \textbf{Architectures attentionnelles (Transformers) :} Bien que plus robustes, elles présentent une complexité algorithmique quadratique $\mathcal{O}(N^2)$ en fonction de la longueur de la séquence. Au-delà de séquences de l'ordre de 1000 éléments, l'empreinte mémoire devient prohibitive.
+\item \textbf{Architectures récurrentes (RNN/LSTM) :} La propagation du gradient à travers le temps (car ces modèles traitent itérativement chaque élément de la séquence) sur de longues séquences est exposé à des problèmes de disparition, ce qui rend difficile le maintient des dépendances temporelles sur de longs horizons.
+\item \textbf{Architectures attentionnelles (Transformers) :} Plus robustes au problème de maintient de dépendance temporelle, cette architecture présente une complexité algorithmique quadratique $\mathcal{O}(N^2)$ en fonction de la longueur de la séquence. Le traitement de séquence longues devient alors un problème challengeant du point de vue matériel (limitation V-RAM).
 \end{itemize}
-Ces limitations imposent souvent des mécanismes de segmentation arbitraires (découpage de la scène en sous-blocs) qui brisent la continuité temporelle du signal et nuisent à la cohérence globale de la détection.
+Ces limitations imposent la mise en place de mécanismes de segmentation, tel que le découpage en fenêtres étudié au chapitre précédent \ref{chap:seq2seq}, qui nuisent à la continuité du traitement et altère donc la séquence globale des PDW émis \ref{seq:discseq2seq}.
 \subsection{Le DCI comme système dynamique réactif}
-Le second obstacle est d'ordre conceptuel. Modéliser le DCI comme une fonction globale $f(\mathbf{X}_{total}) \to \mathbf{Y}_{total}$ est une approximation qui masque la réalité physique du module. Le DCI ne "voit" pas le futur ; il fonctionne intrinsèquement en mode événementiel.
-C'est un système dynamique réactif régis par deux types d'événements :
+Le second obstacle est d'ordre conceptuel. Modéliser le DCI comme une fonction globale $f(\mathbf{X}_{total}) \to \mathbf{Y}_{total}$ est une hypothèse forte qui masque la réalité physique du module. Le DCI est système dynamique réactifs qui est régis par l'arrivé de trois type d'\textit{évènements} :
 \begin{enumerate}
-\item \textbf{L'arrivée d'une impulsion incidente} déclenche une mise à jour des corrélations et de l'état des mémoires internes.
-\item \textbf{L'émission d'une impulsion synthétisée} par le mécanisme de suivi provoque la libération de ressources mémoires.
+\item \textbf{L'arrivée d'une impulsion incidente} déclenche un nouveau calcul des DNA et une mise à jour de l'état des mémoires internes.
+\item \textbf{La disparition d'une impulsion incidente} déclenche aussi le calcul des DNA et une mise à jour de l'état des mémoires internes.
+\item \textbf{L'émission d'une impulsion interceptée} provoque la libération de ressources mémoires.
 \end{enumerate}
-Il apparaît donc plus naturel de chercher à modéliser ce comportement "pas-à-pas". L'objectif est de transformer le problème de prédiction globale en un problème de prédiction locale causale : étant donné une impulsion incidente, le modèle doit prédire la cascade d'événements (émissions) qui surviennent avant l'arrivée de l'impulsion incidente suivante.
+Bien que non-mentionné de cette manière auparavant, cette notion d'évènement était déjà centrale pour le DCI. Par exemple, les deux premiers évènements liées à l'apparition ou la disparition d'impulsions incidentes modelait les \textit{paliers} (dont un exemple est illustré figure \ref{fig:window}). Le DCI traite donc les séquences d'impulsions incidentes itérativement comme une séquence d'évènement, entre lesquels s'entrelaçent des évènements liés à la publication d'impulsion. Finalement, il apparaît intéressant de chercher à rapprocher le traitement de nos architectures de ce comportement "pas-à-pas". Nous proposons est de transformer le problème de prédiction globale en un problème de prédiction locale causale : étant donné une impulsion incidente, le modèle doit prédire la cascade d'événements (émissions) qui surviennent avant l'arrivée de l'impulsion incidente suivante.
 
 \section{Formalisation du problème "Flux-à-flux"}
-Pour implémenter cette approche avec un réseau de neurones, nous devons transformer la structure des données. Cette transformation résulte de la confrontation entre la nature continue du flux radar et la nature discrète des réseaux de neurones. Nous détaillons ici les choix de conception nécessaires pour résoudre ce conflit.
+L'implémentation de cette approche avec un réseau de neurones passe par une étape de réflexion sur la manière, afin de faire de l'idée de la formulation flux-à-flux un réel problème d'entrainement bien définit. Nous analysons ici les contraintes qu'impose l'approche proposée pour y associé des choix que nous faisons. Ces choix concernent aussi bien l'architecture que le mode d'inférence ou encore la transformation des données. Ils visent à relier chaque situation observable (par exemple, l'arrivée d'un certain PDW incident) à une unique sortie (par exemple la prédiction d'une PDW émis), mais aussi inversement qu'à chaque sortie ne corresponde qu'une situation observable. De ce fait, l'entrainement supervisé pourra être réalisé sans embuche.
+
 \subsection{Contraintes architecturales et choix de conception}
 Un réseau de neurones standard est une fonction $f: \mathcal{X} \to \mathcal{Y}$ qui associe un tenseur de sortie unique à un tenseur d'entrée unique. Cette définition rigide nous impose plusieurs contraintes pour le traitement d'un flux d'impulsions incidentes $\{I_k\}$ et d'impulsions émises (sorties) $\{O_k\}$ :
 \paragraph{Contrainte 1 : Discrétisation de la réponse}
-Le modèle ne peut pas "naturellement" générer un nombre variable d'impulsions de sortie pour une seule impulsion d'entrée sans modifier profondément son architecture.
+Le modèle ne peut pas "simplement" générer un nombre variable d'impulsions de sortie pour une seule impulsion d'entrée, scénario qu'on rentre fréquemment. Il doit être adapté à la génération de sortie de taille variable. 
 \begin{itemize}
-\item \textit{Choix de conception :} Nous adoptons une approche itérative. Nous interrogeons le réseau de manière répétée avec la même impulsion incidente tant qu'il reste des impulsions à générer pour ce créneau temporel.
+\item \textit{Choix de conception :} Nous adoptons une approche itérative. Nous interrogeons le réseau de manière répétée avec la même impulsion incidente tant qu'il reste des impulsions à générer avant la sortie de la prochaine impulsion.
 \end{itemize}
 \paragraph{Contrainte 2 : Condition d'arrêt}
 Puisque le nombre de sorties est variable (potentiellement nul), le modèle doit posséder un moyen explicite de signaler la fin de la séquence d'émission associée à l'impulsion incidente courante.
@@ -51,15 +52,16 @@ Puisque le nombre de sorties est variable (potentiellement nul), le modèle doit
 \item \textit{Choix de conception :} Nous introduisons un jeton de contrôle spécial, noté \texttt{NEXT}. La prédiction de ce jeton par le réseau signifie "Il n'y a plus d'émission à générer, passez à l'impulsion incidente suivante".
 \end{itemize}
 \paragraph{Contrainte 3 : Maintien du contexte}
-Le modèle doit savoir où il se situe dans la séquence des émissions (doit-il prédire la première ou la troisième impulsion associée à $I_k$ ?).
+Le modèle doit produire des prédictions en fonction du contexte passé, ce qui inclue savoir les impulsions incidentes précédentes, mais aussi être capable de se situer dans une salve d'émissions (doit-il prédire la première ou la troisième impulsion associée à une impulsion incidente ?).
 \begin{itemize}
-\item \textit{Choix de conception :} Nous optons pour une architecture à double entrée. Le modèle reçoit à chaque pas :
+\item \textit{Choix de conception :} Cette contrainte restreint nos modèles à disposer d'un système de mémoire (RNN) ou bien être capable de traiter un contexte passé ayant une structure de séquence (CNN, Transformer) pour construire une représentation latente associée à une mémoire. Ce choix respecte la philosophie du DCI, disposant lui-même d'une mémoire mise-à-jour à chaque évènement. Ces architectures sont compatibles avec l'inférence itérative mentionnée plus haut.
+\item \textit{Choix de conception :} Nous guidons le modèle à construire sa mémoire en fournissant une double entrée qui rappelle le contexte immédiat. Le modèle reçoit à chaque pas :
 \begin{enumerate}
 \item L'impulsion incidente courante $I_k$.
-\item La dernière prédiction effectuée $P_{t-1}$ (ou un jeton d'initialisation).
+\item La dernière prédiction effectuée $P_{t-1}$ (ou un jeton \texttt{NEXT}).
 \end{enumerate}
 \end{itemize}
-Ce dernier choix s'apparente à une approche auto-régressive guidée (Teacher Forcing), soulageant la mémoire interne du modèle en lui rappelant explicitement son état précédent.
+
 \section{Protocole de transformation des données}
 La combinaison de ces choix aboutit à un algorithme de "dépliage" des données. Une séquence temporelle d'événements est transformée en une série de couples $((\text{Entrées}), \text{Cible})$ indépendants.
 \subsection{Illustration du mécanisme}
