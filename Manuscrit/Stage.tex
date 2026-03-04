@@ -63,36 +63,95 @@ Le modèle doit produire des prédictions en fonction du contexte passé, ce qui
 \end{itemize}
 
 \section{Protocole de transformation des données}
-La combinaison de ces choix aboutit à un algorithme de "dépliage" des données. Une séquence temporelle d'événements est transformée en une série de couples $((\text{Entrées}), \text{Cible})$ indépendants.
+La combinaison de ces choix aboutit à un algorithme de "fusion" des séquences de PDW, considérées alors comme des séquences d'évènements. Nous illustrons cet algorithme à l'aide d'un exemple.
 \subsection{Illustration du mécanisme}
-Considérons une chronologie mixte d'événements réels, triés par temps, impliquant 3 impulsions incidentes ($I$) et 5 impulsions émises ($O$) :
+Considérons une séquence de PDW incidents $[I_1, I_2, I_3]$ et la séquence de PDW interceptés correspondants $[O_1, O_2, O_3, O_4, O_5]$. Alors considérées comme deux séquences d'évènements à auquels une date est associé (la date d'arrivée pour les impulsions incidentes, la date de publication pour les impulsions interceptées), nous obtenons une unique séquence fusionnée d'évènements triés par ordre chronologique :
 \begin{equation}
-\text{Séquence Globale} : [I_1, \mathbf{O_1}, \mathbf{O_2}, \mathbf{O_3}, I_2, I_3, \mathbf{O_4}, \mathbf{O_5}]
+\text{Séquence fusionnée} : [I_1, O_1, O_2, O_3, I_2, I_3, O_4, O_5]
 \end{equation}
-L'objectif est de prédire les événements en gras ($O$) en fonction des événements incidents ($I$). Le jeton \texttt{NEXT} est utilisé pour initialiser la boucle (entrée) et pour la clore (cible).
-Le processus de génération des données d'entraînement se déroule comme suit :
+
+D'après nos choix de conceptions réalisé plus tôt et les contraintes qu'imposent l'approche, l'objectif pour nos modèles sera de prédire itérativement les évènements de publications se réalisant entre l'arrivé de chaque impulsion incidente, ainsi que de prédire l'absence de nouvelle prédiction sur l'intervalle, grâce à l'observation de la dernière impulsion incidente arrivé et du dernier évènement prédit, soulageant le rôle de la mémoire. Ce processus conduit au déroulé des opérations qui explique à chaque instant ce que le modèle observe et ce qu'on attend du modèle en retour. Ci-dessous ce déroulé des opérations pour notre exemple, où nous rappelons entre parenthèses les traitements attendus :
+
 \begin{enumerate}
 \item \textbf{Traitement de $I_1$ (3 émissions associées) :}
 \begin{itemize}
-\item \textit{Entrée :} $(I_1, \texttt{NEXT})$ $\rightarrow$ \textit{Cible :} $O_1$ (Première émission).
-\item \textit{Entrée :} $(I_1, O_1)$ $\rightarrow$ \textit{Cible :} $O_2$ (Le modèle sait qu'il a émis $O_1$).
-\item \textit{Entrée :} $(I_1, O_2)$ $\rightarrow$ \textit{Cible :} $O_3$ (Le modèle sait qu'il a émis $O_2$).
-\item \textit{Entrée :} $(I_1, O_3)$ $\rightarrow$ \textit{Cible :} \texttt{NEXT} (Fin des émissions pour $I_1$).
+\item \textit{Entrée :} $(I_1, \texttt{NEXT})$ $\rightarrow$ \textit{Cible :} $O_1$ (Le modèle sait qu'il n'a rien prédit depuis l'arrivée de $I_1$ et doit prédire la première publication $O_1$).
+\item \textit{Entrée :} $(I_1, O_1)$ $\rightarrow$ \textit{Cible :} $O_2$ (Le modèle sait qu'il a émis $O_1$ et doit prédire la publication suivante $O_2$).
+\item \textit{Entrée :} $(I_1, O_2)$ $\rightarrow$ \textit{Cible :} $O_3$ (Le modèle sait qu'il a émis $O_2$ et doit prédire la publication suivante $O_3$).
+\item \textit{Entrée :} $(I_1, O_3)$ $\rightarrow$ \textit{Cible :} \texttt{NEXT} (Le modèle sait qu'il a émis $O_3$ et doit prédire l'absence de nouvelle émission avant $I_2$).
 \end{itemize}
 \item \textbf{Traitement de $I_2$ (0 émission associée) :}
 \begin{itemize}
-    \item L'impulsion suivante $I_3$ arrive avant toute émission.
-    \item \textit{Entrée :} $(I_2, \texttt{NEXT})$ $\rightarrow$ \textit{Cible :} \texttt{NEXT} (Passage immédiat à la suite).
+    \item \textit{Entrée :} $(I_2, \texttt{NEXT})$ $\rightarrow$ \textit{Cible :} \texttt{NEXT} (Le modèle sait qu'il n'a rien prédit depuis l'arrivée de $I_2$ doit prédire l'absence de nouvelle émission avant $I_3$).
 \end{itemize}
 
 \item \textbf{Traitement de $I_3$ (2 émissions associées) :}
 \begin{itemize}
-    \item \textit{Entrée :} $(I_3, \texttt{NEXT})$ $\rightarrow$ \textit{Cible :} $O_4$.
-    \item \textit{Entrée :} $(I_3, O_4)$ $\rightarrow$ \textit{Cible :} $O_5$.
-    \item \textit{Entrée :} $(I_3, O_5)$ $\rightarrow$ \textit{Cible :} \texttt{NEXT}.
+    \item \textit{Entrée :} $(I_3, \texttt{NEXT})$ $\rightarrow$ \textit{Cible :} $O_4$ (Le modèle sait qu'il n'a rien prédit depuis l'arrivée de $I_2$ et doit prédire la publication suivante $O_4$).
+    \item \textit{Entrée :} $(I_3, O_4)$ $\rightarrow$ \textit{Cible :} $O_5$ (Le modèle sait qu'il a émis $O_4$ et doit prédire la publication suivante $O_5$).
+    \item \textit{Entrée :} $(I_3, O_5)$ $\rightarrow$ \textit{Cible :} \texttt{NEXT} (Le modèle sait qu'il a émis $O_5$ et doit prédire l'absence de nouvelle émission).
 \end{itemize}
 \end{enumerate}
-Au final, la séquence temporelle initiale est convertie en un ensemble de 8 échantillons d'apprentissage. Cette transformation permet de ramener un problème de traitement de séquence complexe et long à une succession de tâches de régression locales de courte portée, parfaitement adaptées à l'entraînement d'un réseau de neurones récurrent supervisé.
+Au final, les séquences de PDW incidents $[I_1, I_2, I_3]$ et de PDW interceptés $[O_1, O_2, O_3, O_4, O_5]$ sont fusionnées en une unique séquence $$[(I_1, \texttt{NEXT}), (I_1, O_1), (I_1, O_2), (I_1, O_3), (I_2, \texttt{NEXT}), (I_3, \texttt{NEXT}), (I_3, O_4), (I_3, O_5)]$$ faisant office d'entrées données itérativement à notre modèle, dont les sorties devront correspondre à une autre nouvelle séquence $$[O_1, O_2, O_3, \texttt{NEXT}, \texttt{NEXT}, O_4, O_5, \texttt{NEXT}]$$, faisant office de cible de prédiction.
+
+\subsection{Préparation des données et ingénierie des caractéristiques}
+Le passage d'une modélisation globale (\textit{séquence vers séquence}) à une modélisation locale (\textit{flux-à-flux}) nécessite, en plus de la redéfinition du problème que nous avons réalisé, une adaptation de la représentation des données. En effet, nous devons nous assurer que les informations temporelles, qui étaient prévues pour être décodée lors d'un traitement des séquences entières comme c'est le cas dans la modélisation Seq2Seq, puissent être encore décodée lors du traitement des séquences de manières locales. De plus, la structure des données doit être adaptée à un traitement automatique par un algorithme, ce qui comprend l'utilisation de masques caractérisant le type de données (émission ou jeton \texttt{NEXT}) ainsi que le padding (prolongations artificielles des séquences permettant d'uniformiser leurs tailles pour un traitement en parallèle). 
+
+\subsubsection{Encodage local du temps}
+Dans l'approche globale Seq2Seq, les données encodaient le temps d'arrivée relativement à la position dans la séquence afin d'éviter la croissance incontrôlée des valeurs \ref{seq:timeencoding}. Cependant, dans l'approche flux-à-flux où les traitements des éléments ont vacation à être réalisé de manière locale, la pertinence de cet encodage est remise en question.
+Bien que, mathématiquement, l'encodage globale reste décodable à l'échelle locale du flux-à-flux par la présence de la mémoire et parce que l'opération de pliage/dépliage est réversible, notre problématique ne porte pas sur la décodabilité théorique, mais sur la difficulté d'extraction de cette information par le réseau de neurones. \\
+
+Nous nous intéressons ici à la difficulté de décoder les informations temporelles dans le cadre d'une sous-séquence (typiquement avec un début tronqué). Ce scénario simule l'horizon limité que le modèle peut se représenter dans son espace latent et sa mémoire, en accord avec la philosophie de l'approche qui vise à reproduire les contraintes du matériel (DCI).\\
+
+\begin{itemize}
+\item Concernant l'encodage du temps dans les PDW incidents ($(I_i)_{1 \leq i \leq N}$) : \\ 
+Nos séquences de PDW incidents encodent le temps d'arrivé par la position dans la séquence \ref{eq:timeencodingin}. Cette encodage, facilité par la simplicité du problème, permet de comprendre le temps d'arrivé des impulsions de manière relative, c'est-à-dire qu'un PDW arrive toujours une unité de temps après le PDW qu'il succède. Ainsi, cet encodage du temps ne pose pas de problème à l'échelle locale, car cela redéfinit simplement une origine des temps au temps d'arrivé du premier PDW de la sous-séquence.\\
+
+\item Concernant les besoins pour la prédiction du bon nombre d'évènement :\\
+Nous avons définit la tâche du réseau, lorsqu'il observe pour la première fois un PDW incident $I_i$, comme celle de prédire toutes les émissions $O_{i_1}, ..., O_{i_k}$ publiés avant l'arrivée du PDW $I_{i+1}$. Cette mission ne peut naturellement pas être remplie sans une connaissance a priori de l'intervalle de temps séparant l'arrivée des deux PDW $i_i$ et $I_{i+1}$. Nous enrichissons ainsi la représentation de chaque PDW  $I_i$ en concaténant à ses caractéristiques la différence de temps d'arrivé avec l'impulsion suivante : 
+$$\Delta T_{i} = TOA(I_{i+1}) - TOA(I_{i})$$
+Cette information permet au modèle d'estimer la "fenêtre temporelle" disponible pour ses émissions. Dans le cas d'une fin de séquence, une valeur assez grande est utilisée pour signifier au modèle qu'il doit vider sa mémoire (générer toutes les réponses restantes).\\
+
+\item Pour les impulsions interceptées ($(O_i)_{0 \leq i \leq M}$) : \\ 
+Dans la configuration \textit{seq2seq}, l'encodage du temps d'émission est réalisé en soustrayant à cette valeur (information globale) réelle la position dans la séquence (information globale) \ref{eq:timeencodingout}. Bien que cette information soit toujours récupérable par inversion du dépliage, on considère que retrouver localement la position qu'une prédiction aurait eu dans la séquence non-dépliée n'est pas dans l'esprit de l'approche. La synchronisation des flux-à-flux permet d'adopter un encodage local plus pertinent : le temps d'arrivé d'un PDW intercepté $O_i$ (qu'il soit en entrée ou à prédire) est encodé relativement au temps d'arrivée de l'impulsion incidente courante $I_j$.
+$$TOA(O_i) - TOA(I_j)$$
+Par exemple dans le cadre de la séquence dépliée liée à \ref{tab:unfolding_example}, le troisième élément est constitué d'une entrée $(I_1, O_2)$ et d'une cible $O_3$. Alors le temps d'arrivé de $O_2$ sera encodé localement $TOA(O_2) - TOA(I_1)$ et le temps d'arrivé de $O_3$ sera encodé $TOA(O_3) - TOA(I_1)$.
+\end{itemize}
+
+\subsubsection{Gestion des masques et exemple de dépliage}
+Outre les valeurs, la structure du dépliage nécessite la gestion de plusieurs masques pour piloter l'apprentissage supervisé et le calcul de la fonction de coût :
+\begin{itemize}
+\item MI (Mask Input) : Indique si l'entrée secondaire (Input 2) est le jeton spécial \texttt{NEXT} (1) ou une PDW valide (0).
+\item MO (Mask Output) : Indique si la cible attendue est le jeton \texttt{NEXT} (1) ou une PDW valide (0).
+\item MP (Mask Padding) : Indique si la position est valide (1) ou si elle relève du remplissage (padding) de fin de batch (0).
+\end{itemize}
+\: \\
+
+Pour illustrer ce mécanisme, considérons une séquence courte avec 2 impulsions incidentes ($I_1, I_2$) générant respectivement 1 et 0 impulsion de sortie ($O_1$). La séquence dépliée de longueur 4 se construit ainsi :
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Pas de temps} & \textbf{t=1} & \textbf{t=2} & \textbf{t=3} & \textbf{t=4} \\
+\hline
+\textbf{Input 1} ($PDW_{in}$) & $I_1$ & $I_1$ & $I_2$ & Pad \\
+\hline
+\textbf{Input 2} (Contexte) & \texttt{NEXT} & $O_1$ & \texttt{NEXT} & Pad \\
+\hline
+\textbf{Target} (Sortie) & $O_1$ & \texttt{NEXT} & \texttt{NEXT} & Pad \\
+\hline
+\hline
+\textbf{MI} (Input 2 is Next) & 1 & 0 & 1 & 0 \\
+\hline
+\textbf{MO} (Target is Next) & 0 & 1 & 1 & 0 \\
+\hline
+\textbf{MP} (Valid) & 1 & 1 & 1 & 0 \\
+\hline
+\end{tabular}
+\caption{Exemple de construction des données et des masques pour une séquence courte dépliée.}
+\label{tab:unfolding_example}
+\end{table}
 
 
 \section{Validation de l'approche sur architectures récurrentes}
@@ -147,60 +206,6 @@ Cette section étend la discussion sur la pertinence du dépliage des données i
 Nous réitérons les expériences en introduisant deux nouvelles familles d'architectures : les Réseaux Convolutifs et les Transformers. \\
 
 Nous détaillons ici les adaptations nécessaires au pré-traitement des données pour maximiser l'efficacité de ces modèles, la sélection des architectures, ainsi que les métriques spécifiques définies pour guider l'apprentissage, avant de présenter les résultats et nos conclusions.
-
-\subsection{Préparation des données et ingénierie des caractéristiques}
-Le passage d'une modélisation globale (\textit{séquence vers séquence}) à une modélisation locale (\textit{flux-à-flux}) impose une adaptation de la représentation des données. D'une part, l'ingénierie des caractéristiques temporelles doit être repensée pour garantir que l'information fournie au modèle est localement exploitable, sans dépendre d'une vision globale de la séquence. D'autre part, la structure des données d'entraînement doit être adaptée via un système de masquage spécifique pour piloter l'apprentissage auto-régressif conditionnel.
-
-\subsubsection{Encodage relatif local du temps}
-
-Avant dépliage, les données brutes encodaient le temps d'arrivée relativement à la position dans la séquence afin d'éviter la croissance incontrôlée des valeurs. Cependant, dans le contexte du dépliage où les séquences d'entrée et de sortie sont entrelacées, la pertinence de cette représentation est remise en question.\\
-
-Il est important de noter que, mathématiquement, l'encodage initial reste décodable avec la séquence dépliée car l'opération de pliage/dépliage est réversible. Toutefois, notre problématique ne porte pas sur la décodabilité théorique, mais sur la difficulté d'extraction de cette information par le réseau de neurones. Nous nous intéressons ici à la difficulté de décoder cette information temporelle dans le cadre d'une sous-séquence (typiquement avec un début tronqué). Ce scénario simule l'horizon limité que le modèle peut se représenter dans son espace latent et sa mémoire, en accord avec la philosophie de l'approche qui vise à reproduire les contraintes du matériel (DCI).\\
-
-\begin{itemize}
-\item Pour les PDW incidents ($(I_i)_{1 \leq i \leq N}$) : \\ Le décodage des temps d'arrivée est réalisé relativement au temps d'arrivée du premier PDW, que nous associons à l'origine des temps locale. Cependant, pour permettre au modèle de prédire, étant donné le PDW incident $I_i$ le bon nombre de PDW à générer avant le prochain PDW incident $I_{i+1}$, le modèle doit savoir cette prochaine date d'arrivée. Nous enrichissons ainsi la représentation de chaque PDW  $I_i$ en concaténant à ses caractéristiques la différence de temps d'arrivé avec l'impulsion suivante : 
-$$\Delta T_{i} = TOA(I_{i+1}) - TOA(I_{i})$$
-Cette information permet au modèle d'estimer la "fenêtre temporelle" disponible pour ses émissions. Dans le cas d'une fin de séquence, une valeur assez grande est utilisée pour signifier au modèle qu'il doit vider sa mémoire (générer toutes les réponses restantes).\\
-
-\item Pour les impulsions interceptées ($(O_i)_{0 \leq i \leq M}$) : \\ Dans la configuration \textit{seq2seq}, l'encodage du temps d'émission est réalisé en soustrayant à cette valeur (information globale) réelle la position dans la séquence (information globale) [ref au calcul]. Bien que cette information soit toujours récupérable par inversion du dépliage, on considère que retrouver localement la position qu'une prédiction aurait eu dans la séquence non-dépliée n'est pas dans l'esprit de l'approche. La synchronisation des flux-à-flux permet d'adopter un encodage local plus pertinent : le temps d'arrivé d'un PDW intercepté $O_i$ (qu'il soit en entrée ou à prédire) est encodé relativement au temps d'arrivée de l'impulsion incidente courante $I_j$ qui la conditionne.
-$$TOA(O_i) - TOA(I_j)$$
-Par exemple dans le cadre de la séquence dépliée liée à \ref{tab:unfolding_example}, le troisième élément est constitué d'une entrée $(I_1, O_2)$ et d'une cible $O_3$. Alors le temps d'arrivé de $O_2$ sera encodé localement $TOA(O_2) - TOA(I_1)$ et le temps d'arrivé de $O_3$ sera encodé $TOA(O_3) - TOA(I_1)$.
-\end{itemize}
-
-\subsubsection{Gestion des masques et exemple de dépliage}
-Outre les valeurs, la structure du dépliage nécessite la gestion de plusieurs masques pour piloter l'apprentissage supervisé et le calcul de la fonction de coût :
-\begin{itemize}
-\item MI (Mask Input) : Indique si l'entrée secondaire (Input 2) est le jeton spécial \texttt{NEXT} (1) ou une PDW valide (0).
-\item MO (Mask Output) : Indique si la cible attendue est le jeton \texttt{NEXT} (1) ou une PDW valide (0).
-\item MP (Mask Padding) : Indique si la position est valide (1) ou si elle relève du remplissage (padding) de fin de batch (0).
-\end{itemize}
-\: \\
-
-Pour illustrer ce mécanisme, considérons une séquence courte avec 2 impulsions incidentes ($I_1, I_2$) générant respectivement 1 et 0 impulsion de sortie ($O_1$). La séquence dépliée de longueur 4 se construit ainsi :
-
-\begin{table}[h]
-\centering
-\begin{tabular}{|l|c|c|c|c|}
-\hline
-\textbf{Pas de temps} & \textbf{t=1} & \textbf{t=2} & \textbf{t=3} & \textbf{t=4} \\
-\hline
-\textbf{Input 1} ($PDW_{in}$) & $I_1$ & $I_1$ & $I_2$ & Pad \\
-\hline
-\textbf{Input 2} (Contexte) & \texttt{NEXT} & $O_1$ & \texttt{NEXT} & Pad \\
-\hline
-\textbf{Target} (Sortie) & $O_1$ & \texttt{NEXT} & \texttt{NEXT} & Pad \\
-\hline
-\hline
-\textbf{MI} (Input 2 is Next) & 1 & 0 & 1 & 0 \\
-\hline
-\textbf{MO} (Target is Next) & 0 & 1 & 1 & 0 \\
-\hline
-\textbf{MP} (Valid) & 1 & 1 & 1 & 0 \\
-\hline
-\end{tabular}
-\caption{Exemple de construction des données et des masques pour une séquence courte dépliée.}
-\label{tab:unfolding_example}
-\end{table}
 
 \subsection{Sélection des architectures}
 Nous comparons trois architectures distinctes, choisies pour leur représentativité des différents paradigmes de traitement séquentiel.
