@@ -21,7 +21,7 @@ if __name__ == '__main__':
     ################################################################################################################################################
     # création des paramètres de la simulation
 
-    param = {"n_layers": 12,
+    param = {"n_layers": 2,
 		"mem_length": 1,
 		"kernel_size": 2,
 		"len_in": 28,
@@ -46,9 +46,9 @@ if __name__ == '__main__':
 			},
 		"mult_grad": 3500,
 		"weight_decay": 1e-2,
-		"NDataT": 500000,
+		"NDataT": 5000,
 		"NDataV": 1000,
-		"batch_size": ["suggest", "categorical", [200, 400, 700]],
+		"batch_size": 500,
 		"n_iter": 80,
 		"training_strategy": [
 			{"mean": [-5, 5], "std": [1, 5]},

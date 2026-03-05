@@ -72,10 +72,13 @@ class Rotary(torch.nn.Module):
 class StandardRotary(nn.Module):
     def __init__(self, dim: int, max_seq_len: int = 70, base: float = 300.0):
         super().__init__()
-        self.dim = dim
+        if dim % 2:
+            self.dim = dim - 1
+        else:
+            self.dim = dim
 
         # 1. Calcul des fréquences inverses
-        inv_freq = 1.0 / (base ** (torch.arange(0, dim, 2).float() / dim))
+        inv_freq = 1.0 / (base ** (torch.arange(0, self.dim, 2).float() / self.dim))
 
         # 2. Création de l'axe temporel (jusqu'à max_seq_len)
         t = torch.arange(max_seq_len, dtype=torch.float32)
@@ -86,6 +89,8 @@ class StandardRotary(nn.Module):
         # 4. Concaténation pour correspondre à la dimension totale
         # Ex: si freqs = [f1, f2], emb = [f1, f2, f1, f2] (Style LLaMA)
         emb = torch.cat((freqs, freqs), dim=-1)
+        if dim % 2:
+            emb = torch.nn.functional.pad(emb, (0, 1))
 
         # 5. Mise en cache de cos et sin (ajout d'une dimension batch au début)
         self.register_buffer("cos_cached", emb.cos()[None, :, :])

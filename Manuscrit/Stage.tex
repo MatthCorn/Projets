@@ -39,7 +39,7 @@ Bien que non-mentionné de cette manière auparavant, cette notion d'évènement
 \section{Formalisation du problème "Flux-à-flux"}
 L'implémentation de cette approche avec un réseau de neurones passe par une étape de réflexion sur la manière, afin de faire de l'idée de la formulation flux-à-flux un réel problème d'entrainement bien définit. Nous analysons ici les contraintes qu'impose l'approche proposée pour y associé des choix que nous faisons. Ces choix concernent aussi bien l'architecture que le mode d'inférence ou encore la transformation des données. Ils visent à relier chaque situation observable (par exemple, l'arrivée d'un certain PDW incident) à une unique sortie (par exemple la prédiction d'une PDW émis), mais aussi inversement qu'à chaque sortie ne corresponde qu'une situation observable. De ce fait, l'entrainement supervisé pourra être réalisé sans embuche.
 
-\subsection{Contraintes architecturales et choix de conception}
+\subsection{Contraintes de l'approche et choix de conception}
 Un réseau de neurones standard est une fonction $f: \mathcal{X} \to \mathcal{Y}$ qui associe un tenseur de sortie unique à un tenseur d'entrée unique. Cette définition rigide nous impose plusieurs contraintes pour le traitement d'un flux d'impulsions incidentes $\{I_k\}$ et d'impulsions émises (sorties) $\{O_k\}$ :
 \paragraph{Contrainte 1 : Discrétisation de la réponse}
 Le modèle ne peut pas "simplement" générer un nombre variable d'impulsions de sortie pour une seule impulsion d'entrée, scénario qu'on rentre fréquemment. Il doit être adapté à la génération de sortie de taille variable. 
@@ -62,11 +62,11 @@ Le modèle doit produire des prédictions en fonction du contexte passé, ce qui
 \end{enumerate}
 \end{itemize}
 
-\section{Protocole de transformation des données}
+\subsection{Illustration du protocole de transformation des données}
 La combinaison de ces choix aboutit à un algorithme de "fusion" des séquences de PDW, considérées alors comme des séquences d'évènements. Nous illustrons cet algorithme à l'aide d'un exemple.
-\subsection{Illustration du mécanisme}
 Considérons une séquence de PDW incidents $[I_1, I_2, I_3]$ et la séquence de PDW interceptés correspondants $[O_1, O_2, O_3, O_4, O_5]$. Alors considérées comme deux séquences d'évènements à auquels une date est associé (la date d'arrivée pour les impulsions incidentes, la date de publication pour les impulsions interceptées), nous obtenons une unique séquence fusionnée d'évènements triés par ordre chronologique :
 \begin{equation}
+\label{eq:seqfusion}
 \text{Séquence fusionnée} : [I_1, O_1, O_2, O_3, I_2, I_3, O_4, O_5]
 \end{equation}
 
@@ -98,14 +98,14 @@ Au final, les séquences de PDW incidents $[I_1, I_2, I_3]$ et de PDW intercept�
 Le passage d'une modélisation globale (\textit{séquence vers séquence}) à une modélisation locale (\textit{flux-à-flux}) nécessite, en plus de la redéfinition du problème que nous avons réalisé, une adaptation de la représentation des données. En effet, nous devons nous assurer que les informations temporelles, qui étaient prévues pour être décodée lors d'un traitement des séquences entières comme c'est le cas dans la modélisation Seq2Seq, puissent être encore décodée lors du traitement des séquences de manières locales. De plus, la structure des données doit être adaptée à un traitement automatique par un algorithme, ce qui comprend l'utilisation de masques caractérisant le type de données (émission ou jeton \texttt{NEXT}) ainsi que le padding (prolongations artificielles des séquences permettant d'uniformiser leurs tailles pour un traitement en parallèle). 
 
 \subsubsection{Encodage local du temps}
-Dans l'approche globale Seq2Seq, les données encodaient le temps d'arrivée relativement à la position dans la séquence afin d'éviter la croissance incontrôlée des valeurs \ref{seq:timeencoding}. Cependant, dans l'approche flux-à-flux où les traitements des éléments ont vacation à être réalisé de manière locale, la pertinence de cet encodage est remise en question.
+Dans l'approche globale Seq2Seq, les données encodaient le temps d'arrivée relativement à la position dans la séquence afin d'éviter la croissance incontrôlée des valeurs \ref{seq:timeencoding}. Cependant, dans l'approche flux-à-flux où les traitements des éléments ont vocation à être réalisés de manière locale, la pertinence de cet encodage est remise en question.
 Bien que, mathématiquement, l'encodage globale reste décodable à l'échelle locale du flux-à-flux par la présence de la mémoire et parce que l'opération de pliage/dépliage est réversible, notre problématique ne porte pas sur la décodabilité théorique, mais sur la difficulté d'extraction de cette information par le réseau de neurones. \\
 
 Nous nous intéressons ici à la difficulté de décoder les informations temporelles dans le cadre d'une sous-séquence (typiquement avec un début tronqué). Ce scénario simule l'horizon limité que le modèle peut se représenter dans son espace latent et sa mémoire, en accord avec la philosophie de l'approche qui vise à reproduire les contraintes du matériel (DCI).\\
 
 \begin{itemize}
 \item Concernant l'encodage du temps dans les PDW incidents ($(I_i)_{1 \leq i \leq N}$) : \\ 
-Nos séquences de PDW incidents encodent le temps d'arrivé par la position dans la séquence \ref{eq:timeencodingin}. Cette encodage, facilité par la simplicité du problème, permet de comprendre le temps d'arrivé des impulsions de manière relative, c'est-à-dire qu'un PDW arrive toujours une unité de temps après le PDW qu'il succède. Ainsi, cet encodage du temps ne pose pas de problème à l'échelle locale, car cela redéfinit simplement une origine des temps au temps d'arrivé du premier PDW de la sous-séquence.\\
+Nos séquences de PDW incidents encodent le temps d'arrivé par la position dans la séquence \ref{eq:timeencodingin}. Cette encodage, facilité par la simplicité du problème, permet de comprendre le temps d'arrivé des impulsions de manière relative, c'est-à-dire qu'un PDW arrive toujours une unité de temps après le PDW qu'il succède. Ainsi, cet encodage du temps ne pose pas de problème à l'échelle locale, car cela redéfinit simplement une origine des temps au temps d'arrivé du premier PDW de la sous-séquence. Il suffit que toutes les informations temporelles soient redéfinies par rapport à cette nouvelle origine.\\
 
 \item Concernant les besoins pour la prédiction du bon nombre d'évènement :\\
 Nous avons définit la tâche du réseau, lorsqu'il observe pour la première fois un PDW incident $I_i$, comme celle de prédire toutes les émissions $O_{i_1}, ..., O_{i_k}$ publiés avant l'arrivée du PDW $I_{i+1}$. Cette mission ne peut naturellement pas être remplie sans une connaissance a priori de l'intervalle de temps séparant l'arrivée des deux PDW $i_i$ et $I_{i+1}$. Nous enrichissons ainsi la représentation de chaque PDW  $I_i$ en concaténant à ses caractéristiques la différence de temps d'arrivé avec l'impulsion suivante : 
@@ -115,54 +115,73 @@ Cette information permet au modèle d'estimer la "fenêtre temporelle" disponibl
 \item Pour les impulsions interceptées ($(O_i)_{0 \leq i \leq M}$) : \\ 
 Dans la configuration \textit{seq2seq}, l'encodage du temps d'émission est réalisé en soustrayant à cette valeur (information globale) réelle la position dans la séquence (information globale) \ref{eq:timeencodingout}. Bien que cette information soit toujours récupérable par inversion du dépliage, on considère que retrouver localement la position qu'une prédiction aurait eu dans la séquence non-dépliée n'est pas dans l'esprit de l'approche. La synchronisation des flux-à-flux permet d'adopter un encodage local plus pertinent : le temps d'arrivé d'un PDW intercepté $O_i$ (qu'il soit en entrée ou à prédire) est encodé relativement au temps d'arrivée de l'impulsion incidente courante $I_j$.
 $$TOA(O_i) - TOA(I_j)$$
-Par exemple dans le cadre de la séquence dépliée liée à \ref{tab:unfolding_example}, le troisième élément est constitué d'une entrée $(I_1, O_2)$ et d'une cible $O_3$. Alors le temps d'arrivé de $O_2$ sera encodé localement $TOA(O_2) - TOA(I_1)$ et le temps d'arrivé de $O_3$ sera encodé $TOA(O_3) - TOA(I_1)$.
+Par exemple dans le cadre de la séquence dépliée liée à \ref{tab:seqfusion}, le troisième élément est constitué d'une entrée $(I_1, O_2)$ et d'une cible $O_3$. Alors le temps d'arrivé de $O_2$ sera encodé localement $TOA(O_2) - TOA(I_1)$ et le temps d'arrivé de $O_3$ sera encodé $TOA(O_3) - TOA(I_1)$.
 \end{itemize}
 
 \subsubsection{Gestion des masques et exemple de dépliage}
-Outre les valeurs, la structure du dépliage nécessite la gestion de plusieurs masques pour piloter l'apprentissage supervisé et le calcul de la fonction de coût :
+Comme abordé précédemment, l'approche flux-à-flux nécessite la gestion de plusieurs masques pour piloter l'apprentissage supervisé et le calcul de la fonction de coût.
 \begin{itemize}
-\item MI (Mask Input) : Indique si l'entrée secondaire (Input 2) est le jeton spécial \texttt{NEXT} (1) ou une PDW valide (0).
-\item MO (Mask Output) : Indique si la cible attendue est le jeton \texttt{NEXT} (1) ou une PDW valide (0).
-\item MP (Mask Padding) : Indique si la position est valide (1) ou si elle relève du remplissage (padding) de fin de batch (0).
+\item MI (Mask Input) : Indique si l'entrée secondaire (Input 2) est le jeton \texttt{NEXT} (1) ou un PDW (0). Ce masque est fourni au modèle pour qu'il remplace sa deuxième entrée (Input 2) par un vecteur latent appris qu'il stock en interne, représentant le rôle du jeton \texttt{NEXT} si ce n'est pas un PDW.
+\item MO (Mask Output) : Indique si la cible attendue est le jeton \texttt{NEXT} (1) ou une PDW valide (0). Ce masque est utilisé pour l'apprentissage, afin de pouvoir séparer le calcul de l'erreur sur les positions où on attend un PDW (calcule d'une erreur de reconstruction) des positions où l'on attend la détection de la fin des émissions et le passage au PDW incident suivant (calcule d'une erreur de classification).
+\item MP (Mask Padding) : Indique si la position est valide (1) ou si elle relève du remplissage (padding) de fin de batch (0). Ce masque est utilisé pour l'apprentissage, afin de simplement ignorer les sorties du modèle sur ces positions, où il n'aurait pas du être interrogé en inférence.\\
 \end{itemize}
-\: \\
 
-Pour illustrer ce mécanisme, considérons une séquence courte avec 2 impulsions incidentes ($I_1, I_2$) générant respectivement 1 et 0 impulsion de sortie ($O_1$). La séquence dépliée de longueur 4 se construit ainsi :
+Nous illustrons ce mécanisme dans le tableau \ref{tab:seqfusion} qui reprend l'exemple de la séquence fusionnée $[I_1, O_1, O_2, O_3, I_2, I_3, O_4, O_5]$ présentée plus tôt \ref{eq:seqfusion} . Ce tableau présente pour chaque pas de temps (les prédictions itératives réalisées par le modèle) la réponse attendu du modèle ainsi que la valeur de chaque masque. 
 
 \begin{table}[h]
 \centering
-\begin{tabular}{|l|c|c|c|c|}
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|}
 \hline
-\textbf{Pas de temps} & \textbf{t=1} & \textbf{t=2} & \textbf{t=3} & \textbf{t=4} \\
+\textbf{Pas de temps} & \textbf{t=0} & \textbf{t=1} & \textbf{t=2} & \textbf{t=3} & \textbf{t=4} & \textbf{t=5} & \textbf{t=6} & \textbf{t=7} & \textbf{t=8} & \textbf{t=9}\\
 \hline
-\textbf{Input 1} ($PDW_{in}$) & $I_1$ & $I_1$ & $I_2$ & Pad \\
+\textbf{Input 1} ($PDW_{in}$) & $I_1$ & $I_1$ & $I_1$ & $I_1$ & $I_2$ &$I_3$ & $I_3$&$I_3$ & Pad & Pad\\
 \hline
-\textbf{Input 2} (Contexte) & \texttt{NEXT} & $O_1$ & \texttt{NEXT} & Pad \\
+\textbf{Input 2} (Contexte) & \texttt{NEXT}& $O_1$ & $O_2$ & $O_3$ & \texttt{NEXT} & \texttt{NEXT}& $O_4$  & $O_5$ & Pad & Pad\\
 \hline
-\textbf{Target} (Sortie) & $O_1$ & \texttt{NEXT} & \texttt{NEXT} & Pad \\
+\textbf{Target} (Sortie) & $O_1$ & $O_2$ & $O_3$ & \texttt{NEXT} & \texttt{NEXT}& $O_4$  & $O_5$ & \texttt{NEXT} & Pad & Pad\\
 \hline
 \hline
-\textbf{MI} (Input 2 is Next) & 1 & 0 & 1 & 0 \\
+\textbf{MI} (Input 2 is Next) & 1 & 0 & 0 & 0 & 1& 1& 0& 0& -& -\\
 \hline
-\textbf{MO} (Target is Next) & 0 & 1 & 1 & 0 \\
+\textbf{MO} (Target is Next) & 0 & 0 & 0 & 1& 1& 0& 0& 1& -& -\\
 \hline
-\textbf{MP} (Valid) & 1 & 1 & 1 & 0 \\
+\textbf{MP} (Valid) & 1 & 1 & 1 & 1 & 1& 1& 1& 1& 0&0\\
 \hline
 \end{tabular}
-\caption{Exemple de construction des données et des masques pour une séquence courte dépliée.}
-\label{tab:unfolding_example}
+\caption{Compilation de l'ensemble des données (entrées, sortie, masques) qui permettent de superviser l'entrainement d'un modèle. Dans cet exemple, la séquence fusionnée \ref{eq:seqfusion} est de longueur 8 mais est prolongée jusqu'à 10, ce qui correspond à l'étape d'uniformisation des longueurs des séquences permettant un entrainement en parallèle de nos modèles.}
+\label{tab:seqfusion}
 \end{table}
 
-
 \section{Validation de l'approche sur architectures récurrentes}
-Dans cette section, nous présentons les résultats publiés lors de la conférence CAID. Cet article démontre que pour la modélisation du traitement radar, l'approche "flux-à-flux" (ici désignée par le terme Forecasting) est particulièrement pertinente pour capturer la causalité temporelle du système. L'étude établit également quelle variante d'architecture récurrente offre le meilleur compromis entre mémoire et stabilité dans ce contexte.
-Cette section se concentre exclusivement sur les résultats obtenus en mode "prévision" (forecasting), qui correspond à la configuration opérationnelle cible. Nous omettrons ici la description détaillée de la transformation des données (le dépliage en séquences d'événements) ainsi que la métrique spécifique utilisée pour l'optimisation. Ces éléments méthodologiques sont détaillés dans l'article et une transformation analogue sera exposée en détail dans la section suivante consacrée aux extensions de ces travaux. La fonction de coût utilisée ici est comparable à l'équation (4) présentée précédemment, où le terme de normalisation est calculé sur la séquence événementielle dépliée.
+Dans cette section, nous présentons les résultats publiés lors de la conférence CAID. Cet article démontre que pour la modélisation du traitement radar, l'approche "flux-à-flux" (ici désignée par le terme Forecasting) est particulièrement pertinente pour capturer la causalité temporelle du système. L'étude établit également quelle variante d'architecture récurrente offre les meilleures performances.
+Cette section se concentre exclusivement sur les résultats obtenus en mode "prévision" (forecasting), qui correspond à la configuration opérationnelle cible. Nous omettrons ici la description des métriques spécifiques utilisées pour l'optimisation car elles sont détaillés dans l'article et sont très proches des métriques développés dans la section suivante \ref{seq:metrique} consacrée aux extensions de ces travaux à d'autres architectures. 
+
 \subsection{Les architectures}
-Afin d'identifier la structure la plus adaptée, nous avons évalué un panel d'architectures récurrentes classiques. Ce choix est motivé par la nature séquentielle et causale du problème, où chaque prédiction dépend de l'historique des états internes. Les modèles comparés sont les suivants :
-\begin{itemize} \item \textbf{RNN (Vanilla Recurrent Neural Network)} : Il constitue l'architecture de référence la plus simple. Bien que théoriquement capable de traiter des séquences, il souffre notoirement du problème de disparition du gradient, limitant sa capacité à retenir l'information sur de longues périodes. \item \textbf{LSTM (Long Short-Term Memory)} : Cette architecture introduit des portes logiques (entrée, oubli, sortie) pour réguler le flux d'information. Elle est conçue spécifiquement pour capturer les dépendances à long terme qui échappent aux RNN simples. \item \textbf{GRU (Gated Recurrent Unit)} : Variante simplifiée du LSTM, le GRU fusionne certaines portes pour réduire le nombre de paramètres tout en conservant une capacité de mémoire comparable. Il offre souvent une convergence plus rapide et une meilleure stabilité numérique. \item \textbf{LSTMAT (LSTM + Attention Additive)} : Il s'agit d'un décodeur LSTM augmenté d'un mécanisme d'attention de type Bahdanau. À chaque pas de temps, le modèle calcule un score additif pour pondérer l'importance des états cachés passés, permettant de "relire" l'historique pertinent. \item \textbf{LSTMAT-L (LSTM + Attention de Luong)} : Cette variante utilise un mécanisme d'attention bilinéaire (produit scalaire généralisé). Plus efficace calculatoirement, cette formulation tend à mieux passer l'échelle sur les longues séquences en offrant des gradients plus nets lors de l'alignement temporel. \end{itemize}
+Afin d'identifier la structure la plus adaptée, nous avons évalué un panel d'architectures récurrentes classiques. 
+Ce choix est motivé par la correspondance entre la nature causale et itérative des architectures récurrentes et le fonctionnement itératif du DCI. Les modèles comparés sont les suivants :
+
+\begin{itemize} 
+\item \textbf{RNN (Vanilla Recurrent Neural Network)} : Il constitue l'architecture de référence la plus simple. Bien que théoriquement capable de traiter des séquences, il souffre notoirement du problème de disparition du gradient, limitant sa capacité à retenir l'information sur de longues périodes. 
+\item \textbf{LSTM (Long Short-Term Memory)} : Cette architecture introduit des portes logiques (entrée, oubli, sortie) pour réguler le flux d'information. Elle est conçue spécifiquement pour capturer les dépendances à long terme qui échappent aux RNN simples. 
+\item \textbf{GRU (Gated Recurrent Unit)} : Variante simplifiée du LSTM, le GRU fusionne certaines portes pour réduire le nombre de paramètres tout en conservant une capacité de mémoire comparable. Il offre souvent une convergence plus rapide et une meilleure stabilité numérique. 
+\item \textbf{LSTMAT (LSTM + Attention Additive)} : Il s'agit d'un décodeur LSTM augmenté d'un mécanisme d'attention de type Bahdanau. À chaque pas de temps, le modèle calcule un score additif pour pondérer l'importance des états cachés passés, permettant de "relire" l'historique pertinent. 
+\item \textbf{LSTMAT-L (LSTM + Attention de Luong)} : Cette variante utilise un mécanisme d'attention scalaire, réputée plus efficace calculatoirement et mieux adaptée aux séquences longues. 
+\end{itemize}
+
+Quelque soit le modèle, son architecture général est identique et reprend l'architecture canonique des réseaux de neurones récurrents \ref{RNN base} présentée dans le chapitre \ref{chap:SOTA}. C'est le bloc réalisant la propagation de la mémoire et sa mise-à-jour qui distinguera les modèles. La figure \ref{fig:compareRNN} propose une comparaison de ces trois blocs élémentaires.
+
+\begin{figure}[htbp]
+\begin{center} 
+\includegraphics[scale=0.35]{compareRNN.png}
+\end{center}
+\caption{Représentation du cœur des trois principales architectures comparées. Chaque architecure dispose d'une mémoire latente $h_t$ qu'elle met à jour à partir d'une entrée courante $x_t$ et qu'elle peut exploiter pour produire une prédiction.}
+\label{fig:compareRNN}
+\end{figure}
+
 \subsection{Résultats expérimentaux}
 L'évaluation concerne ici uniquement la configuration Forecasting, où le modèle ne dispose d'aucun accès au futur et génère les impulsions de manière purement causale.
-Afin de garantir une comparaison équitable, chaque architecture a fait l'objet une optimisation rigoureuse de ses hyper-paramètres via un algorithme bayésien (TPE via Optuna). Cette étape a permis de s'assurer que les écarts de performance observés sont structurels et non liés à un mauvais réglage. La table ci-dessous résume la configuration géométrique optimale (nombre de couches $L$ et dimension latente $H$) retenue pour chaque modèle à l'issue de cette optimisation:
+Afin de garantir une comparaison équitable, chaque architecture a fait l'objet une optimisation rigoureuse de ses hyper-paramètres. Cette étape a permis de s'assurer que les écarts de performance observés sont structurels et non liés à un mauvais réglage. Le tableau \ref{tab:hypRNN} résume la configuration géométrique optimale (nombre de couches $L$ et dimension latente $H$) retenue pour chaque modèle à l'issue de cette optimisation.\\
+
 \begin{table}[h]
 \centering
 \begin{tabular}{l c c}
@@ -177,7 +196,9 @@ LSTMAT-L (Luong) & 768 & 6 \\
 \hline
 \end{tabular}
 \caption{Configurations optimales des architectures évaluées (issues de l'annexe de l'article [ref]).}
+\label{tab:hypRNN}
 \end{table}
+
 Les entraînements ont été réalisés sur des ensembles de données synthétiques de 500 000 séquences, permettant de couvrir une grande diversité de scénarios d'interférence. La performance est mesurée par l'erreur quadratique moyenne normalisée (NRMSE) sur des horizons de prédiction croissants (10, 20 et 50 impulsions).
 
 \begin{table}[h] 
@@ -257,6 +278,7 @@ Dropout & 0.1 & 0.2 & 0.1 \\
 
 
 \subsection{Fonction de perte et métriques d'évaluation}
+\label{seq:metrique}
 L'apprentissage est guidé par une fonction de perte composite qui minimise simultanément l'erreur de reconstruction des PDW (régression) et l'erreur de détection du jeton \texttt{NEXT} (classification). Un coefficient $\lambda \in ]0; 1[$ permet de pondéré les deux facteurs $\mathcal{L}_{reg}$ et $\mathcal{L}_{class}$, qui sont définis dans la suite. La fonction de perte s'écrira alors :
 $$\mathcal{L}_{total} = (1 - \lambda)\mathcal{L}_{reg} + \lambda \mathcal{L}_{class}$$
 
