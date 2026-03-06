@@ -199,7 +199,9 @@ LSTMAT-L (Luong) & 768 & 6 \\
 \label{tab:hypRNN}
 \end{table}
 
-Les entraînements ont été réalisés sur des ensembles de données synthétiques de 500 000 séquences, permettant de couvrir une grande diversité de scénarios d'interférence. La performance est mesurée par l'erreur quadratique moyenne normalisée (NRMSE) sur des horizons de prédiction croissants (10, 20 et 50 impulsions).
+Les résultats finaux ont été obtenus après un entraînement réalisé sur un ensemble de données de 500 000 séquences et mesurent la performances des différents modèles par l'erreur de reconstruction normalisée \ref{eq:loss} sur des séquences de taille croissante (10, 20 et 50 impulsions). Avant d'observer ces résultats résumés dans le tableau \ref{tab:resRNN}, nous faisons un court rappel permettant d'appréhender le sens des valeurs numériques présentes dans le tableau.\\
+
+L'erreur de reconstruction étant normalisée, elle permet de donner un sens à une valeur numérique. Si l'erreur vaut $1$, cela signifie que le modèle ne parvient à trouver le moindre lien dans les données pour produire sortie pertinente. C'est la valeur qu'on obtient en mesurant l'erreur de reconstruction entre une séquence de PDW incidents et une séquence de PDW intercepté ne lui correspondant pas. Cette valeur est atteinte pendant l'entrainement après quelques itérations, comme nous pouvons l'observer sur la figure \ref{fig:errcurve}. En revanche, si l'erreur tombe sous cette valeur de référence, cela signifie que le modèle parvient à produire des prédictions "intelligentes" (en contradiction avec la prédiction "naïve" qui sert à la normalisation de l'erreur). C'est ce qu'on retrouve dans le tableau.
 
 \begin{table}[h] 
 \centering 
@@ -215,10 +217,15 @@ LSTMAT (Basic) & 0.1053 & 0.1757 & 0.1684 \\
 \hline 
 \end{tabular} 
 \caption{Comparaison des performances (NRMSE) en mode Forecasting en fonction de la longueur de la séquence.} 
+\label{tab:resRNN}
 \end{table}
 
-Les résultats mettent en évidence plusieurs dynamiques caractéristiques : \begin{itemize} \item Limite des modèles simples : Le RNN et le LSTM standard montrent leurs limites sur la durée. Si le LSTM est performant à court terme (0.1146), il décroche significativement sur les horizons longs (0.2001 à 50 impulsions), victime de dérive temporelle (drift). Le GRU offre une stabilité légèrement supérieure sur le long terme mais reste insuffisant. \item Apport de l'attention : L'ajout de mécanismes d'attention améliore la robustesse globale. La variante avec attention additive (LSTMAT) réduit l'erreur à long terme (0.1684). \item Supériorité de Luong : L'architecture LSTMAT-L se distingue nettement. Elle offre non seulement la meilleure précision sur les courts horizons (0.0744), mais maintient surtout une erreur stable ($\approx 0.15$) lorsque la séquence s'allonge. Cela confirme que la capacité à "requêter" précisément l'historique via une attention bilinéaire est cruciale pour maintenir la cohérence du flux radar sur la durée. \end{itemize}
-\subsection{Conclusion}
+Les résultats mettent en évidence plusieurs dynamiques caractéristiques : 
+\begin{itemize} 
+\item Limite des modèles simples : Le RNN et le LSTM standard montrent leurs limites sur la durée. Si le LSTM est performant à court terme (0.1146), il décroche significativement sur les horizons longs (0.2001 à 50 impulsions), victime de dérive temporelle (drift). Le GRU offre une stabilité légèrement supérieure sur le long terme mais reste insuffisant. 
+\item Apport de l'attention : L'ajout de mécanismes d'attention améliore la robustesse globale. La variante avec attention additive (LSTMAT) réduit l'erreur à long terme (0.1684). 
+\item Supériorité de Luong : L'architecture LSTMAT-L se distingue nettement. Elle offre non seulement la meilleure précision sur les courts horizons (0.0744), mais maintient surtout une erreur stable ($\approx 0.15$) lorsque la séquence s'allonge. Cela confirme que la capacité à "requêter" précisément l'historique via une attention bilinéaire est cruciale pour maintenir la cohérence du flux radar sur la durée. \end{itemize}
+
 Cette étude valide expérimentalement la pertinence de l'approche par flux (Forecasting) couplée à une architecture LSTM avec attention de Luong. Ces travaux, présentés sous forme de poster à la conférence CAID, ont reçu un accueil favorable, confirmant l'intérêt de la communauté pour des modèles neuronaux capables de reproduire la causalité fine des chaînes de traitement signal. Ces résultats constituent le socle sur lequel nous bâtissons les extensions présentées dans la section suivante.
 
 
@@ -292,6 +299,7 @@ Considérons un lot (batch) de $B$ séquences de longueur maximale $T$, où chaq
 
 Le terme au dénominateur assure que la perte est invariante à la taille du batch et au taux de remplissage (padding). Pour équilibrer l'apprentissage face à la diversité des séquences, nous utilisons la version pondérée par l'erreur de référence $\mathcal{L}_{ref}$ (calculée sur la séquence dépliée cible selon le protocole défini au chapitre précédent) :
 \begin{equation}
+\label{eq:loss}
 \mathcal{L}{reg} = \frac{\mathcal{L}{raw}}{\mathcal{L}_{ref}}
 \end{equation}
 
