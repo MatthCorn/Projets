@@ -123,18 +123,17 @@
 \contentsline {section}{\numberline {6.3}Validation de l'approche sur architectures récurrentes}{83}{section.6.3}%
 \contentsline {subsection}{\numberline {6.3.1}Les architectures}{83}{subsection.6.3.1}%
 \contentsline {subsection}{\numberline {6.3.2}Résultats expérimentaux}{84}{subsection.6.3.2}%
-\contentsline {subsection}{\numberline {6.3.3}Conclusion}{86}{subsection.6.3.3}%
 \contentsline {section}{\numberline {6.4}Extension des essais : Généralisation à d'autres architectures}{86}{section.6.4}%
-\contentsline {subsection}{\numberline {6.4.1}Sélection des architectures}{86}{subsection.6.4.1}%
-\contentsline {subsubsection}{\numberline {6.4.1.1}Le Transformer (Attention Mechanism)}{86}{subsubsection.6.4.1.1}%
-\contentsline {subsubsection}{\numberline {6.4.1.2}Le TCN (Temporal Convolutional Network)}{86}{subsubsection.6.4.1.2}%
+\contentsline {subsection}{\numberline {6.4.1}Sélection des architectures}{87}{subsection.6.4.1}%
+\contentsline {subsubsection}{\numberline {6.4.1.1}Le Transformer (Attention Mechanism)}{87}{subsubsection.6.4.1.1}%
+\contentsline {subsubsection}{\numberline {6.4.1.2}Le TCN (Temporal Convolutional Network)}{87}{subsubsection.6.4.1.2}%
 \contentsline {subsubsection}{\numberline {6.4.1.3}Le GRU (Recurrent Network)}{87}{subsubsection.6.4.1.3}%
 \contentsline {subsubsection}{\numberline {6.4.1.4}Structure commune et hyper-paramètres}{87}{subsubsection.6.4.1.4}%
-\contentsline {subsection}{\numberline {6.4.2}Fonction de perte et métriques d'évaluation}{87}{subsection.6.4.2}%
-\contentsline {subsubsection}{\numberline {6.4.2.1}Erreur de reconstruction pondérée ($\mathcal {L}_{reg}$)}{88}{subsubsection.6.4.2.1}%
-\contentsline {subsubsection}{\numberline {6.4.2.2}Erreur de classification par MCC différentiable ($\mathcal {L}_{class}$)}{88}{subsubsection.6.4.2.2}%
-\contentsline {subsection}{\numberline {6.4.3}Résultats et Analyse Comparative}{89}{subsection.6.4.3}%
-\contentsline {subsubsection}{\numberline {6.4.3.1}Performance globale et convergence}{89}{subsubsection.6.4.3.1}%
-\contentsline {subsubsection}{\numberline {6.4.3.2}Robustesse face à la longueur de séquence}{90}{subsubsection.6.4.3.2}%
+\contentsline {subsection}{\numberline {6.4.2}Fonction de perte et métriques d'évaluation}{88}{subsection.6.4.2}%
+\contentsline {subsubsection}{\numberline {6.4.2.1}Erreur de reconstruction pondérée ($\mathcal {L}_{reg}$)}{89}{subsubsection.6.4.2.1}%
+\contentsline {subsubsection}{\numberline {6.4.2.2}Erreur de classification par MCC différentiable ($\mathcal {L}_{class}$)}{89}{subsubsection.6.4.2.2}%
+\contentsline {subsection}{\numberline {6.4.3}Résultats et Analyse Comparative}{90}{subsection.6.4.3}%
+\contentsline {subsubsection}{\numberline {6.4.3.1}Performance globale et convergence}{90}{subsubsection.6.4.3.1}%
+\contentsline {subsubsection}{\numberline {6.4.3.2}Robustesse face à la longueur de séquence}{91}{subsubsection.6.4.3.2}%
 \contentsline {subsubsection}{\numberline {6.4.3.3}Analyse qualitative des générations}{91}{subsubsection.6.4.3.3}%
-\contentsline {subsection}{\numberline {6.4.4}Conclusion sur les extensions}{91}{subsection.6.4.4}%
+\contentsline {subsection}{\numberline {6.4.4}Conclusion sur les extensions}{92}{subsection.6.4.4}%

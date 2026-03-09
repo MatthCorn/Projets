@@ -5,8 +5,9 @@
 	"creator": "Simon Kornblith",
 	"target": "rdf",
 	"minVersion": "1.0.0b4.r1",
-	"maxVersion": "",
+	"maxVersion": null,
 	"priority": 25,
+	"inRepository": true,
 	"configOptions": {
 		"getCollections": "true",
 		"dataMode": "rdf/xml"
@@ -15,8 +16,7 @@
 		"exportNotes": true,
 		"exportFileData": false
 	},
-	"inRepository": true,
-	"lastUpdated": "2021-01-25 06:49:57"
+	"lastUpdated": "2026-03-06 21:55:00"
 }
 
 var addedCollections = new Set();
@@ -348,9 +348,9 @@ function generateItem(item, zoteroType, resource) {
 	// relative file path for attachment items
 	if (item.defaultPath) {	// For Zotero 3.0
 		item.saveFile(item.defaultPath, true);
-		Zotero.RDF.addStatement(resource, rdf+"resource", item.defaultPath, false);
+		Zotero.RDF.addStatement(resource, n.z+"path", item.defaultPath, false);
 	} else if (item.path) {	// For Zotero 2.1
-		Zotero.RDF.addStatement(resource, rdf+"resource", item.path, false);
+		Zotero.RDF.addStatement(resource, n.z+"path", item.path, false);
 	}
     
 	// Related items and tags
@@ -581,3 +581,8 @@ function doExport() {
 		generateCollection(collection);
 	}
 }
+
+/** BEGIN TEST CASES **/
+var testCases = [
+]
+/** END TEST CASES **/

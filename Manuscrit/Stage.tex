@@ -141,9 +141,9 @@ Nous illustrons ce mécanisme dans le tableau \ref{tab:seqfusion} qui reprend l'
 \textbf{Target} (Sortie) & $O_1$ & $O_2$ & $O_3$ & \texttt{NEXT} & \texttt{NEXT}& $O_4$  & $O_5$ & \texttt{NEXT} & Pad & Pad\\
 \hline
 \hline
-\textbf{MI} (Input 2 is Next) & 1 & 0 & 0 & 0 & 1& 1& 0& 0& -& -\\
+\textbf{MI} (Input 2 is Next) & 1 & 0 & 0 & 0 & 1& 1& 0& 0& Pad & Pad\\
 \hline
-\textbf{MO} (Target is Next) & 0 & 0 & 0 & 1& 1& 0& 0& 1& -& -\\
+\textbf{MO} (Target is Next) & 0 & 0 & 0 & 1& 1& 0& 0& 1& Pad & Pad\\
 \hline
 \textbf{MP} (Valid) & 1 & 1 & 1 & 1 & 1& 1& 1& 1& 0&0\\
 \hline
@@ -153,7 +153,7 @@ Nous illustrons ce mécanisme dans le tableau \ref{tab:seqfusion} qui reprend l'
 \end{table}
 
 \section{Validation de l'approche sur architectures récurrentes}
-Dans cette section, nous présentons les résultats publiés lors de la conférence CAID. Cet article démontre que pour la modélisation du traitement radar, l'approche "flux-à-flux" (ici désignée par le terme Forecasting) est particulièrement pertinente pour capturer la causalité temporelle du système. L'étude établit également quelle variante d'architecture récurrente offre les meilleures performances.
+Dans cette section, nous présentons les résultats publiés lors de la conférence CAID \textcolor{red}{REF}. Cet article démontre que pour la modélisation du traitement radar, l'approche "flux-à-flux" (ici désignée par le terme Forecasting) est particulièrement pertinente pour capturer la causalité temporelle du système. L'étude établit également quelle variante d'architecture récurrente offre les meilleures performances.
 Cette section se concentre exclusivement sur les résultats obtenus en mode "prévision" (forecasting), qui correspond à la configuration opérationnelle cible. Nous omettrons ici la description des métriques spécifiques utilisées pour l'optimisation car elles sont détaillés dans l'article et sont très proches des métriques développés dans la section suivante \ref{seq:metrique} consacrée aux extensions de ces travaux à d'autres architectures. 
 
 \subsection{Les architectures}
@@ -165,7 +165,7 @@ Ce choix est motivé par la correspondance entre la nature causale et itérative
 \item \textbf{LSTM (Long Short-Term Memory)} : Cette architecture introduit des portes logiques (entrée, oubli, sortie) pour réguler le flux d'information. Elle est conçue spécifiquement pour capturer les dépendances à long terme qui échappent aux RNN simples. 
 \item \textbf{GRU (Gated Recurrent Unit)} : Variante simplifiée du LSTM, le GRU fusionne certaines portes pour réduire le nombre de paramètres tout en conservant une capacité de mémoire comparable. Il offre souvent une convergence plus rapide et une meilleure stabilité numérique. 
 \item \textbf{LSTMAT (LSTM + Attention Additive)} : Il s'agit d'un décodeur LSTM augmenté d'un mécanisme d'attention de type Bahdanau. À chaque pas de temps, le modèle calcule un score additif pour pondérer l'importance des états cachés passés, permettant de "relire" l'historique pertinent. 
-\item \textbf{LSTMAT-L (LSTM + Attention de Luong)} : Cette variante utilise un mécanisme d'attention scalaire, réputée plus efficace calculatoirement et mieux adaptée aux séquences longues. 
+\item \textbf{LSTMAT-L (LSTM + Attention de Luong)} : Cette variante utilise un mécanisme d'attention scalaire, réputée plus efficace calculatoirement et mieux adaptée aux séquences longues. \\
 \end{itemize}
 
 Quelque soit le modèle, son architecture général est identique et reprend l'architecture canonique des réseaux de neurones récurrents \ref{RNN base} présentée dans le chapitre \ref{chap:SOTA}. C'est le bloc réalisant la propagation de la mémoire et sa mise-à-jour qui distinguera les modèles. La figure \ref{fig:compareRNN} propose une comparaison de ces trois blocs élémentaires.
@@ -179,8 +179,8 @@ Quelque soit le modèle, son architecture général est identique et reprend l'a
 \end{figure}
 
 \subsection{Résultats expérimentaux}
-L'évaluation concerne ici uniquement la configuration Forecasting, où le modèle ne dispose d'aucun accès au futur et génère les impulsions de manière purement causale.
-Afin de garantir une comparaison équitable, chaque architecture a fait l'objet une optimisation rigoureuse de ses hyper-paramètres. Cette étape a permis de s'assurer que les écarts de performance observés sont structurels et non liés à un mauvais réglage. Le tableau \ref{tab:hypRNN} résume la configuration géométrique optimale (nombre de couches $L$ et dimension latente $H$) retenue pour chaque modèle à l'issue de cette optimisation.\\
+L'évaluation concerne ici uniquement la configuration \textit{Forecasting}, où le modèle ne dispose d'aucun accès au futur et génère les impulsions de manière purement causale.
+Afin de garantir une comparaison équitable, chaque architecture a fait l'objet d'une optimisation de ses hyper-paramètres. Cette étape a permis de s'assurer que les écarts de performance observés sont structurels et non liés à un mauvais hyper-paramétrage. Le tableau \ref{tab:hypRNN} résume la configuration (nombre de couches $L$ et dimension latente $H$) retenue pour chaque modèle à l'issue de cette optimisation.\\
 
 \begin{table}[h]
 \centering
@@ -195,13 +195,13 @@ LSTMAT (Basic) & 768 & 4 \\
 LSTMAT-L (Luong) & 768 & 6 \\
 \hline
 \end{tabular}
-\caption{Configurations optimales des architectures évaluées (issues de l'annexe de l'article [ref]).}
+\caption{Configurations optimales des architectures évaluées.}
 \label{tab:hypRNN}
 \end{table}
 
-Les résultats finaux ont été obtenus après un entraînement réalisé sur un ensemble de données de 500 000 séquences et mesurent la performances des différents modèles par l'erreur de reconstruction normalisée \ref{eq:loss} sur des séquences de taille croissante (10, 20 et 50 impulsions). Avant d'observer ces résultats résumés dans le tableau \ref{tab:resRNN}, nous faisons un court rappel permettant d'appréhender le sens des valeurs numériques présentes dans le tableau.\\
+Les résultats finaux ont été obtenus après un entraînement réalisé sur un ensemble de 500 000 séquences et mesurent la performances des différents modèles par l'erreur de reconstruction normalisée \ref{eq:loss} sur des séquences de taille croissante (10, 20 et 50 impulsions). Avant d'observer ces résultats résumés dans le tableau \ref{tab:resRNN}, nous faisons un court rappel permettant d'appréhender le sens des valeurs numériques présentes dans le tableau.\\
 
-L'erreur de reconstruction étant normalisée, elle permet de donner un sens à une valeur numérique. Si l'erreur vaut $1$, cela signifie que le modèle ne parvient à trouver le moindre lien dans les données pour produire sortie pertinente. C'est la valeur qu'on obtient en mesurant l'erreur de reconstruction entre une séquence de PDW incidents et une séquence de PDW intercepté ne lui correspondant pas. Cette valeur est atteinte pendant l'entrainement après quelques itérations, comme nous pouvons l'observer sur la figure \ref{fig:errcurve}. En revanche, si l'erreur tombe sous cette valeur de référence, cela signifie que le modèle parvient à produire des prédictions "intelligentes" (en contradiction avec la prédiction "naïve" qui sert à la normalisation de l'erreur). C'est ce qu'on retrouve dans le tableau.
+Afin d'interpréter correctement les résultats du Tableau \ref{tab:resRNN}, il convient de préciser le comportement de cette métrique. La normalisation de l'erreur de reconstruction fournit un repère quantitatif absolu : par construction, une erreur de $1$ correspond à la performance d'un prédicteur naïf (qui prédit par exemple toujours la même séquence quelque soit la séquence de PDW incidents). C'est la valeur qu'on obtient en mesurant l'erreur de reconstruction entre une séquence de PDW incidents et une séquence de PDW intercepté ne lui correspondant pas. Ce seuil de référence est typiquement observé lors des toutes premières itérations de l'entraînement. En revanche, une erreur strictement inférieure à $1$ signifie que le modèle a dépassé ce niveau de base et a réussi à capturer la logique sous-jacente des données. Dans le tableau \ref{tab:resRNN}, l'ensemble de nos modèles atteint des scores significativement inférieurs à cette unité de référence, confirmant leur aptitude à modéliser mathématiquement le problème de transduction.\\
 
 \begin{table}[h] 
 \centering 
@@ -220,18 +220,20 @@ LSTMAT (Basic) & 0.1053 & 0.1757 & 0.1684 \\
 \label{tab:resRNN}
 \end{table}
 
-Les résultats mettent en évidence plusieurs dynamiques caractéristiques : 
-\begin{itemize} 
-\item Limite des modèles simples : Le RNN et le LSTM standard montrent leurs limites sur la durée. Si le LSTM est performant à court terme (0.1146), il décroche significativement sur les horizons longs (0.2001 à 50 impulsions), victime de dérive temporelle (drift). Le GRU offre une stabilité légèrement supérieure sur le long terme mais reste insuffisant. 
-\item Apport de l'attention : L'ajout de mécanismes d'attention améliore la robustesse globale. La variante avec attention additive (LSTMAT) réduit l'erreur à long terme (0.1684). 
-\item Supériorité de Luong : L'architecture LSTMAT-L se distingue nettement. Elle offre non seulement la meilleure précision sur les courts horizons (0.0744), mais maintient surtout une erreur stable ($\approx 0.15$) lorsque la séquence s'allonge. Cela confirme que la capacité à "requêter" précisément l'historique via une attention bilinéaire est cruciale pour maintenir la cohérence du flux radar sur la durée. \end{itemize}
+En complément de cette évaluation quantitative, la figure \ref{fig:RNNgen} illustre les capacités génératives du modèle de manière qualitative. Cette représentation permet la comparaison des séquences incidente (à gauche), cible (au milieu) et générée par le modèle (à droite). Nous pouvons alors distinguer dans la séquence générée les même artefacts que ceux de la séquence cible (encadrés en vert), prouvant la pertinence de cette approche pour l'apprentissage automatique, mais aussi la faculté du modèle à comprendre et reproduire le traitement du DCI.\\
 
-Cette étude valide expérimentalement la pertinence de l'approche par flux (Forecasting) couplée à une architecture LSTM avec attention de Luong. Ces travaux, présentés sous forme de poster à la conférence CAID, ont reçu un accueil favorable, confirmant l'intérêt de la communauté pour des modèles neuronaux capables de reproduire la causalité fine des chaînes de traitement signal. Ces résultats constituent le socle sur lequel nous bâtissons les extensions présentées dans la section suivante.
+\begin{figure}
+\begin{center} 
+\includegraphics[scale=0.5]{genRNN.png}
+\end{center}
+\caption{Comparaison qualitative de séquences incidentes (gauche), cible (milieu), prédite par le modèle (droite). La séquence source est composée de 50 PDW. Le modèle utilisé pour prédire la séquence est le LSTMAT-L. Les encadrés verts permettent d'observer la capacité de notre modèle à reproduire les artefacts propre au traitement du DCI \ref{fig:IOex}}
+\label{fig:RNNgen}
+\end{figure}
 
+Cette étude valide expérimentalement la pertinence de l'approche flux-à-flux couplée à une architecture récurrente. La très faible variation de l'erreur observée entre 20 et 50 PDW, proche de 0, confirme que notre approche permet de passer à l'échelle sur de plus longues séquences. De plus, l'invariance de la tâche itérative à réaliser sur le traitement du flux assure que le modèle ne nécessite pas d'un entrainement supplémentaire pour traiter ces longues séquences. Ces travaux, présentés sous forme de poster à la conférence CAID \textcolor{red}{REF}, ont reçu un accueil favorable, confirmant l'intérêt de la communauté pour des modèles neuronaux capables de reproduire la causalité fine des chaînes de traitement signal. Ces résultats constituent le socle sur lequel nous bâtissons les extensions présentées dans la section suivante.
 
 \section{Extension des essais : Généralisation à d'autres architectures}
-Cette section étend la discussion sur la pertinence du dépliage des données initiée avec les travaux présentés à la conférence CAID [ref]. Si l'étude précédente se concentrait sur les architectures récurrentes, nous avons constaté que cette nouvelle formulation du problème permet en réalité l'utilisation de toute architecture de traitement de séquence, à condition qu'elle opère de manière auto-régressive et respecte donc la contrainte de causalité.
-Nous réitérons les expériences en introduisant deux nouvelles familles d'architectures : les Réseaux Convolutifs et les Transformers. \\
+Cette section étend la discussion sur la pertinence du dépliage des données initiée avec les travaux présentés à la conférence CAID \textcolor{red}{REF}. En effet, cette nouvelle formulation flux-à-flux du problème permet en réalité l'utilisation de toutes architectures de traitement de séquence, au delà des architectures récurrentes, à condition qu'elles opèrent de manière auto-régressive et respectent donc la contrainte de causalité. Nous réitérons les expériences en introduisant deux nouvelles familles d'architectures : les Réseaux Convolutifs et les Transformers. Bien qu'elles ne disposent pas de mémoire, ces architectures peuvent accéder aux derniers éléments passées pour en construire une représentation latent, jouant un rôle similaire à la mémoire. \\
 
 Nous détaillons ici les adaptations nécessaires au pré-traitement des données pour maximiser l'efficacité de ces modèles, la sélection des architectures, ainsi que les métriques spécifiques définies pour guider l'apprentissage, avant de présenter les résultats et nos conclusions.
 
@@ -239,10 +241,34 @@ Nous détaillons ici les adaptations nécessaires au pré-traitement des donnée
 Nous comparons trois architectures distinctes, choisies pour leur représentativité des différents paradigmes de traitement séquentiel.
 
 \subsubsection{Le Transformer (Attention Mechanism)}
-Le modèle utilisé est un Encodeur Transformer modifié, inspiré de l'architecture "Attention Is All You Need" [Vaswani et al., 2017]. Contrairement à l'encodeur standard qui voit tout le contexte, notre encodeur remplace les modules de Self-Attention [ref] par un module de Masked Self-Attention [ref] pour garantir la causalité. Cette architecture est particulièrement adaptée pour capturer des dépendances complexes et non-locales dans la séquence dépliée.
+Le modèle utilisé est un Encodeur Transformer modifié, inspiré de l'architecture proposé par Vaswani \cite{vaswani_attention_2017}. Contrairement à l'encodeur standard qui voit tout le contexte, notre encodeur remplace les modules de Self-Attention \ref{MHAeq} par un module de Masked Self-Attention \ref{maskedattention} pour garantir la causalité. Cette architecture est particulièrement adaptée pour capturer des dépendances complexes et non-locales dans la séquence dépliée. Elle est illustrée dans la figure \ref{fig:linTrans}.
+
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.4]{enc_transformer_lin.png}
+\end{center}
+\caption{Illustration de l'architecture Transformer utilisé pour le traitement flux-à-flux, où l'auto-attention de référence \ref{encoder transformer} est remplacée par de l'auto-attention masquée.}
+\label{fig:linTrans}
+\end{figure}
 
 \subsubsection{Le TCN (Temporal Convolutional Network)}
-Le TCN (Temporal Convolutional Network) est une architecture convolutionnelle adaptée aux séquences. Contrairement aux RNNs, il traite l'information en parallèle via des convolutions causales dilatées. Cette architecture est introduite pour évaluer si une modélisation hiérarchique locale, à champ réceptif fixe mais large, est plus efficace qu'une mémoire récurrente pour capturer la dynamique événementielle du DCI.
+
+Le TCN (Temporal Convolutional Network, \cite{bai_empirical_2018}) est une architecture convolutionnelle spécifiquement adaptée aux séquences unidimensionnelles. Contrairement aux réseaux récurrents (RNN), il traite l'information de manière massivement parallèle via des convolutions causales dilatées. Ces convolutions se définissent par l'application d'un filtre dont la portée s'étend de manière exponentielle avec la profondeur de la couche, sans pour autant augmenter le nombre de paramètres.\\
+
+Formellement, pour une séquence d'entrée $x$, l'opération de convolution causale dilatée est définie par la taille du noyau $m$ et le facteur de dilatation $d$. La sortie $F(k)$ à la position $k$ s'exprime par la somme pondérée suivante :
+$$F(k) = \sum_{j=0}^{m-1} w_j \cdot x_{k - d\cdot j}$$
+
+Dans l'architecture TCN, le facteur de dilatation croît exponentiellement avec la profondeur de la couche $i$, tel que $d = \alpha^i$ (avec typiquement $\alpha = 2$). La couche $i$ calcule ainsi son état en agrégeant des éléments distants de $d = \alpha^i$ pas de temps dans la couche inférieure, distance qui croît exponentiellement avec la profondeur de la couche. Pour la première couche ($i = 0$, soit $d = 1$), l'équation se réduit à la convolution causale canonique. La figure \ref{fig:TCN} illustre la croissance du champ récepteur et la compare à la convolution causale.\\
+
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.4]{TCN.png}
+\end{center}
+\caption{Comparaison structurelle des architectures convolutives unidimensionnelles. À gauche (a), une convolution causale standard où l'horizon d'interaction croît linéairement avec la profondeur. À droite (b), une convolution causale dilatée où le facteur de dilatation $d$ croît exponentiellement ($d=1, 2, 4$). Figure reproduite d'après \cite{bai_empirical_2018}.}
+\label{fig:TCN}
+\end{figure}
+
+Cette architecture s'est particulièrement distinguée dans la littérature en surpassant les modèles récurrents (LSTM, GRU) sur une vaste majorité de tâches standards de modélisation de séquences \cite{bai_empirical_2018}. Elle offre notamment une stabilité d'optimisation supérieure en s'affranchissant du problème de disparition du gradient inhérent aux longues boucles de récurrence, tout en réduisant considérablement les temps d'entraînement grâce à sa parallélisation totale. Dans le cadre de notre étude, l'introduction du TCN permet de tester une hypothèse structurelle fondamentale : il s'agit d'évaluer si une modélisation hiérarchique locale, dotée d'un champ récepteur fixe mais large, peut s'avérer plus efficace qu'une mémoire récurrente infinie pour capturer la dynamique algorithmique temporelle du DCI.
 
 \subsubsection{Le GRU (Recurrent Network)}
 Pour représenter la famille des réseaux récurrents, nous avons écarté les variantes à attention (LSTMAT) car leur mécanisme de "relecture" du passé les rapproche conceptuellement des Transformers, diluant l'intérêt de la comparaison "orthogonale". Au vu des résultats précédents [ref section précédente], nous retenons le GRU (Gated Recurrent Unit), qui s'est avéré être le compromis le plus performant et stable pour le traitement des longues séquences en mode déplié.
