@@ -130,6 +130,7 @@ Si l'on considère un prédicteur naïf générant en sortie $N$ répétitions d
 Pour corriger ce biais, nous définissons un facteur de normalisation par séquence, correspondant à cette erreur "naïve", qui permet d'uniformiser l'influence des séquences dans le gradient total :
 \begin{equation}
     \mathcal{L}_{ref}(\mathbf{Y}_k) = \frac{\| \mathbf{Y}_k - \mathbf{1}\boldsymbol{\mu}_k^\top \|_2}{\sqrt{N \cdot d}}
+\label{eq:Lref}
 \end{equation}
 
 La métrique pondérée, assurant une contribution équitable de chaque séquence au processus d'apprentissage, est alors définie par le ratio:

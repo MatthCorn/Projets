@@ -174,7 +174,7 @@ Quelque soit le modèle, son architecture général est identique et reprend l'a
 \begin{center} 
 \includegraphics[scale=0.35]{compareRNN.png}
 \end{center}
-\caption{Représentation du cœur des trois principales architectures comparées. Chaque architecure dispose d'une mémoire latente $h_t$ qu'elle met à jour à partir d'une entrée courante $x_t$ et qu'elle peut exploiter pour produire une prédiction.}
+\caption{Représentation du cœur des trois principales architectures comparées. Chaque architecure dispose d'une mémoire latente $h_t$ qu'elle met à jour à partir d'une entrée courante $x_t$ et qu'elle peut exploiter pour produire une prédiction. source : \textit{https://colah.github.io/posts/2015-08-Understanding-LSTMs/}}
 \label{fig:compareRNN}
 \end{figure}
 
@@ -262,7 +262,7 @@ Dans l'architecture TCN, le facteur de dilatation croît exponentiellement avec 
 
 \begin{figure}
 \begin{center}
-\includegraphics[scale=0.4]{TCN.png}
+\includegraphics[scale=0.35]{TCN.png}
 \end{center}
 \caption{Comparaison structurelle des architectures convolutives unidimensionnelles. À gauche (a), une convolution causale standard où l'horizon d'interaction croît linéairement avec la profondeur. À droite (b), une convolution causale dilatée où le facteur de dilatation $d$ croît exponentiellement ($d=1, 2, 4$). Figure reproduite d'après \cite{bai_empirical_2018}.}
 \label{fig:TCN}
@@ -295,9 +295,9 @@ Mise à part le corps du modèle, qui constitue le module de traitement de séqu
 
 \begin{figure}
 \begin{center}
-\includegraphics[scale=0.4]{LinProcess.png}
+\includegraphics[scale=0.55]{LinProcess.png}
 \end{center}
-\caption{Comparaison structurelle des architectures convolutives unidimensionnelles. À gauche (a), une convolution causale standard où l'horizon d'interaction croît linéairement avec la profondeur. À droite (b), une convolution causale dilatée où le facteur de dilatation $d$ croît exponentiellement ($d=1, 2, 4$). Figure reproduite d'après \cite{bai_empirical_2018}.}
+\caption{Schéma des structures neuronales qui précèdent (à gauche) et succèdent (à droite) le cœur du modèle (constitué soit d'une GRU, TCN ou Transformer). Les opérations réalisés dans ces modules sont appliquées aux éléments indépendamment, contrairement au cœur du modèle qui constitue le module du traitement de séquence. La séquence prise pour exemple correspond à la séquence \ref{tab:seqfusion}.}
 \label{fig:LinProcess}
 \end{figure}
 
@@ -323,27 +323,50 @@ Nombre de paramètres & 1/5040696 & 1/4967712 & 1/5066712 \\
 
 \subsection{Fonction de perte et métriques d'évaluation}
 \label{seq:metrique}
-L'apprentissage est guidé par une fonction de perte composite qui minimise simultanément l'erreur de reconstruction des PDW (régression) et l'erreur de détection du jeton \texttt{NEXT} (classification). Un coefficient $\lambda \in ]0; 1[$ permet de pondéré les deux facteurs $\mathcal{L}_{reg}$ et $\mathcal{L}_{class}$, qui sont définis dans la suite. La fonction de perte s'écrira alors :
-$$\mathcal{L}_{total} = (1 - \lambda)\mathcal{L}_{reg} + \lambda \mathcal{L}_{class}$$
+L'apprentissage est guidé par une fonction de perte composite qui minimise simultanément l'erreur de reconstruction des PDW $\mathcal{L}_{rec}$ et l'erreur de détection du jeton \texttt{NEXT} (classification) $\mathcal{L}_{class}$. Un coefficient $\lambda \in ]0; 1[$ permet de pondéré ces deux facteurs, définissant la fonction de perte qui s'écrit alors :
+$$\mathcal{L}_{total} = (1 - \lambda)\mathcal{L}_{rec} + \lambda \mathcal{L}_{class}$$
 
 \subsubsection{Erreur de reconstruction pondérée ($\mathcal{L}_{reg}$)}
 Cette composante évalue la qualité des caractéristiques prédites, mais uniquement pour les positions correspondant à une impulsion valide. Elle ignore donc les positions de padding ($MP=0$) ainsi que les positions où le jeton \texttt{NEXT} est attendu ($MO=1$).\\
 
-Considérons un lot (batch) de $B$ séquences de longueur maximale $T$, où chaque impulsion est un vecteur de dimension $D$. L'ensemble des séquences cibles $\mathbf{Y}$ comme l'ensemble des séquences prédites $\hat{\mathbf{Y}}$ peuvent être considéré comme des tenseurs de dimension $B \times T \times D$. Les masques peuvent eux être associés à des tenseurs de dimensions $B \times T$. L'erreur brute est définie comme une distance euclidienne (RMSE), normalisée par le nombre total d'éléments scalaires valides dans le lot. Elle s'écrit :
+Considérons un lot (batch) de $B$ séquences de longueur maximale $T$, où chaque impulsion est un vecteur de dimension $D$. L'ensemble des séquences cibles $\mathbf{Y}$ comme l'ensemble des séquences prédites $\hat{\mathbf{Y}}$ peuvent être considéré comme des tenseurs de dimension $B \times T \times D$. Les masques peuvent eux être associés à des tenseurs de dimensions $B \times T$, naturellement étendu en tenseur de taille $B \times T \times D$ pour les opérations élément par élément tel que la multiplication de Hadamard $\odot$. L'erreur brute est définie comme une distance euclidienne (RMSE) entre une prédiction $\hat{\mathbf{Y}}_k$ et une cible $\mathbf{Y}_k$, normalisée par le nombre total d'éléments scalaires à la fois valides, défini par $MP_k$, et à la fois ne devant pas être un jeton \texttt{NEXT}, défini par $1 - MO_k$. Elle s'écrit :
+
 \begin{equation}
-\mathcal{L}{raw}(\hat{\mathbf{Y}}, \mathbf{Y}) = \frac{\| (\hat{\mathbf{Y}} - \mathbf{Y}) \odot (1 - \mathbf{MO}) \odot \mathbf{MP} \|_2}{\| ((1 - \mathbf{MO}) \odot \mathbf{MP} \|_2\sqrt{D}}
+\mathcal{L}{raw}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k) = \frac{\| (\hat{\mathbf{Y}}_k - \mathbf{Y}_k) \odot (1 - \mathbf{MO}_k) \odot \mathbf{MP_k} \|_2}{\| ((1 - \mathbf{MO}_k) \odot \mathbf{MP}_k \|_2\sqrt{D}}
 \end{equation}
 
-Le terme au dénominateur assure que la perte est invariante à la taille du batch et au taux de remplissage (padding). Pour équilibrer l'apprentissage face à la diversité des séquences, nous utilisons la version pondérée par l'erreur de référence $\mathcal{L}_{ref}$ (calculée sur la séquence dépliée cible selon le protocole défini au chapitre précédent) :
+Le terme au dénominateur assure que la perte est invariante au nombre d'éléments considéré dans le calcul. Pour équilibrer l'apprentissage face à la diversité des séquences, nous définissons à partir de cette expression l'erreur de référence $\mathcal{L}_{ref}$, calculée similairement à \ref{eq:Lref} :
+
+\begin{align*}
+\boldsymbol{\mu}_k & = & \underset{Y \in \mathbb{R}^{D}}{\operatorname{argmin}} \mathcal{L}{raw}(\mathbf{1}Y^\top, \mathbf{Y}_k) \\
+\mathcal{L}_{ref}(\mathbf{Y}_k) & = & \mathcal{L}{raw}(\mathbf{1}\boldsymbol{\mu}_k^\top, \mathbf{Y}_k)
+\end{align*}
+
+$\mathbf{1}\boldsymbol{\mu}_k^\top$ est la séquence répétant $T$ fois l'élément $\boldsymbol{\mu}_k$, et correspond à la meilleure répétition d'éléments à prédire pour minimiser la distance à $\mathbf{Y}_k$. La valeur de $\mathcal{L}_{ref}(\mathbf{Y}_k)$ indique donc à quel point la séquence $\mathbf{Y}_k$ est loin d'être une répétition d'éléments similaires, qu'un modèle pourrait prédire aisément sans réellement avoir appris à reproduire le DCI.\\
+
+L'erreur de reconstruction entre une prédiction $\hat{\mathbf{Y}}_k$ et une cible $\mathbf{Y}_k$ s'écrit donc comme le rapport entre l'erreur brute $\mathcal{L}{raw}$ et l'erreur de référence $\mathcal{L}_{ref}$, permettant de renforcer la contribution des séquences "proches" de la répétition d'un même élément, ce qui correspond à des cas critiques où l'interaction entre PDW est forte et où nous considérons que l'apprentissage du modèle doit se concentrer. Elle s'écrit :
+\begin{equation}
+\mathcal{L}{weighted}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k) = \frac{\mathcal{L}{raw}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k)}{\mathcal{L}_{ref}(\mathbf{Y}_k)}
+\end{equation}
+
+Finalement, la fonction de perte caractérisant l'erreur de reconstruction est la moyenne quadratique de l'erreur pondéré présenté avant et elle s'écrit :
 \begin{equation}
 \label{eq:loss}
-\mathcal{L}{reg} = \frac{\mathcal{L}{raw}}{\mathcal{L}_{ref}}
+\mathcal{L}{rec}(\hat{\mathbf{Y}}, \mathbf{Y}) = \sqrt{\frac{1}{B} \sum_{k=1}^B \mathcal{L}_{weighted}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k)^2}
 \end{equation}
 
 \subsubsection{Erreur de classification par MCC différentiable ($\mathcal{L}_{class}$)}
 La seconde tête du réseau prédit un tenseur de probabilités $\mathbf{P}$, dont la cible est $\mathbf{MO}$ de dimension $B \times T$, où chaque élément $p_{k,t} \in [0, 1]$ représente la probabilité que la cible $t \in [|1; T|]$ de la séquence $k \in [|1; B|]$ soit un jeton \texttt{NEXT}.\\
 
-Pour optimiser la performance sur ce problème de classification binaire déséquilibré, nous maximisons une version différentiable ("soft") du Coefficient de Corrélation de Matthews (MCC). L'opérateur $\Sigma(\cdot)$ calcule la somme de tous les éléments d'un tenseur. 
+Pour optimiser la performance sur ce problème de classification binaire déséquilibré, nous maximisons une version différentiable ("soft") du Coefficient de Corrélation de Matthews (MCC). Le MCC est une métrique permettant d'évaluer les performances d'un modèle de classification binaire, particulièrement robuste lors d'un déséquilibre dans la représentation des classes. Le MCC repose sur le calcul du nombre de vrai positif $TP$, de faux positif $FP$, de vrai négatif $TN$ et de faux négatif $FN$, obtenu en comparant les classes prédites et les classes attendues, et s'exprime ainsi :
+$$ MCC = \frac{TP\times TN - FP \times FN}{\sqrt{(TP + FP)(TP + FN)(TN + FP)(TN + FN)}}$$
+La version "soft" repose sur un calcul souple se basant sur les probabilités d'attributions des classes : 
+\begin{itemize}
+\item une probabilité prédite de $0.34$ associé à la cible "positif" (1) est a $34%$ un vrai positif et à $66%$ un faux négatif
+\item une probabilité prédite de $0.34$ associé à la cible "négatif" (0) est a $34%$ un faux positif et à $66%$ un vrai négatif
+\end{itemize} 
+
+Cette souplesse permet de conserver la différentiabilité du $MCC_{soft}$ par rapport aux prédiction du modèle, et donc de propager le gradient pour l'apprentissage.En notant $\Sigma(\cdot)$ l'opérateur  qui calcule la somme de tous les éléments d'un tenseur, les versions "soft" de $TP, TN, FP, FN$ s'expriment ainsi : 
 \begin{align*}
 TP &= \Sigma(\mathbf{MO} \odot \mathbf{P} \odot \mathbf{MP} )\\
 TN &= \Sigma((\mathbf{1} - \mathbf{MO}) \odot (\mathbf{1} - \mathbf{P}) \odot \mathbf{MP}) \\
@@ -382,7 +405,7 @@ Dans un premier temps, nous évaluons la capacité des modèles à converger ver
 \label{fig:learning_curves}
 \end{figure}
 
-Le tableau \ref{tab:global_results} synthétise les métriques finales obtenues sur le jeu de test. Nous rapportons l'erreur de régression pondérée ($\mathcal{L}_{reg}$), le coefficient de corrélation de Matthews ($MCC$) pour la détection du jeton \texttt{NEXT}, ainsi que le temps d'inférence moyen par impulsion générée.\\
+Le tableau \ref{tab:global_results} synthétise les métriques finales obtenues sur le jeu de test. Nous rapportons l'erreur de reconstruction ($\mathcal{L}_{reg}$), le coefficient de corrélation de Matthews ($MCC$) pour la détection du jeton \texttt{NEXT}, ainsi que le temps d'inférence moyen par impulsion générée.\\
 
 \begin{table}[h]
 \centering

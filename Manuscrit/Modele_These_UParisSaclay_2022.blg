@@ -1,17 +1,17 @@
 [0] Config.pm:328> INFO - This is Biber 2.21
 [0] Config.pm:331> INFO - Logfile is 'Modele_These_UParisSaclay_2022.blg'
-[341] biber-MSWIN64:342> INFO - === 
-[460] Biber.pm:421> INFO - Reading 'Modele_These_UParisSaclay_2022.bcf'
-[565] Biber.pm:1002> INFO - Found 104 citekeys in bib section 0
-[576] Biber.pm:4487> INFO - Processing section 0
-[600] Biber.pm:4678> INFO - Looking for bibtex file 'Biblio.bib' for section 0
-[692] bibtex.pm:1713> INFO - LaTeX decoding ...
-[850] bibtex.pm:1519> INFO - Found BibTeX data source 'Biblio.bib'
-[1708] UCollate.pm:68> INFO - Overriding locale 'fr-FR' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[1708] UCollate.pm:68> INFO - Overriding locale 'fr-FR' defaults 'variable = shifted' with 'variable = non-ignorable'
-[1708] Biber.pm:4307> INFO - Sorting list 'none/global//global/global/global' of type 'entry' with template 'none' and locale 'fr-FR'
-[1708] Biber.pm:4313> INFO - No sort tailoring available for locale 'fr-FR'
-[1818] bbl.pm:676> INFO - Writing 'Modele_These_UParisSaclay_2022.bbl' with encoding 'UTF-8'
-[2062] bbl.pm:779> INFO - Output to Modele_These_UParisSaclay_2022.bbl
-[2063] Biber.pm:132> WARN - ISBN '978-3-319-24573-7 978-3-319-24574-4' in entry 'navab_u-net_2015' is invalid - run biber with '--validate_datamodel' for details.
-[2063] Biber.pm:134> INFO - WARNINGS: 1
+[69] biber-MSWIN64:342> INFO - === 
+[97] Biber.pm:421> INFO - Reading 'Modele_These_UParisSaclay_2022.bcf'
+[177] Biber.pm:1002> INFO - Found 104 citekeys in bib section 0
+[185] Biber.pm:4487> INFO - Processing section 0
+[192] Biber.pm:4678> INFO - Looking for bibtex file 'Biblio.bib' for section 0
+[267] bibtex.pm:1713> INFO - LaTeX decoding ...
+[386] bibtex.pm:1519> INFO - Found BibTeX data source 'Biblio.bib'
+[923] UCollate.pm:68> INFO - Overriding locale 'fr-FR' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[923] UCollate.pm:68> INFO - Overriding locale 'fr-FR' defaults 'variable = shifted' with 'variable = non-ignorable'
+[923] Biber.pm:4307> INFO - Sorting list 'none/global//global/global/global' of type 'entry' with template 'none' and locale 'fr-FR'
+[923] Biber.pm:4313> INFO - No sort tailoring available for locale 'fr-FR'
+[971] bbl.pm:676> INFO - Writing 'Modele_These_UParisSaclay_2022.bbl' with encoding 'UTF-8'
+[1133] bbl.pm:779> INFO - Output to Modele_These_UParisSaclay_2022.bbl
+[1133] Biber.pm:132> WARN - ISBN '978-3-319-24573-7 978-3-319-24574-4' in entry 'navab_u-net_2015' is invalid - run biber with '--validate_datamodel' for details.
+[1133] Biber.pm:134> INFO - WARNINGS: 1
