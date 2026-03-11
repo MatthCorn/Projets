@@ -31,33 +31,39 @@
 \@writefile{lof}{\contentsline {figure}{\numberline {6.2}{\ignorespaces Comparaison qualitative de séquences incidentes (gauche), cible (milieu), prédite par le modèle (droite). La séquence source est composée de 50 PDW. Le modèle utilisé pour prédire la séquence est le LSTMAT-L. Les encadrés verts permettent d'observer la capacité de notre modèle à reproduire les artefacts propre au traitement du DCI \ref {fig:IOex}}}{86}{figure.caption.35}\protected@file@percent }
 \newlabel{fig:RNNgen}{{6.2}{86}{Comparaison qualitative de séquences incidentes (gauche), cible (milieu), prédite par le modèle (droite). La séquence source est composée de 50 PDW. Le modèle utilisé pour prédire la séquence est le LSTMAT-L. Les encadrés verts permettent d'observer la capacité de notre modèle à reproduire les artefacts propre au traitement du DCI \ref {fig:IOex}}{figure.caption.35}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {6.4}Extension des essais : Généralisation à d'autres architectures}{86}{section.6.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6.3}{\ignorespaces Illustration de l'architecture Transformer utilisé pour le traitement flux-à-flux, où l'auto-attention de référence \ref {encoder transformer} est remplacée par de l'auto-attention masquée.}}{87}{figure.caption.36}\protected@file@percent }
+\newlabel{fig:linTrans}{{6.3}{87}{Illustration de l'architecture Transformer utilisé pour le traitement flux-à-flux, où l'auto-attention de référence \ref {encoder transformer} est remplacée par de l'auto-attention masquée}{figure.caption.36}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.4.1}Sélection des architectures}{87}{subsection.6.4.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {6.4.1.1}Le Transformer (Attention Mechanism)}{87}{subsubsection.6.4.1.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.4.1.2}Le TCN (Temporal Convolutional Network)}{87}{subsubsection.6.4.1.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.4.1.3}Le GRU (Recurrent Network)}{87}{subsubsection.6.4.1.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.4.1.4}Structure commune et hyper-paramètres}{87}{subsubsection.6.4.1.4}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {6.4}{\ignorespaces Hyper-paramètres géométriques retenus pour chaque architecture.}}{88}{table.caption.36}\protected@file@percent }
-\newlabel{tab:hyperparams}{{6.4}{88}{Hyper-paramètres géométriques retenus pour chaque architecture}{table.caption.36}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.4.2}Fonction de perte et métriques d'évaluation}{88}{subsection.6.4.2}\protected@file@percent }
-\newlabel{seq:metrique}{{6.4.2}{88}{Fonction de perte et métriques d'évaluation}{subsection.6.4.2}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.4.2.1}Erreur de reconstruction pondérée ($\mathcal  {L}_{reg}$)}{89}{subsubsection.6.4.2.1}\protected@file@percent }
-\newlabel{eq:loss}{{6.3}{89}{Erreur de reconstruction pondérée ($\mathcal {L}_{reg}$)}{equation.6.3}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.4.2.2}Erreur de classification par MCC différentiable ($\mathcal  {L}_{class}$)}{89}{subsubsection.6.4.2.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.4.3}Résultats et Analyse Comparative}{90}{subsection.6.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.4.3.1}Performance globale et convergence}{90}{subsubsection.6.4.3.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.3}{\ignorespaces Comparaison des dynamiques d'apprentissage. Le Transformer montre une convergence plus lente initialement mais atteint un plateau asymptotique plus bas que le GRU.}}{90}{figure.caption.37}\protected@file@percent }
-\newlabel{fig:learning_curves}{{6.3}{90}{Comparaison des dynamiques d'apprentissage. Le Transformer montre une convergence plus lente initialement mais atteint un plateau asymptotique plus bas que le GRU}{figure.caption.37}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {6.5}{\ignorespaces Performances comparées sur le jeu de test (valeurs fictives pour illustration). Le Transformer excelle en précision mais le GRU reste le plus rapide en inférence séquentielle.}}{90}{table.caption.38}\protected@file@percent }
-\newlabel{tab:global_results}{{6.5}{90}{Performances comparées sur le jeu de test (valeurs fictives pour illustration). Le Transformer excelle en précision mais le GRU reste le plus rapide en inférence séquentielle}{table.caption.38}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.4.3.2}Robustesse face à la longueur de séquence}{91}{subsubsection.6.4.3.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.4}{\ignorespaces Évolution de la performance de régression en fonction de la longueur de la séquence traitée. Contrairement aux approches globales, les architectures auto-régressives maintiennent une performance stable sur le long terme.}}{91}{figure.caption.39}\protected@file@percent }
-\newlabel{fig:length_robustness}{{6.4}{91}{Évolution de la performance de régression en fonction de la longueur de la séquence traitée. Contrairement aux approches globales, les architectures auto-régressives maintiennent une performance stable sur le long terme}{figure.caption.39}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.4.3.3}Analyse qualitative des générations}{91}{subsubsection.6.4.3.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.5}{\ignorespaces Exemple de reconstruction sur une fenêtre complexe. Le modèle identifie correctement qu'une impulsion incidente $I_k$ doit générer deux impulsions de sortie $O_a, O_b$ avant de passer à la suivante (prédiction correcte des tokens \texttt  {NEXT}).}}{92}{figure.caption.40}\protected@file@percent }
-\newlabel{fig:qualitative}{{6.5}{92}{Exemple de reconstruction sur une fenêtre complexe. Le modèle identifie correctement qu'une impulsion incidente $I_k$ doit générer deux impulsions de sortie $O_a, O_b$ avant de passer à la suivante (prédiction correcte des tokens \texttt {NEXT})}{figure.caption.40}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.4.4}Conclusion sur les extensions}{92}{subsection.6.4.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.4.1.2}Le TCN (Temporal Convolutional Network)}{88}{subsubsection.6.4.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.4.1.3}Le GRU (Recurrent Network)}{88}{subsubsection.6.4.1.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6.4}{\ignorespaces Comparaison structurelle des architectures convolutives unidimensionnelles. À gauche (a), une convolution causale standard où l'horizon d'interaction croît linéairement avec la profondeur. À droite (b), une convolution causale dilatée où le facteur de dilatation $d$ croît exponentiellement ($d=1, 2, 4$). Figure reproduite d'après \blx@tocontentsinit {0}\cite {bai_empirical_2018}.}}{89}{figure.caption.37}\protected@file@percent }
+\newlabel{fig:TCN}{{6.4}{89}{Comparaison structurelle des architectures convolutives unidimensionnelles. À gauche (a), une convolution causale standard où l'horizon d'interaction croît linéairement avec la profondeur. À droite (b), une convolution causale dilatée où le facteur de dilatation $d$ croît exponentiellement ($d=1, 2, 4$). Figure reproduite d'après \cite {bai_empirical_2018}}{figure.caption.37}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.4.1.4}Structure commune et hyper-paramètres}{89}{subsubsection.6.4.1.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6.5}{\ignorespaces Comparaison structurelle des architectures convolutives unidimensionnelles. À gauche (a), une convolution causale standard où l'horizon d'interaction croît linéairement avec la profondeur. À droite (b), une convolution causale dilatée où le facteur de dilatation $d$ croît exponentiellement ($d=1, 2, 4$). Figure reproduite d'après \blx@tocontentsinit {0}\cite {bai_empirical_2018}.}}{90}{figure.caption.38}\protected@file@percent }
+\newlabel{fig:LinProcess}{{6.5}{90}{Comparaison structurelle des architectures convolutives unidimensionnelles. À gauche (a), une convolution causale standard où l'horizon d'interaction croît linéairement avec la profondeur. À droite (b), une convolution causale dilatée où le facteur de dilatation $d$ croît exponentiellement ($d=1, 2, 4$). Figure reproduite d'après \cite {bai_empirical_2018}}{figure.caption.38}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4.2}Fonction de perte et métriques d'évaluation}{90}{subsection.6.4.2}\protected@file@percent }
+\newlabel{seq:metrique}{{6.4.2}{90}{Fonction de perte et métriques d'évaluation}{subsection.6.4.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {6.4}{\ignorespaces Hyper-paramètres géométriques retenus pour chaque architecture.}}{91}{table.caption.39}\protected@file@percent }
+\newlabel{tab:hyperparams}{{6.4}{91}{Hyper-paramètres géométriques retenus pour chaque architecture}{table.caption.39}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.4.2.1}Erreur de reconstruction pondérée ($\mathcal  {L}_{reg}$)}{91}{subsubsection.6.4.2.1}\protected@file@percent }
+\newlabel{eq:loss}{{6.3}{91}{Erreur de reconstruction pondérée ($\mathcal {L}_{reg}$)}{equation.6.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.4.2.2}Erreur de classification par MCC différentiable ($\mathcal  {L}_{class}$)}{91}{subsubsection.6.4.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4.3}Résultats et Analyse Comparative}{92}{subsection.6.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.4.3.1}Performance globale et convergence}{92}{subsubsection.6.4.3.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6.6}{\ignorespaces Comparaison des dynamiques d'apprentissage. Le Transformer montre une convergence plus lente initialement mais atteint un plateau asymptotique plus bas que le GRU.}}{92}{figure.caption.40}\protected@file@percent }
+\newlabel{fig:learning_curves}{{6.6}{92}{Comparaison des dynamiques d'apprentissage. Le Transformer montre une convergence plus lente initialement mais atteint un plateau asymptotique plus bas que le GRU}{figure.caption.40}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {6.5}{\ignorespaces Performances comparées sur le jeu de test (valeurs fictives pour illustration). Le Transformer excelle en précision mais le GRU reste le plus rapide en inférence séquentielle.}}{93}{table.caption.41}\protected@file@percent }
+\newlabel{tab:global_results}{{6.5}{93}{Performances comparées sur le jeu de test (valeurs fictives pour illustration). Le Transformer excelle en précision mais le GRU reste le plus rapide en inférence séquentielle}{table.caption.41}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.4.3.2}Robustesse face à la longueur de séquence}{93}{subsubsection.6.4.3.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6.7}{\ignorespaces Évolution de la performance de régression en fonction de la longueur de la séquence traitée. Contrairement aux approches globales, les architectures auto-régressives maintiennent une performance stable sur le long terme.}}{93}{figure.caption.42}\protected@file@percent }
+\newlabel{fig:length_robustness}{{6.7}{93}{Évolution de la performance de régression en fonction de la longueur de la séquence traitée. Contrairement aux approches globales, les architectures auto-régressives maintiennent une performance stable sur le long terme}{figure.caption.42}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.4.3.3}Analyse qualitative des générations}{94}{subsubsection.6.4.3.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6.8}{\ignorespaces Exemple de reconstruction sur une fenêtre complexe. Le modèle identifie correctement qu'une impulsion incidente $I_k$ doit générer deux impulsions de sortie $O_a, O_b$ avant de passer à la suivante (prédiction correcte des tokens \texttt  {NEXT}).}}{94}{figure.caption.43}\protected@file@percent }
+\newlabel{fig:qualitative}{{6.8}{94}{Exemple de reconstruction sur une fenêtre complexe. Le modèle identifie correctement qu'une impulsion incidente $I_k$ doit générer deux impulsions de sortie $O_a, O_b$ avant de passer à la suivante (prédiction correcte des tokens \texttt {NEXT})}{figure.caption.43}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4.4}Conclusion sur les extensions}{94}{subsection.6.4.4}\protected@file@percent }
 \@setckpt{Stage}{
-\setcounter{page}{93}
+\setcounter{page}{95}
 \setcounter{equation}{5}
 \setcounter{enumi}{3}
 \setcounter{enumii}{0}
@@ -72,7 +78,7 @@
 \setcounter{subsubsection}{0}
 \setcounter{paragraph}{0}
 \setcounter{subparagraph}{0}
-\setcounter{figure}{5}
+\setcounter{figure}{8}
 \setcounter{table}{5}
 \setcounter{parentequation}{0}
 \setcounter{caption@flags}{2}
@@ -95,7 +101,7 @@
 \setcounter{citetotal}{0}
 \setcounter{multicitecount}{0}
 \setcounter{multicitetotal}{0}
-\setcounter{instcount}{121}
+\setcounter{instcount}{128}
 \setcounter{maxnames}{3}
 \setcounter{minnames}{1}
 \setcounter{maxitems}{3}

@@ -277,21 +277,31 @@ Pour représenter la famille des réseaux récurrents, nous avons écarté les v
 Afin de garantir une comparaison rigoureuse, toutes les architectures évaluées partagent une topologie modulaire commune et un même principe d'inférence, structurés comme suit :\\
 
 \begin{itemize}
-\item Un vecteur d'état spécial $l_{next}$ : Il s'agit d'une représentation latente apprenable du jeton \texttt{NEXT}. Ce vecteur est destiné à être inséré dynamiquement dans la séquence pour signaler les changements de contexte.
+\item Un vecteur d'état spécial $\hat{h}$ : Il s'agit d'une représentation latente apprenable du jeton \texttt{NEXT}. Ce vecteur est destiné à être inséré dynamiquement dans la séquence pour signaler les changements de contexte.
 
 \item Une couche d'embedding : Elle projette la séquence d'entrée brute vers l'espace latent du modèle, élément par élément, transformant les caractéristiques physiques des impulsions en une représentation vectorielle latente initiale.
 
-\item Un mécanisme de substitution conditionnelle : À l'aide du masque binaire $MI$, les représentations latentes situées aux positions de contexte (Input 2) sont substituées par le vecteur $l_{next}$. Cette opération prépare la séquence pour le traitement auto-régressif.
+\item Un mécanisme de substitution conditionnelle : À l'aide du masque binaire $MI$, les représentations latentes situées aux positions de contexte (Input 2) sont substituées par le vecteur $\hat{h}$. Cette opération prépare la séquence pour le traitement auto-régressif.
 
 \item Le corps du modèle : Selon l'architecture testée (GRU, TCN ou Transformer), ce bloc traite la séquence latente de manière strictement causale. Il enrichit progressivement les représentations par agrégation du contexte temporel passé, produisant en sortie une séquence latente à haute teneur sémantique.
 
 \item Un décodeur (Tête de régression) : Il transforme chaque élément de la séquence latente enrichie en une prédiction dans l'espace des PDW (caractéristiques physiques) et retourne cette estimation.
 
-\item Un comparateur (Tête de classification) : Ce module calcule la similarité (\textit{cosine similarity}) entre chaque représentation latente enrichie finale et le vecteur $e_{next}$. Ces scores, normalisés entre 0 et 1, quantifient la probabilité que chaque prédiction corresponde au jeton \texttt{NEXT}.
+\item Un comparateur (Tête de classification) : Ce module calcule la similarité (\textit{cosine similarity}) entre chaque représentation latente enrichie finale et le vecteur $\hat{h}$. Ces scores, normalisés entre 0 et 1, quantifient la probabilité que chaque prédiction corresponde au jeton \texttt{NEXT}.
 \end{itemize}
 \; \\
 
-Les hyper-paramètres de chaque architecture ont été optimisés via une recherche bayésienne (TPESampler d'Optuna) sur des entraînements courts.
+Mise à part le corps du modèle, qui constitue le module de traitement de séquence, tous les modules présentés ci-dessus agissent élément par élément, de manière totalement indépendante. La figure \ref{fig:LinProcess} schématise la transformation des éléments dans les modules qui (à gauche) précédent le corps du modèle (GRU, TCN ou Transformer), ainsi que les modules qui le succèdent (à droite). 
+
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.4]{LinProcess.png}
+\end{center}
+\caption{Comparaison structurelle des architectures convolutives unidimensionnelles. À gauche (a), une convolution causale standard où l'horizon d'interaction croît linéairement avec la profondeur. À droite (b), une convolution causale dilatée où le facteur de dilatation $d$ croît exponentiellement ($d=1, 2, 4$). Figure reproduite d'après \cite{bai_empirical_2018}.}
+\label{fig:LinProcess}
+\end{figure}
+
+Les hyper-paramètres de chaque architecture ont été optimisés via une recherche bayésienne afin de s'assurer que les écarts de performances proviennent directement de la capacité de l'architecture à apprendre les dépendances des données. Nous avons choisi des plages de variation de ces paramètres permettant aux modèles d'atteindre le même nombre maximal de paramètre, soit environ $5$ millions. Les valeurs caractérisant la géométrie des modèles (largeur, profondeur) sont données dans le tableau \ref{tab:hyperparams}, à côté de la valeur maximale possible.
 
 \begin{table}[h]
 \centering
@@ -299,10 +309,11 @@ Les hyper-paramètres de chaque architecture ont été optimisés via une recher
 \hline
 \textbf{Paramètre} & \textbf{Transformer} & \textbf{TCN} & \textbf{GRU} \\
 \hline
-Dimension Latente ($d_{model}$) & 128 & 128 & 256 \\
-Nombre de couches ($L$) & 4 & 6 & 2 \\
-Têtes d'attention / Taille Noyau & 4 têtes & $k=3$ & - \\
-Dropout & 0.1 & 0.2 & 0.1 \\
+Dimension Latente & 300/300 & 300/300 & 300/300 \\
+Nombre de couches & 12/12 & 4/5 & 6/8 \\
+Nombre de tête & 4 & - & - \\
+Taille du noyau & - & 3 & - \\
+Nombre de paramètres & 1/5040696 & 1/4967712 & 1/5066712 \\
 \hline
 \end{tabular}
 \caption{Hyper-paramètres géométriques retenus pour chaque architecture.}

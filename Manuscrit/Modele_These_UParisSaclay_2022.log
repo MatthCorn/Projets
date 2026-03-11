@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.11.20)  9 MAR 2026 15:07
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.11.20)  10 MAR 2026 17:41
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -2334,69 +2334,112 @@ File: genRNN.png Graphic file (type png)
 Package pdftex.def Info: genRNN.png  used on input line 227.
 (pdftex.def)             Requested size: 443.40547pt x 158.09023pt.
 [85]
-Underfull \hbox (badness 10000) in paragraph at lines 236--238
+Underfull \hbox (badness 10000) in paragraph at lines 236--237
 
  []
 
 [86 <./genRNN.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 254--255
+<enc_transformer_lin.png, id=1297, 721.19438pt x 590.205pt>
+File: enc_transformer_lin.png Graphic file (type png)
+<use enc_transformer_lin.png>
+Package pdftex.def Info: enc_transformer_lin.png  used on input line 248.
+(pdftex.def)             Requested size: 288.47264pt x 236.0778pt.
+ [87 <./enc_transformer_lin.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 256--257
 
  []
 
-[87]
-Underfull \hbox (badness 10000) in paragraph at lines 269--270
+
+Underfull \hbox (badness 10000) in paragraph at lines 261--262
 
  []
 
+<TCN.png, id=1309, 1333.23094pt x 522.45187pt>
+File: TCN.png Graphic file (type png)
+<use TCN.png>
+Package pdftex.def Info: TCN.png  used on input line 265.
+(pdftex.def)             Requested size: 533.28293pt x 208.97704pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 296--297
+Overfull \hbox (78.03882pt too wide) in paragraph at lines 265--266
+ [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 277--278
 
  []
 
 [88]
-Underfull \hbox (badness 10000) in paragraph at lines 310--311
+Underfull \vbox (badness 1810) has occurred while \output is active []
+
+ [89 <./TCN.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 292--293
 
  []
 
-[89]
-Overfull \hbox (4.06923pt too wide) in paragraph at lines 331--332
+<LinProcess.png, id=1329, 764.10469pt x 514.17094pt>
+File: LinProcess.png Graphic file (type png)
+<use LinProcess.png>
+Package pdftex.def Info: LinProcess.png  used on input line 298.
+(pdftex.def)             Requested size: 305.63646pt x 205.66473pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Underfull \vbox (badness 1281) has occurred while \output is active []
+
+ [90 <./LinProcess.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 330--331
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 344--345
+
+ []
+
+[91]
+Overfull \hbox (4.06923pt too wide) in paragraph at lines 365--366
 []\T1/opensans-TOsF/m/sc/10.95 Cette sec-tion pré-sente les per-for-mances com-
 pa-rées des trois ar-chi-tec-tures (GRU, TCN, Trans-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 351--352
+Underfull \hbox (badness 10000) in paragraph at lines 385--386
 
  []
 
 
-Overfull \hbox (9.40222pt too wide) in paragraph at lines 355--364
+Overfull \hbox (9.40222pt too wide) in paragraph at lines 389--398
  [][] 
  []
 
 
-Overfull \hbox (6.79599pt too wide) in paragraph at lines 368--369
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Overfull \hbox (6.79599pt too wide) in paragraph at lines 402--403
 []\T1/opensans-TOsF/m/sc/10.95 On ob-serve que l'ar-chi-tec-ture Trans-for-mer 
 offre la meilleure fi-dé-lité de re-cons-truc-tion ($\OMS/cmsy/m/n/10.95 L[] \O
 T1/cmr/m/n/10.95 =
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 368--369
+Underfull \hbox (badness 10000) in paragraph at lines 402--403
 
  []
 
-[90]
-Underfull \hbox (badness 10000) in paragraph at lines 374--375
+[92]
+Underfull \hbox (badness 10000) in paragraph at lines 408--409
 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 423--424
+[93]
+Underfull \hbox (badness 10000) in paragraph at lines 457--458
 
  []
 
-[91]) [92]
+) [94]
 LaTeX Font Info:    Font shape `T1/opensans-TOsF/m/it' will be
 (Font)              scaled to size 11.39996pt on input line 247.
 
@@ -2417,7 +2460,7 @@ Overfull \hbox (26.7801pt too wide) in paragraph at lines 248--248
 oE$[][] \T1/opensans-TOsF/m/sc/12 (vi-sité le 26/11/2025). 
  []
 
-[93
+[95
 
 
 
@@ -2427,7 +2470,7 @@ Overfull \hbox (8.75963pt too wide) in paragraph at lines 248--248
 pdf$[][] \T1/opensans-TOsF/m/sc/12 (vi-sité le 26/11/2025). 
  []
 
-[94]
+[96]
 Overfull \hbox (38.53647pt too wide) in paragraph at lines 248--248
 \T1/cmtt/m/n/12 / / proceedings . neurips . cc / paper / 2019 / hash / 26cd8eca
 dce0d4efd6cc8a8725cbd1f8 -[]
@@ -2439,7 +2482,7 @@ Overfull \hbox (236.08823pt too wide) in paragraph at lines 248--248
 8nsu5zAdIGdvnCQ2HUA0cQqPyuGJEWgDg4MSMrH4DvTYUcfmSITqw$[][]
  []
 
-[95]
+[97]
 Overfull \hbox (131.8595pt too wide) in paragraph at lines 248--248
 \T1/opensans-TOsF/m/sc/12 (2019). url : [][]$\T1/cmtt/m/n/12 https : / / procee
 dings . neurips . cc / paper / 2019 / hash / 5f8e2fa1718d1bbcadf1cd9c7a54fb8c -
@@ -2459,13 +2502,13 @@ ngs . neurips . cc / paper / 2020 / hash / 4c5bcfec8584af0d967f1ab10179ca4b -[]
 
  []
 
-[96]
+[98]
 Overfull \hbox (9.38358pt too wide) in paragraph at lines 248--248
 []\T1/opensans-TOsF/m/sc/12 Alec []Radford []et al. ``Im-pro-ving lan-guage un-
 ders-tan-ding by ge-ne-ra-tive pre-training''.
  []
 
-[97]
+[99]
 Overfull \hbox (2.58614pt too wide) in paragraph at lines 248--248
 \T1/cmtt/m/n/12 hash / c399862d3b9d6b76c8436e924a68c45b -[] Abstract . html$[][
 ] \T1/opensans-TOsF/m/sc/12 (vi-sité le 26/11/2025). 
@@ -2477,7 +2520,7 @@ Overfull \hbox (4.18068pt too wide) in paragraph at lines 248--248
 ensans-TOsF/m/it/12 Very Deep Convo-lu-tio-nal Net-works for Large-
  []
 
-[98]
+[100]
 Overfull \hbox (3.4385pt too wide) in paragraph at lines 248--248
 []\T1/opensans-TOsF/m/sc/12 Du []Tran []et al. ``Lear-ning spa-tio-tem-po-ral f
 ea-tures with 3d convo-lu-tio-nal net-works''.
@@ -2496,7 +2539,7 @@ Overfull \hbox (75.57742pt too wide) in paragraph at lines 248--248
 sh / 5dd9db5e033da9c6fb5ba83c7a7ebea9 -[]
  []
 
-[99] [100]
+[101] [102]
 Overfull \hbox (26.18948pt too wide) in paragraph at lines 248--248
 \T1/cmtt/m/n/12 neurips . cc / paper _ files / paper / 2015 / hash / 29921001f2
 f04bd3baee84a12e98098f -[]
@@ -2528,7 +2571,7 @@ Overfull \hbox (26.18948pt too wide) in paragraph at lines 248--248
 cb4967418bfb8ac142f64a -[]
  []
 
-[101]
+[103]
 Overfull \hbox (132.3383pt too wide) in paragraph at lines 248--248
 \T1/opensans-TOsF/m/sc/12 15097. url : [][]$\T1/cmtt/m/n/12 https : / / proceed
 ings . neurips . cc / paper / 2021 / hash / 7f489f642a0ddb10272b5c31057f0663 -[
@@ -2541,7 +2584,7 @@ Overfull \hbox (8.09929pt too wide) in paragraph at lines 248--248
 ieeexplore . ieee . org / abstract / document / 10825633/$[][]
  []
 
-[102] [103] (Modele_These_UParisSaclay_2022.aux (Introduction.aux)
+[104] [105] (Modele_These_UParisSaclay_2022.aux (Introduction.aux)
 (Problematique.aux) (Etat de l art.aux) (EUSIPCO.aux) (GrosTAF.aux) (Stage.aux)
 )
  ***********
@@ -2564,10 +2607,10 @@ l'.
 
  ) 
 Here is how much of TeX's memory you used:
- 35377 strings out of 467871
- 688932 string characters out of 5418375
- 1639865 words of memory out of 5000000
- 63242 multiletter control sequences out of 15000+600000
+ 35406 strings out of 467871
+ 689490 string characters out of 5418375
+ 1641059 words of memory out of 5000000
+ 63266 multiletter control sequences out of 15000+600000
  654707 words of font info for 123 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  102i,15n,117p,2577b,2269s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -2587,20 +2630,19 @@ s/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/Matth/AppData/Local/Programs/MiK
 TeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/Matth/AppData/Local/Prog
 rams/MiKTeX/fonts/type1/public/amsfonts/cm/cmmib10.pfb><C:/Users/Matth/AppData/
 Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/Matth/
-AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/User
-s/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><
-C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr
-8.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts
-/cm/cmss10.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/public
-/amsfonts/cm/cmsy10.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/typ
-e1/public/amsfonts/cm/cmsy6.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/f
-onts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/Matth/AppData/Local/Programs/
-MiKTeX/fonts/type1/public/doublestroke/dsrom10.pfb><C:/Users/Matth/AppData/Loca
-l/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on Modele_These_UParisSaclay_2022.pdf (103 pages, 6840332 bytes)
+AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users
+/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C
+:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmss
+10.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfont
+s/cm/cmsy10.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/type1/publi
+c/amsfonts/cm/cmsy6.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/fonts/typ
+e1/public/amsfonts/cm/cmsy8.pfb><C:/Users/Matth/AppData/Local/Programs/MiKTeX/f
+onts/type1/public/doublestroke/dsrom10.pfb><C:/Users/Matth/AppData/Local/Progra
+ms/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on Modele_These_UParisSaclay_2022.pdf (105 pages, 7407785 bytes)
 .
 PDF statistics:
- 1907 PDF objects out of 2073 (max. 8388607)
- 417 named destinations out of 1000 (max. 500000)
- 873 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1937 PDF objects out of 2073 (max. 8388607)
+ 422 named destinations out of 1000 (max. 500000)
+ 888 words of extra memory for PDF output out of 10000 (max. 10000000)
 
