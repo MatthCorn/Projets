@@ -9,131 +9,131 @@
 \contentsline {subsection}{\numberline {1.2.1}Principe d'interception et caractérisation (PDW)}{10}{subsection.1.2.1}%
 \contentsline {subsection}{\numberline {1.2.2}Niveaux d'exploitation du renseignement}{11}{subsection.1.2.2}%
 \contentsline {section}{\numberline {1.3}Le besoin de simulation et la problématique d'accélération}{11}{section.1.3}%
-\contentsline {subsection}{\numberline {1.3.1}L'impératif de la simulation numérique}{11}{subsection.1.3.1}%
+\contentsline {subsection}{\numberline {1.3.1}L'impératif de la simulation numérique}{12}{subsection.1.3.1}%
 \contentsline {subsection}{\numberline {1.3.2}Limites et définition de la problématique}{12}{subsection.1.3.2}%
-\contentsline {section}{\numberline {1.4}Organisation du manuscrit}{12}{section.1.4}%
+\contentsline {section}{\numberline {1.4}Organisation du manuscrit}{13}{section.1.4}%
 \contentsline {chapter}{\numberline {2}Problématique}{17}{chapter.2}%
 \contentsline {section}{\numberline {2.1}Introduction}{17}{section.2.1}%
 \contentsline {section}{\numberline {2.2}Description de l'intégration du capteur de Mesures de Soutien Électronique et son fonctionnement}{17}{section.2.2}%
 \contentsline {subsection}{\numberline {2.2.1}Contexte opérationnel : La maîtrise du spectre électromagnétique}{17}{subsection.2.2.1}%
-\contentsline {subsection}{\numberline {2.2.2}Chaîne de traitement de l'information}{17}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.2}Chaîne de traitement de l'information}{19}{subsection.2.2.2}%
 \contentsline {subsection}{\numberline {2.2.3}Architecture et fonctionnement du capteur}{19}{subsection.2.2.3}%
-\contentsline {section}{\numberline {2.3}Description de l'environnement virtuel}{22}{section.2.3}%
-\contentsline {subsection}{\numberline {2.3.1}Motivations}{22}{subsection.2.3.1}%
-\contentsline {subsection}{\numberline {2.3.2}Architecture et fonctionnement de l'environnement virtuel}{23}{subsection.2.3.2}%
-\contentsline {section}{\numberline {2.4}Identification du goulot d'étranglement et limites opérationnelles}{24}{section.2.4}%
-\contentsline {subsection}{\numberline {2.4.1}L'impératif de temps réel et le coût de la simulation}{24}{subsection.2.4.1}%
+\contentsline {section}{\numberline {2.3}Description de l'environnement virtuel}{21}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Motivations}{21}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Architecture et fonctionnement de l'environnement virtuel}{24}{subsection.2.3.2}%
+\contentsline {section}{\numberline {2.4}Identification du goulot d'étranglement et limites opérationnelles}{26}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}L'impératif de temps réel et le coût de la simulation}{26}{subsection.2.4.1}%
 \contentsline {subsection}{\numberline {2.4.2}Analyse de la complexité et localisation du verrou}{26}{subsection.2.4.2}%
-\contentsline {section}{\numberline {2.5}Formalisation et complexité du problème d'apprentissage}{26}{section.2.5}%
-\contentsline {subsection}{\numberline {2.5.1}Nature des données et définition formelle de la tâche}{26}{subsection.2.5.1}%
-\contentsline {subsection}{\numberline {2.5.2}Une double problématique : Traitement de séquence et Génération}{27}{subsection.2.5.2}%
-\contentsline {section}{\numberline {2.6}Introduction}{29}{section.2.6}%
-\contentsline {section}{\numberline {2.7}IA générative}{29}{section.2.7}%
-\contentsline {section}{\numberline {2.8}Méthodes pour le traitement de séquence}{29}{section.2.8}%
-\contentsline {section}{\numberline {2.9}Les améliorations}{30}{section.2.9}%
-\contentsline {chapter}{\numberline {3}État de l'art}{31}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Environnements Numériques et fondements de l'Intelligence Artificielle}{31}{section.3.1}%
-\contentsline {subsection}{\numberline {3.1.1}Distinction conceptuelle : Environnement Virtuel et Jumeau Numérique}{31}{subsection.3.1.1}%
-\contentsline {subsection}{\numberline {3.1.2}Principes mathématiques de l'Apprentissage Profond}{33}{subsection.3.1.2}%
-\contentsline {subsubsection}{\numberline {3.1.2.1}Risque théorique, risque empirique et surapprentissage}{33}{subsubsection.3.1.2.1}%
-\contentsline {subsubsection}{\numberline {3.1.2.2}Optimisation par descente de gradient et rétropropagation}{34}{subsubsection.3.1.2.2}%
-\contentsline {subsubsection}{\numberline {3.1.2.3}Géométrie de l'optimisation}{35}{subsubsection.3.1.2.3}%
-\contentsline {subsection}{\numberline {3.1.3}L'IA pour la constitution géométrique et visuelle de l'environnement}{36}{subsection.3.1.3}%
-\contentsline {subsubsection}{\numberline {3.1.3.1}Reconstruction neurale et représentations implicites}{36}{subsubsection.3.1.3.1}%
-\contentsline {subsubsection}{\numberline {3.1.3.2}Synthèse géométrique par modèles de diffusion}{36}{subsubsection.3.1.3.2}%
-\contentsline {subsection}{\numberline {3.1.4}L'IA pour l'accélération et la modélisation des phénomènes physiques}{37}{subsection.3.1.4}%
-\contentsline {subsubsection}{\numberline {3.1.4.1}Apprentissage par Observation (Data-Driven)}{37}{subsubsection.3.1.4.1}%
-\contentsline {subsubsection}{\numberline {3.1.4.2}Apprentissage sous contraintes physiques (Physics-Informed)}{37}{subsubsection.3.1.4.2}%
-\contentsline {subsubsection}{\numberline {3.1.4.3}Apprentissage structuré par biais inductif physique}{38}{subsubsection.3.1.4.3}%
-\contentsline {subsection}{\numberline {3.1.5}L'IA au service de l'interactivité et de l'adaptation décisionnelle}{38}{subsection.3.1.5}%
-\contentsline {subsubsection}{\numberline {3.1.5.1}Intégration d'agents autonomes par apprentissage par renforcement}{38}{subsubsection.3.1.5.1}%
-\contentsline {subsubsection}{\numberline {3.1.5.2}Génération procédurale et apprentissage par curriculum}{38}{subsubsection.3.1.5.2}%
-\contentsline {subsection}{\numberline {3.1.6}Ancrage dans la problématique}{39}{subsection.3.1.6}%
-\contentsline {section}{\numberline {3.2}Architectures neuronales génératives}{39}{section.3.2}%
-\contentsline {subsection}{\numberline {3.2.1}Auto-Encodeurs Variationnels (VAE)}{40}{subsection.3.2.1}%
-\contentsline {subsection}{\numberline {3.2.2}Réseaux Antagonistes Génératifs (GAN)}{40}{subsection.3.2.2}%
-\contentsline {subsection}{\numberline {3.2.3}Modèles de Diffusion Probabilistes}{41}{subsection.3.2.3}%
-\contentsline {subsection}{\numberline {3.2.4}Le paradigme séquentiel et l'Autorégression}{41}{subsection.3.2.4}%
-\contentsline {subsection}{\numberline {3.2.5}Ancrage dans la problématique}{42}{subsection.3.2.5}%
-\contentsline {section}{\numberline {3.3}Architectures de traitement séquentiel et spatial}{42}{section.3.3}%
-\contentsline {subsection}{\numberline {3.3.1}Typologie des données : causalité temporelle et topologie spatiale}{42}{subsection.3.3.1}%
-\contentsline {subsubsection}{\numberline {3.3.1.1}Propriétés causales des données séquentielles}{43}{subsubsection.3.3.1.1}%
-\contentsline {subsubsection}{\numberline {3.3.1.2}Topologie et contiguïté des données spatiales}{43}{subsubsection.3.3.1.2}%
-\contentsline {subsubsection}{\numberline {3.3.1.3}Universalité de la modélisation séquentielle}{43}{subsubsection.3.3.1.3}%
-\contentsline {subsection}{\numberline {3.3.2}Réseaux de convolution}{43}{subsection.3.3.2}%
-\contentsline {subsubsection}{\numberline {3.3.2.1}Origine et application à la vision par ordinateur}{44}{subsubsection.3.3.2.1}%
-\contentsline {subsubsection}{\numberline {3.3.2.2}Filtrage local et expansion hiérarchique du champ récepteur}{44}{subsubsection.3.3.2.2}%
-\contentsline {subsubsection}{\numberline {3.3.2.3}Application aux structures spatiales bidimensionnelles}{46}{subsubsection.3.3.2.3}%
-\contentsline {subsubsection}{\numberline {3.3.2.4}Application aux séquences unidimensionnelles}{47}{subsubsection.3.3.2.4}%
-\contentsline {subsubsection}{\numberline {3.3.2.5}Généralisation aux données volumétriques et topologies irrégulières}{47}{subsubsection.3.3.2.5}%
-\contentsline {subsection}{\numberline {3.3.3}Réseaux de neurones récurrents et Espaces d'Etats (RNN et SSM)}{48}{subsection.3.3.3}%
-\contentsline {subsubsection}{\numberline {3.3.3.1}Évolution architecturale : des RNN simples aux portes logiques (LSTM/GRU)}{48}{subsubsection.3.3.3.1}%
-\contentsline {subsubsection}{\numberline {3.3.3.2}Principe de récurrence et mise à jour de l'état mémoire}{49}{subsubsection.3.3.3.2}%
-\contentsline {subsubsection}{\numberline {3.3.3.3}Modèles d'Espaces d'États (SSM)}{50}{subsubsection.3.3.3.3}%
-\contentsline {subsubsection}{\numberline {3.3.3.4}Traitement du langage naturel et architectures Sequence-to-Sequence}{51}{subsubsection.3.3.3.4}%
-\contentsline {subsubsection}{\numberline {3.3.3.5}AApplication aux systèmes dynamiques et temporels continus}{51}{subsubsection.3.3.3.5}%
-\contentsline {subsection}{\numberline {3.3.4}L'architecture Transformer}{52}{subsection.3.3.4}%
-\contentsline {subsubsection}{\numberline {3.3.4.1}Limites de la récurrence et introduction du mécanisme d'Attention}{52}{subsubsection.3.3.4.1}%
-\contentsline {subsubsection}{\numberline {3.3.4.2}Architecture macroscopique Encodeur-Décodeur}{53}{subsubsection.3.3.4.2}%
-\contentsline {subsubsection}{\numberline {3.3.4.3}L'Encodeur}{54}{subsubsection.3.3.4.3}%
-\contentsline {subsubsection}{\numberline {3.3.4.4}Le Décodeur}{54}{subsubsection.3.3.4.4}%
-\contentsline {subsubsection}{\numberline {3.3.4.5}Le mécanisme d'Attention et ses variantes}{56}{subsubsection.3.3.4.5}%
-\contentsline {subsubsection}{\numberline {3.3.4.6}Application au traitement du langage naturel}{59}{subsubsection.3.3.4.6}%
-\contentsline {subsubsection}{\numberline {3.3.4.7}Application et limites sur les séries temporelles continues}{59}{subsubsection.3.3.4.7}%
-\contentsline {subsubsection}{\numberline {3.3.4.8}Application à la vision par ordinateur (Vision Transformers)}{61}{subsubsection.3.3.4.8}%
-\contentsline {subsubsection}{\numberline {3.3.4.9}Généralisation aux systèmes physiques et à la prise de décision}{61}{subsubsection.3.3.4.9}%
-\contentsline {subsection}{\numberline {3.3.5}Ancrage dans la problématique}{61}{subsection.3.3.5}%
-\contentsline {chapter}{\numberline {4}L'ordonnancement supervisé comme proxy d'évaluation}{63}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Génération des données et protocole de construction}{65}{section.4.1}%
-\contentsline {subsection}{\numberline {4.1.1}Règle d'ordonnancement implicite}{65}{subsection.4.1.1}%
-\contentsline {subsection}{\numberline {4.1.2}Définition de la difficulté et invariances}{65}{subsection.4.1.2}%
-\contentsline {subsection}{\numberline {4.1.3}Algorithme de génération sous contrainte}{67}{subsection.4.1.3}%
-\contentsline {section}{\numberline {4.2}Stratégie d'apprentissage et architectures neuronales}{67}{section.4.2}%
-\contentsline {subsection}{\numberline {4.2.1}Fonction de coût normalisée}{68}{subsection.4.2.1}%
-\contentsline {subsection}{\numberline {4.2.2}Métrique d'évaluation : La Justesse Positionnelle}{68}{subsection.4.2.2}%
-\contentsline {subsection}{\numberline {4.2.3}Apprentissage progressif}{69}{subsection.4.2.3}%
-\contentsline {subsection}{\numberline {4.2.4}Architectures évaluées}{70}{subsection.4.2.4}%
-\contentsline {section}{\numberline {4.3}Résultats expérimentaux et analyse}{70}{section.4.3}%
-\contentsline {subsection}{\numberline {4.3.1}Protocole de visualisation}{70}{subsection.4.3.1}%
-\contentsline {subsubsection}{\numberline {4.3.1.1}Cartographies de performance}{70}{subsubsection.4.3.1.1}%
-\contentsline {subsubsection}{\numberline {4.3.1.2}Analyse statistique par diagrammes en boîte}{70}{subsubsection.4.3.1.2}%
-\contentsline {subsection}{\numberline {4.3.2}Évaluation du modèle de référence}{71}{subsection.4.3.2}%
-\contentsline {subsection}{\numberline {4.3.3}Évaluation de la méthodologie proposée}{72}{subsection.4.3.3}%
-\contentsline {subsection}{\numberline {4.3.4}Synthèse et comparaison des architectures}{73}{subsection.4.3.4}%
-\contentsline {chapter}{\numberline {5}L'approche séquence vers séquence}{75}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Description du problème}{75}{section.5.1}%
-\contentsline {subsection}{\numberline {5.1.1}Encodage du temps}{75}{subsection.5.1.1}%
-\contentsline {section}{\numberline {5.2}Architectures employées}{75}{section.5.2}%
-\contentsline {section}{\numberline {5.3}Traitement de séquence entière}{75}{section.5.3}%
-\contentsline {section}{\numberline {5.4}Fenêtrage}{75}{section.5.4}%
-\contentsline {section}{\numberline {5.5}Discussion}{75}{section.5.5}%
-\contentsline {chapter}{\numberline {6}Dépliage du problème : une approche événementielle}{77}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Motivation : Du traitement de séquence à la modélisation dynamique}{77}{section.6.1}%
-\contentsline {subsection}{\numberline {6.1.1}Le goulot d'étranglement des architectures pour le Seq2Seq}{77}{subsection.6.1.1}%
-\contentsline {subsection}{\numberline {6.1.2}Le DCI comme système dynamique réactif}{78}{subsection.6.1.2}%
-\contentsline {section}{\numberline {6.2}Formalisation du problème "Flux-à-flux"}{78}{section.6.2}%
-\contentsline {subsection}{\numberline {6.2.1}Contraintes de l'approche et choix de conception}{79}{subsection.6.2.1}%
-\contentsline {paragraph}{Contrainte 1 : Discrétisation de la réponse}{79}{paragraph*.28}%
-\contentsline {paragraph}{Contrainte 2 : Condition d'arrêt}{79}{paragraph*.29}%
-\contentsline {paragraph}{Contrainte 3 : Maintien du contexte}{79}{paragraph*.30}%
-\contentsline {subsection}{\numberline {6.2.2}Illustration du protocole de transformation des données}{80}{subsection.6.2.2}%
-\contentsline {subsection}{\numberline {6.2.3}Préparation des données et ingénierie des caractéristiques}{81}{subsection.6.2.3}%
-\contentsline {subsubsection}{\numberline {6.2.3.1}Encodage local du temps}{81}{subsubsection.6.2.3.1}%
-\contentsline {subsubsection}{\numberline {6.2.3.2}Gestion des masques et exemple de dépliage}{82}{subsubsection.6.2.3.2}%
-\contentsline {section}{\numberline {6.3}Validation de l'approche sur architectures récurrentes}{83}{section.6.3}%
-\contentsline {subsection}{\numberline {6.3.1}Les architectures}{83}{subsection.6.3.1}%
-\contentsline {subsection}{\numberline {6.3.2}Résultats expérimentaux}{84}{subsection.6.3.2}%
-\contentsline {section}{\numberline {6.4}Extension des essais : Généralisation à d'autres architectures}{86}{section.6.4}%
-\contentsline {subsection}{\numberline {6.4.1}Sélection des architectures}{87}{subsection.6.4.1}%
-\contentsline {subsubsection}{\numberline {6.4.1.1}Le Transformer (Attention Mechanism)}{87}{subsubsection.6.4.1.1}%
-\contentsline {subsubsection}{\numberline {6.4.1.2}Le TCN (Temporal Convolutional Network)}{88}{subsubsection.6.4.1.2}%
-\contentsline {subsubsection}{\numberline {6.4.1.3}Le GRU (Recurrent Network)}{89}{subsubsection.6.4.1.3}%
-\contentsline {subsubsection}{\numberline {6.4.1.4}Structure commune et hyper-paramètres}{89}{subsubsection.6.4.1.4}%
-\contentsline {subsection}{\numberline {6.4.2}Fonction de perte et métriques d'évaluation}{91}{subsection.6.4.2}%
-\contentsline {subsubsection}{\numberline {6.4.2.1}Erreur de reconstruction pondérée ($\mathcal {L}_{reg}$)}{91}{subsubsection.6.4.2.1}%
-\contentsline {subsubsection}{\numberline {6.4.2.2}Erreur de classification par MCC différentiable ($\mathcal {L}_{class}$)}{92}{subsubsection.6.4.2.2}%
-\contentsline {subsection}{\numberline {6.4.3}Résultats et Analyse Comparative}{93}{subsection.6.4.3}%
-\contentsline {subsubsection}{\numberline {6.4.3.1}Performance globale et convergence}{93}{subsubsection.6.4.3.1}%
-\contentsline {subsubsection}{\numberline {6.4.3.2}Robustesse face à la longueur de séquence}{94}{subsubsection.6.4.3.2}%
-\contentsline {subsubsection}{\numberline {6.4.3.3}Analyse qualitative des générations}{94}{subsubsection.6.4.3.3}%
-\contentsline {subsection}{\numberline {6.4.4}Conclusion sur les extensions}{95}{subsection.6.4.4}%
+\contentsline {section}{\numberline {2.5}Formalisation et complexité du problème d'apprentissage}{27}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}Nature des données et définition formelle de la tâche}{27}{subsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.5.2}Une double problématique : Traitement de séquence et Génération}{28}{subsection.2.5.2}%
+\contentsline {section}{\numberline {2.6}Introduction}{31}{section.2.6}%
+\contentsline {section}{\numberline {2.7}IA générative}{31}{section.2.7}%
+\contentsline {section}{\numberline {2.8}Méthodes pour le traitement de séquence}{31}{section.2.8}%
+\contentsline {section}{\numberline {2.9}Les améliorations}{32}{section.2.9}%
+\contentsline {chapter}{\numberline {3}État de l'art}{33}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Environnements Numériques et fondements de l'Intelligence Artificielle}{33}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}Distinction conceptuelle : Environnement Virtuel et Jumeau Numérique}{33}{subsection.3.1.1}%
+\contentsline {subsection}{\numberline {3.1.2}Principes mathématiques de l'Apprentissage Profond}{35}{subsection.3.1.2}%
+\contentsline {subsubsection}{\numberline {3.1.2.1}Risque théorique, risque empirique et surapprentissage}{35}{subsubsection.3.1.2.1}%
+\contentsline {subsubsection}{\numberline {3.1.2.2}Optimisation par descente de gradient et rétropropagation}{36}{subsubsection.3.1.2.2}%
+\contentsline {subsubsection}{\numberline {3.1.2.3}Géométrie de l'optimisation}{37}{subsubsection.3.1.2.3}%
+\contentsline {subsection}{\numberline {3.1.3}L'IA pour la constitution géométrique et visuelle de l'environnement}{38}{subsection.3.1.3}%
+\contentsline {subsubsection}{\numberline {3.1.3.1}Reconstruction neurale et représentations implicites}{38}{subsubsection.3.1.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.3.2}Synthèse géométrique par modèles de diffusion}{38}{subsubsection.3.1.3.2}%
+\contentsline {subsection}{\numberline {3.1.4}L'IA pour l'accélération et la modélisation des phénomènes physiques}{39}{subsection.3.1.4}%
+\contentsline {subsubsection}{\numberline {3.1.4.1}Apprentissage par Observation (Data-Driven)}{39}{subsubsection.3.1.4.1}%
+\contentsline {subsubsection}{\numberline {3.1.4.2}Apprentissage sous contraintes physiques (Physics-Informed)}{39}{subsubsection.3.1.4.2}%
+\contentsline {subsubsection}{\numberline {3.1.4.3}Apprentissage structuré par biais inductif physique}{40}{subsubsection.3.1.4.3}%
+\contentsline {subsection}{\numberline {3.1.5}L'IA au service de l'interactivité et de l'adaptation décisionnelle}{40}{subsection.3.1.5}%
+\contentsline {subsubsection}{\numberline {3.1.5.1}Intégration d'agents autonomes par apprentissage par renforcement}{40}{subsubsection.3.1.5.1}%
+\contentsline {subsubsection}{\numberline {3.1.5.2}Génération procédurale et apprentissage par curriculum}{40}{subsubsection.3.1.5.2}%
+\contentsline {subsection}{\numberline {3.1.6}Ancrage dans la problématique}{41}{subsection.3.1.6}%
+\contentsline {section}{\numberline {3.2}Architectures neuronales génératives}{41}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Auto-Encodeurs Variationnels (VAE)}{42}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Réseaux Antagonistes Génératifs (GAN)}{42}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}Modèles de Diffusion Probabilistes}{43}{subsection.3.2.3}%
+\contentsline {subsection}{\numberline {3.2.4}Le paradigme séquentiel et l'Autorégression}{43}{subsection.3.2.4}%
+\contentsline {subsection}{\numberline {3.2.5}Ancrage dans la problématique}{44}{subsection.3.2.5}%
+\contentsline {section}{\numberline {3.3}Architectures de traitement séquentiel et spatial}{44}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Typologie des données : causalité temporelle et topologie spatiale}{44}{subsection.3.3.1}%
+\contentsline {subsubsection}{\numberline {3.3.1.1}Propriétés causales des données séquentielles}{45}{subsubsection.3.3.1.1}%
+\contentsline {subsubsection}{\numberline {3.3.1.2}Topologie et contiguïté des données spatiales}{45}{subsubsection.3.3.1.2}%
+\contentsline {subsubsection}{\numberline {3.3.1.3}Universalité de la modélisation séquentielle}{45}{subsubsection.3.3.1.3}%
+\contentsline {subsection}{\numberline {3.3.2}Réseaux de convolution}{45}{subsection.3.3.2}%
+\contentsline {subsubsection}{\numberline {3.3.2.1}Origine et application à la vision par ordinateur}{46}{subsubsection.3.3.2.1}%
+\contentsline {subsubsection}{\numberline {3.3.2.2}Filtrage local et expansion hiérarchique du champ récepteur}{46}{subsubsection.3.3.2.2}%
+\contentsline {subsubsection}{\numberline {3.3.2.3}Application aux structures spatiales bidimensionnelles}{48}{subsubsection.3.3.2.3}%
+\contentsline {subsubsection}{\numberline {3.3.2.4}Application aux séquences unidimensionnelles}{49}{subsubsection.3.3.2.4}%
+\contentsline {subsubsection}{\numberline {3.3.2.5}Généralisation aux données volumétriques et topologies irrégulières}{49}{subsubsection.3.3.2.5}%
+\contentsline {subsection}{\numberline {3.3.3}Réseaux de neurones récurrents et Espaces d'Etats (RNN et SSM)}{50}{subsection.3.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.3.1}Évolution architecturale : des RNN simples aux portes logiques (LSTM/GRU)}{50}{subsubsection.3.3.3.1}%
+\contentsline {subsubsection}{\numberline {3.3.3.2}Principe de récurrence et mise à jour de l'état mémoire}{50}{subsubsection.3.3.3.2}%
+\contentsline {subsubsection}{\numberline {3.3.3.3}Modèles d'Espaces d'États (SSM)}{53}{subsubsection.3.3.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.3.4}Traitement du langage naturel et architectures Sequence-to-Sequence}{53}{subsubsection.3.3.3.4}%
+\contentsline {subsubsection}{\numberline {3.3.3.5}AApplication aux systèmes dynamiques et temporels continus}{53}{subsubsection.3.3.3.5}%
+\contentsline {subsection}{\numberline {3.3.4}L'architecture Transformer}{54}{subsection.3.3.4}%
+\contentsline {subsubsection}{\numberline {3.3.4.1}Limites de la récurrence et introduction du mécanisme d'Attention}{54}{subsubsection.3.3.4.1}%
+\contentsline {subsubsection}{\numberline {3.3.4.2}Architecture macroscopique Encodeur-Décodeur}{55}{subsubsection.3.3.4.2}%
+\contentsline {subsubsection}{\numberline {3.3.4.3}L'Encodeur}{57}{subsubsection.3.3.4.3}%
+\contentsline {subsubsection}{\numberline {3.3.4.4}Le Décodeur}{57}{subsubsection.3.3.4.4}%
+\contentsline {subsubsection}{\numberline {3.3.4.5}Le mécanisme d'Attention et ses variantes}{58}{subsubsection.3.3.4.5}%
+\contentsline {subsubsection}{\numberline {3.3.4.6}Application au traitement du langage naturel}{61}{subsubsection.3.3.4.6}%
+\contentsline {subsubsection}{\numberline {3.3.4.7}Application et limites sur les séries temporelles continues}{61}{subsubsection.3.3.4.7}%
+\contentsline {subsubsection}{\numberline {3.3.4.8}Application à la vision par ordinateur (Vision Transformers)}{63}{subsubsection.3.3.4.8}%
+\contentsline {subsubsection}{\numberline {3.3.4.9}Généralisation aux systèmes physiques et à la prise de décision}{63}{subsubsection.3.3.4.9}%
+\contentsline {subsection}{\numberline {3.3.5}Ancrage dans la problématique}{63}{subsection.3.3.5}%
+\contentsline {chapter}{\numberline {4}L'ordonnancement supervisé comme proxy d'évaluation}{65}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Génération des données et protocole de construction}{67}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Règle d'ordonnancement implicite}{67}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Définition de la difficulté et invariances}{68}{subsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.1.3}Algorithme de génération sous contrainte}{69}{subsection.4.1.3}%
+\contentsline {section}{\numberline {4.2}Stratégie d'apprentissage et architectures neuronales}{70}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Fonction de coût normalisée}{70}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Métrique d'évaluation : La Justesse Positionnelle}{70}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}Apprentissage progressif}{71}{subsection.4.2.3}%
+\contentsline {subsection}{\numberline {4.2.4}Architectures évaluées}{72}{subsection.4.2.4}%
+\contentsline {section}{\numberline {4.3}Résultats expérimentaux et analyse}{72}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Protocole de visualisation}{72}{subsection.4.3.1}%
+\contentsline {subsubsection}{\numberline {4.3.1.1}Cartographies de performance}{72}{subsubsection.4.3.1.1}%
+\contentsline {subsubsection}{\numberline {4.3.1.2}Analyse statistique par diagrammes en boîte}{73}{subsubsection.4.3.1.2}%
+\contentsline {subsection}{\numberline {4.3.2}Évaluation du modèle de référence}{73}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Évaluation de la méthodologie proposée}{74}{subsection.4.3.3}%
+\contentsline {subsection}{\numberline {4.3.4}Synthèse et comparaison des architectures}{75}{subsection.4.3.4}%
+\contentsline {chapter}{\numberline {5}L'approche séquence vers séquence}{77}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Description du problème}{77}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}Encodage du temps}{77}{subsection.5.1.1}%
+\contentsline {section}{\numberline {5.2}Architectures employées}{77}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Traitement de séquence entière}{77}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Fenêtrage}{77}{section.5.4}%
+\contentsline {section}{\numberline {5.5}Discussion}{77}{section.5.5}%
+\contentsline {chapter}{\numberline {6}Sérialisation du problème : une approche événementielle}{79}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Motivation : Du traitement de séquence à la modélisation dynamique}{79}{section.6.1}%
+\contentsline {subsection}{\numberline {6.1.1}Le goulot d'étranglement des architectures pour le Seq2Seq}{79}{subsection.6.1.1}%
+\contentsline {subsection}{\numberline {6.1.2}Le DCI comme système dynamique réactif}{80}{subsection.6.1.2}%
+\contentsline {section}{\numberline {6.2}Formalisation du problème "Flux-à-flux"}{80}{section.6.2}%
+\contentsline {subsection}{\numberline {6.2.1}Contraintes de l'approche et choix de conception}{81}{subsection.6.2.1}%
+\contentsline {paragraph}{Contrainte 1 : Discrétisation de la réponse}{81}{paragraph*.28}%
+\contentsline {paragraph}{Contrainte 2 : Condition d'arrêt}{81}{paragraph*.29}%
+\contentsline {paragraph}{Contrainte 3 : Maintien du contexte}{81}{paragraph*.30}%
+\contentsline {subsection}{\numberline {6.2.2}Sérialisation : transformation et préparation des données}{81}{subsection.6.2.2}%
+\contentsline {subsection}{\numberline {6.2.3}Préparation des données et ingénierie des caractéristiques}{83}{subsection.6.2.3}%
+\contentsline {subsubsection}{\numberline {6.2.3.1}Encodage local du temps}{83}{subsubsection.6.2.3.1}%
+\contentsline {subsubsection}{\numberline {6.2.3.2}Gestion des masques et exemple de sérialisation}{84}{subsubsection.6.2.3.2}%
+\contentsline {section}{\numberline {6.3}Validation de l'approche sur architectures récurrentes}{85}{section.6.3}%
+\contentsline {subsection}{\numberline {6.3.1}Les architectures}{86}{subsection.6.3.1}%
+\contentsline {subsection}{\numberline {6.3.2}Résultats expérimentaux}{86}{subsection.6.3.2}%
+\contentsline {section}{\numberline {6.4}Extension des essais : Généralisation à d'autres architectures}{89}{section.6.4}%
+\contentsline {subsection}{\numberline {6.4.1}Sélection des architectures}{89}{subsection.6.4.1}%
+\contentsline {subsubsection}{\numberline {6.4.1.1}Le Transformer (Attention Mechanism)}{89}{subsubsection.6.4.1.1}%
+\contentsline {subsubsection}{\numberline {6.4.1.2}Le TCN (Temporal Convolutional Network)}{89}{subsubsection.6.4.1.2}%
+\contentsline {subsubsection}{\numberline {6.4.1.3}Le GRU (Recurrent Network)}{91}{subsubsection.6.4.1.3}%
+\contentsline {subsubsection}{\numberline {6.4.1.4}Structure commune et hyper-paramètres}{91}{subsubsection.6.4.1.4}%
+\contentsline {subsection}{\numberline {6.4.2}Fonction de perte et métriques d'évaluation}{92}{subsection.6.4.2}%
+\contentsline {subsubsection}{\numberline {6.4.2.1}Erreur de reconstruction pondérée ($\mathcal {L}_{reg}$)}{94}{subsubsection.6.4.2.1}%
+\contentsline {subsubsection}{\numberline {6.4.2.2}Erreur de classification par MCC différentiable ($\mathcal {L}_{class}$)}{95}{subsubsection.6.4.2.2}%
+\contentsline {subsection}{\numberline {6.4.3}Résultats et Analyse Comparative}{95}{subsection.6.4.3}%
+\contentsline {subsubsection}{\numberline {6.4.3.1}Performance globale et convergence}{96}{subsubsection.6.4.3.1}%
+\contentsline {subsubsection}{\numberline {6.4.3.2}Robustesse face à la longueur de séquence}{97}{subsubsection.6.4.3.2}%
+\contentsline {subsubsection}{\numberline {6.4.3.3}Analyse qualitative des générations}{97}{subsubsection.6.4.3.3}%
+\contentsline {subsection}{\numberline {6.4.4}Conclusion sur les extensions}{97}{subsection.6.4.4}%

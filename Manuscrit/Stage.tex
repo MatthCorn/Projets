@@ -1,23 +1,9 @@
-\chapter{Dépliage du problème : une approche événementielle}
-
-\section*{Plan}
-\begin{itemize}
-\item Motivation
-\item Formalisation du problème
-\item Visualisation (vraiment utile)
-\item Présentation CAID
-\item Extension des essaies
-	\begin{itemize}
-	\item pré-traitement
-	\item architecture
-	\item fonction de perte
-	\item résultats
-	\end{itemize}
-\item Conclusion
-\end{itemize}
-\; \\
+\chapter{Sérialisation du problème : une approche événementielle}
 
 Ce chapitre introduit une méthodologie alternative pour la reproduction par IA du mécanisme de Détection et Caractérisation des Impulsions (DCI). En rupture avec l'approche de type \textit{sequence-to-sequence} (Seq2Seq) abordées dans le chapitre précédent \ref{chap:seq2seq}, nous proposons ici une reformulation du problème axée sur la causalité et le traitement flux-à-flux (\textit{stream processing}). 
+
+Cette transition méthodologique repose sur un concept de \textbf{sérialisation événementielle}. Il s'agit d'une démarche consistant à réorganiser les flux parallèles et asynchrones d'entrée (les impulsions incidentes) et de sortie (les PDW publiés) en une unique ligne temporelle. Ce concept sera approfondi dans la sous-section \ref{seq:serialisation}.
+
 \section{Motivation : Du traitement de séquence à la modélisation dynamique}
 L'approche Seq2Seq consiste à traiter l'intégralité d'une séquence d'impulsions source dans un encodeur avant l'utilisation de l'information issue de ce traitement par un décodeur pour produire itérativement la séquence d'impulsions cible. Cette approche se heurte alors à deux obstacles majeurs. Premièrement, le traitement de la séquence source entière par un encodeur constitue un goulot d'étranglement calculatoire problématique pour les séquences longues. Deuxièmement, l'inférence de ce modèle est dissonante avec le mécanisme de traitement du système réel, qui lui n'attend pas la fin des impulsions incidentes pour publier des interceptions, et exploite une mémoire locale. L'approche flux-à-flux, que nous formalisons dans cette section, vise à reproduire ce mécanisme de production d'interceptions en direct présent dans le DCI, en forçant l'exploitation d'une information locale et causale de la séquence source pour les prédictions.
 \subsection{Le goulot d'étranglement des architectures pour le Seq2Seq}
@@ -27,6 +13,7 @@ Le premier obstacle à l'approche Seq2Seq est la difficulté à traiter des séq
 \item \textbf{Architectures attentionnelles (Transformers) :} Plus robustes au problème de maintient de dépendance temporelle, cette architecture présente une complexité algorithmique quadratique $\mathcal{O}(N^2)$ en fonction de la longueur de la séquence. Le traitement de séquence longues devient alors un problème challengeant du point de vue matériel (limitation V-RAM).
 \end{itemize}
 Ces limitations imposent la mise en place de mécanismes de segmentation, tel que le découpage en fenêtres étudié au chapitre précédent \ref{chap:seq2seq}, qui nuisent à la continuité du traitement et altère donc la séquence globale des PDW émis \ref{seq:discseq2seq}.
+
 \subsection{Le DCI comme système dynamique réactif}
 Le second obstacle est d'ordre conceptuel. Modéliser le DCI comme une fonction globale $f(\mathbf{X}_{total}) \to \mathbf{Y}_{total}$ est une hypothèse forte qui masque la réalité physique du module. Le DCI est système dynamique réactifs qui est régis par l'arrivé de trois type d'\textit{évènements} :
 \begin{enumerate}
@@ -37,6 +24,7 @@ Le second obstacle est d'ordre conceptuel. Modéliser le DCI comme une fonction 
 Bien que non-mentionné de cette manière auparavant, cette notion d'évènement était déjà centrale pour le DCI. Par exemple, les deux premiers évènements liées à l'apparition ou la disparition d'impulsions incidentes modelait les \textit{paliers} (dont un exemple est illustré figure \ref{fig:window}). Le DCI traite donc les séquences d'impulsions incidentes itérativement comme une séquence d'évènement, entre lesquels s'entrelaçent des évènements liés à la publication d'impulsion. Finalement, il apparaît intéressant de chercher à rapprocher le traitement de nos architectures de ce comportement "pas-à-pas". Nous proposons est de transformer le problème de prédiction globale en un problème de prédiction locale causale : étant donné une impulsion incidente, le modèle doit prédire la cascade d'événements (émissions) qui surviennent avant l'arrivée de l'impulsion incidente suivante.
 
 \section{Formalisation du problème "Flux-à-flux"}
+\label{seq:serialisation}
 L'implémentation de cette approche avec un réseau de neurones passe par une étape de réflexion sur la manière, afin de faire de l'idée de la formulation flux-à-flux un réel problème d'entrainement bien définit. Nous analysons ici les contraintes qu'impose l'approche proposée pour y associé des choix que nous faisons. Ces choix concernent aussi bien l'architecture que le mode d'inférence ou encore la transformation des données. Ils visent à relier chaque situation observable (par exemple, l'arrivée d'un certain PDW incident) à une unique sortie (par exemple la prédiction d'une PDW émis), mais aussi inversement qu'à chaque sortie ne corresponde qu'une situation observable. De ce fait, l'entrainement supervisé pourra être réalisé sans embuche.
 
 \subsection{Contraintes de l'approche et choix de conception}
@@ -62,12 +50,13 @@ Le modèle doit produire des prédictions en fonction du contexte passé, ce qui
 \end{enumerate}
 \end{itemize}
 
-\subsection{Illustration du protocole de transformation des données}
-La combinaison de ces choix aboutit à un algorithme de "fusion" des séquences de PDW, considérées alors comme des séquences d'évènements. Nous illustrons cet algorithme à l'aide d'un exemple.
-Considérons une séquence de PDW incidents $[I_1, I_2, I_3]$ et la séquence de PDW interceptés correspondants $[O_1, O_2, O_3, O_4, O_5]$. Alors considérées comme deux séquences d'évènements à auquels une date est associé (la date d'arrivée pour les impulsions incidentes, la date de publication pour les impulsions interceptées), nous obtenons une unique séquence fusionnée d'évènements triés par ordre chronologique :
+\subsection{Sérialisation : transformation et préparation des données}
+L'opération de \textbf{sérialisation événementielle} est un processus algorithmique qui consiste à fusionner plusieurs flux de données parallèles (arrivée d'impulsions incidentes et publication d'impulsion interceptée) et asynchrones (sans correspondance temporelle un-à-un entre les deux flux) en une unique séquence. L'ordonnancement de cette nouvelle séquence est strictement chronologique et régi par la date effective de chaque événement (date d'arrivée pour une impulsion incidente, ou date de publication pour un PDW intercepté). En alignant ces évènements sur une même frise temporelle, la sérialisation événementielle permet de ramener un problème de dynamique asynchrone complexe à un problème de traitement auto-régressif causal classique.\\
+
+Nous illustrons cet algorithme à l'aide d'un exemple. Considérons une séquence de PDW incidents $[I_1, I_2, I_3]$ et la séquence de PDW interceptés correspondants $[O_1, O_2, O_3, O_4, O_5]$. Alors considérées comme deux séquences d'évènements à auxquels une date est associé (la date d'arrivée pour les impulsions incidentes, la date de publication pour les impulsions interceptées), nous obtenons par sérialisation une unique séquence trié par ordre chronologique :
 \begin{equation}
 \label{eq:seqfusion}
-\text{Séquence fusionnée} : [I_1, O_1, O_2, O_3, I_2, I_3, O_4, O_5]
+\text{Séquence sérialisée} : [I_1, O_1, O_2, O_3, I_2, I_3, O_4, O_5]
 \end{equation}
 
 D'après nos choix de conceptions réalisé plus tôt et les contraintes qu'imposent l'approche, l'objectif pour nos modèles sera de prédire itérativement les évènements de publications se réalisant entre l'arrivé de chaque impulsion incidente, ainsi que de prédire l'absence de nouvelle prédiction sur l'intervalle, grâce à l'observation de la dernière impulsion incidente arrivé et du dernier évènement prédit, soulageant le rôle de la mémoire. Ce processus conduit au déroulé des opérations qui explique à chaque instant ce que le modèle observe et ce qu'on attend du modèle en retour. Ci-dessous ce déroulé des opérations pour notre exemple, où nous rappelons entre parenthèses les traitements attendus :
@@ -99,7 +88,7 @@ Le passage d'une modélisation globale (\textit{séquence vers séquence}) à un
 
 \subsubsection{Encodage local du temps}
 Dans l'approche globale Seq2Seq, les données encodaient le temps d'arrivée relativement à la position dans la séquence afin d'éviter la croissance incontrôlée des valeurs \ref{seq:timeencoding}. Cependant, dans l'approche flux-à-flux où les traitements des éléments ont vocation à être réalisés de manière locale, la pertinence de cet encodage est remise en question.
-Bien que, mathématiquement, l'encodage globale reste décodable à l'échelle locale du flux-à-flux par la présence de la mémoire et parce que l'opération de pliage/dépliage est réversible, notre problématique ne porte pas sur la décodabilité théorique, mais sur la difficulté d'extraction de cette information par le réseau de neurones. \\
+Bien que, mathématiquement, l'encodage globale reste décodable à l'échelle locale du flux-à-flux par la présence de la mémoire et parce que la sérialisation est réversible, notre problématique ne porte pas sur la décodabilité théorique, mais sur la difficulté d'extraction de cette information par le réseau de neurones. \\
 
 Nous nous intéressons ici à la difficulté de décoder les informations temporelles dans le cadre d'une sous-séquence (typiquement avec un début tronqué). Ce scénario simule l'horizon limité que le modèle peut se représenter dans son espace latent et sa mémoire, en accord avec la philosophie de l'approche qui vise à reproduire les contraintes du matériel (DCI).\\
 
@@ -113,12 +102,12 @@ $$\Delta T_{i} = TOA(I_{i+1}) - TOA(I_{i})$$
 Cette information permet au modèle d'estimer la "fenêtre temporelle" disponible pour ses émissions. Dans le cas d'une fin de séquence, une valeur assez grande est utilisée pour signifier au modèle qu'il doit vider sa mémoire (générer toutes les réponses restantes).\\
 
 \item Pour les impulsions interceptées ($(O_i)_{0 \leq i \leq M}$) : \\ 
-Dans la configuration \textit{seq2seq}, l'encodage du temps d'émission est réalisé en soustrayant à cette valeur (information globale) réelle la position dans la séquence (information globale) \ref{eq:timeencodingout}. Bien que cette information soit toujours récupérable par inversion du dépliage, on considère que retrouver localement la position qu'une prédiction aurait eu dans la séquence non-dépliée n'est pas dans l'esprit de l'approche. La synchronisation des flux-à-flux permet d'adopter un encodage local plus pertinent : le temps d'arrivé d'un PDW intercepté $O_i$ (qu'il soit en entrée ou à prédire) est encodé relativement au temps d'arrivée de l'impulsion incidente courante $I_j$.
+Dans la configuration \textit{seq2seq}, l'encodage du temps d'émission est réalisé en soustrayant à cette valeur (information globale) réelle la position dans la séquence (information globale) \ref{eq:timeencodingout}. Bien que cette information soit toujours récupérable par inversion de la sérialisation, on considère que retrouver localement la position qu'une prédiction aurait eu dans la séquence cible globale n'est pas dans l'esprit de l'approche. La synchronisation des flux permet d'adopter un encodage local plus pertinent : le temps d'arrivé d'un PDW intercepté $O_i$ (qu'il soit en entrée ou à prédire) est encodé relativement au temps d'arrivée de l'impulsion incidente courante $I_j$.
 $$TOA(O_i) - TOA(I_j)$$
-Par exemple dans le cadre de la séquence dépliée liée à \ref{tab:seqfusion}, le troisième élément est constitué d'une entrée $(I_1, O_2)$ et d'une cible $O_3$. Alors le temps d'arrivé de $O_2$ sera encodé localement $TOA(O_2) - TOA(I_1)$ et le temps d'arrivé de $O_3$ sera encodé $TOA(O_3) - TOA(I_1)$.
+Par exemple dans le cadre de la séquence sérialisée liée à \ref{tab:seqfusion}, le troisième élément est constitué d'une entrée $(I_1, O_2)$ et d'une cible $O_3$. Alors le temps d'arrivé de $O_2$ sera encodé localement $TOA(O_2) - TOA(I_1)$ et le temps d'arrivé de $O_3$ sera encodé $TOA(O_3) - TOA(I_1)$.
 \end{itemize}
 
-\subsubsection{Gestion des masques et exemple de dépliage}
+\subsubsection{Gestion des masques et exemple de sérialisation}
 Comme abordé précédemment, l'approche flux-à-flux nécessite la gestion de plusieurs masques pour piloter l'apprentissage supervisé et le calcul de la fonction de coût.
 \begin{itemize}
 \item MI (Mask Input) : Indique si l'entrée secondaire (Input 2) est le jeton \texttt{NEXT} (1) ou un PDW (0). Ce masque est fourni au modèle pour qu'il remplace sa deuxième entrée (Input 2) par un vecteur latent appris qu'il stock en interne, représentant le rôle du jeton \texttt{NEXT} si ce n'est pas un PDW.
@@ -126,7 +115,7 @@ Comme abordé précédemment, l'approche flux-à-flux nécessite la gestion de p
 \item MP (Mask Padding) : Indique si la position est valide (1) ou si elle relève du remplissage (padding) de fin de batch (0). Ce masque est utilisé pour l'apprentissage, afin de simplement ignorer les sorties du modèle sur ces positions, où il n'aurait pas du être interrogé en inférence.\\
 \end{itemize}
 
-Nous illustrons ce mécanisme dans le tableau \ref{tab:seqfusion} qui reprend l'exemple de la séquence fusionnée $[I_1, O_1, O_2, O_3, I_2, I_3, O_4, O_5]$ présentée plus tôt \ref{eq:seqfusion} . Ce tableau présente pour chaque pas de temps (les prédictions itératives réalisées par le modèle) la réponse attendu du modèle ainsi que la valeur de chaque masque. 
+Nous illustrons ce mécanisme dans le tableau \ref{tab:seqfusion} qui reprend l'exemple de la séquence sérialisée $[I_1, O_1, O_2, O_3, I_2, I_3, O_4, O_5]$ présentée plus tôt \ref{eq:seqfusion} . Ce tableau présente pour chaque pas de temps (les prédictions itératives réalisées par le modèle) la réponse attendu du modèle ainsi que la valeur de chaque masque. 
 
 \begin{table}[h]
 \centering
@@ -148,7 +137,7 @@ Nous illustrons ce mécanisme dans le tableau \ref{tab:seqfusion} qui reprend l'
 \textbf{MP} (Valid) & 1 & 1 & 1 & 1 & 1& 1& 1& 1& 0&0\\
 \hline
 \end{tabular}
-\caption{Compilation de l'ensemble des données (entrées, sortie, masques) qui permettent de superviser l'entrainement d'un modèle. Dans cet exemple, la séquence fusionnée \ref{eq:seqfusion} est de longueur 8 mais est prolongée jusqu'à 10, ce qui correspond à l'étape d'uniformisation des longueurs des séquences permettant un entrainement en parallèle de nos modèles.}
+\caption{Compilation de l'ensemble des données (entrées, sortie, masques) qui permettent de superviser l'entrainement d'un modèle. Dans cet exemple, la séquence sérialisée \ref{eq:seqfusion} est de longueur 8 mais est prolongée jusqu'à 10, ce qui correspond à l'étape d'uniformisation des longueurs des séquences permettant un entrainement en parallèle de nos modèles.}
 \label{tab:seqfusion}
 \end{table}
 
@@ -233,7 +222,7 @@ En complément de cette évaluation quantitative, la figure \ref{fig:RNNgen} ill
 Cette étude valide expérimentalement la pertinence de l'approche flux-à-flux couplée à une architecture récurrente. La très faible variation de l'erreur observée entre 20 et 50 PDW, proche de 0, confirme que notre approche permet de passer à l'échelle sur de plus longues séquences. De plus, l'invariance de la tâche itérative à réaliser sur le traitement du flux assure que le modèle ne nécessite pas d'un entrainement supplémentaire pour traiter ces longues séquences. Ces travaux, présentés sous forme de poster à la conférence CAID \textcolor{red}{REF}, ont reçu un accueil favorable, confirmant l'intérêt de la communauté pour des modèles neuronaux capables de reproduire la causalité fine des chaînes de traitement signal. Ces résultats constituent le socle sur lequel nous bâtissons les extensions présentées dans la section suivante.
 
 \section{Extension des essais : Généralisation à d'autres architectures}
-Cette section étend la discussion sur la pertinence du dépliage des données initiée avec les travaux présentés à la conférence CAID \textcolor{red}{REF}. En effet, cette nouvelle formulation flux-à-flux du problème permet en réalité l'utilisation de toutes architectures de traitement de séquence, au delà des architectures récurrentes, à condition qu'elles opèrent de manière auto-régressive et respectent donc la contrainte de causalité. Nous réitérons les expériences en introduisant deux nouvelles familles d'architectures : les Réseaux Convolutifs et les Transformers. Bien qu'elles ne disposent pas de mémoire, ces architectures peuvent accéder aux derniers éléments passées pour en construire une représentation latent, jouant un rôle similaire à la mémoire. \\
+Cette section étend la discussion sur la pertinence de la sérialisation des données initiée avec les travaux présentés à la conférence CAID \textcolor{red}{REF}. En effet, cette nouvelle formulation flux-à-flux du problème permet en réalité l'utilisation de toutes architectures de traitement de séquence, au delà des architectures récurrentes, à condition qu'elles opèrent de manière auto-régressive et respectent donc la contrainte de causalité. Nous réitérons les expériences en introduisant deux nouvelles familles d'architectures : les Réseaux Convolutifs et les Transformers. Bien qu'elles ne disposent pas de mémoire, ces architectures peuvent accéder aux derniers éléments passées pour en construire une représentation latent, jouant un rôle similaire à la mémoire. \\
 
 Nous détaillons ici les adaptations nécessaires au pré-traitement des données pour maximiser l'efficacité de ces modèles, la sélection des architectures, ainsi que les métriques spécifiques définies pour guider l'apprentissage, avant de présenter les résultats et nos conclusions.
 
@@ -241,7 +230,7 @@ Nous détaillons ici les adaptations nécessaires au pré-traitement des donnée
 Nous comparons trois architectures distinctes, choisies pour leur représentativité des différents paradigmes de traitement séquentiel.
 
 \subsubsection{Le Transformer (Attention Mechanism)}
-Le modèle utilisé est un Encodeur Transformer modifié, inspiré de l'architecture proposé par Vaswani \cite{vaswani_attention_2017}. Contrairement à l'encodeur standard qui voit tout le contexte, notre encodeur remplace les modules de Self-Attention \ref{MHAeq} par un module de Masked Self-Attention \ref{maskedattention} pour garantir la causalité. Cette architecture est particulièrement adaptée pour capturer des dépendances complexes et non-locales dans la séquence dépliée. Elle est illustrée dans la figure \ref{fig:linTrans}.
+Le modèle utilisé est un Encodeur Transformer modifié, inspiré de l'architecture proposé par Vaswani \cite{vaswani_attention_2017}. Contrairement à l'encodeur standard qui voit tout le contexte, notre encodeur remplace les modules de Self-Attention \ref{MHAeq} par un module de Masked Self-Attention \ref{maskedattention} pour garantir la causalité. Cette architecture est particulièrement adaptée pour capturer des dépendances complexes et non-locales dans la séquence sérialisée. Elle est illustrée dans la figure \ref{fig:linTrans}.
 
 \begin{figure}
 \begin{center}
@@ -271,7 +260,7 @@ Dans l'architecture TCN, le facteur de dilatation croît exponentiellement avec 
 Cette architecture s'est particulièrement distinguée dans la littérature en surpassant les modèles récurrents (LSTM, GRU) sur une vaste majorité de tâches standards de modélisation de séquences \cite{bai_empirical_2018}. Elle offre notamment une stabilité d'optimisation supérieure en s'affranchissant du problème de disparition du gradient inhérent aux longues boucles de récurrence, tout en réduisant considérablement les temps d'entraînement grâce à sa parallélisation totale. Dans le cadre de notre étude, l'introduction du TCN permet de tester une hypothèse structurelle fondamentale : il s'agit d'évaluer si une modélisation hiérarchique locale, dotée d'un champ récepteur fixe mais large, peut s'avérer plus efficace qu'une mémoire récurrente infinie pour capturer la dynamique algorithmique temporelle du DCI.
 
 \subsubsection{Le GRU (Recurrent Network)}
-Pour représenter la famille des réseaux récurrents, nous avons écarté les variantes à attention (LSTMAT) car leur mécanisme de "relecture" du passé les rapproche conceptuellement des Transformers, diluant l'intérêt de la comparaison "orthogonale". Au vu des résultats précédents \ref{tab:resRNN}, nous retenons le GRU (Gated Recurrent Unit), qui s'est avéré être le compromis le plus performant et stable pour le traitement des longues séquences en mode déplié. Le GRU est illustré à droite de la figure \ref{fig:compareRNN}.
+Pour représenter la famille des réseaux récurrents, nous avons écarté les variantes à attention (LSTMAT) car leur mécanisme de "relecture" du passé les rapproche conceptuellement des Transformers, diluant l'intérêt de la comparaison "orthogonale". Au vu des résultats précédents \ref{tab:resRNN}, nous retenons le GRU (Gated Recurrent Unit), qui s'est avéré être le compromis le plus performant et stable pour le traitement des longues séquences sérialisées. Le GRU est illustré à droite de la figure \ref{fig:compareRNN}.
 
 \subsubsection{Structure commune et hyper-paramètres}
 Afin de garantir une comparaison rigoureuse, toutes les architectures évaluées partagent une topologie modulaire commune et un même principe d'inférence, structurés comme suit :\\
@@ -362,8 +351,8 @@ Pour optimiser la performance sur ce problème de classification binaire déséq
 $$ MCC = \frac{TP\times TN - FP \times FN}{\sqrt{(TP + FP)(TP + FN)(TN + FP)(TN + FN)}}$$
 La version "soft" repose sur un calcul souple se basant sur les probabilités d'attributions des classes : 
 \begin{itemize}
-\item une probabilité prédite de $0.34$ associé à la cible "positif" (1) est a $34%$ un vrai positif et à $66%$ un faux négatif
-\item une probabilité prédite de $0.34$ associé à la cible "négatif" (0) est a $34%$ un faux positif et à $66%$ un vrai négatif
+\item une probabilité prédite de $0.34$ associée à la cible "positif" (1) est a $34\%$ un vrai positif et à $66\%$ un faux négatif
+\item une probabilité prédite de $0.34$ associée à la cible "négatif" (0) est a $34\%$ un faux positif et à $66\%$ un vrai négatif
 \end{itemize} 
 
 Cette souplesse permet de conserver la différentiabilité du $MCC_{soft}$ par rapport aux prédiction du modèle, et donc de propager le gradient pour l'apprentissage.En notant $\Sigma(\cdot)$ l'opérateur  qui calcule la somme de tous les éléments d'un tenseur, les versions "soft" de $TP, TN, FP, FN$ s'expriment ainsi : 
@@ -385,7 +374,7 @@ La perte de classification est définie pour tendre vers 0 lorsque la corrélati
 \end{equation}
 
 \subsection{Résultats et Analyse Comparative}
-Cette section présente les performances comparées des trois architectures (GRU, TCN, Transformer) sur la tâche de génération de flux dépliés. Les modèles ont été entraînés et évalués selon le protocole décrit précédemment, avec un facteur de pondération $\lambda = 0.5$ équilibrant la régression et la classification.
+Cette section présente les performances comparées des trois architectures (GRU, TCN, Transformer) sur la tâche de génération de flux évènementiel. Les modèles ont été entraînés et évalués selon le protocole décrit précédemment, avec un facteur de pondération $\lambda = 0.5$ équilibrant la régression et la classification.
 
 \subsubsection{Performance globale et convergence}
 Dans un premier temps, nous évaluons la capacité des modèles à converger vers une solution stable et à généraliser sur l'ensemble de test. La figure ci-dessous illustre la dynamique d'apprentissage.
@@ -452,7 +441,7 @@ L'une des motivations principales du passage au "flux-à-flux" était de s'affra
 Comme l'illustre la figure \ref{fig:length_robustness}, les trois architectures démontrent une stabilité remarquable quelle que soit la longueur de la séquence (courbes quasi-plates). L'encodage relatif local du temps et la gestion événementielle par le token \texttt{NEXT} permettent effectivement de "réinitialiser" implicitement le contexte, empêchant la dérive temporelle ou la saturation de la mémoire souvent constatée sur les LSTM/GRU en mode Seq2Seq global.
 
 \subsubsection{Analyse qualitative des générations}
-Enfin, il est pertinent d'observer visuellement la qualité des séquences générées. La figure \ref{fig:qualitative} présente un exemple de dépliage pour une séquence complexe où plusieurs impulsions incidentes se chevauchent temporellement.
+Enfin, il est pertinent d'observer visuellement la qualité des séquences générées. La figure \ref{fig:qualitative} présente un exemple de sérialisation pour une séquence complexe où plusieurs impulsions incidentes se chevauchent temporellement.
 \begin{figure}[htbp]
 \centering
 \fbox{
@@ -477,7 +466,7 @@ L'analyse qualitative confirme que le modèle a bien appris la logique de causal
 \end{itemize}
 
 \subsection{Conclusion sur les extensions}
-Ces expériences complémentaires valident la généralité de l'approche par dépliage. Si le Transformer s'impose comme la référence en termes de précision pure, confirmant la puissance des mécanismes d'attention pour la modélisation fine des signaux radar, le GRU reste une alternative très pertinente pour les environnements à fortes contraintes de latence. Le TCN offre un compromis intermédiaire mais ne semble pas apporter d'avantage décisif sur cette topologie de données spécifique.\\
+Ces expériences complémentaires valident la généralité de l'approche par sérialisation évènementielle. Si le Transformer s'impose comme la référence en termes de précision pure, confirmant la puissance des mécanismes d'attention pour la modélisation fine des signaux radar, le GRU reste une alternative très pertinente pour les environnements à fortes contraintes de latence. Le TCN offre un compromis intermédiaire mais ne semble pas apporter d'avantage décisif sur cette topologie de données spécifique.\\
 
 Surtout, ces résultats confirment que la reformulation du problème en flux causal résout structurellement la limitation de longueur des séquences, ouvrant la voie à la simulation de scénarios électromagnétiques de durée indéfinie.
 
