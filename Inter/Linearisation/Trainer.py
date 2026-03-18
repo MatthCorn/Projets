@@ -302,6 +302,7 @@ if __name__ == '__main__':
                     err_next = torch.mean(1 - soft_mcc(is_next, NMOutputBatch, OSMBatch))
 
                     (param["mult_grad"] * ((1 - param['weight_error']) * err + param['weight_error'] * err_next)).backward()
+                    torch.nn.utils.clip_grad_norm_(N.parameters(), 1.0)
                     optimizer.step()
                     if lr_scheduler is not None:
                         lr_scheduler.step()
