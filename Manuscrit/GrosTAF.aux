@@ -1,23 +1,33 @@
 \relax 
 \providecommand\zref@newlabel[2]{}
 \providecommand\hyper@newdestlabel[2]{}
-\@writefile{toc}{\contentsline {chapter}{\numberline {5}L'approche séquence vers séquence}{77}{chapter.5}\protected@file@percent }
+\newlabel{chap:seq2seq}{{4.3.4}{73}{L'approche séquence vers séquence}{chapter*.25}{}}
+\newlabel{seq:timeencoding}{{4.3.4}{73}{}{chapter*.25}{}}
+\newlabel{eq:timeencodingin}{{4.11}{73}{}{equation.4.11}{}}
+\newlabel{eq:timeencodingout}{{4.12}{73}{}{equation.4.12}{}}
+\newlabel{seq:discseq2seq}{{4.3.4}{73}{}{equation.4.12}{}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {5}L'approche séquence vers séquence}{75}{chapter.5}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\newlabel{chap:seq2seq}{{5}{77}{L'approche séquence vers séquence}{chapter.5}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.1}Description du problème}{77}{section.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1.1}Encodage du temps}{77}{subsection.5.1.1}\protected@file@percent }
-\newlabel{seq:timeencoding}{{5.1.1}{77}{Encodage du temps}{subsection.5.1.1}{}}
-\newlabel{eq:timeencodingin}{{5.1}{77}{Encodage du temps}{equation.5.1}{}}
-\newlabel{eq:timeencodingout}{{5.2}{77}{Encodage du temps}{equation.5.2}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.2}Architectures employées}{77}{section.5.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5.3}Traitement de séquence entière}{77}{section.5.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5.4}Fenêtrage}{77}{section.5.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5.5}Discussion}{77}{section.5.5}\protected@file@percent }
-\newlabel{seq:discseq2seq}{{5.5}{77}{Discussion}{section.5.5}{}}
+\@writefile{loa}{\addvspace {10\p@ }}
+\@writefile{lof}{\contentsline {figure}{\numberline {5.1}{\ignorespaces Représentation dans un plan temps-fréquence des PDW entrant dans le DCIS (à gauche) et sortant de ce module (à droite) simplifiant la modélisation du processus de DCI. La couleur de chaque rectangle encode l'amplitude du PDW. Les annotations identifient les dégradations structurelles induites par le traitement : (a) Fusion de signaux distincts, (b) Disparition d'impulsion (non-détection), (c) Scission artificielle d'une impulsion continue, (d) Troncature avant, (e) Troncature arrière, comme dans \ref {fig:IOex}}}{75}{figure.caption.26}\protected@file@percent }
+\newlabel{fig:IOsimple}{{5.1}{75}{Représentation dans un plan temps-fréquence des PDW entrant dans le DCIS (à gauche) et sortant de ce module (à droite) simplifiant la modélisation du processus de DCI. La couleur de chaque rectangle encode l'amplitude du PDW. Les annotations identifient les dégradations structurelles induites par le traitement : (a) Fusion de signaux distincts, (b) Disparition d'impulsion (non-détection), (c) Scission artificielle d'une impulsion continue, (d) Troncature avant, (e) Troncature arrière, comme dans \ref {fig:IOex}}{figure.caption.26}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.1}Description du problème}{76}{section.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1.1}La simplification du DCI}{76}{subsection.5.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.1.1.1}Motivation}{76}{subsubsection.5.1.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.1.1.2}Détails des traitements du DCIS}{77}{subsubsection.5.1.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Création de la séquence incidente :}{77}{paragraph*.27}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1.2}Modélisation comportementale du capteur ESM}{78}{subsection.5.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.1.2.1}Génération stochastique de la séquence d'entrée}{78}{subsubsection.5.1.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.1.2.2}Filtre de Détection Non-Ambiguë (DNA)}{78}{subsubsection.5.1.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.1.2.3}Suivi dynamique et caractérisation des PDW}{79}{subsubsection.5.1.2.3}\protected@file@percent }
+\@writefile{loa}{\contentsline {algocf}{\numberline {1}{\ignorespaces Génération stochastique de la séquence d'impulsions incidentes}}{80}{algocf.1}\protected@file@percent }
+\newlabel{algo:generation_sequence}{{1}{80}{Génération stochastique de la séquence d'entrée}{algocf.1}{}}
+\@writefile{loa}{\contentsline {algocf}{\numberline {2}{\ignorespaces Algorithme de suivi temporel et de publication des PDW}}{81}{algocf.2}\protected@file@percent }
+\newlabel{algo:tracking_dci}{{2}{81}{Suivi dynamique et caractérisation des PDW}{algocf.2}{}}
 \@setckpt{GrosTAF}{
-\setcounter{page}{78}
-\setcounter{equation}{2}
+\setcounter{page}{82}
+\setcounter{equation}{3}
 \setcounter{enumi}{0}
 \setcounter{enumii}{0}
 \setcounter{enumiii}{0}
@@ -26,14 +36,18 @@
 \setcounter{mpfootnote}{0}
 \setcounter{part}{0}
 \setcounter{chapter}{5}
-\setcounter{section}{5}
-\setcounter{subsection}{0}
-\setcounter{subsubsection}{0}
+\setcounter{section}{1}
+\setcounter{subsection}{2}
+\setcounter{subsubsection}{3}
 \setcounter{paragraph}{0}
 \setcounter{subparagraph}{0}
-\setcounter{figure}{0}
+\setcounter{figure}{1}
 \setcounter{table}{0}
 \setcounter{parentequation}{0}
+\setcounter{AlgoLine}{0}
+\setcounter{algocfline}{2}
+\setcounter{algocfproc}{2}
+\setcounter{algocf}{2}
 \setcounter{caption@flags}{2}
 \setcounter{continuedfloat}{0}
 \setcounter{mdf@globalstyle@cnt}{0}
@@ -44,7 +58,7 @@
 \setcounter{section@level}{0}
 \setcounter{Item}{0}
 \setcounter{Hfootnote}{0}
-\setcounter{bookmark@seq@number}{74}
+\setcounter{bookmark@seq@number}{70}
 \setcounter{tabx@nest}{0}
 \setcounter{listtotal}{0}
 \setcounter{listcount}{0}

@@ -1,14 +1,3 @@
-\chapter*{Problématique (plan)}
-
-Le chapitre sur la problématique contiendra les éléments suivants:
-\begin{itemize}
-\item Description du fonctionnement du capteur ESM dans l'environnement (dans la limite de ce qu'on peut dire), intégré dans la chaine algorithmique de traitement de l'information.
-\item Description du fonctionnement de l'environnement virtuel, avec l'explication des modélisations de chaque traitement.
-\item Spécification du goulot d'étranglement et commentaire sur les données I/O.
-\item Commentaire sur le complexité du problème pour l'apprentissage automatique : double problématique génération et traitement de séquence.
-\item \textcolor{red}{Penser à ajouter des références de traitement avec ce principe de mesureur (brevet ?) pour montrer qu'on ne révèle pas des secrets}
-\end{itemize}
-
 \chapter{Problématique}
 \label{chap:prob}
 \section{Introduction}
@@ -66,7 +55,7 @@ Cette problématique d'interprétation est illustrée par la figure \ref{fig:dra
 
 \begin{figure}[htbp]
 \begin{center} 
-\includegraphics[scale=0.3]{IOexemple.png}
+\includegraphics[scale=0.15]{IOexemple.png}
 \end{center}
 \caption{Représentation dans un plan temps-fréquence des informations conceptuelles transitant dans la chaîne de traitement, visualisées à l'étape précédant (gauche) et succédant (droite) à la modélisation du processus de DCI (Détection et Caractérisation des Impulsions). La couleur de chaque rectangle encode l'amplitude du PDW. Les annotations identifient les dégradations structurelles induites par la chaîne de traitement : (a) Fusion de signaux distincts, (b) Disparition d'impulsion (non-détection), (c) Scission artificielle d'une impulsion continue, (d) Troncature avant, (e) Troncature arrière}
 \label{fig:IOex}
@@ -86,7 +75,7 @@ La figure \ref{fig:env1} illustre comment un environnement virtuel (en bas, dél
 \end{figure}
 
 \subsection{Architecture et fonctionnement de l'environnement virtuel}
-
+\label{seq:VEexplication}
 L'environnement virtuel est structuré en quatre modules fonctionnels séquentiels. Il repose sur une approche de modélisation comportementale, dont l'objectif n'est pas de reproduire le traitement du signal échantillon par échantillon, mais de simuler l'effet macroscopique des traitements physiques et logiques sur le flux d'impulsions incident, afin de prédire les PDW que le capteur aurait effectivement générés. Les quatre modules présentés ci-après sont schématisés dans l'encadré en pointillés bleus en bas de la figure \ref{fig:env1}, représentant le périmètre de l'environnement virtuel.
 
 Le premier module assure la génération de la vérité terrain EM. Il ingère les fichiers de description cinématique (trajectoires du porteur et des radars environnants) ainsi que les séquences d'émission théoriques de chaque radar. À partir de ces données, il construit une liste chronologique d'impulsions émises, triées par date d'arrivée (ToA), où chaque impulsion est décrite par un PDW idéal contenant ses caractéristiques physiques natives. \\
@@ -123,6 +112,7 @@ Cette approche est schématisée dans la figure \ref{fig:env2} où le goulot d'�
 \end{figure}
 
 \section{Formalisation et complexité du problème d'apprentissage}
+\label{seq:FormaPb}
 Pour finir, cette section revient sur notre problématique en deux points, en commençant par nature même des données et leurs structures, ensuite en exposant ce que cette structure, associée à l'objectif de substitution du goulot d'étranglement du VE implique pour l'approche par IA.
 \subsection{Nature des données et définition formelle de la tâche}
 Du point de vue des données, la tâche de substituer au DCI un modèle appris se formalise comme un problème de transduction de séquence s'opérant dans un espace continu. L'entrée du modèle, notée $X$, est la séquence de PDW "modulés" issue du module de propagation (module 2). Elle représente l'information physique brute incidente aux bornes des convertisseurs analogique-numérique. La cible à prédire, notée $Y$, est la séquence de PDW "capteur" (sortie du module 4), correspondant aux impulsions effectivement construites et publiées par le système. Ce flux a été illustré précédemment sur la figure \ref{fig:IOex}. Dans ce formalisme, les désignations "données d'entrée" et "données de sortie" se définissent par rapport aux bornes du goulot d'étranglement identifié précédemment (le DCI) : il s'agit de reproduire la fonction de génération permettant de construire la séquence de sortie $Y$ conditionnellement à l'observation de la séquence d'entrée $X$.\\

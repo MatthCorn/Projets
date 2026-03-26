@@ -1,9 +1,9 @@
-\chapter{L'approche séquence vers séquence}
+\chapter*{L'approche séquence vers séquence}
 \label{chap:seq2seq}
 On introduit l'étude, on aborde les difficultés du problème de base et qu'on étudie ici un problème similaire simplifié.
-\section{Description du problème}
+\section*{Description du problème}
 On introduit le problème simplifié, en insistant sur les modifications avec le problème de base et les apports de cette étude.
-\subsection{Encodage du temps}
+\subsection*{Encodage du temps}
 \label{seq:timeencoding}
 \begin{equation}
 \label{eq:timeencodingin}
@@ -16,11 +16,191 @@ a = b + 1
 a = b + 1
 \text{Ici on montre comment le temps est encodé dans les séquences}
 \end{equation}
-\section{Architectures employées}
+\section*{Architectures employées}
 On introduit les architectures étudiées pour cette partie, il faut justifier ces choix. Il s'agit d'un transformer mais on pourra ajouter des résultats sur les RNNs permettant de les disqualifier. Les CNNs ne s'adapte pas au traitement seq2seq.
 \section*{Suite : (ce n'est pas un titre de section}
 Dans la suite on présentera comme dans la soumission à CAID.
-\section{Traitement de séquence entière}
-\section{Fenêtrage}
-\section{Discussion}
+\section*{Traitement de séquence entière}
+\section*{Fenêtrage}
+\section*{Discussion}
 \label{seq:discseq2seq}
+
+
+\chapter{L'approche séquence vers séquence}
+\textcolor{red}{essayer de raconter une histoire : on change de stratégie car le problème de base est trop compliqué donc on construit un outil qui permet de comprendre le problème et de diffuser les résultats. Faire un chapitre à part. Dire que nos approximations ne simplifient pas en soit le problème d'apprentissage automatique. On a une contrainte de ne pas aborder les trucs sensibles donc on ne l'a pas abordé.}
+Dans ce chapitre, nous présentons la principale contribution de nos travaux. Il s'agit de l'étude de l'approche séquence vers séquence pour remplacer le module DCI de l'environnement numérique. Ce problème est décrit en détails dans la section \ref{seq:FormaPb}. Afin de mener à bien cette étude, nous avons fait le choix de recourir à un module simplifié, basé sur un principe similaire au DCI. Nous écrirons DCIS (DCI simplifié) pour évoquer le module simplifié. L'objectif de ce module est de produire un traitement semblable au DCI, aboutissant à l'apparition des mêmes artefacts présentés figure \ref{fig:IOex}, tout en permettant plus de flexibilité de réglage et d'accessibilité pour la génération des données. Une séquence de PDW traitée par le DCIS, dans laquelle les artéfacts sont mis en avant, est illustrée figure \ref{fig:IOsimple}.\\
+
+\begin{figure}[htbp]
+\begin{center} 
+\includegraphics[scale=0.35]{IOsimpleexemple.png}
+\end{center}
+\caption{Représentation dans un plan temps-fréquence des PDW entrant dans le DCIS (à gauche) et sortant de ce module (à droite) simplifiant la modélisation du processus de DCI. La couleur de chaque rectangle encode l'amplitude du PDW. Les annotations identifient les dégradations structurelles induites par le traitement : (a) Fusion de signaux distincts, (b) Disparition d'impulsion (non-détection), (c) Scission artificielle d'une impulsion continue, (d) Troncature avant, (e) Troncature arrière, comme dans \ref{fig:IOex}}
+\label{fig:IOsimple}
+\end{figure}
+
+Mis à part le traitement régissant la transformation \textit{seq2seq}, qui est modifié, ce nouveau problème reste semblable en tout point au problème de transduction séquentiel décrit dans la section \ref{seq:FormaPb} du point de vue de l'apprentissage automatique. Proche structurellement des problématiques de traduction très étudiée dans la littérature, \textcolor{red}{... [suite biblio ciblée]}. \\
+
+Ne pas oublier de finir l'intro avec un plan du chapitre.
+
+\section{Description du problème}
+\subsection{La simplification du DCI}
+Comme mentionné précédemment, le problème étudié dans ce chapitre se base sur une simplification du DCI. À travers le DCIS, nous redéfinissons un problème de transduction séquentiel, que nous abordons avec des architectures basées sur le Transformer. Nous détaillons ici les motivations du DCIS et présentons ici une description du module, ce qui permet de mieux comprendre le niveau de complexité du problème que nous traitons, ainsi que les éléments importants qui fixent nos objectifs pour cette étude.
+
+\subsubsection{Motivation} 
+Le DCI est le module qui simule les effets de la détection et de la caractérisation des impulsions sur l'information, représentée comme une séquence de PDW \ref{seq:VEexplication}. Dans l'optique de faire apprendre la transformation réalisé par le DCI à une IA, nous optons pour la réalisation d'un module DCI simplifié (DCIS) dont les apports sont les suivants :
+\begin{itemize}
+\item \textbf{Flexibilité} : notre module dispose d'hyper-paramètres réglables, permettant d'altérer son fonctionnement et donc d'étudier différents aspects du problème. Nous pouvons en particulier contrôler les fréquences d'échantillonnages pour faire disparaître l'effet du repliement de spectre et de la levée d'ambiguïté, contrôler les seuils d'apparitions d'harmonique, d'inter-modulation et de saturation pour faire disparaître l'expression de ces effets, contrôler le nombre de mémoire et le nombre de DNA transmis afin de changer l'impacte du suivis temporel des fréquences, contrôler la précision fréquentiel déterminant sur chaque palier les impulsions masqués ou visible. Finalement, nous pouvons aussi générer des scénarios (au sens des séquences de PDW données en entrée du module) dont les PDW recouvrent intelligemment l'espace des séquences de PDW, contrairement aux scénarios "réels" créés en positionnant des RADAR et en décrivant leurs dynamiques, qui sont, certes, plus réalistes du point de vu opérationnel, mais qui n'assurent pas un recouvrement l'espace des séquences de PDW, essentiel pour un bon déroulement de l'apprentissage automatique.
+\item \textbf{Accessibilité} : le DCIS repose sur une normalisation et un adimensionnement des paramètres du problèmes, permettant de retirer toute référence à une potentielle véritable architecture de capteur ESM se trouvant dans le DCI. Les données générées peuvent donc être exploitées ouvertement sur des serveurs de calcul publique sans risque de révéler les caractéristiques d'un vrai capteur. Il est aussi implémenté en python afin de permettre une connectivité maximale avec les réseaux de neurones, aussi implémenté en python.
+\item \textbf{Support à la compréhension} : l'implémentation du DCIS est aussi un exercice apportant une grande compréhension des mécanismes aboutissants à la présence d'artéfacts dans la séquence de PDW générées. Ce module nous permet de choisir d'exprimer ou non différents aspects du traitement du DCI dans les données générées, aidant à l'identification des difficultés auxquelles l'IA se heurtera durant l'apprentissage.
+\end{itemize}
+
+\subsubsection{Détails des traitements du DCIS}
+La fonctionnement du DCIS repose sur deux blocs ayant des rôles complémentaires :
+\begin{itemize}
+\item le \textit{simulateur scénario} est une instance de classe, on lui fournit les informations relatives à la simulation générale (aussi bien sur les paramètres du capteur modélisé que sur le scénario) et il crée une instance de capteur et s'occupe de générer aléatoirement les impulsions du scénarios, il gère les passages entre les paliers et appelle sur chaque palier une méthode de l'instance de capteur
+\item le \textit{simulateur capteur} est une instance, qui dispose de mémoire et méthode pour réaliser les traitements sur chaque palier.
+\end{itemize}
+Voici une description détaillée du fonctionnement de la simulation.
+
+\paragraph{Création de la séquence incidente :} La procédure de création de la séquence de PDW incidents est aléatoire mais suit des règles précises permettant de maintenir le nombre d'impulsions par palier constant. Cette propriété est équivalente à faire en sorte qu'un changement de palier soit caractérisé par simultanément l'apparition d'une unique impulsion et la disparition d'une unique impulsion, sauf pour les premières et dernières impulsions de la séquence, qui vont respectivement apparaitre sans disparition simultanée et disparaitre sans apparition simultanée.\\
+
+Voici la procédure de création d'une séquence de longueur $N$, avec un nombre de PDW par palier de $n$:
+\begin{itemize}
+\item $L$ est la liste des impulsions de la séquence, initialement vide
+\item $V$ est la liste des impulsions présentes sur le palier, initialement vide \\
+on notera $[V_1, \cdots, V_n]$ la liste $V$.
+\item $A$ est la liste de l'âge des impulsions présentes sur la palier, initialement vide \\
+on notera $[A_1, \cdots, A_n]$ la liste $A$.
+\item T est le temps de la simulation, initialement à 0 \\
+\item Tant que $T < n$ : (initialisation de $V$ et $A$)
+	\begin{itemize}
+	\item On génère le prochain vecteur $V_{-1}$ représentant une nouvelle impulsion.
+	\item On ajoute à la fin de $L$
+	\item Gestion du palier:
+		\begin{itemize}
+		\item On ajoute à la fin de $V$
+		\item On ajoute un $0$ à la fin de $A$, correspondant à l'âge du vecteur nouvellement ajouté à $V$
+		\item $T$ augmente de $1$
+		\item Chaque élément de $A$ augmente de 1
+		\item On appelle le traitement du \textit{simulateur capteur} pour suivre les informations du palier
+		\end{itemize}
+	\end{itemize}
+\item Tant que $T<N$ : (génération du milieu de la séquence)
+	\item rien
+\end{itemize}
+
+
+\subsection{Modélisation comportementale du capteur ESM}
+Afin d'évaluer la capacité de nos architectures neuronales à assimiler la logique interne du module de Détection et Caractérisation des Impulsions (DCI), nous avons développé une simulation comportementale simplifiée de ce capteur. L'objectif de cet environnement contrôlé est de générer des paires de séquences (impulsions incidentes en entrée, PDW publiés en sortie) dont la relation causale est parfaitement maîtrisée, offrant ainsi une vérité terrain absolue pour l'apprentissage supervisé. Le processus de simulation se décompose en trois phases séquentielles : la génération stochastique du flux incident, le filtrage spatial et fréquentiel (modélisation des masquages matériels), et enfin le suivi dynamique des pistes.
+\subsubsection{Génération stochastique de la séquence d'entrée}
+La première étape consiste à synthétiser une séquence d'impulsions incidentes représentative d'un environnement électromagnétique dense. Pour garantir la stabilité de la simulation, nous imposons une contrainte de densité constante : le nombre d'impulsions simultanément actives par palier temporel, noté $n$, doit être maintenu fixe. Cette propriété implique que chaque transition temporelle (changement de palier) soit caractérisée par l'apparition d'exactement une nouvelle impulsion et la disparition simultanée d'une impulsion existante.
+Afin d'éviter l'introduction de biais cycliques prévisibles par l'intelligence artificielle, la sélection de l'impulsion appelée à disparaître est stochastique. Elle suit une loi de probabilité proportionnelle à l'âge de l'impulsion au sein du palier, favorisant ainsi le renouvellement naturel des signaux tout en autorisant des durées d'émission variables. Ce processus itératif de génération est formalisé par l'Algorithme \ref{algo:generation_sequence}.
+
+\begin{algorithm}[httb]
+\DontPrintSemicolon
+\SetAlgoLined
+\KwIn{Longueur totale $N$, Densité d'impulsions par palier $n$}
+\KwOut{Séquence d'entrée $\mathcal{L}$}
+\textbf{Initialisation :} $\mathcal{L} \leftarrow \emptyset$, Palier courant $\mathcal{V} \leftarrow \emptyset$, Âges $\mathcal{A} \leftarrow \emptyset$, $T \leftarrow 0$ \;
+\tcc{Phase 1 : Remplissage initial du palier}
+\While{$T < n$}{
+Générer une nouvelle impulsion $v_{new}$\;
+Ajouter $v_{new}$ à la fin de $\mathcal{L}$ et de $\mathcal{V}$, ajouter l'âge $0$ à $\mathcal{A}$\;
+$T \leftarrow T + 1$\;
+Incrémenter tous les éléments de $\mathcal{A}$ de 1\;
+}
+\tcc{Phase 2 : Régime permanent (Renouvellement)}
+\While{$T < N$}{
+Générer une nouvelle impulsion $v_{new}$\;
+Ajouter $v_{new}$ à $\mathcal{L}$ et à $\mathcal{V}$, ajouter l'âge $0$ à $\mathcal{A}$\;
+$T \leftarrow T + 1$\;
+Incrémenter tous les éléments de $\mathcal{A}$ de 1\;
+\tcc{Sélection stochastique basée sur l'âge}
+Sélectionner un indice $k \in [1, n]$ avec la probabilité $P(k) = \frac{\mathcal{A}_k}{\sum_{i=1}^{n} \mathcal{A}_i}$\;
+Extraire $v_k$ de $\mathcal{V}$ et $\mathcal{A}_k$ de $\mathcal{A}$\;
+Remplacer $v_k$ dans $\mathcal{L}$ par l'impulsion concaténée $[v_k, \mathcal{A}_k]$\;
+}
+\tcc{Phase 3 : Vidage du palier final (Clôture)}
+\While{$\mathcal{V} \neq \emptyset$}{
+Soit $m$ la taille actuelle de $\mathcal{V}$\;
+Incrémenter tous les éléments de $\mathcal{A}$ de 1\;
+Sélectionner un indice $k \in [1, m]$ avec la probabilité $P(k) = \frac{\mathcal{A}_k}{\sum_{i=1}^{m} \mathcal{A}_i}$\;
+Extraire $v_k$ de $\mathcal{V}$ et $\mathcal{A}_k$ de $\mathcal{A}$\;
+Remplacer $v_k$ dans $\mathcal{L}$ par l'impulsion concaténée $[v_k, \mathcal{A}_k]$\;
+}
+\Return $\mathcal{L}$
+\vspace{20px}
+\caption{Génération stochastique de la séquence d'impulsions incidentes}
+\label{algo:generation_sequence}
+\end{algorithm}
+\subsubsection{Filtre de Détection Non-Ambiguë (DNA)}
+
+Une fois la séquence physique générée, le simulateur reproduit les contraintes matérielles du récepteur lors de l'acquisition. L'étape d'extraction des Détections Non-Ambiguës (DNA) opère une sélection visant à modéliser les phénomènes de masquage fréquentiel. À un palier donné, constitué de $n$ impulsions incidentes définies par leurs fréquences $f$ et leurs niveaux de puissance $N$, nous évaluons les interactions locales.
+Nous modélisons le voisinage fréquentiel par une matrice de proximité $\mathbf{F} \in \mathbb{R}^{n \times n}$ telle que, pour un seuil de résolution matériel $\delta f$ :
+
+\begin{equation}
+\mathbf{F}_{i,j} = \begin{cases}
+1 & \text{si } |f_i - f_j| \le \delta f \\
+0 & \text{sinon}
+\end{cases}
+\end{equation}
+
+Simultanément, nous définissons une matrice de domination énergétique $\mathbf{L} \in \mathbb{R}^{n \times n}$ comparant les niveaux de puissance relatifs :
+
+\begin{equation}
+\mathbf{L}_{i,j} = \begin{cases}
+1 & \text{si } N_i < N_j \\
+0 & \text{sinon}
+\end{cases}
+\end{equation}
+
+La matrice de masquage globale $\mathbf{M}$ s'obtient par le produit de Hadamard (terme à terme) de ces deux conditions : $\mathbf{M} = \mathbf{F} \odot \mathbf{L}$. Ainsi, un coefficient $\mathbf{M}_{i,j} = 1$ indique que l'impulsion $j$ masque physiquement l'impulsion $i$. Par conséquent, une impulsion incidente $i$ est promue au rang de DNA si et seulement si elle ne subit aucun masquage, ce qui se traduit mathématiquement par la nullité de la somme sur sa ligne :
+
+\begin{equation}
+\text{Sélection}(i) = \begin{cases}
+\text{Vrai} & \text{si } \sum_{j=1}^{n} \mathbf{M}_{i,j} = 0 \\
+\text{Faux} & \text{sinon}
+\end{cases}
+\end{equation}
+
+Les impulsions validées par ce filtre sont ensuite triées par énergie décroissante, définissant ainsi l'ordre de priorité pour l'étape d'association temporelle.
+\subsubsection{Suivi dynamique et caractérisation des PDW}
+La dernière étape de la simulation reproduit le comportement de la mémoire d'interception du DCI. Le suivi dynamique repose sur l'association des impulsions filtrées (les DNA) aux instances d'impulsions (les pistes) en cours de suivi. À chaque itération temporelle, le système tente de corréler les nouvelles observations avec l'historique actif. Une corrélation réussie met à jour l'état de la piste, tandis qu'une observation orpheline engendre l'ouverture d'une nouvelle piste. Inversement, l'absence prolongée de mise à jour d'une piste active déclenche sa clôture et provoque la publication du PDW final reconstitué. Ce mécanisme de gestion de mémoire, responsable des phénomènes d'artefacts (fusions, fragmentations) que le modèle d'IA devra apprendre à reproduire, est détaillé dans l'Algorithme \ref{algo:tracking_dci}.
+
+\begin{algorithm}[httb]
+\DontPrintSemicolon
+\SetAlgoLined
+\KwIn{Séquence des paliers de DNA $\mathcal{V} = [V^{(1)}, V^{(2)}, \dots, V^{(T)}]$}
+\KwOut{Liste des PDW reconstitués $\mathcal{R}$}
+\textbf{Initialisation :} $t \leftarrow 0$, Pistes actives $\mathcal{P} \leftarrow \emptyset$, $\mathcal{R} \leftarrow \emptyset$\;
+\ForEach{palier $V^{(t)} \in \mathcal{V}$}{
+$t \leftarrow t + 1$\; \;
+\tcc{$V^{(t)}$ est trié par niveau d'amplitude décroissant}
+\ForEach{impulsion $v_i \in V^{(t)}$}{
+Associer $v_i$ à la piste $p_j \in \mathcal{P}$ la plus proche en fréquence\;
+\eIf{Association réussie (\& $p_j$ non mise à jour à l'instant $t$)}{
+Mettre à jour la date de dernière vue : $TM_j \leftarrow t$\;
+Actualiser les caractéristiques de $p_j$ avec celles de $v_i$\;
+}{
+Créer une nouvelle piste $p_{new}$ à partir de $v_i$\;
+Définir Date de création $TI_{new} \leftarrow t-1$ et Date de dernière vue $TM_{new} \leftarrow t$\;
+$\mathcal{P} \leftarrow \mathcal{P} \cup \{p_{new}\}$\;
+}
+}\;
+\tcc{Purge des pistes inactives (Condition de publication)}
+\ForEach{piste $p_j \in \mathcal{P}$}{
+\If{$t - TM_j \ge 2$}{
+\tcc{Calcul de la durée et encodage local du temps de fin}
+Concaténer la durée $(TM_j - TI_j)$ aux caractéristiques de $p_j$\;
+Concaténer la valeur $(\text{taille}(\mathcal{R}) - TI_j)$ à $p_j$\;
+$\mathcal{R} \leftarrow \mathcal{R} \cup \{p_j\}$\;
+$\mathcal{P} \leftarrow \mathcal{P} \setminus \{p_j\}$\;
+}
+}
+}
+\Return $\mathcal{R}$
+\vspace{20px}
+\caption{Algorithme de suivi temporel et de publication des PDW}
+\label{algo:tracking_dci}
+\end{algorithm}
+

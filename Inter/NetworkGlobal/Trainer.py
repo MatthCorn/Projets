@@ -13,11 +13,10 @@ warnings.filterwarnings("ignore")
 
 if __name__ == '__main__':
     import multiprocessing as mp
-    mp.set_start_method('spawn', force=True)
+    mp.set_start_method('spawn', force=True)  # permet les lancements en parallèle pour l'optimisation de l'architecture avec Optuna
 
     ################################################################################################################################################
-    # création des paramètres de la simulation
-
+    ###                                              création des paramètres de la simulation                                                    ###
     param = {"n_encoder": 10,
              "n_decoder": 10,
              "len_in": 10,
@@ -59,6 +58,7 @@ if __name__ == '__main__':
              "nb_frames_GIF": -1
              }
 
+    # On met à jour les paramètres avec ceux qui peuvent être passés en argument lors de l'exécution du script
     try:
         import json
         import sys
@@ -69,6 +69,7 @@ if __name__ == '__main__':
     except:
         print("nothing loaded")
     ################################################################################################################################################
+    ###     permet d'afficher les informations du composant sur lequel le script s'exécute, pratique pour débug les lancements en parallèle      ###
     import os
     try:
         gpu_id = torch.cuda.current_device()
@@ -76,7 +77,7 @@ if __name__ == '__main__':
     except:
         pass
     ################################################################################################################################################
-    # pour les performances
+    ###  permet sur certains ordinateurs (mon ordi portable) d'avoir plus de performance en forçant une priorité haute à l'exécution du script   ###
     import psutil, sys, os
 
     p = psutil.Process(os.getpid())
@@ -84,14 +85,18 @@ if __name__ == '__main__':
     if sys.platform == "win32":
         p.nice(psutil.HIGH_PRIORITY_CLASS)
     ################################################################################################################################################
+    ###                                    on initialise les paramètres et le réseau de neurones                                                 ###
 
     d_out = param['d_in'] + 1
 
-    period_checkpoint = param["period_checkpoint"]  #  <= 0 : pas de checkpoint en entrainement, -1 : pas de sauvegarde du tout
+    period_checkpoint = param["period_checkpoint"]  # 0 : pas de checkpoint en entrainement, -1 : pas de sauvegarde du tout
+
+    # paramètre relatif à l'enregistrement des données pour créer un GIF (évolution de l'image en fonction de la difficulté de la séquence)
     nb_frames_GIF = param["nb_frames_GIF"]
     nb_frames_window = int(nb_frames_GIF / len(param["training_strategy"]))
     res_GIF = 50
-    n_iter_window = int(param["n_iter"] / len(param["training_strategy"]))
+
+    n_iter_window = int(param["n_iter"] / len(param["training_strategy"])) # nombre d'itération par fenêtre d'entrainement (curriculum learning)
 
     if torch.cuda.is_available():
         torch.cuda.set_device(0)
@@ -119,6 +124,8 @@ if __name__ == '__main__':
 
     n_iter = param["n_iter"]
 
+    # on peut choisir de réinitialiser le taux d'apprentissage à chaque fenêtre,
+    # ce qui modifie les paramètres qui règlent le lr_scheduler
     if param['lr_option']['reset'] == 'y':
         n_updates = int(NDataT / batch_size) * n_iter_window
         warmup_steps = int(NDataT / batch_size * param["warmup"])
@@ -126,6 +133,7 @@ if __name__ == '__main__':
         n_updates = int(NDataT / batch_size) * n_iter
         warmup_steps = int(NDataT / batch_size * param["warmup"])
 
+    # on crée la grille d'évaluation pour créer le GIF (plot = true dans les arguments)
     if nb_frames_GIF > 0:
         PlottingInput, PlottingOutput, PlottingMasks, PlottingStd = GetData(
             d_in=param['d_in'],
@@ -156,12 +164,16 @@ if __name__ == '__main__':
     }
 
     ################################################################################################################################################
+    ###         on va ici initialiser l'état de l'entrainement, soit à partir d'un entrainement qu'on continue, soit à partir de rien            ###
+
     import pickle
     from Tools.XMLTools import saveObjAsXml
     local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
     save_dir = os.path.join(local, 'Inter', 'NetworkGlobal', 'Save')
     data_dir = os.path.join(local, 'Inter', 'Data')
 
+    # on essaie de charger un ancien entrainement. pour que ça marche, le chemin spécifié dans "resume_from" doit exister
+    # et les paramètres de l'architecture doivent être compatible avec ceux de l'ancien entrainement
     try:
         from Tools.XMLTools import loadXmlAsObj
         resume_from = param["resume_from"]
@@ -184,15 +196,17 @@ if __name__ == '__main__':
 
         lr_scheduler = Scheduler(optimizer=optimizer, **checkpoint["scheduler_hparams"])
 
-        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])  # on charge l'état de l'optimiseur
 
-        lr_scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
+        lr_scheduler.load_state_dict(checkpoint["scheduler_state_dict"])  # on charge l'état du scheduler du learning rate
 
         error_dict = loadXmlAsObj(os.path.join(save_path, "error"))
         TrainingError = error_dict["TrainingError"]
         ValidationError = error_dict["ValidationError"]
         PlottingError = error_dict["PlottingError"]
 
+        # à partir de l'état du scheduler, on peut retrouver où on était dans l'entrainement
+        # l'état d'avancement de l'entrainement est défini par window_index, j, p, k
         window_index, r = divmod(checkpoint['scheduler_state_dict']['last_epoch'] + 1,
                                  n_iter_window * n_batch * n_minibatch)
         j, r = divmod(r, n_batch * n_minibatch)
@@ -204,6 +218,7 @@ if __name__ == '__main__':
         print(f"Erreur lors de la reprise du checkpoint : {e}")
         print("Lancement d'un entraînement depuis zéro.")
 
+        # si on n'a pas d'entrainement à reprendre, on va créer un dossier de sauvegarde
         if period_checkpoint != -1:
             # pour sauvegarder toutes les informations de l'apprentissage
             import datetime
@@ -211,6 +226,8 @@ if __name__ == '__main__':
 
             base_folder = datetime.datetime.now().strftime("%Y-%m-%d__%H-%M")
 
+            # on crée une boucle pour trouver un nom de dossier libre, c'est nécessaire pour gérer la concurrence
+            # d'entrainements lancés simultanément, qui aurait le même base_folder
             attempt = 0
             while True:
                 folder = f"{base_folder}({attempt})" if attempt > 0 else base_folder
@@ -241,14 +258,18 @@ if __name__ == '__main__':
         best_state_dict = N.state_dict().copy()
 
     ################################################################################################################################################
+    ###                                         on commence la procédure d'entrainement ici                                                      ###
 
+    # les boucles de l'entrainement sont des while avec des indices incrémentés pour pouvoir reprendre l'entrainement en cours facilement
     while window_index < len(param["training_strategy"]):
         window = param["training_strategy"][window_index]
+
+        # si on commence l'entrainement sur la fenêtre et que le paramétrage demande un reset des params de l'optimisation, on les réinitialise
         if param["lr_option"]["reset"] == "y" and (j == 0):
             optimizer = optimizers[param['optim']](N.parameters(), weight_decay=param["weight_decay"], lr=param["lr_option"]["value"])
-
             lr_scheduler = Scheduler(optimizer, 256, warmup_steps, max=param["max_lr"], max_steps=n_updates, type=param["lr_option"]["type"])
 
+        # on charge les données d'entrainement et de validation de la fenêtre
         [(TrainingInput, TrainingOutput, TrainingMasks, TrainingStd), (ValidationInput, ValidationOutput, ValidationMasks, ValidationStd)] = GetData(
             d_in=param['d_in'],
             n_pulse_plateau=param['n_pulse_plateau'],
@@ -273,14 +294,18 @@ if __name__ == '__main__':
         )
 
         pbar = tqdm(total=n_iter_window, initial=j)
-        t = time.time()
-        while j < n_iter_window:
+        t = time.time()  # sert à enregistrer régulièrement des checkpoints de l'entrainement
+        while j < n_iter_window:  # traitement de la fenêtre
 
             error = 0
+
+            # on crée des booléens qui décident si on observe le gradient ou si on crée une image pour le GIF
             time_to_observe = (int(j * param["FreqGradObs"]) == (j * param["FreqGradObs"])) and (param['FreqGradObs'] > 0)
             time_for_GIF = (j in torch.linspace(0, n_iter_window, abs(nb_frames_window), dtype=int)) and (nb_frames_GIF > 0)
 
             n_minibatch_epoch = n_minibatch - p
+
+            # on découpe chaque fenêtre une première fois (mini_batch) pour faciliter le chargement des données sur le GPU
             while p < n_minibatch:
                 InputMiniBatch = TrainingInput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
                 OutputMiniBatch = TrainingOutput[p * mini_batch_size:(p + 1) * mini_batch_size].to(device)
@@ -290,6 +315,8 @@ if __name__ == '__main__':
                 p += 1
 
                 n_batch_epoch = n_batch - k
+
+                # on découpe chaque minibatch en batch pour faire la mise-à-jour des paramètres
                 while k < n_batch:
                     optimizer.zero_grad(set_to_none=True)
 
@@ -304,20 +331,21 @@ if __name__ == '__main__':
                     if param['error_weighting'] == 'n':
                         StdBatch = torch.mean(StdBatch)
 
+                    # calcul de l'erreur de la prédiction et update des poids du réseau de neurones
                     Prediction = N(InputBatch, OutputBatch, TargetMaskBatch)[:, :-1, :]
-
                     err = torch.norm((Prediction - OutputBatch) / StdBatch, p=2) / sqrt((torch.sum(Mask) - batch_size) * d_out)
                     (param["mult_grad"] * err).backward()
                     optimizer.step()
-                    if lr_scheduler is not None:
+
+                    if lr_scheduler is not None:  # update du scheduler
                         lr_scheduler.step()
 
-                    if k == 0 and p == 0 and time_to_observe:
+                    if k == 0 and p == 0 and time_to_observe:  # capture du gradient pour observation
                         DictGrad.update()
 
                     error += float(err) / (n_batch_epoch * n_minibatch_epoch)
 
-                    if (time.time() - t > period_checkpoint) and (period_checkpoint > 0):
+                    if (time.time() - t > period_checkpoint) and (period_checkpoint > 0):  # enregistrement du checkpoint
                         t = time.time()
                         try:
                             os.mkdir(save_path)
@@ -350,9 +378,7 @@ if __name__ == '__main__':
 
             TrainingError.append(error)
 
-            if time_to_observe:
-                DictGrad.next(j)
-
+            # calcul de l'erreur de validation
             with torch.no_grad():
                 Input = ValidationInput.to(device)
                 Output = ValidationOutput.to(device)
@@ -370,6 +396,8 @@ if __name__ == '__main__':
                 err = torch.norm((Prediction - Output) / Std, p=2) / sqrt((torch.sum(Mask) - NDataV) * d_out)
                 ValidationError.append(float(err))
 
+            # écriture de l'erreur de validation dans un fichier à part, uniquement utile pour qu'Optuna
+            # puisse suivre l'entrainement et le couper prématurément si besoin
             if period_checkpoint == -1:
                 if len(sys.argv) > 2:
                     if not 'progress_file' in locals():
@@ -383,10 +411,10 @@ if __name__ == '__main__':
                     except Exception as e:
                         print(f"[WARN] Could not write progress: {e}", flush=True)
 
-            if error == min(TrainingError):
+            if error == min(TrainingError):  # mise-à-jour des meilleurs paramètres
                 best_state_dict = N.state_dict().copy()
 
-            if time_for_GIF:
+            if time_for_GIF:  # enregistrement de l'erreur sur la grille PlottingInput pour le GIF
                 with (torch.no_grad()):
                     Input = PlottingInput.to(device)
                     Output = PlottingOutput.to(device)
@@ -411,6 +439,9 @@ if __name__ == '__main__':
 
         window_index += 1
         j = 0
+
+    ################################################################################################################################################
+    ###                                         enregistrement finale des infos de l'entrainement                                                ###
 
     error_dict = {"TrainingError": TrainingError,
                   "ValidationError": ValidationError,

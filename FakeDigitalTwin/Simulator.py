@@ -295,16 +295,16 @@ if __name__ == '__main__':
     TOA = 0
     Dt = 0
     AntP = []
-    for k in range(15):
+    for k in range(30):
         DF = 0
         F = 10 + 1 * np.random.random()
-        AntP.append(Pulse(TOA=TOA, LI=0.5 + 3 * np.random.random(), FreqStart=F, FreqEnd=F + DF,
-                          Level=5.5 * np.random.random()))
+        AntP.append(Pulse(TOA=TOA, LI=1 + 4 * np.random.random(), FreqStart=F, FreqEnd=F + DF,
+                          Level=5.5 * np.random.random() + 0.5))
         TOA += np.random.random()
 
     Param = {
         'Fe_List': [5.1, 5, 4.9, 4.8],
-        'Duree_max_impulsion': 4,
+        'Duree_max_impulsion': 5,
         'Seuil_mono': 10,
         'Seuil_harmo': 8,
         'Seuil_IM': 8,
@@ -316,10 +316,10 @@ if __name__ == '__main__':
         'M1_aveugle': 2,
         'M2_aveugle': 2,
         'M_local': 5,
-        'N_DetEl': 12,
-        'Seuil_ecart_freq': 5e-3,
+        'N_DetEl': 5,
+        'Seuil_ecart_freq': 2e-2,
         'Duree_maintien_max': 0.2,
-        'N_mesureurs_max': 8,
+        'N_mesureurs_max': 4,
         'PDW_tries': True,
     }
 
@@ -367,7 +367,7 @@ if __name__ == '__main__':
         y_max_data = max(y_max_data, F1 + df, F2 + df)
         x_max_data = max(x_max_data, T2)
 
-        r, g, b, a = value_to_rgb(N, min_val=0, max_val=5.5)
+        r, g, b, a = value_to_rgb(N, min_val=0, max_val=7)
 
         # Utilisation d'un Polygon pour gérer l'écart de fréquence (F1 != F2)
         sommets = [
@@ -394,7 +394,7 @@ if __name__ == '__main__':
         y_max_data = max(y_max_data, F + df)
         x_max_data = max(x_max_data, T2)
 
-        r, g, b, a = value_to_rgb(N, min_val=0, max_val=5.5)
+        r, g, b, a = value_to_rgb(N, min_val=0, max_val=7)
 
         # Les sorties ont une fréquence constante, mais on garde le Polygon pour être raccord
         sommets = [
