@@ -204,3 +204,117 @@ $\mathcal{P} \leftarrow \mathcal{P} \setminus \{p_j\}$\;
 \label{algo:tracking_dci}
 \end{algorithm}
 
+\subsection{Modélisation comportementale du capteur ESM}
+Afin d'évaluer la capacité de nos modèles à assimiler la logique interne du module DCI, nous avons développé une simulation comportementale simplifiée notée DCIS (DCI simplifié). Son objectif est de générer des paires de séquences (impulsions incidentes en entrée, PDW publiés en sortie) dont la relation causale est parfaitement maîtrisée, offrant ainsi une vérité terrain absolue pour l'apprentissage supervisé. Le processus de simulation se décompose en trois phases séquentielles : la génération stochastique du flux incident, le filtrage spatial et fréquentiel (modélisation des masquages matériels), et enfin le suivi dynamique des pistes.
+\subsubsection{Génération stochastique de la séquence d'entrée}
+La première étape consiste à synthétiser une séquence d'impulsions incidentes représentative d'un environnement électromagnétique dense. Pour garantir la stabilité de la simulation, nous imposons une contrainte de densité constante : le nombre d'impulsions simultanément actives par palier temporel, noté $n$, doit être maintenu fixe. Cette propriété implique que chaque transition temporelle (changement de palier) soit caractérisée par l'apparition d'exactement une nouvelle impulsion et la disparition simultanée d'une impulsion existante.
+Afin d'éviter l'introduction de biais cycliques prévisibles par l'intelligence artificielle, la sélection de l'impulsion appelée à disparaître est stochastique. Elle suit une loi de probabilité proportionnelle à l'âge de l'impulsion au sein du palier, favorisant ainsi le renouvellement naturel des signaux tout en autorisant des durées d'émission variables. Ce processus itératif de génération est formalisé par l'Algorithme \ref{algo:generation_sequence}.
+
+\begin{algorithm}[httb]
+\DontPrintSemicolon
+\SetAlgoLined
+\KwIn{Longueur totale $N$, Densité d'impulsions par palier $n$}
+\KwOut{Séquence d'entrée $\mathrm{L}$}
+\textbf{Initialisation :} $\mathrm{L} \leftarrow \emptyset$, Palier courant $\mathrm{V} \leftarrow \emptyset$, Âges $\mathcal{A} \leftarrow \emptyset$, $T \leftarrow 0$ \;
+\tcc{Phase 1 : Remplissage initial du palier}
+\While{$T < n$}{
+Générer une nouvelle impulsion $v_{new}$\;
+Ajouter $v_{new}$ à la fin de $\mathcal{L}$ et de $\mathcal{V}$, ajouter l'âge $0$ à $\mathcal{A}$\;
+$T \leftarrow T + 1$\;
+Incrémenter tous les éléments de $\mathcal{A}$ de 1\;
+}
+\tcc{Phase 2 : Régime permanent (Renouvellement)}
+\While{$T < N$}{
+Générer une nouvelle impulsion $v_{new}$\;
+Ajouter $v_{new}$ à $\mathcal{L}$ et à $\mathcal{V}$, ajouter l'âge $0$ à $\mathcal{A}$\;
+$T \leftarrow T + 1$\;
+Incrémenter tous les éléments de $\mathcal{A}$ de 1\;
+\tcc{Sélection stochastique basée sur l'âge}
+Sélectionner un indice $k \in [1, n]$ avec la probabilité $P(k) = \frac{\mathcal{A}_k}{\sum_{i=1}^{n} \mathcal{A}_i}$\;
+Extraire $v_k$ de $\mathcal{V}$ et $\mathcal{A}_k$ de $\mathcal{A}$\;
+Remplacer $v_k$ dans $\mathcal{L}$ par l'impulsion concaténée $[v_k, \mathcal{A}_k]$\;
+}
+\tcc{Phase 3 : Vidage du palier final (Clôture)}
+\While{$\mathcal{V} \neq \emptyset$}{
+Soit $m$ la taille actuelle de $\mathcal{V}$\;
+Incrémenter tous les éléments de $\mathcal{A}$ de 1\;
+Sélectionner un indice $k \in [1, m]$ avec la probabilité $P(k) = \frac{\mathcal{A}_k}{\sum_{i=1}^{m} \mathcal{A}_i}$\;
+Extraire $v_k$ de $\mathcal{V}$ et $\mathcal{A}_k$ de $\mathcal{A}$\;
+Remplacer $v_k$ dans $\mathcal{L}$ par l'impulsion concaténée $[v_k, \mathcal{A}_k]$\;
+}
+\Return $\mathcal{L}$
+\vspace{20px}
+\caption{Génération stochastique de la séquence d'impulsions incidentes}
+\label{algo:generation_sequence}
+\end{algorithm}
+\subsubsection{Filtre de Détection Non-Ambiguë (DNA)}
+
+Une fois la séquence physique générée, le simulateur reproduit les contraintes matérielles du récepteur lors de l'acquisition. L'étape d'extraction des Détections Non-Ambiguës (DNA) opère une sélection visant à modéliser les phénomènes de masquage fréquentiel. À un palier donné, constitué de $n$ impulsions incidentes définies par leurs fréquences $f$ et leurs niveaux de puissance $N$, nous évaluons les interactions locales.
+Nous modélisons le voisinage fréquentiel par une matrice de proximité $\mathbf{F} \in \mathbb{R}^{n \times n}$ telle que, pour un seuil de résolution matériel $\delta f$ :
+
+\begin{equation}
+\mathbf{F}_{i,j} = \begin{cases}
+1 & \text{si } |f_i - f_j| \le \delta f \\
+0 & \text{sinon}
+\end{cases}
+\end{equation}
+
+Simultanément, nous définissons une matrice de domination énergétique $\mathbf{L} \in \mathbb{R}^{n \times n}$ comparant les niveaux de puissance relatifs :
+
+\begin{equation}
+\mathbf{L}_{i,j} = \begin{cases}
+1 & \text{si } N_i < N_j \\
+0 & \text{sinon}
+\end{cases}
+\end{equation}
+
+La matrice de masquage globale $\mathbf{M}$ s'obtient par le produit de Hadamard (terme à terme) de ces deux conditions : $\mathbf{M} = \mathbf{F} \odot \mathbf{L}$. Ainsi, un coefficient $\mathbf{M}_{i,j} = 1$ indique que l'impulsion $j$ masque physiquement l'impulsion $i$. Par conséquent, une impulsion incidente $i$ est promue au rang de DNA si et seulement si elle ne subit aucun masquage, ce qui se traduit mathématiquement par la nullité de la somme sur sa ligne :
+
+\begin{equation}
+\text{Sélection}(i) = \begin{cases}
+\text{Vrai} & \text{si } \sum_{j=1}^{n} \mathbf{M}_{i,j} = 0 \\
+\text{Faux} & \text{sinon}
+\end{cases}
+\end{equation}
+
+Les impulsions validées par ce filtre sont ensuite triées par énergie décroissante, définissant ainsi l'ordre de priorité pour l'étape d'association temporelle.
+\subsubsection{Suivi dynamique et caractérisation des PDW}
+La dernière étape de la simulation reproduit le comportement de la mémoire d'interception du DCI. Le suivi dynamique repose sur l'association des impulsions filtrées (les DNA) aux instances d'impulsions (les pistes) en cours de suivi. À chaque itération temporelle, le système tente de corréler les nouvelles observations avec l'historique actif. Une corrélation réussie met à jour l'état de la piste, tandis qu'une observation orpheline engendre l'ouverture d'une nouvelle piste. Inversement, l'absence prolongée de mise à jour d'une piste active déclenche sa clôture et provoque la publication du PDW final reconstitué. Ce mécanisme de gestion de mémoire, responsable des phénomènes d'artefacts (fusions, fragmentations) que le modèle d'IA devra apprendre à reproduire, est détaillé dans l'Algorithme \ref{algo:tracking_dci}.
+
+\begin{algorithm}[httb]
+\DontPrintSemicolon
+\SetAlgoLined
+\KwIn{Séquence des paliers de DNA $\mathcal{V} = [V^{(1)}, V^{(2)}, \dots, V^{(T)}]$}
+\KwOut{Liste des PDW reconstitués $\mathcal{R}$}
+\textbf{Initialisation :} $t \leftarrow 0$, Pistes actives $\mathcal{P} \leftarrow \emptyset$, $\mathcal{R} \leftarrow \emptyset$\;
+\ForEach{palier $V^{(t)} \in \mathcal{V}$}{
+$t \leftarrow t + 1$\; \;
+\tcc{$V^{(t)}$ est trié par niveau d'amplitude décroissant}
+\ForEach{impulsion $v_i \in V^{(t)}$}{
+Associer $v_i$ à la piste $p_j \in \mathcal{P}$ la plus proche en fréquence\;
+\eIf{Association réussie (\& $p_j$ non mise à jour à l'instant $t$)}{
+Mettre à jour la date de dernière vue : $TM_j \leftarrow t$\;
+Actualiser les caractéristiques de $p_j$ avec celles de $v_i$\;
+}{
+Créer une nouvelle piste $p_{new}$ à partir de $v_i$\;
+Définir Date de création $TI_{new} \leftarrow t-1$ et Date de dernière vue $TM_{new} \leftarrow t$\;
+$\mathcal{P} \leftarrow \mathcal{P} \cup \{p_{new}\}$\;
+}
+}\;
+\tcc{Purge des pistes inactives (Condition de publication)}
+\ForEach{piste $p_j \in \mathcal{P}$}{
+\If{$t - TM_j \ge 2$}{
+\tcc{Calcul de la durée et encodage local du temps de fin}
+Concaténer la durée $(TM_j - TI_j)$ aux caractéristiques de $p_j$\;
+Concaténer la valeur $(\text{taille}(\mathcal{R}) - TI_j)$ à $p_j$\;
+$\mathcal{R} \leftarrow \mathcal{R} \cup \{p_j\}$\;
+$\mathcal{P} \leftarrow \mathcal{P} \setminus \{p_j\}$\;
+}
+}
+}
+\Return $\mathcal{R}$
+\vspace{20px}
+\caption{Algorithme de suivi temporel et de publication des PDW}
+\label{algo:tracking_dci}
+\end{algorithm}
+
