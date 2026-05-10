@@ -96,47 +96,61 @@
 \contentsline {subsection}{\numberline {4.3.2}Évaluation du modèle de référence}{67}{subsection.4.3.2}%
 \contentsline {subsection}{\numberline {4.3.3}Évaluation de la méthodologie proposée}{68}{subsection.4.3.3}%
 \contentsline {subsection}{\numberline {4.3.4}Synthèse et comparaison des architectures}{69}{subsection.4.3.4}%
-\contentsline {chapter}{\numberline {5}L'approche séquence vers séquence}{73}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Description du problème}{74}{section.5.1}%
-\contentsline {subsection}{\numberline {5.1.1}La simplification du DCI}{74}{subsection.5.1.1}%
-\contentsline {subsubsection}{\numberline {5.1.1.1}Motivation}{74}{subsubsection.5.1.1.1}%
-\contentsline {subsubsection}{\numberline {5.1.1.2}Détails des traitements du DCIS}{75}{subsubsection.5.1.1.2}%
-\contentsline {paragraph}{Création de la séquence incidente :}{75}{paragraph*.27}%
-\contentsline {subsection}{\numberline {5.1.2}Modélisation comportementale du capteur ESM}{76}{subsection.5.1.2}%
-\contentsline {subsubsection}{\numberline {5.1.2.1}Génération stochastique de la séquence d'entrée}{76}{subsubsection.5.1.2.1}%
-\contentsline {subsubsection}{\numberline {5.1.2.2}Filtre de Détection Non-Ambiguë (DNA)}{76}{subsubsection.5.1.2.2}%
-\contentsline {subsubsection}{\numberline {5.1.2.3}Suivi dynamique et caractérisation des PDW}{77}{subsubsection.5.1.2.3}%
-\contentsline {subsection}{\numberline {5.1.3}Modélisation comportementale du capteur ESM}{77}{subsection.5.1.3}%
-\contentsline {subsubsection}{\numberline {5.1.3.1}Génération stochastique de la séquence d'entrée}{77}{subsubsection.5.1.3.1}%
-\contentsline {subsubsection}{\numberline {5.1.3.2}Filtre de Détection Non-Ambiguë (DNA)}{78}{subsubsection.5.1.3.2}%
-\contentsline {subsubsection}{\numberline {5.1.3.3}Suivi dynamique et caractérisation des PDW}{78}{subsubsection.5.1.3.3}%
-\contentsline {chapter}{\numberline {6}Sérialisation du problème : une approche événementielle}{85}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Motivation : Du traitement de séquence à la modélisation dynamique}{85}{section.6.1}%
-\contentsline {subsection}{\numberline {6.1.1}Le goulot d'étranglement des architectures pour le Seq2Seq}{85}{subsection.6.1.1}%
-\contentsline {subsection}{\numberline {6.1.2}Le DCI comme système dynamique réactif}{86}{subsection.6.1.2}%
-\contentsline {section}{\numberline {6.2}Formalisation du problème "Flux-à-flux"}{86}{section.6.2}%
-\contentsline {subsection}{\numberline {6.2.1}Contraintes de l'approche et choix de conception}{87}{subsection.6.2.1}%
-\contentsline {paragraph}{Contrainte 1 : Discrétisation de la réponse}{87}{paragraph*.32}%
-\contentsline {paragraph}{Contrainte 2 : Condition d'arrêt}{87}{paragraph*.33}%
-\contentsline {paragraph}{Contrainte 3 : Maintien du contexte}{87}{paragraph*.34}%
-\contentsline {subsection}{\numberline {6.2.2}Sérialisation : transformation et préparation des données}{87}{subsection.6.2.2}%
-\contentsline {subsection}{\numberline {6.2.3}Préparation des données et ingénierie des caractéristiques}{89}{subsection.6.2.3}%
-\contentsline {subsubsection}{\numberline {6.2.3.1}Encodage local du temps}{89}{subsubsection.6.2.3.1}%
-\contentsline {subsubsection}{\numberline {6.2.3.2}Gestion des masques et exemple de sérialisation}{90}{subsubsection.6.2.3.2}%
-\contentsline {section}{\numberline {6.3}Validation de l'approche sur architectures récurrentes}{91}{section.6.3}%
-\contentsline {subsection}{\numberline {6.3.1}Les architectures}{92}{subsection.6.3.1}%
-\contentsline {subsection}{\numberline {6.3.2}Résultats expérimentaux}{92}{subsection.6.3.2}%
-\contentsline {section}{\numberline {6.4}Extension des essais : Généralisation à d'autres architectures}{95}{section.6.4}%
-\contentsline {subsection}{\numberline {6.4.1}Sélection des architectures}{95}{subsection.6.4.1}%
-\contentsline {subsubsection}{\numberline {6.4.1.1}Le Transformer (Attention Mechanism)}{95}{subsubsection.6.4.1.1}%
-\contentsline {subsubsection}{\numberline {6.4.1.2}Le TCN (Temporal Convolutional Network)}{95}{subsubsection.6.4.1.2}%
-\contentsline {subsubsection}{\numberline {6.4.1.3}Le GRU (Recurrent Network)}{97}{subsubsection.6.4.1.3}%
-\contentsline {subsubsection}{\numberline {6.4.1.4}Structure commune et hyper-paramètres}{97}{subsubsection.6.4.1.4}%
-\contentsline {subsection}{\numberline {6.4.2}Fonction de perte et métriques d'évaluation}{98}{subsection.6.4.2}%
-\contentsline {subsubsection}{\numberline {6.4.2.1}Erreur de reconstruction pondérée ($\mathcal {L}_{reg}$)}{100}{subsubsection.6.4.2.1}%
-\contentsline {subsubsection}{\numberline {6.4.2.2}Erreur de classification par MCC différentiable ($\mathcal {L}_{class}$)}{101}{subsubsection.6.4.2.2}%
-\contentsline {subsection}{\numberline {6.4.3}Résultats et Analyse Comparative}{101}{subsection.6.4.3}%
-\contentsline {subsubsection}{\numberline {6.4.3.1}Performance globale et convergence}{102}{subsubsection.6.4.3.1}%
-\contentsline {subsubsection}{\numberline {6.4.3.2}Robustesse face à la longueur de séquence}{103}{subsubsection.6.4.3.2}%
-\contentsline {subsubsection}{\numberline {6.4.3.3}Analyse qualitative des générations}{103}{subsubsection.6.4.3.3}%
-\contentsline {subsection}{\numberline {6.4.4}Conclusion sur les extensions}{103}{subsection.6.4.4}%
+\contentsline {chapter}{\numberline {5}Un sujet d'étude pertinent: Module de détection et caractérisation des impulsions simplifié}{71}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Récit de l'étude}{71}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Implémentation de la modélisation du DCIS}{71}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Le cœur de la simplification}{72}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}Génération du scénario : la séquence d'impulsions incidents}{73}{subsection.5.2.2}%
+\contentsline {subsection}{\numberline {5.2.3}Simulation de l'interception des impulsions}{73}{subsection.5.2.3}%
+\contentsline {section}{\numberline {5.3}Illustration du DCIS}{74}{section.5.3}%
+\contentsline {chapter}{\numberline {6}Un sujet d'étude pertinent : Module de Détection et Caractérisation des Impulsions Simplifié (DCIS)}{79}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Contexte et motivations}{79}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Modélisation systémique du DCIS}{79}{section.6.2}%
+\contentsline {subsection}{\numberline {6.2.1}Filtre de Détection Non-Ambiguë (DNA)}{80}{subsection.6.2.1}%
+\contentsline {subsection}{\numberline {6.2.2}Génération de l'environnement : la séquence d'impulsions incidentes}{80}{subsection.6.2.2}%
+\contentsline {subsection}{\numberline {6.2.3}Simulation de l'acquisition et du suivi temporel}{81}{subsection.6.2.3}%
+\contentsline {section}{\numberline {6.3}Validation de la modélisation comportementale}{82}{section.6.3}%
+\contentsline {chapter}{\numberline {7}L'approche séquence vers séquence}{87}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Description du problème}{87}{section.7.1}%
+\contentsline {subsection}{\numberline {7.1.1}La simplification du DCI}{87}{subsection.7.1.1}%
+\contentsline {subsubsection}{\numberline {7.1.1.1}Motivation}{87}{subsubsection.7.1.1.1}%
+\contentsline {subsubsection}{\numberline {7.1.1.2}Détails des traitements du DCIS}{88}{subsubsection.7.1.1.2}%
+\contentsline {paragraph}{Création de la séquence incidente :}{88}{paragraph*.31}%
+\contentsline {subsection}{\numberline {7.1.2}Modélisation comportementale du capteur ESM}{89}{subsection.7.1.2}%
+\contentsline {subsubsection}{\numberline {7.1.2.1}Génération stochastique de la séquence d'entrée}{89}{subsubsection.7.1.2.1}%
+\contentsline {subsubsection}{\numberline {7.1.2.2}Filtre de Détection Non-Ambiguë (DNA)}{89}{subsubsection.7.1.2.2}%
+\contentsline {subsubsection}{\numberline {7.1.2.3}Suivi dynamique et caractérisation des PDW}{90}{subsubsection.7.1.2.3}%
+\contentsline {subsection}{\numberline {7.1.3}Modélisation comportementale du capteur ESM}{90}{subsection.7.1.3}%
+\contentsline {subsubsection}{\numberline {7.1.3.1}Génération stochastique de la séquence d'entrée}{90}{subsubsection.7.1.3.1}%
+\contentsline {subsubsection}{\numberline {7.1.3.2}Filtre de Détection Non-Ambiguë (DNA)}{91}{subsubsection.7.1.3.2}%
+\contentsline {subsubsection}{\numberline {7.1.3.3}Suivi dynamique et caractérisation des PDW}{91}{subsubsection.7.1.3.3}%
+\contentsline {chapter}{\numberline {8}Sérialisation du problème : une approche événementielle}{97}{chapter.8}%
+\contentsline {section}{\numberline {8.1}Motivation : Du traitement de séquence à la modélisation dynamique}{97}{section.8.1}%
+\contentsline {subsection}{\numberline {8.1.1}Le goulot d'étranglement des architectures pour le Seq2Seq}{97}{subsection.8.1.1}%
+\contentsline {subsection}{\numberline {8.1.2}Le DCI comme système dynamique réactif}{98}{subsection.8.1.2}%
+\contentsline {section}{\numberline {8.2}Formalisation du problème "Flux-à-flux"}{98}{section.8.2}%
+\contentsline {subsection}{\numberline {8.2.1}Contraintes de l'approche et choix de conception}{99}{subsection.8.2.1}%
+\contentsline {paragraph}{Contrainte 1 : Discrétisation de la réponse}{99}{paragraph*.36}%
+\contentsline {paragraph}{Contrainte 2 : Condition d'arrêt}{99}{paragraph*.37}%
+\contentsline {paragraph}{Contrainte 3 : Maintien du contexte}{99}{paragraph*.38}%
+\contentsline {subsection}{\numberline {8.2.2}Sérialisation : transformation et préparation des données}{99}{subsection.8.2.2}%
+\contentsline {subsection}{\numberline {8.2.3}Préparation des données et ingénierie des caractéristiques}{101}{subsection.8.2.3}%
+\contentsline {subsubsection}{\numberline {8.2.3.1}Encodage local du temps}{101}{subsubsection.8.2.3.1}%
+\contentsline {subsubsection}{\numberline {8.2.3.2}Gestion des masques et exemple de sérialisation}{102}{subsubsection.8.2.3.2}%
+\contentsline {section}{\numberline {8.3}Validation de l'approche sur architectures récurrentes}{103}{section.8.3}%
+\contentsline {subsection}{\numberline {8.3.1}Les architectures}{104}{subsection.8.3.1}%
+\contentsline {subsection}{\numberline {8.3.2}Résultats expérimentaux}{104}{subsection.8.3.2}%
+\contentsline {section}{\numberline {8.4}Extension des essais : Généralisation à d'autres architectures}{107}{section.8.4}%
+\contentsline {subsection}{\numberline {8.4.1}Sélection des architectures}{107}{subsection.8.4.1}%
+\contentsline {subsubsection}{\numberline {8.4.1.1}Le Transformer (Attention Mechanism)}{107}{subsubsection.8.4.1.1}%
+\contentsline {subsubsection}{\numberline {8.4.1.2}Le TCN (Temporal Convolutional Network)}{107}{subsubsection.8.4.1.2}%
+\contentsline {subsubsection}{\numberline {8.4.1.3}Le GRU (Recurrent Network)}{109}{subsubsection.8.4.1.3}%
+\contentsline {subsubsection}{\numberline {8.4.1.4}Structure commune et hyper-paramètres}{109}{subsubsection.8.4.1.4}%
+\contentsline {subsection}{\numberline {8.4.2}Fonction de perte et métriques d'évaluation}{110}{subsection.8.4.2}%
+\contentsline {subsubsection}{\numberline {8.4.2.1}Erreur de reconstruction pondérée ($\mathcal {L}_{reg}$)}{112}{subsubsection.8.4.2.1}%
+\contentsline {subsubsection}{\numberline {8.4.2.2}Erreur de classification par MCC différentiable ($\mathcal {L}_{class}$)}{113}{subsubsection.8.4.2.2}%
+\contentsline {subsection}{\numberline {8.4.3}Résultats et Analyse Comparative}{113}{subsection.8.4.3}%
+\contentsline {subsubsection}{\numberline {8.4.3.1}Performance globale et convergence}{114}{subsubsection.8.4.3.1}%
+\contentsline {subsubsection}{\numberline {8.4.3.2}Robustesse face à la longueur de séquence}{115}{subsubsection.8.4.3.2}%
+\contentsline {subsubsection}{\numberline {8.4.3.3}Analyse qualitative des générations}{115}{subsubsection.8.4.3.3}%
+\contentsline {subsection}{\numberline {8.4.4}Conclusion sur les extensions}{115}{subsection.8.4.4}%

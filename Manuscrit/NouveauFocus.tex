@@ -1,0 +1,328 @@
+\chapter{Un sujet d'étude pertinent: Module de détection et caractérisation des impulsions simplifié}
+
+\section{Récit de l'étude}
+Lors de nos travaux sur l'étude de l'approche seq2seq pour reproduire les données du DCI, constituant la problématique initiale de ces travaux de thèse \ref{chap:prob}, nous nous sommes heurtés à deux obstacles.\\
+
+Le premier concerne la complexité du traitement du DCI. Entre les masquages fréquentiels par repliement de spectre, la saturation des voies, l'intermodulationn les harmoniques et les capacités limitées de suivis temorel, le nombre de facteur entrant en jeu dans la création d'artefact \ref{fig:IOex} sont très nombbreux. Du point de vue de l'apprentissage automatique, cela rend difficile l'identification des difficultés rencontrées en cas d'échec d'un apprentissage, hors la possibilité d'isoler les sources de difficultées, pour par exemple identifier que l'IA ne comprend pas l'inter-modulation, est une nécessité.\\
+
+Le deuxième obstacle concerne l'exercice scientifique qu'est le travail de recherche d'un doctorant. Dans ce cadre, résultats et études doivent être publiés au maximum. Ainsi dans l'objectif, les expériences doivent être reproductible et donc les données publiées.\\
+
+Pour surpasser ces obstacles, nous optons pour la réalisation d'un module de détection et de caractérisation des impulsions simplifié (DCIS), proposant des leviers pour l'identification des difficultés liées à l'apprentissage automatique et permettant de se défaire des contraintes de diffusion liuée à l'étude d'un simulateur développé par Thales.
+
+\section{Implémentation de la modélisation du DCIS}
+L'implémentation du DCIS repose sur deux blocs ayant des rôles complémentaires :
+\begin{itemize}
+\item le simulateur capteur es tune classe qui permet d'instancier une reporudction numérique d'un capteur. Elle dispose de mémoires pour effectuer le suivi temporel des informations , d'une méthode permettant de déterminer les DNA à partir des impulsions du palier et une méthode permettant l'association des DNA aux mesureurs.
+\item le simulateur scénario est une classe qui permet de créer un scénario. Elle gère la succession des impulsions dans les paliers en fonction de paramètres fournis. Elle possède aussi une instance de simulateur capteur et appelle ses méthodes sur chaque palier pour calculer les DNA et mettre à jour les mesureurs.
+\end{itemize}
+
+Le cœur de l'approximation réside dans la manière de déterminer les NDA, qui est fortement simplifiée dans le DCIS. Nous présentons cette simplification avant de détailler l'implémentation du DCIS dans les sous-sections qui suivent.
+
+\subsection{Le cœur de la simplification}
+\label{seq:DNA_DCIS}
+Pour rappel, DNA signifie détection non-ambigüe. Lorsque des impulsions sont présentes simultanément, le capteur réel détecte des pics d'énergie sur les spectres des différentes voies d'acquisitions. Ces pics d'énergies correspondent alors aux fréquences des impulsions, repliées différemment en fonction de la fréquence d'échantillonnage de la voie. Un processus comparaison des pics en fonction des voies permet alors d'établir les fréquences non-repliées. Ce processus peut échouer à réassocier certains pics, auquel cas certaines impulsions seront manqués. Pour les associations réussies, qualifiées de DNA, elles sont transmises aux mesureurs pour mettre à jour le suivi temporel des impulsions. \\
+
+La simulation du DCI possède ainsi une règle qui permet de déterminer pour quelles impulsions présentes simultanément, l'association de leurs pics repliés auraient réussi, qualifié aussi de DNA, ou bien échoué, dans quel cas l'impulsion est considérée masquée.\\
+
+Le DCIS fait le choix de ne pas considérer de repliement en particulier, car les notions de proximités fréquentielles entre impulsions présentes simultanément permet déjà de faire apparaître un fort phénomène de masquage, suffisant pour notre étude. Voici la logique qui permet de déterminer parmi des impulsions d'un même palier, lesquelles seront des DNA et alors lesquelles seront masquées.\\\\
+
+\noindent Notons $I_1, I_2, \cdots, I_n$ les impulsions d'un palier, avec $F_1, \cdots, F_n$ leurs fréquences et $N_1, \cdots, N_n$ leurs niveaux.\\
+
+\noindent Nous calculons une matrice de proximité fréquentielle, $\mathrm{F} \in \mathbb{R}^{n \times n}$, telle que le terme $i, j$ indique si les fréquences des impulsions $I_i$ et $I_j$ sont proches d'une distance inférieur à un seuil $\delta F$, caractérisant la résolution fréquentielle des spectres réalisés par le capteur.
+\begin{equation}
+\mathbf{F}_{i,j} = \begin{cases}
+1 & \text{si } |F_i - F_j| \le \delta F \\
+0 & \text{sinon}
+\end{cases}
+\end{equation}
+\, \\
+
+\noindent En parallèle, nous calculons une matrice de supériorité énergétique, $\mathrm{L} \in \mathbb{R}^{n \times n}$, telle que le terme $i, j$ indique si l'amplitude de l'impulsion $I_i$ est inférieur à l'amplitude de l'impulsion $I_j$.
+\begin{equation}
+\mathbf{L}_{i,j} = \begin{cases}
+1 & \text{si } N_i < N_j \\
+0 & \text{sinon}
+\end{cases}
+\end{equation}
+\, \\
+
+\noindent Notre règle postule qu'une impulsion est masquée par une seconde si sa fréquence en est proche et son niveau est inférieur. Nous calculons ainsi la matrice de masquage $\mathrm{M} = \mathrm{F} \odot \mathrm{L}$ par un produit terme à terme, telle que le terme en position $i, j$ indique si l'impulsion $I_i$ est masquée par l'impulsion $I_j$.\\\\
+
+\noindent Finalement une DNA est une impulsion qui n'est masqué par aucune autre, nous calculons donc un booléen pour chaque impulsion qui détermine si elle sera considérée comme une DNA ou non.
+\begin{equation}
+\text{Sélection}_i= \begin{cases}
+\text{Vrai} & \text{si } \sum_{j=1}^{n} \mathbf{M}_{i,j} = 0 \\
+\text{Faux} & \text{sinon}
+\end{cases}
+\end{equation}
+\, \\
+
+Nous réfèrerons à cette procédure sous le nom \textit{DCIS\_make\_DNA} pour la suite.
+
+\subsection{Génération du scénario : la séquence d'impulsions incidents}
+La première brique de notre implémentation est une classe appelée \textit{simulateur\_scénario}. Cette classe, qui permet de créer la séquence d'impulsions incidentes et lance la simulation du capteur, est instanciée avec des arguments qui spécifie le scénario en lui même, ainsi que les arguments qui spécifie le capteur qui est instancié en attribue de la classe. Elle possède une méthode \textit{step} appelée en boucle, gérant les impulsions du nouveau palier et l'appel du traitement du capteur. L'algorithme \ref{algo:generation_sequence_scenario} explique le fonctionnement du traitement réalisé par cette classe, sous la forme d'une unique fonction.
+
+\begin{algorithm}[httb]
+\DontPrintSemicolon
+\SetAlgoLined
+\KwIn{Longueur totale $N$, Nombre de PDW par palier $n$, $\mathrm{Arg}$ du capteur}
+\KwOut{Séquence de PDW incidents $\mathrm{L}$, séquence de PDW interceptés $\mathrm{R}$}
+\textbf{Initialisation :} \;
+$\mathrm{L} \leftarrow \emptyset$ la liste des PDW incidents \;
+$\mathrm{V} \leftarrow \emptyset$ la liste des PDW du palier \;
+$\mathrm{A} \leftarrow \emptyset$ la liste de l'age des PDW du palier \;
+$\mathrm{T} \leftarrow 0$ le temps de la simulation \;
+$\mathrm{Capteur} = \textit{simulateur\_capteur}(\mathrm{Arg})$ une instance de \textit{simulateur\_capteur} \;
+\;
+\tcc{boucle d'appel du traitement du palier}
+\While{$\mathrm{Capteur.running}$ \text{(critère mis à jour sur chaque palier)}}{
+\tcc{Création du nouveau PDW, sauf pour les derniers paliers}
+\If{$T < N$}{
+Générer un nouveau PDW $v_{new}$\;
+Ajouter $v_{new}$ à la fin de $\mathrm{L}$ et de $\mathrm{V}$\;
+Ajouter l'âge $0$ à la fin de $\mathrm{A}$\;
+}
+\;
+\tcc{Suppression d'un PDW du palier, sauf premiers paliers}
+\If{$T > n$}{
+Soit $m$ la taille actuelle de $\mathrm{V}$\;
+Sélectionner un indice $k \in [1, m]$ avec la probabilité $P(k) = \frac{\mathrm{A}_k + 1}{\sum_{i=1}^{m} \mathrm{A}_i + m}$\;
+Extraire $v_k$ de $\mathrm{V}$ et $\mathrm{A}_k$ de $\mathrm{A}$\;
+Remplacer $v_k$ dans $\mathrm{L}$ par le PDW concaténé $[v_k, \mathrm{A}_k + 1]$\;
+}
+\;
+\tcc{Incrément du temps}
+$\mathrm{T} \leftarrow \mathrm{T} + 1$\;
+Ajouter 1 à chaque élément de $\mathrm{A}$\;
+\;
+\tcc{Appel du traitement capteur avec les PDW du palier}
+$\mathrm{Capteur}.\mathrm{Process}(\mathrm{V})$
+}
+\;
+\tcc{Récupération des PDW reconstruites par le capteur}
+$\mathrm{R} = \mathrm{Capteur}.\mathrm{R}$\;
+\Return $\mathrm{L}$ et $\mathrm{R}$
+\vspace{20px}
+\caption{Génération stochastique des séquences d'impulsions du scénario}
+\label{algo:generation_sequence_scenario}
+\end{algorithm}
+
+\subsection{Simulation de l'interception des impulsions}
+La deuxième brique de notre implémentation est une classe appelée \textit{simulateur\_capteur} et permet de modéliser la dynamique de fonctionnement du capteur. La méthode $\mathrm{Process}$ est appelée à chaque palier, comme présenté dans l'algorithme \ref{algo:generation_sequence_scenario}. Elle met à jour les mesureurs, qui sont des attribues de la classe, en fonction des DNA du palier, dont l'obtention est décrite dans \ref{seq:DNA_DCIS}. Cette action peut engendrer la création de mesureur par une DNA dont la fréquence n'est pas encore suivie, la mise-à-jour de mesureur par une DNA dont la fréquence correspond, ou encore la libération d'un mesureur s'il n'est plus mis à jour depuis un certain temps. Ainsi l'appel de la méthode $\mathrm{Process}$ peut générer lors de la libération des mesureurs des PDW, qui correspondent aux PDW interceptés par le capteur.\\
+
+La classe est initialisée par les paramètres qui décrivent le capteur : 
+\begin{itemize}
+\item Le paramètre $Tps_{maintien}$ contrôle combien de temps un mesureur reste actif sans être mis à jour avant d'être libérée.
+\item Le paramètre $\delta f$ spécifie le seuil de sensibilité fréquentielle qui contrôle l'association entre les mesureurs et les DNA.
+\item Le paramètre $\delta F$ spécifie la résolution fréquentielle des spectres réalisés par le capteur.
+\end{itemize}
+Dans l'algorithme \ref{algo:capteur_process}, nous introduisons les attribues de la classe $\mathrm{Capteur}$ avant d'illustrer le fonctionnement de la méthode $\mathrm{Process}$ du capteur, sous la forme d'une unique fonction. Nous ferons référence à une fonction \textit{DCIS\_make\_DNA} qui est en fait une méthode de la classe $\mathrm{Capteur}$ dépendant du paramètre $\delta F$, mais dont le fonctionnement est déjà expliqué dans la sous-section \ref{seq:DNA_DCIS}.
+
+\begin{algorithm}[httb]
+\DontPrintSemicolon
+\SetAlgoLined
+\KwAttr{État initial des attribues de la classe manipulés par la méthode}
+$\mathrm{R}, \mathrm{P}, \mathrm{T}$ les listes vides des PDW déjà créés, des mesureurs actifs, et des dates de dernière mise-à-jour des mesureurs \;
+$t \leftarrow 0$ le temps actuel\;
+\;
+\tcc{Méthode $\mathrm{Process}$}
+\KwIn{Liste des PDW du palier actuel palier $\mathrm{V}$}
+$t \leftarrow t+1$ incrément du temps initial de l'horloge du capteur\;
+$\mathrm{DNA} \leftarrow \textit{DCIS\_make\_DNA}(\mathrm{V})$ détermination des DNA du palier\;
+\;
+\tcc{Association des DNA aux mesureurs actifs}
+\ForEach{Mesureur actif $\mathcal{P} \in \mathrm{P}$, par niveau décroissant}{
+Soit $\mathcal{T} \in \mathrm{T}$ correspondant à $\mathcal{P}$\;
+\ForEach{Impulsion $\mathcal{I} \in \mathrm{DNA}$ par niveau décroissant}{
+Soit $F_\mathcal{I}$ et $F_\mathcal{P}$ les fréquences de $\mathcal{I}$ et $\mathcal{P}$\;
+\If{$\|F_\mathcal{I} - F_\mathcal{P} \| < \delta f$}{
+Retirer $\mathcal{I}$ de $\mathrm{DNA}$ et l'associer au mesureur $\mathcal{P}$\;
+$\mathcal{T} \leftarrow t$\;
+$\mathbf{Break}$
+}
+}
+}
+\;
+\tcc{Association des DNA restant à de nouveaux mesureurs}
+\ForEach{Impulsion $\mathcal{I} \in \mathrm{DNA}$ par niveau décroissant}{
+\If{$|\mathrm{P}| < N_{max}$ \text{(ressources de suivi restantes)}}{
+Retirer $\mathcal{I}$ de $\mathrm{DNA}$ et l'associer à un nouveau mesureur $\mathcal{P}$\;
+Ajouter $\mathcal{P}$ à $\mathrm{P}$ et ajouter $t$ à $\mathrm{T}$
+}
+\lElse{
+$\mathbf{Break}$
+}
+}
+\;
+\tcc{Purge des mesureurs et création des PDW}
+\ForEach{Mesureur actif $\mathcal{P} \in \mathrm{P}$}{
+Soit $\mathcal{T} \in \mathrm{T}$ correspondant à $\mathcal{P}$\;
+\If{$t - \mathcal{T} \ge T_{maintien}$}{
+Créer un PDW avec les informations contenues dans $\mathcal{T}$ et $\mathcal{P}$\;
+Retirer $\mathcal{T}$ de $\mathrm{T}$, retirer $\mathcal{P}$ de $\mathrm{P}$, ajouter le PDW à la fin de $\mathrm{R}$\;
+
+}
+}
+\vspace{20px}
+\caption{Algorithme de suivi temporel et de création des PDW}
+\label{algo:capteur_process}
+\end{algorithm}
+
+\section{Illustration du DCIS}
+Nous avons finalement construit un outil de compréhension et d'étude du problème de base, décrit en détails dans la section \ref{seq:FormaPb} du chapitre \ref{chap:prob}. Cette simplification a pour conséquence n'entrave pas l'étude de l'apprentissage automatique de la transformation opérée, mais donne simplement le moyen d'en contrôler les causes, et surtout de générer dans d'énormes quantités. \\
+
+La transformation qu'opère le DCIS est semblable au DCI. La figure \ref{fig:IOsimple} illustre les séquences de PDW incidentes et les séquences de PDW interceptées, faisant apparaître des artéfacts similaires à ceux des données du DCI, illustrées dans la figure \ref{fig:IOex}. 
+
+\begin{figure}[htbp]
+\begin{center} 
+\includegraphics[scale=0.35]{IOsimpleexemple.png}
+\end{center}
+\caption{Représentation dans un plan temps-fréquence des PDW entrant dans le DCIS (à gauche) et sortant de ce module (à droite) simplifiant la modélisation du processus de DCI. La couleur de chaque rectangle encode l'amplitude du PDW. Les annotations identifient les dégradations structurelles induites par le traitement : (a) Fusion de signaux distincts, (b) Disparition d'impulsion (non-détection), (c) Scission artificielle d'une impulsion continue, (d) Troncature avant, (e) Troncature arrière, comme dans \ref{fig:IOex}}
+\label{fig:IOsimple}
+\end{figure}
+
+Ainsi nous nous focaliserons à partir de maintenant sur l'apprentissage par IA de la transformation opérée par le DCIS, et nos modèles devront comprendre des données les règles exposées dans la section précédentes afin de générée des séquences de PDW interceptées semblables, ce que nous pourrons facilement constater visuellement en observant si vos modèles créent des artéfacts aux bonnes positions. Mis à part le traitement régissant la transformation \textit{seq2seq}, qui est modifié, ce nouveau problème reste semblable en tout point au problème de transduction séquentiel décrit dans la section \ref{seq:FormaPb} du point de vue de l'apprentissage automatique.
+
+
+
+
+
+
+
+
+
+
+
+\chapter{Un sujet d'étude pertinent : Module de Détection et Caractérisation des Impulsions Simplifié (DCIS)}
+
+\section{Contexte et motivations}
+Lors de nos travaux sur l'évaluation de l'approche sequence-to-sequence (Seq2Seq) pour reproduire les données du DCI, constituant la problématique initiale de ces travaux (Chapitre \ref{chap:prob}), nous nous sommes heurtés à deux obstacles structurels.\\
+
+Le premier réside dans la complexité intrinsèque du traitement opéré par le DCI. Les phénomènes de masquage fréquentiel par repliement de spectre, de saturation des voies d'acquisition, d'intermodulation ou encore la présence d'harmoniques induisent une multitude de facteurs dans la création des artéfacts. Du point de vue de l'apprentissage automatique, cette intrication rend opaque l'identification des causes d'erreur du modèle. Or, la capacité d'isoler la source d'une difficulté — par exemple, diagnostiquer l'incapacité d'une architecture neuronale à modéliser une intermodulation spécifique — est une nécessité méthodologique absolue.\\
+
+Le second obstacle est inhérent à l'exigence de reproductibilité de la recherche scientifique. L'utilisation d'un simulateur industriel propriétaire impose des contraintes de confidentialité strictes, limitant la diffusion des jeux de données et empêchant la validation indépendante des résultats.  \\
+
+Pour pallier ces limitations, nous proposons un environnement de simulation simplifié, désigné par le terme DCIS (Module de Détection et de Caractérisation des Impulsions Simplifié). Cet outil offre des leviers de contrôle explicites sur les mécanismes générateurs d'artéfacts, facilitant le diagnostic des réseaux de neurones, tout en s'affranchissant des restrictions de diffusion de données industrielles. 
+
+
+\section{Modélisation systémique du DCIS}
+L'architecture du DCIS repose sur deux modules séquentiels aux rôles complémentaires :
+\begin{itemize}
+\item \textbf{Le générateur stochastique d'environnement (scénario) :} Ce module régit la succession et la densité des impulsions physiques dans l'espace électromagnétique au fil du temps.
+\item \textbf{Le modèle de réception et de suivi (capteur) :} Ce module simule la dynamique d'acquisition. Il maintient un état interne (la mémoire de suivi temporel), évalue les détections non-ambiguës (DNA) à chaque instant, et associe ces détections aux pistes actives.
+\end{itemize}  
+
+Le cœur de cette modélisation réside dans l'approximation des règles d'extraction des DNA, qui régit l'apparition des artéfacts de masquage. Nous formalisons cette étape avant de détailler la génération de l'environnement et le processus de suivi.  
+
+
+\subsection{Filtre de Détection Non-Ambiguë (DNA)}
+\label{seq:DNA_DCIS}
+Dans le système réel, une DNA résulte d'un processus complexe de corrélation de pics d'énergie repliés spectralement sur plusieurs voies. Le DCIS s'abstrait de la notion de repliement matériel pour se concentrer sur un phénomène de masquage par proximité fréquentielle pure, suffisant pour engendrer des dynamiques d'artéfacts complexes.  \\
+
+Considérons un palier temporel contenant $n$ impulsions incidentes $I_1, \dots, I_n$, caractérisées par leurs fréquences $F_1, \dots, F_n$ et leurs niveaux d'énergie $N_1, \dots, N_n$. Nous définissons la matrice de proximité fréquentielle $\mathbf{F} \in \mathbb{R}^{n \times n}$ modélisant la résolution du capteur par un seuil $\delta F$ :
+\begin{equation}
+\mathbf{F}_{i,j} = \begin{cases}
+1 & \text{si } |F_i - F_j| \le \delta F \\
+0 & \text{sinon}
+\end{cases}
+\end{equation} 
+
+Parallèlement, nous établissons la matrice de domination énergétique $\mathbf{L} \in \mathbb{R}^{n \times n}$ :
+\begin{equation}
+\mathbf{L}_{i,j} = \begin{cases}
+1 & \text{si } N_i < N_j \\
+0 & \text{sinon}
+\end{cases}
+\end{equation}
+
+Notre modèle postule qu'une impulsion subit un masquage matériel si une seconde impulsion, à la fois proche en fréquence et de niveau supérieur, est présente simultanément. Puisque $\mathbf{F}$ et $\mathbf{L}$ sont des matrices booléennes, nous calculons la matrice de masquage globale $\mathbf{M}$ via le produit de Hadamard : $\mathbf{M} = \mathbf{F} \odot \mathbf{L}$. Cette opération agit comme un opérateur de conjonction logique (ET) : le terme $\mathbf{M}_{i,j}$ vaut $1$ si et seulement si l'impulsion $I_j$ masque l'impulsion $I_i$.  \\
+
+Finalement, une impulsion est promue au statut de DNA si elle n'est masquée par aucune autre, ce qui se traduit par la nullité de la somme sur sa ligne :\begin{equation}
+\text{Sélection}_i= \begin{cases}
+\text{Vrai} & \text{si } \sum_{j=1}^{n} \mathbf{M}_{i,j} = 0 \\
+\text{Faux} & \text{sinon}
+\end{cases}
+\end{equation}
+Nous noterons cette fonction de filtrage $\mathcal{F}{\text{DNA}}(\cdot)$ dans la suite de l'étude.
+
+\subsection{Génération de l'environnement : la séquence d'impulsions incidentes}
+La première étape de la simulation consiste à synthétiser l'environnement électromagnétique, c'est-à-dire l'ordre d'arrivée et la durée de vie des impulsions physiques. L'algorithme maintient une densité d'impulsions constante par palier. Afin de prévenir l'émergence de motifs cycliques triviaux, l'éviction d'une impulsion du palier actif est stochastique, régie par une loi de probabilité favorisant la disparition des signaux les plus anciens. Ce processus, détaillé dans l'Algorithme \ref{algo:generation_sequence_scenario}, génère l'historique complet des paliers $\mathcal{V}_{tot}$ qui sera ensuite soumis au capteur.  
+
+\begin{algorithm}[htbp]
+\DontPrintSemicolon
+\SetAlgoLined
+\KwIn{Nombre total d'événements $N$, Densité par palier $n$}
+\KwOut{Séquence chronologique des paliers $\mathcal{V}_{tot}$, Liste des impulsions incidentes $\mathcal{L}$}
+\textbf{Initialisation :} $\mathcal{L} \leftarrow \emptyset$, $\mathcal{V}_{tot} \leftarrow \emptyset$, Palier courant $\mathcal{V} \leftarrow \emptyset$, Âges $\mathcal{A} \leftarrow \emptyset$, $T \leftarrow 0$\;
+\vspace{2mm}\tcp*[l]{Générateur stochastique de l'environnement}
+\While{$T < N$}{
+Générer une nouvelle impulsion $v_{new}$\;
+Ajouter $v_{new}$ à $\mathcal{L}$ et à $\mathcal{V}$ \; 
+Ajouter l'âge $0$ à $\mathcal{A}$\;
+}
+\If{$T > n$}{
+Soit $m$ la taille de $\mathcal{V}$\;
+Sélectionner un indice $k \in [1, m]$ avec probabilité $P(k) = \frac{\mathcal{A}_k + 1}{\sum_{i=1}^{m} \mathcal{A}_i + m}$\;
+Extraire $v_k$ de $\mathcal{V}$ et $\mathcal{A}_k$ de $\mathcal{A}$\;
+Mettre à jour $v_k$ dans $\mathcal{L}$ avec son âge de clôture $(\mathcal{A}_k + 1)$
+}
+$T \leftarrow T + 1$\;
+Incrémenter tous les éléments de $\mathcal{A}$ de 1\;
+Enregistrer une copie du palier : $\mathcal{V}_{tot} \leftarrow \mathcal{V}_{tot} \cup \{\mathcal{V}\}$;
+\Return $\mathcal{V}_{tot}, \mathcal{L}$
+
+\caption{Génération stochastique de la séquence d'impulsions incidentes}
+\label{algo:generation_sequence_scenario}
+\end{algorithm}
+
+
+\subsection{Simulation de l'acquisition et du suivi temporel}
+La seconde étape modélise la dynamique d'acquisition du capteur. Ce module traite séquentiellement le flux physique généré précédemment. À chaque pas de temps, la fonction de filtrage $\mathcal{F}_{\text{DNA}}$ extrait les détections non-ambiguës du palier courant. Celles-ci sont ensuite confrontées à la mémoire interne du système (les "mesureurs" actifs).  \\
+
+Cette confrontation induit trois mécanismes fondamentaux, responsables des artéfacts que les réseaux de neurones devront assimiler : l'association d'une DNA à un suivi existant (mise à jour), l'allocation d'une DNA non corrélée à une nouvelle piste (fragmentation potentielle), et la clôture d'une piste obsolète déclenchant la publication d'un PDW intercepté. Ce processus global est formalisé par l'Algorithme \ref{algo:capteur_process}.  
+
+\begin{algorithm}[httb]
+\DontPrintSemicolon
+\SetAlgoLined
+\KwIn{Séquence des paliers physiques $\mathcal{V}_{tot} = [\mathcal{V}^{(1)}, \dots, \mathcal{V}^{(T)}]$, Seuil d'association $\delta f$, Maintien $T_{maintien}$}
+\KwOut{Séquence des PDW interceptés $\mathcal{R}$}
+\textbf{Initialisation :} Temps $t \leftarrow 0$, Pistes actives $\mathcal{P} \leftarrow \emptyset$, Dates de mise à jour $\mathcal{T} \leftarrow \emptyset$, $\mathcal{R} \leftarrow \emptyset$\;
+\vspace{2mm}\tcp*[l]{Traitement du flux événementiel par le capteur}
+\ForEach{palier $\mathcal{V}^{(t)} \in \mathcal{V}_{tot}$}{
+$t \leftarrow t + 1$\;
+Extraire les DNA : $\mathcal{D} \leftarrow \mathcal{F}_{\text{DNA}}(\mathcal{V}^{(t)})$
+}
+\tcp*[f]{Sélection et tri par niveau décroissant}\;
+\tcp*[l]{1. Association des DNA aux pistes ou création}
+\ForEach{impulsion $\mathcal{I} \in \mathcal{D}$}{
+Chercher la piste active $\mathcal{P}_k \in \mathcal{P}$ vérifiant $\|F_\mathcal{I} - F_{\mathcal{P}_k}\| \le \delta f$\;
+\eIf{Une piste $\mathcal{P}_k$ valide est trouvée}{
+Associer $\mathcal{I}$ à $\mathcal{P}_k$ \tcp*[f]{Fusion ou mise à jour}\;
+Mettre à jour la date associée dans $\mathcal{T}_k \leftarrow t$\;
+}{
+\If{$|\mathcal{P}| < N_{max}$}{
+Créer une nouvelle piste $\mathcal{P}_{new}$ à partir de $\mathcal{I}$\;
+Ajouter $\mathcal{P}_{new}$ à $\mathcal{P}$ et la date $t$ à $\mathcal{T}$\;
+}
+}
+}
+\vspace{1mm}
+\tcp*[l]{2. Purge de la mémoire et publication}
+\ForEach{piste $\mathcal{P}_k \in \mathcal{P}$}{
+\If{$t - \mathcal{T}_k \ge T_{maintien}$}{
+Construire le PDW intercepté final à partir de $\mathcal{P}_k$ et $\mathcal{T}_k$\;
+Ajouter le PDW à $\mathcal{R}$\;
+Retirer $\mathcal{P}_k$ de $\mathcal{P}$ et $\mathcal{T}_k$ de $\mathcal{T}$\;
+}
+}
+\Return $\mathcal{R}$
+\caption{Algorithme d'acquisition, de suivi et de publication des PDW}
+\label{algo:capteur_process}
+\end{algorithm}
+
+\section{Validation de la modélisation comportementale}
+Le développement de cet environnement contrôlé répond pleinement aux exigences de notre étude (Section \ref{seq:FormaPb}). Bien que structurellement simplifiée, cette modélisation n'entrave pas l'évaluation des capacités d'apprentissage des réseaux de neurones ; elle offre au contraire un cadre d'expérimentation massif, déterministe et isolable.  \\
+
+La dynamique de transformation opérée par le DCIS reste fondamentalement homologue à celle du capteur réel. Comme l'illustre la Figure \ref{fig:IOsimple}, la projection des séquences incidentes et interceptées met en évidence l'émergence d'artéfacts canoniques (fusions de signaux, disparitions, scissions artificielles, troncatures), identiques à ceux observés sur le DCI (Figure \ref{fig:IOex}).  \\
+
+Par conséquent, l'objectif d'optimisation de nos architectures d'apprentissage automatique reste inchangé. Nos modèles devront induire, à partir des seules données d'entrée/sortie, la topologie algorithmique interne du DCIS décrite dans ce chapitre, afin de prédire de manière causale la séquence des PDW interceptés. La fidélité de ces prédictions pourra désormais être formellement auditée en confrontant les artéfacts générés par l'IA aux règles mathématiques sous-jacentes du simulateur.

@@ -27,21 +27,6 @@ Dans la suite on présentera comme dans la soumission à CAID.
 
 
 \chapter{L'approche séquence vers séquence}
-\textcolor{red}{essayer de raconter une histoire : on change de stratégie car le problème de base est trop compliqué donc on construit un outil qui permet de comprendre le problème et de diffuser les résultats. Faire un chapitre à part. Dire que nos approximations ne simplifient pas en soit le problème d'apprentissage automatique. On a une contrainte de ne pas aborder les trucs sensibles donc on ne l'a pas abordé.}
-Dans ce chapitre, nous présentons la principale contribution de nos travaux. Il s'agit de l'étude de l'approche séquence vers séquence pour remplacer le module DCI de l'environnement numérique. Ce problème est décrit en détails dans la section \ref{seq:FormaPb}. Afin de mener à bien cette étude, nous avons fait le choix de recourir à un module simplifié, basé sur un principe similaire au DCI. Nous écrirons DCIS (DCI simplifié) pour évoquer le module simplifié. L'objectif de ce module est de produire un traitement semblable au DCI, aboutissant à l'apparition des mêmes artefacts présentés figure \ref{fig:IOex}, tout en permettant plus de flexibilité de réglage et d'accessibilité pour la génération des données. Une séquence de PDW traitée par le DCIS, dans laquelle les artéfacts sont mis en avant, est illustrée figure \ref{fig:IOsimple}.\\
-
-\begin{figure}[htbp]
-\begin{center} 
-\includegraphics[scale=0.35]{IOsimpleexemple.png}
-\end{center}
-\caption{Représentation dans un plan temps-fréquence des PDW entrant dans le DCIS (à gauche) et sortant de ce module (à droite) simplifiant la modélisation du processus de DCI. La couleur de chaque rectangle encode l'amplitude du PDW. Les annotations identifient les dégradations structurelles induites par le traitement : (a) Fusion de signaux distincts, (b) Disparition d'impulsion (non-détection), (c) Scission artificielle d'une impulsion continue, (d) Troncature avant, (e) Troncature arrière, comme dans \ref{fig:IOex}}
-\label{fig:IOsimple}
-\end{figure}
-
-Mis à part le traitement régissant la transformation \textit{seq2seq}, qui est modifié, ce nouveau problème reste semblable en tout point au problème de transduction séquentiel décrit dans la section \ref{seq:FormaPb} du point de vue de l'apprentissage automatique. Proche structurellement des problématiques de traduction très étudiée dans la littérature, \textcolor{red}{... [suite biblio ciblée]}. \\
-
-Ne pas oublier de finir l'intro avec un plan du chapitre.
-
 \section{Description du problème}
 \subsection{La simplification du DCI}
 Comme mentionné précédemment, le problème étudié dans ce chapitre se base sur une simplification du DCI. À travers le DCIS, nous redéfinissons un problème de transduction séquentiel, que nous abordons avec des architectures basées sur le Transformer. Nous détaillons ici les motivations du DCIS et présentons ici une description du module, ce qui permet de mieux comprendre le niveau de complexité du problème que nous traitons, ainsi que les éléments importants qui fixent nos objectifs pour cette étude.
