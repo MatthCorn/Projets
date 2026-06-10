@@ -19,7 +19,7 @@
 		"Full TEI Document": false,
 		"Export Collections": false
 	},
-	"lastUpdated": "2022-09-30 10:56:50"
+	"lastUpdated": "2026-05-20 18:05:00"
 }
 
 // ********************************************************************
@@ -282,7 +282,7 @@ function generateItem(item, teiDoc) {
 			idno = teiDoc.createElementNS(ns.tei, "idno");
 			idno.setAttribute("type", "DOI");
 			idno.appendChild(teiDoc.createTextNode(item.DOI));
-			analytic.appendChild(idno);
+			monogr.appendChild(idno);
 		}
 	}
 
@@ -646,3 +646,8 @@ function doExport() {
 	var serializer = new XMLSerializer();
 	Zotero.write(serializer.serializeToString(outputElement));
 }
+
+/** BEGIN TEST CASES **/
+var testCases = [
+]
+/** END TEST CASES **/

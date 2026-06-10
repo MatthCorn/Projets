@@ -1,11 +1,13 @@
 {
 	"translatorID": "b6e39b57-8942-4d11-8259-342c46ce395f",
+	"translatorType": 2,
 	"label": "BibLaTeX",
 	"creator": "Simon Kornblith, Richard Karnesky and Anders Johansson",
 	"target": "bib",
 	"minVersion": "2.1.9",
-	"maxVersion": "",
+	"maxVersion": null,
 	"priority": 100,
+	"inRepository": true,
 	"configOptions": {
 		"getCollections": true
 	},
@@ -15,9 +17,7 @@
 		"exportFileData": false,
 		"useJournalAbbreviation": false
 	},
-	"inRepository": true,
-	"translatorType": 2,
-	"lastUpdated": "2024-03-25 14:49:42"
+	"lastUpdated": "2026-04-27 15:50:00"
 }
 
 /*
@@ -302,9 +302,8 @@ function writeField(field, value, isMacro, noEscape) {
 
 		// Case of words with uppercase characters in non-initial positions is preserved with braces.
 		// we're looking at all unicode letters
-		var protectCaps = new ZU.XRegExp("\\b\\p{Letter}+\\p{Uppercase_Letter}\\p{Letter}*", 'g');
 		if (field != "pages") {
-			value = ZU.XRegExp.replace(value, protectCaps, "{$0}");
+			value = value.replace(/\b\p{L}+\p{Lu}\p{L}*/gu, "{$&}");
 		}
 
 		// Page ranges should use double dash

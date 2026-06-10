@@ -9,7 +9,7 @@
 	"priority": 100,
 	"inRepository": true,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2026-01-07 17:55:00"
+	"lastUpdated": "2026-05-15 19:35:00"
 }
 
 /*
@@ -184,7 +184,7 @@ async function scrape(doc) {
 	
 	if (item.itemType == 'journalArticle') {
 		// Publication name in the CSL is shortened; scrape from page to get full title.
-		let expandedTitle = text(doc, 'span.epub-section__title');
+		let expandedTitle = attr(doc, 'meta[name="citation_journal_title"]', 'content');
 		if (expandedTitle) {
 			item.journalAbbreviation = item.publicationTitle;
 			item.publicationTitle = expandedTitle;

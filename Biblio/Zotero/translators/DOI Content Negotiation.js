@@ -1,14 +1,14 @@
 {
 	"translatorID": "b28d0d42-8549-4c6d-83fc-8382874a5cb9",
+	"translatorType": 8,
 	"label": "DOI Content Negotiation",
 	"creator": "Sebastian Karcher",
-	"target": "",
+	"target": null,
 	"minVersion": "5.0",
-	"maxVersion": "",
+	"maxVersion": null,
 	"priority": 100,
 	"inRepository": true,
-	"translatorType": 8,
-	"lastUpdated": "2025-07-27 04:51:26"
+	"lastUpdated": "2026-04-01 05:25:00"
 }
 
 /*
@@ -69,7 +69,7 @@ async function processDOI(doi) {
 	// Outage: 17 May 2025, 14:00–15:00 UTC
 	// Start 1 hour before (13:00 UTC) and end 2 hours after (17:00 UTC)
 	// TEMP for May 22 outage
-	let startDate = new Date(Date.UTC(2025, 4, 22, 00, 0, 0));
+	let startDate = new Date(Date.UTC(2025, 4, 22, 0, 0, 0));
 	let endDate   = new Date(Date.UTC(2025, 4, 24, 0, 0, 0));
 
 	// At least for now, always use REST API for Crossref DOIs
