@@ -27,7 +27,233 @@ Dans la suite on présentera comme dans la soumission à CAID.
 
 
 \chapter{L'approche séquence vers séquence}
-Le chapitre présente la principale méthode de résolution de la problématique : une approche de transduction séquence ver séquence. Cette approche est la plus naturelle du point de vue de l'environnement virtuel puisque le module DCI génère toutes les impulsions avant que les modules suivantes ne traitent la séquence d'interceptions entière. Ce chapitre présente les travaux que constituent un article soumis à la conférence CAID. Il est articulé en trois sections. Nous commençons en exposant à nouveau les motivations de cette approches, en formulant nos attendes et nos réserves par rapport aux chances de succès. Ensuite nous présentons des travaux concernant le traitement des séquences entières, approches dont les limites sont liées aux tailles des séquences traitées. Finalement, nous présentons des travaux sur un mécanisme de fenêtrage, permettant de traiter les séquences longues en plusieurs fois, et son intégration dans un processus de prédiction de séquences.
+Ce chapitre présente la principale approche mise en place dans la thèse : la transduction séquence vers séquence. Ces travaux s'appuient sur un article soumis à la conférence CAID. Le chapitre s'articule en trois sections. Nous exposons d'abord les motivations de cette approche, en formulant nos attentes et nos réserves.  Ensuite, nous étudions le traitement de séquences entières, dont les limites sont liées à la longueur des séquences traitées. Enfin, nous introduisons un mécanisme de fenêtrage permettant de traiter ces longues séquences par segments, et détaillons son intégration aux architectures de traitement de séquences.
 
 \section{Motivations}
-Les Transformers excellent 
+L'architecture Transformer \cite{vaswani_attention_2017} a redéfini le traitement séquentiel. Initialement conçue pour la traduction automatique, elle s'est imposée en traitement du langage naturel (NLP) avant d'être déployée dans d'autres domaines, tels que la vision par ordinateur avec le Vision Transformer \cite{dosovitskiy_image_2020} ou la biologie structurale \cite{jumper_highly_2021}. Bien que notre objectif diffère d'une traduction linguistique, ce qui implique des modifications dans la procédure d'apprentissage des modèles, l'étude du Transformer constitue un axe central de ces travaux, amorcé au chapitre \ref{chap:eusipco}. L'effort de recherche s'est concentré sur la compréhension et l'adaptation de l'architecture canonique à notre problème, sans recourir aux multiples variantes algorithmiques développées ultérieurement par la communauté.\\
+
+Aborder la modélisation du DCI par une transduction de la séquence de PDW incidents vers la séquence de PDW reconstruits constitue la démarche la plus directe. Du point de vue de l'environnement virtuel, le module DCI génère les impulsions interceptées en un seul bloc avant de les transmettre aux étages de traitement aval. Toutefois, l'architecture Transformer présente une complexité spatiale et temporelle quadratique $\mathcal{O}(N^2)$ par rapport à la longueur de la séquence $N$. Cette propriété rend matériellement impossible le traitement direct de scénarios comportant plusieurs millions d'impulsions (une volumétrie courante en simulation). Pour lever cette réserve quant à la viabilité du modèle sur des flux étendus, nous proposerons un mécanisme de fenêtrage autorisant un traitement par sous-séquences.
+
+\section{Séquence vers séquence en bloc}
+L'approche étudiée dans cette section, qualifiée d'approche "en bloc", consiste à fournir en entrée du Transformer l'intégralité de la séquence des PDW incidents pour prédire la séquence complète des PDW reconstruits. L'avantage est la proximité de cette approche avec la mise en œuvre native de l'architecture (faite pour la traduction linguistique). En revanche, la manipulation de grandeurs physiques continues (PDW) au lieu de mots (considérés dans l'approche native comme des classes) impose une redéfinition des métriques et de la procédure d'entraînement.\\
+
+Cette section rappelle d'abord la formulation de la problématique sous l'angle de la modélisation neuronale en soulignant les spécificités structurelles de nos données. Nous présenterons ensuite l'architecture retenue, les métriques d'évaluation, la procédure d'entraînement, et enfin les résultats expérimentaux obtenus par cette méthode.
+
+\subsection{Problématique de la modélisation neuronale}
+La formalisation mathématique de notre problème diverge de celle de la traduction en NLP. Cette distinction structurelle contraint à repenser l'approche d'optimisation.\\
+
+En NLP, les éléments manipulés sont des mots (ou \textit{tokens}) appartenant à un dictionnaire fini $\mathfrak{D}$. Le processus de traduction auto-régressive consiste à retrouver la probabilité d'apparition du prochain mot $y_k$, conditionnée par la séquence source $x = (x_1, \dots, x_N)$ et le préfixe de la traduction $y_{<k} = (y_1, \dots, y_{k-1})$. Cette probabilité d'apparition est propre à la langue de traduction et peut se formaliser sous la forme d'une densité :
+$$\mathbb{P}_{y_k}(\cdot | x, y_{<k}) \in [0; 1]^{\mathfrak{D}}$$
+Le support du vocabulaire étant fini, les modèles neuronaux $f_\theta$ ont quasiment toujours comme objectif non pas de prédire le prochain mot exact, mais d'estimer une loi de probabilité sur un support fini de même taille, comme nous l'illustrons dans l'équation \ref{eq:trad}.
+\begin{equation}
+\label{eq:trad}
+f_{\theta}:(\mathbf{x},\mathbf{y}_{<k})\mapsto P \in [0; 1]^{|\mathfrak{D}|}    
+\end{equation}
+Cette formulation réduit la génération à une tâche de classification. Le maximum de la distribution $$\hat{y_k} = \argmax{f_{\theta}(\mathbf{x},\,\mathbf{y}_{<k})}$$ est alors un bon candidat pour la prédiction du prochain mot. Cette approche autorise l'utilisation de l'entropie croisée comme fonction de perte, une métrique standard de la communauté offrant de fortes garanties de convergence et de stabilité lors de l'apprentissage.\\
+
+Dans le cas du DCI, les éléments manipulés sont des PDW caractérisés par des grandeurs physiques (fréquence, date, amplitude). Ils appartiennent à un espace continu multidimensionnel assimilable à un intervalle de $\mathbb{R}^d$. Pour conserver les avantages de l'entropie croisée, nous devrions discrétiser le support de la densité de probabilité $$\mathbb{P}_{y_k}(\cdot | x, y_{<k}) \in \mathbb{(R^+)}^{\mathbb{R}^d}$$ pour le modéliser par apprentissage, nous exposant à \textit{la malédiction de la dimensionnalité}. En effet, la simple création d'une grille de résolution fine de 100 points pour les 5 dimensions (cf. \ref{seq:descPDW}) créer 10 milliards de points, impossibles à traiter en pratique.\\
+
+Le problème de transduction de séquences de PDW doit par conséquent être formulé comme une tâche de régression. L'objectif du réseau n'est plus d'estimer une distribution, mais bien de prédire directement le prochain PDW intercepté $\hat{y_k}$ :
+
+\begin{equation}
+\label{eq:trad_dci}
+f_{\theta}:(\mathbf{x},\mathbf{y}_{<k})\mapsto \hat{y_k} \in \mathbb{R}^d    
+\end{equation}
+
+\subsection{Génération et préparation des données}
+Avant d'aborder la sélection architecturale et le processus d'entraînement, il convient de définir la construction des ensembles d'apprentissage et de validation. Cette étape exploite le DCIS présenté au chapitre \ref{chap:newfocus}. L'Algorithme \ref{algo:generation_sequence_scenario} assure la synthèse des scénarios d'entrée, tandis que l'Algorithme \ref{algo:capteur_process} génère la séquence cible des PDW interceptés. Ce socle de simulation permet de produire une volumétrie arbitraire de données.
+
+\subsubsection{Structure des données}
+\label{seq:structuredonnées}
+Les ensembles de données sont structurés sous la forme de tenseurs tridimensionnels de dimension $B \times N \times d$. La dimension $B$ (Batch size) correspond au nombre de séquences constituant l'ensemble, $N$ correspond à la longueur de chaque séquence, et $d$ représente le nombre de caractéristiques encodant les PDW. On parlera d'ensemble d'entrée pour qualifier un ensemble de séquences de PDW incidents. On parlera d'ensemble de sortie pour qualifier l'ensemble des séquences de PDW interceptés correspondantes. L'ensemble des entrées et l'ensemble des sorties partagent le même $B$ mais $N$ et $d$ peuvent varier.\\
+
+La constitution du tenseur de l'ensemble d'entrée s'effectue directement, sans transformation préalable. En effet, l'algorithme \ref{algo:generation_sequence_scenario} permet de créer des scénarios avec un nombre de PDW incidents identique. À l'inverse, le nombre de PDW interceptés générés par l'algorithme \ref{algo:capteur_process} fluctue en fonction de la complexité du scénario (fusions, disparitions). Pour regrouper ces séquences cibles de longueurs inégales dans un tenseur unique, elles sont artificiellement complétées (padding). Pour des séquences d'entrées de longueur $N$, on considèrera qu'au plus $1.2N$ PDW seront interceptés (facteur obtenu expérimentalement), ainsi toutes les séquences de sortie sont artificiellement complétées jusqu'à cette longueur.\\
+
+Ainsi, qu'ils servent à l'entrainement ou la validation, les ensembles d'entrée et de sortie sont construits simultanément et forment deux tenseurs dont les dimensions prennent la forme $B \times N \times d_{in}$ et $B \times 1.2N \times d_{out}$.
+
+\subsubsection{Génération sous contrainte}
+Afin de pouvoir déployer la stratégie d'apprentissage progressif (curriculum) validée au chapitre \ref{chap:eusipco}, l'ensemble de données requiert un contrôle de sa complexité. Cette dernière est régie par la distribution des fréquences au sein du scénario : une forte proximité fréquentielle accroît le nombre d'interactions locales entre les PDW, multipliant les artéfacts dans les PDW interceptés par le DCI.\\
+
+Nous intégrons ainsi une étape de post-traitement au processus de génération. Le principe, formellement défini par l'algorithme \ref{algo:post}, s'inspire de la méthode détaillée en section \ref{seq:algocontr}. Il modifie les composantes fréquentielles des PDW des scénarios, contraintes de suivre des distributions qui caractérise le complexité des séquences. 
+
+\begin{algorithm}[htbp]
+\DontPrintSemicolon
+\SetAlgoLined
+\KwIn{Séquences de PDW incident, Domaine cible $[\mu_{min}, \mu_{max}] \times [\sigma_{min}, \sigma_{max}]$}
+\KwOut{Séquences avec distribution fréquentielle contrainte}
+\ForEach{séquence de PDW incidents}{
+    Tirer la moyenne $\mu \sim \mathcal{U}([\mu_{min}, \mu_{max}])$\;
+    Tirer l'écart-type $\sigma \sim \text{LogUnif}([\sigma_{min}, \sigma_{max}])$\;
+    Tirer les composantes fréquentielles $(f_1, \dots, f_N) \sim \mathcal{N}(\mu, \sigma^2)$\;
+    \For{$i \leftarrow 1$ \KwTo $N$}{
+        Remplacer la fréquence du PDW $i$ par $f_i$\;
+    }
+}
+\Return{Séquences modifiées}
+\caption{Ajustement de la séparabilité fréquentielle des scénarios d'entraînement}
+\label{algo:post}
+\end{algorithm}
+
+L'intervalle $[\mu_{min}, \mu_{max}]$ définit la plage de variation des fréquences observables, tandis que $\sigma$ définit la dispersion des fréquences au sein d'une même séquence. Plus le rapport \ref{eq:comp} entre la dispersion des fréquences dans une séquence et la plage de variation possible est faible et plus la séquence est complexe. Cette notion est similaire à la notion de ratio de séparabilité introduit dans l'équation \ref{eq:sep} du chapitre \ref{chap:eusipco}.
+\begin{equation}
+\label{eq:comp}
+r = \frac{\sigma}{\mu_{max} - \mu_{min}}
+\end{equation}
+
+\subsubsection{Encodage du temps}
+\label{seq:timeencoding}
+L'encodage de la date d'arrivée des PDW (ToA) exige une attention particulière, afin de prévenir l'instabilité numérique des réseaux de neurones.\\
+
+Dans le tenseur d'entrée, les PDW incidents sont triés chronologiquement. La différence des temps d'arrivée des PDW incidents étant constant, la variable ToA est redondante avec l'indice de position du PDW dans la séquence. Par conséquent, nous choisissons d'exclure la coordonnée ToA des descripteurs des PDW incidents. L'information temporelle sera restituée par les mécanismes d'encodage de position natifs des modèles choisit.\\
+
+Dans le tenseur de sortie, l'ordre d'apparition correspond à l'ordre de publication des PDW interceptés. Il faut donc encoder l'information des ToA dans une coordonnée des PDW. Pour éviter d'entraîner le modèle sur une fonction croissante non bornée, nous exploitons la corrélation temporelle entre la séquence d'entrée et de sortie : le PDW interceptée à la position $i$ caractérise généralement un PDW dont la ToA est proche de $i$. Nous encodons donc la date d'arrivé de la date du PDW intercepté numéro $i$ par la différence
+\begin{equation}
+\label{eq:timeencodingout}
+\text{ToA}(PDW) - i
+\end{equation}
+\, \\
+
+Cette transformation recentre la distribution de la variable temporelle cible autour de zéro et borne sa variance. Ce pré-traitement stationnaire assure la stabilité de la fonction de perte durant l'optimisation et garantit l'invariance temporelle du réseau à l'inférence.
+
+
+\subsection{Architecture et implémentation}
+Cette sous-section justifie le choix de l'architecture neuronale et détaille la mécanique de son implémentation, de la gestion des flux à l'application des masques de traitement.
+
+\subsubsection{Choix et fonctionnement du Transformer}
+Dans le cadre du paradigme séquence vers séquence (\textit{seq2seq}) traitant des longueurs variables, les architectures récurrentes (RNN et variantes) et le Transformer constituent les deux options de référence. Pour une approche globale de transduction, les modèles récurrents doivent impérativement compresser l'intégralité de l'information de la séquence source dans un unique vecteur de contexte latent avant d'initier le décodage, comme expliqué en \ref{seq:RNNPrincipe}. Cette spécificité structurelle constitue dans notre cas un goulot d'étranglement qui entraîne une déperdition d'information, entravant les capacités du réseau dès que les séquences dépassent une dizaine de PDW.
+
+Face à cette limite, nous retenons l'architecture Transformer. En s'affranchissant de la compression temporelle, elle préserve une représentation explicite de la séquence d'entrée et autorise une comparaison directe entre tous ses éléments via l'attention croisée. L'architecture déployée, illustrée par la figure \ref{fig:GTAFTrans}, s'appuie sur les fondements détaillés en section \ref{seq:Transformer}. Afin de nous conformer à la nomenclature standard du traitement du langage naturel dont cette architecture est issue, nous adopterons désormais les termes de \textit{séquence source} et \textit{séquence cible} pour désigner respectivement le flux des PDW incidents en entrée, et le flux des PDW interceptés en sortie. Par extension, cette nomenclature s'appliquera également aux ensembles de données (ensemble source et ensemble cible).\\
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[scale=0.50]{seq2seqTrans.png}
+\end{center}
+\caption{Architecture Transformer d'encodage-décodage adaptée à la transduction de séquences de PDW. La longueur $M$ est ajustée à la longueur maximale des séquences de sortie, soit $1.2N$. Chaque prédiction $\hat{y}_k$ n'est calculée qu'à partir des PDW déjà interceptés dans sa propre temporalité $(y_1, \dots, y_{k-1})$ et de la séquence source complète $(x_1, \dots, x_N)$, assurant la causalité de l'opération de prédiction.}
+\label{fig:GTAFTrans}
+\end{figure}
+
+Le traitement de l'information s'articule autour de deux flux distincts. À gauche, la séquence source (les PDW incidents composant le scénario) alimente l'encodeur. Les vecteurs physiques sont projetés dans l'espace latent, complétés par un encodage positionnel, puis traités par une pile de $N_{enc}$ blocs d'encodage. Ce processus génère une représentation latente riche du scénario global.
+
+À droite, la séquence cible (les PDW interceptés) est introduite dans le décodeur. Pour initier et décaler le flux, un jeton de début de séquence (\texttt{S}) est inséré en première position. Après projection latente et ajout de l'encodage positionnel, cette séquence traverse $N_{dec}$ blocs de décodage. La sortie latente du décodeur est finalement rétro-projetée vers l'espace physique pour fournir la prédiction des PDW interceptés. 
+
+\subsubsection{Mise en œuvre et gestion des masques de séquences}
+Comme mentionné en \ref{seq:structuredonnées}, l'ensemble de sortie est composé de séquences complétées artificiellement pour atteindre une longueur fixe $M$. Si une séquence de sortie contient un nombre de PDW valides $K \le M$, la séquence cible d'entrée du décodeur, illustré figure \ref{fig:GTAFTrans}, se structure ainsi : 
+$$\mathbf{y} = ( \texttt{S}, y_1, \cdots, y_M) = (\texttt{S}, \texttt{PDW}_1, \dots, \texttt{PDW}_K, \underbrace{\texttt{PAD}, \dots, \texttt{PAD}}_{M-K \text{ fois}})$$
+Le jeton $\texttt{PAD}$, comme le jeton $\texttt{S}$, est un vecteur appris par le réseau de neurone pour représenter une position complétée artificiellement.\\
+
+La prédiction du réseau de neurone, $\hat{\mathbf{y}} = (\hat{y}_1, \dots, \hat{y}_{M+1})$, est partitionnée en trois parties:
+\begin{itemize}
+    \item \textbf{Le signal physique ($1 \leq i \leq K$)} : La prédiction $\hat{y}_i$ est contrainte d'approximer les caractéristiques continues du PDW cible $\texttt{PDW}_i = y_{i+1}$.
+    \item \textbf{La terminaison ($i = K+1$)} : La prédiction $\hat{y}_{K+1}$ est contrainte d'approximer les caractéristiques de la représentation latente du jeton de fin \texttt{E}.
+    \item \textbf{Le remplissage neutre ($K+2 \leq i \leq M+1$)} : La prédiction $\hat{y}_i$ ne subit pas de contrainte et sa valeur n'apparait pas dans le calcul de l'erreur d'apprentissage.
+\end{itemize}
+\; \\
+
+Pour aligner la prédiction $\hat{\mathbf{y}}$ et la cible $\mathbf{y}$, nous appliquons une permutation circulaire vers la gauche, notée $\sigma$, telle que 
+$$\sigma(\mathbf{y}) = (y_1, \dots, y_M, \texttt{S})$$
+et ainsi pour les indices $1 \leq i \leq K$, $\hat{y}_i$ devra correspondre à $y_i$.
+
+Pour représenter mathématiquement ces partitions, nous définissions deux masques binaires de longueur $M+1$, notés $\mathbf{m}^{(sig)}$ et $\mathbf{m}^{(fin)}$, isolant respectivement dans $\sigma(\mathbf{y})$ les positions des PDW et de la position du premier jeton $\texttt{PAD}$.
+
+\begin{align*}
+\mathbf{m}^{(sig)} & = \underbrace{(1, \dots, 1}_{K \text{ fois}}, \underbrace{0, \dots, 0)}_{M-K+1 \text{ fois}}\\
+\mathbf{m}^{(fin)} & = \underbrace{(0, \dots, 0}_{K \text{ fois}}, 1, \underbrace{0, \dots, 0)}_{M-K \text{ fois}}
+\end{align*}
+
+Lors du traitement par batchs, ces masques sont agrégés pour former deux tenseurs binaires de dimension $B \times (M+1)$ (où $B$ est la taille du batch), notés $\mathbf{M}^{(sig)}$ et $\mathbf{M}^{(fin)}$. Ils permettent le calcul vectoriel de l'erreur à minimiser.
+
+\subsection{Métrique d'entraînement : la fonction de coût normalisée}
+La transduction de PDW s'opérant dans un espace continu, l'entropie croisée est inapplicable. Nous concevons une métrique de régression évaluant la distance entre deux séquences de variables hétérogènes. \\
+
+De manière générale, quantifier mathématiquement l'écart entre deux séquences est un problème complexe en raison des enjeux d'alignement. Un simple décalage temporel ou une permutation d'éléments (par exemple, comparer la séquence $(y_1, y_2, \dots, y_5, y_6)$ à $(y_1, y_6, y_2, \dots, y_5)$) engendre une erreur maximale lors d'une comparaison terme à terme, bien que les séquences partagent une forte similarité structurelle. Pour les séries de variables continues, le contournement de ce désalignement requiert typiquement des algorithmes d'appariement coûteux, tels que la déformation temporelle dynamique \cite{berndt_using_1994}.
+
+Néanmoins, notre procédure d'apprentissage s'appuie sur la technique du forçage de l'enseignant (\textit{teacher forcing}) \cite{williams_learning_1989}. Lors de l'entraînement, la prédiction $\hat{y}_i$ est conditionnée exclusivement par la séquence source complète $\mathbf{x}$ et par l'historique exact de la véritable séquence cible $(y_1, \dots, y_{i-1})$. Ce conditionnement par la vérité terrain empêche toute prolifération des erreurs : une mauvaise approximation locale à l'instant $i-1$ n'induit aucun décalage temporel sur la prédiction à l'instant $i$. Cette propriété garantit que la prédiction $\hat{y}_i$ partage systématiquement le même contexte historique que sa cible $y_i$, autorisant ainsi une comparaison terme à terme.\\
+
+Pour créer cette métrique, nous réinvestissons et adaptons le principe de l'erreur pondérée par séquence introduit au chapitre \ref{chap:eusipco}.
+
+Considérons une séquence cible $\mathbf{y}$ et sa prédiction associée $\hat{\mathbf{y}}$. L'erreur brute de reconstruction est évaluée en mesurant la distance euclidienne entre la prédiction et la cible préalablement réalignée par permutation, notée $\sigma(\mathbf{y})$.
+L'application du masque de signal $\mathbf{m}^{(sig)}$, au moyen d'un produit terme à terme, permet d'annuler mathématiquement le calcul sur les positions de remplissage, restreignant ainsi l'évaluation aux seuls $K = \|\mathbf{m}^{(sig)}\|_1$ éléments physiques valides. Enfin, cette distance est normalisée par la quantité totale de scalaires sommés ($K \times d_{out}$).
+L'équation de l'erreur brute s'écrit de la façon suivante :\\
+\begin{equation}
+E_{raw}(\hat{\mathbf{y}}, \mathbf{y}) = \frac{\|(\hat{\mathbf{y}} - \sigma(\mathbf{y})) \odot \mathbf{m}^{(sig)}\|_2}{\sqrt{\|\mathbf{m}^{(sig)}\|_1 \times d_{\text{out}}}}
+\end{equation}
+
+Afin d'uniformiser la contribution de chaque séquence indépendamment de sa variance physique, nous utilisons l'erreur d'un prédicteur naïf \ref{eq:naif} comme facteur de normalisation. Ce prédicteur génère une séquence constante, constituée de la répétition de $\bar{\mathbf{y}}$, le vecteur moyen de la séquence $\mathbf{y}$ calculé exclusivement sur les $K$ éléments valides de la cible. 
+
+
+Afin d'uniformiser la contribution de chaque séquence, nous utilisons l'erreur d'un prédicteur naïf comme facteur de normalisation. Ce prédicteur génère une séquence constituée de la répétition de $\bar{\mathbf{y}}$, le vecteur moyen calculé exclusivement sur les $K$ éléments valides de la séquence cible $\mathbf{y}$.\\
+
+\begin{equation}
+E_{ref}(\mathbf{y}) = E_{raw}((\underbrace{\bar{\mathbf{y}}, \cdots, \bar{\mathbf{y}}}_{M+1 \text{ fois}}), \mathbf{y})
+\end{equation}
+
+L'erreur pondérée pour la séquence s'écrit alors :
+
+\begin{equation}
+E_{weighted}(\hat{\mathbf{y}}, \mathbf{y}) = \frac{E_{raw}(\hat{\mathbf{y}}, \mathbf{y})}{E_{ref}(\mathbf{y})}
+\end{equation}
+
+Sans cette normalisation, un scénario composé d'impulsions physiquement très similaires induirait une erreur brute artificiellement basse pour une prédiction naïve. Cette propriété ralentirait l'apprentissage des véritables règles de traitement du DCI pour ce genre de scénario. Comme établi en section \ref{seq:errnorm} (équations \ref{eq:raweusipco} et \ref{eq:weighteusipco}), cette pondération garantit que toutes les séquences contribuent de manière équitable à la mise à jour des poids du réseau. Une valeur $E_{weighted} < 1$ certifie que le modèle produit une prédiction plus représentative des variations du signal qu'une simple répétition d'un unique PDW.\\
+
+La fonction de coût de reconstruction $\mathcal{L}_{rec}$ correspond à la moyenne quadratique de ces erreurs pondérées sur l'ensemble du lot de $B$ séquences de sortie $\mathbf{Y} = (\mathbf{y}_k)_{1 \leq K \leq B}$ et des séquences prédites correspondantes $\hat{\mathbf{Y}} = (\mathbf{\hat{y}}_k)_{1 \leq K \leq B}$.\\
+
+\begin{equation}
+\mathcal{L}_{rec}(\hat{\mathbf{Y}}, \mathbf{Y}) = \sqrt{\frac{1}{B} \sum_{k=1}^B E_{weighted}(\hat{\mathbf{y}}_k, \mathbf{y}_k)^2}
+\end{equation}
+
+Parallèlement, l'erreur de terminaison $\mathcal{L}_{fin}$ évalue la distance euclidienne entre la prédiction isolée par le masque de fin et la représentation latent du jeton de fin $\texttt{E}$. Cette erreur est calculé par l'équation \ref{eq:termine}, appliquée directement sur le lot de prédictions $\hat{\mathbf{Y}}$ et de sorties $\mathbf{Y}$.
+\begin{equation}
+\label{eq:termine}
+\mathcal{L}_{fin}(\hat{\mathbf{Y}}, \mathbf{Y}) = \frac{\|(\hat{\mathbf{Y}} - \texttt{E}) \odot \mathbf{M}^{(fin)} \|_2}{\sqrt{B \times d_{\text{out}}}}
+\end{equation}
+
+La fonction de coût finale $\mathcal{L}_{total}$ minimisée lors de l'entraînement combine l'erreur de reconstruction et l'erreur de terminaison, équilibrées par un hyperparamètre $\lambda$ :
+\begin{equation}
+\mathcal{L}_{total}(\hat{\mathbf{Y}}, \mathbf{Y}) = \mathcal{L}_{rec}(\hat{\mathbf{Y}}, \mathbf{Y}) + \lambda \mathcal{L}_{fin}(\hat{\mathbf{Y}}, \mathbf{Y})
+\end{equation}
+
+
+\subsection{Résultats expérimentaux}
+L'évaluation initiale de cette approche globale est réalisée sur des séquences courtes. La configuration retenue simule des scénarios composés de $N=20$ PDW incidents, générant des séquences cibles de longueur variable limitées à 30 PDW. Le modèle Transformer (10 couches, dimension latente 128, 4 têtes d'attention) a été entraîné sur un ensemble de 8 millions de séquences durant 150 époques.
+
+\subsubsection{Convergence de l'apprentissage}
+La figure \ref{fig:loss_short} illustre l'évolution de la fonction de coût $\mathcal{L}$ sur les ensembles d'entraînement et de validation.
+
+\begin{figure}[htbp]
+  \centering
+  \framebox{\parbox{0.8\textwidth}{\centering
+    \vspace{3cm}
+    \textbf{Image Placeholder} \\
+    \small\textit{Figure de convergence de l'apprentissage.}
+    \vspace{3cm}
+  }}
+  \caption{Évolution de l'erreur pondérée en validation et en entraînement pour des séquences courtes ($N=20$). La barre horizontale noire symbolise l'erreur du prédicteur naïf (valeur 1.0).}
+  \label{fig:loss_short}
+\end{figure}
+
+L'erreur de validation converge et se stabilise autour de $0.06$. Ce résultat, strictement inférieur au seuil critique de $1.0$, confirme la validité de la formulation en régression. Le réseau ne se contente pas d'approximer la moyenne de la séquence cible ; il extrait les règles physiques sous-jacentes pour prédire la position exacte des descripteurs dans l'espace $\mathbb{R}^d$.
+
+\subsubsection{Analyse temporelle et qualitative}
+Pour évaluer la conformité des prédictions aux traitements algorithmiques du capteur, nous analysons visuellement les séquences dans le plan temps-fréquence. La figure \ref{fig:gen_short} compare la séquence incidente (vérité terrain du scénario), la séquence cible (sortie attendue du DCI) et les séquences générées par le modèle sous deux régimes d'inférence distincts.
+
+\begin{figure}[htbp]
+  \centering
+  \framebox{\parbox{0.8\textwidth}{\centering
+    \vspace{3cm}
+    \textbf{Image Placeholder} \\
+    \small\textit{Figure d'analyse temps-fréquence.}
+    \vspace{3cm}
+  }}
+  \caption{Comparaison qualitative dans le plan temps-fréquence. En haut : séquence incidente source et séquence cible du DCI. En bas : séquences prédites par le modèle en mode guidé (gauche) et auto-régressif (droite). L'axe des couleurs représente l'amplitude des PDW.}
+  \label{fig:gen_short}
+\end{figure}
+
+Le premier régime évalué est le mode guidé (\textit{teacher-forced}), correspondant aux conditions d'entraînement où l'entrée du décodeur est forcée avec la séquence cible réelle. Le second régime est le mode auto-régressif, correspondant à l'utilisation opérationnelle, où chaque prédiction du modèle est réinjectée comme entrée pour l'étape suivante.
+
+L'observation des graphiques prouve que le modèle a assimilé la logique complexe du système DCI. On identifie formellement la reproduction de deux artefacts caractéristiques :
+\begin{itemize}
+    \item \textbf{La fusion :} Deux PDW incidents proches temporellement et fréquentiellement sont correctement agglomérés en un unique PDW de sortie.
+    \item \textbf{La fragmentation :} Une impulsion incidente continue subit une scission artificielle en deux PDW distincts, reproduisant le comportement du capteur face à une saturation transitoire.
+\end{itemize}
+
+De plus, l'absence de divergence visuelle entre le mode guidé et le mode auto-régressif valide la stabilité de la génération. Les erreurs locales d'approximation continue dans $\mathbb{R}^d$ ne provoquent pas de dérive causale catastrophique sur l'horizon de 30 impulsions. Cette preuve de concept valide la capacité du Transformer à agir comme modèle de substitution pour le DCI sur des fenêtres limitées.

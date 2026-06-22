@@ -1,4 +1,5 @@
-\chapter{L'ordonnancement supervisé comme proxy d'évaluation} 
+\chapter{L'ordonnancement supervisé comme proxy d'évaluation}
+\label{chap:eusipco}
 Comme établi dans le chapitre Problématique \ref{chap:prob}, l'objectif de nos travaux consiste à substituer le bloc de Détection et Caractérisation des Impulsions (DCI) par une intelligence artificielle. Ce défi, formulé comme un problème de transduction de séquence à séquence (\textit{seq2seq}), sera traité en détail dans le chapitre suivant. Avant d'aborder cette modélisation, nous proposons d'explorer plus en profondeur la nature du problème afin d'estimer les chances de succès d'une approche \textit{seq2seq}.\\
 
 Le bloc DCI, encadré en rouge dans la figure \ref{fig:DNApb}, réalise un traitement itératif, palier par palier, structuré en trois étapes :\\
@@ -81,6 +82,7 @@ Ces métriques prennent leurs sens lorsqu'elles sont confrontées aux contrainte
 
 Nous pouvons à présent introduire le \textbf{ratio de séparabilité} $r$ d'une séquence, définit comme le rapport entre sa mesure $\sigma_S$  et cette étendue globale sur laquelle sa mesure $\mu_S$ peut se trouver :
 \begin{equation}
+\label{eq:sep}
 r = \frac{\sigma_S}{\mu_{max} - \mu_{min}}
 \end{equation}
 
@@ -95,6 +97,7 @@ Cette formulation respecte les intuitions naturelles concernant une tâche de di
 Ainsi, le paramètre $r$ contrôle le niveau de discernement exigé du réseau pour ordonner la séquence correspondante. La difficulté de traitement d'une séquence par le modèle peut donc être définit comme l'inverse du ratio de séparabilité, qui augmente à mesure que $r$ diminue.
 
 \subsection{Algorithme de génération sous contrainte}
+\label{seq:algocontr}
 Pour imposer le ratio de séparabilité $r$ souhaité, nous procédons par une méthode inverse : nous fixons d'abord les statistiques des scores cibles $(S_i)_i$, puis nous construisons les vecteurs $(V_i)_i$ correspondants.
 
 La procédure de génération pour une séquence de ratio $r$, contrainte au domaine global $[\mu_{min}, \mu_{max}]$, est la suivante :
@@ -119,9 +122,11 @@ Ce protocole assure une double propriété statistique à l'ensemble de données
 La génération de données synthétiques nous permet de produire des séquences de difficulté arbitraire, mais l'entraînement d'un réseau de neurones sur ces données requiert une méthodologie spécifique. Comme nous l'avons exposé dans nos travaux précédents, l'approche standard de minimisation de l'erreur quadratique moyenne s'avère insuffisante face à la dynamique des scores dans un espace continu. Cette section détaille la fonction de coût pondérée et la stratégie de curriculum mises en place pour permettre la convergence des modèles.
 
 \subsection{Fonction de coût normalisée}
+\label{seq:errnorm}
 Nous détaillons ici la fonction de coût utilisée lors de l'entraînement de nos modèles, telle que présentée dans l'article \cite{cornu_learning_2025}. Cette métrique se base initialement sur une erreur de reconstruction brute $\mathcal{L}_{raw}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k)$ entre une séquence prédite $\hat{\mathbf{Y}}_k$ et une séquence cible ordonnée $\mathbf{Y}_k$ :
 
 \begin{equation}
+\label{eq:raweusipco}
     \mathcal{L}_{raw}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k) = \frac{\| \hat{\mathbf{Y}}_k - \mathbf{Y}_k \|_2}{\sqrt{N \cdot d}}
 \end{equation}
 
@@ -135,6 +140,7 @@ Pour corriger ce biais, nous définissons un facteur de normalisation par séque
 
 La métrique pondérée, assurant une contribution équitable de chaque séquence au processus d'apprentissage, est alors définie par le ratio:
 \begin{equation}
+\label{eq:weighteusipco}
     \mathcal{L}_{weighted}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k) = \frac{\mathcal{L}_{raw}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k)}{\mathcal{L}_{ref}(\mathbf{Y}_k)}
 \end{equation}
 

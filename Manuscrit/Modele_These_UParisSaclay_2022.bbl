@@ -7819,6 +7819,98 @@
       \verb https://eusipco2025.org/wp-content/uploads/pdfs/0001902.pdf
       \endverb
     \endentry
+    \entry{berndt_using_1994}{inproceedings}{}{}
+      \name{author}{2}{}{%
+        {{hash=f8fb497760cdc668a34a663cceda49f7}{%
+           family={Berndt},
+           familyi={B\bibinitperiod},
+           given={Donald\bibnamedelima J.},
+           giveni={D\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=4e67ea8fd70a83e2b3668aec2682f39b}{%
+           family={Clifford},
+           familyi={C\bibinitperiod},
+           given={James},
+           giveni={J\bibinitperiod}}}%
+      }
+      \strng{namehash}{6af6206edb3395e859b477221fc09646}
+      \strng{fullhash}{6af6206edb3395e859b477221fc09646}
+      \strng{fullhashraw}{6af6206edb3395e859b477221fc09646}
+      \strng{bibnamehash}{6af6206edb3395e859b477221fc09646}
+      \strng{authorbibnamehash}{6af6206edb3395e859b477221fc09646}
+      \strng{authornamehash}{6af6206edb3395e859b477221fc09646}
+      \strng{authorfullhash}{6af6206edb3395e859b477221fc09646}
+      \strng{authorfullhashraw}{6af6206edb3395e859b477221fc09646}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 3rd international conference on knowledge discovery and data mining}
+      \field{title}{Using dynamic time warping to find patterns in time series}
+      \field{urlday}{22}
+      \field{urlmonth}{6}
+      \field{urlyear}{2026}
+      \field{year}{1994}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{359\bibrangedash 370}
+      \range{pages}{12}
+      \verb{urlraw}
+      \verb https://dl.acm.org/doi/abs/10.5555/3000850.3000887
+      \endverb
+      \verb{url}
+      \verb https://dl.acm.org/doi/abs/10.5555/3000850.3000887
+      \endverb
+    \endentry
+    \entry{williams_learning_1989}{article}{}{}
+      \name{author}{2}{}{%
+        {{hash=6cbc29ad7fd57ffdb9ed4728418fd988}{%
+           family={Williams},
+           familyi={W\bibinitperiod},
+           given={Ronald\bibnamedelima J.},
+           giveni={R\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=9dca68d8353451ac61a3e272e73e9d7d}{%
+           family={Zipser},
+           familyi={Z\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {{MIT} Press}%
+      }
+      \strng{namehash}{f33081f69b27aeafe61c344341194184}
+      \strng{fullhash}{f33081f69b27aeafe61c344341194184}
+      \strng{fullhashraw}{f33081f69b27aeafe61c344341194184}
+      \strng{bibnamehash}{f33081f69b27aeafe61c344341194184}
+      \strng{authorbibnamehash}{f33081f69b27aeafe61c344341194184}
+      \strng{authornamehash}{f33081f69b27aeafe61c344341194184}
+      \strng{authorfullhash}{f33081f69b27aeafe61c344341194184}
+      \strng{authorfullhashraw}{f33081f69b27aeafe61c344341194184}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Neural computation}
+      \field{number}{2}
+      \field{title}{A learning algorithm for continually running fully recurrent neural networks}
+      \field{urlday}{22}
+      \field{urlmonth}{6}
+      \field{urlyear}{2026}
+      \field{volume}{1}
+      \field{year}{1989}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{270\bibrangedash 280}
+      \range{pages}{11}
+      \verb{file}
+      \verb Available Version (via Google Scholar):C\:\\Users\\matth\\Documents\\Python\\Projets\\Biblio\\Zotero\\storage\\D6ISRTR5\\Williams et Zipser - 1989 - A learning algorithm for continually running fully recurrent neural networks.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://ieeexplore.ieee.org/abstract/document/6795228/
+      \endverb
+      \verb{url}
+      \verb https://ieeexplore.ieee.org/abstract/document/6795228/
+      \endverb
+    \endentry
   \enddatalist
 \endrefsection
 \endinput
