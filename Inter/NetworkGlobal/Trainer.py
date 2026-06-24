@@ -335,6 +335,7 @@ if __name__ == '__main__':
                     Prediction = N(InputBatch, OutputBatch, TargetMaskBatch)[:, :-1, :]
                     err = torch.norm((Prediction - OutputBatch) / StdBatch, p=2) / sqrt((torch.sum(Mask) - batch_size) * d_out)
                     (param["mult_grad"] * err).backward()
+                    torch.nn.utils.clip_grad_norm_(N.parameters(), 0.8)
                     optimizer.step()
 
                     if lr_scheduler is not None:  # update du scheduler
