@@ -39,6 +39,7 @@ if __name__ == '__main__':
                  "type": "cos"
              },
              "mult_grad": 10000,
+             "grad_norm_clip": 1.,
              "weight_decay": 1e-3,
              "NDataT": 50000,
              "NDataV": 1000,
@@ -335,7 +336,7 @@ if __name__ == '__main__':
                     Prediction = N(InputBatch, OutputBatch, TargetMaskBatch)[:, :-1, :]
                     err = torch.norm((Prediction - OutputBatch) / StdBatch, p=2) / sqrt((torch.sum(Mask) - batch_size) * d_out)
                     (param["mult_grad"] * err).backward()
-                    torch.nn.utils.clip_grad_norm_(N.parameters(), 0.8)
+                    torch.nn.utils.clip_grad_norm_(N.parameters(), param['grad_norm_clip'])
                     optimizer.step()
 
                     if lr_scheduler is not None:  # update du scheduler
