@@ -1,4 +1,5 @@
 import optuna, sys, os
+from optuna.storages import JournalStorage, JournalFileStorage
 
 if __name__ == '__main__':
     # Récupère le SLURM_JOB_ID (défini automatiquement dans l'environnement du job)
@@ -16,7 +17,7 @@ if __name__ == '__main__':
 
     # Copie du chemin de la base à l'intérieur du dossier
     db_path = os.path.join(RUN_DIR, "optuna.db")
-    storage = f"sqlite:///{db_path}?timeout=30&journal_mode=WAL"
+    storage = JournalStorage(JournalFileStorage(db_path))
 
     # Crée la base et l'étude si elles n'existent pas
     study = optuna.create_study(
