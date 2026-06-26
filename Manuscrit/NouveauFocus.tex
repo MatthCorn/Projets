@@ -92,7 +92,7 @@ Une impulsion $v \in \mathcal{L}$ est considérée comme présente sur le palier
 
 Une fois ce palier reconstruit localement, la fonction de filtrage $\mathcal{F}_{\mathrm{DNA}}$ en extrait les détections non-ambiguës. Celles-ci sont ensuite confrontées à la mémoire interne du système (les "pistes"). Ces mémoires sont régulièrement vidées de leurs informations , lesquelles composeront les PDW interceptés par le capteur.\\
 
-Ce processus global intègre les contraintes matérielles du capteur, tel que le nombre de pistes simultanées maximal $N_{max}$ ou le seuil d'association aux pistes $\delta f$, et il est formalisé par l'Algorithme \ref{algo:capteur_process}. 
+Ce processus global intègre les contraintes matérielles du capteur, tel que le nombre de pistes simultanées maximal $N_{max}$,le seuil d'association aux pistes $\delta f$, ou encore de temps de maintien d'une mémoire après sa dernière mise-à-jour $T_{maintien}$, et il est formalisé par l'Algorithme \ref{algo:capteur_process}. 
 
 \begin{algorithm}[httb]
 \DontPrintSemicolon

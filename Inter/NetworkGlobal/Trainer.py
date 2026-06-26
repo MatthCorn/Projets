@@ -45,6 +45,7 @@ if __name__ == '__main__':
              "NDataV": 1000,
              "batch_size": 1000,
              "n_iter": 20,
+             "cut_early": 1,
              "training_strategy": [
                  {"mean": [-5, 5], "std": [0.2, 1]},
              ],
@@ -412,6 +413,10 @@ if __name__ == '__main__':
                             f.write(f"{j + n_iter_window * window_index} {ValidationError[-1] if ValidationError else float('inf')}\n")
                     except Exception as e:
                         print(f"[WARN] Could not write progress: {e}", flush=True)
+
+                if param['cut_early'] > -1:
+                    if (window_index * n_iter_window + j) > param['cut_early']:
+                        sys.exit()
 
             if error == min(TrainingError):  # mise-à-jour des meilleurs paramètres
                 best_state_dict = N.state_dict().copy()
