@@ -83,6 +83,7 @@ Incrémenter tous les éléments de $\mathcal{A}$ de 1\;
 
 
 \subsection{Simulation de l'acquisition et du suivi temporel}
+\label{seq:DCISsuivi}
 La seconde étape modélise la dynamique d'acquisition du capteur. Ce module prend désormais en entrée unique la liste globale des impulsions physiques $\mathcal{L}$ générée en amont par l'environnement. Pour traiter ce flux de manière causale et pas-à-pas, le capteur reconstruit dynamiquement le palier actif $\mathcal{V_L}^{(t)}$ à chaque instant de son horloge interne $t$. \\
 
 Une impulsion $v \in \mathcal{L}$ est considérée comme présente sur le palier à l'instant $t$ si sa date d'arrivée ($TOA_v$) est inférieure ou égale à $t$, et que sa date de fin (définie par $TOA_v + LI_v$, où $LI_v$ désigne sa durée) est strictement supérieure à $t$. Ainsi, mathématiquement, l'opération $\mathcal{F}_{\mathcal{V}}$ consistant à construire l'ensemble des impulsions composant le palier courant est définie selon le critère de sélection suivant :

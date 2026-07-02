@@ -44,10 +44,11 @@ if __name__ == '__main__':
              "NDataT": 50000,
              "NDataV": 1000,
              "batch_size": 1000,
-             "n_iter": 20,
-             "cut_early": 1,
+             "n_iter": 100,
+             "cut_early": 20,
              "training_strategy": [
                  {"mean": [-5, 5], "std": [0.2, 1]},
+                 {"mean": [-5, 5], "std": [1, 5]}
              ],
              "distrib": "log",
              "plot_distrib": "log",
@@ -56,7 +57,7 @@ if __name__ == '__main__':
              "FreqGradObs": 1/3,
              "warmup": 5,
              "resume_from": "r",
-             "period_checkpoint": 15 * 60,  # en seconde
+             "period_checkpoint": -1, #15 * 60,  # en seconde
              "nb_frames_GIF": -1
              }
 

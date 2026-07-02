@@ -35,6 +35,7 @@ L'architecture Transformer \cite{vaswani_attention_2017} a redéfini le traiteme
 Aborder la modélisation du DCI par une transduction de la séquence de PDW incidents vers la séquence de PDW reconstruits constitue la démarche la plus directe. Du point de vue de l'environnement virtuel, le module DCI génère les impulsions interceptées en un seul bloc avant de les transmettre aux étages de traitement aval. Toutefois, l'architecture Transformer présente une complexité spatiale et temporelle quadratique $\mathcal{O}(N^2)$ par rapport à la longueur de la séquence $N$. Cette propriété rend matériellement impossible le traitement direct de scénarios comportant plusieurs millions d'impulsions (une volumétrie courante en simulation). Pour lever cette réserve quant à la viabilité du modèle sur des flux étendus, nous proposerons un mécanisme de fenêtrage autorisant un traitement par sous-séquences.
 
 \section{Séquence vers séquence en bloc}
+\label{seq:seq2seqblock}
 L'approche étudiée dans cette section, qualifiée d'approche "en bloc", consiste à fournir en entrée du Transformer l'intégralité de la séquence des PDW incidents pour prédire la séquence complète des PDW reconstruits. L'avantage est la proximité de cette approche avec la mise en œuvre native de l'architecture (faite pour la traduction linguistique). En revanche, la manipulation de grandeurs physiques continues (PDW) au lieu de mots (considérés dans l'approche native comme des classes) impose une redéfinition des métriques et de la procédure d'entraînement.\\
 
 Cette section rappelle d'abord la formulation de la problématique sous l'angle de la modélisation neuronale en soulignant les spécificités structurelles de nos données. Nous présenterons ensuite l'architecture retenue, les métriques d'évaluation, la procédure d'entraînement, et enfin les résultats expérimentaux obtenus par cette méthode.
@@ -72,6 +73,7 @@ La constitution du tenseur de l'ensemble d'entrée s'effectue directement, sans 
 Ainsi, qu'ils servent à l'entrainement ou la validation, les ensembles d'entrée et de sortie sont construits simultanément et forment deux tenseurs dont les dimensions prennent la forme $B \times N \times d_{in}$ et $B \times 1.2N \times d_{out}$.
 
 \subsubsection{Génération sous contrainte}
+\label{seq:gencontr}
 Afin de pouvoir déployer la stratégie d'apprentissage progressif (curriculum) validée au chapitre \ref{chap:eusipco}, l'ensemble de données requiert un contrôle de sa complexité. Cette dernière est régie par la distribution des fréquences au sein du scénario : une forte proximité fréquentielle accroît le nombre d'interactions locales entre les PDW, multipliant les artéfacts dans les PDW interceptés par le DCI.\\
 
 Nous intégrons ainsi une étape de post-traitement au processus de génération. Le principe, formellement défini par l'algorithme \ref{algo:post}, s'inspire de la méthode détaillée en section \ref{seq:algocontr}. Il modifie les composantes fréquentielles des PDW des scénarios, contraintes de suivre des distributions qui caractérise le complexité des séquences. 
@@ -106,20 +108,22 @@ L'encodage de la date d'arrivée des PDW (ToA) exige une attention particulière
 
 Dans le tenseur d'entrée, les PDW incidents sont triés chronologiquement. La différence des temps d'arrivée des PDW incidents étant constant, la variable ToA est redondante avec l'indice de position du PDW dans la séquence. Par conséquent, nous choisissons d'exclure la coordonnée ToA des descripteurs des PDW incidents. L'information temporelle sera restituée par les mécanismes d'encodage de position natifs des modèles choisit.\\
 
-Dans le tenseur de sortie, l'ordre d'apparition correspond à l'ordre de publication des PDW interceptés. Il faut donc encoder l'information des ToA dans une coordonnée des PDW. Pour éviter d'entraîner le modèle sur une fonction croissante non bornée, nous exploitons la corrélation temporelle entre la séquence d'entrée et de sortie : le PDW interceptée à la position $i$ caractérise généralement un PDW dont la ToA est proche de $i$. Nous encodons donc la date d'arrivé de la date du PDW intercepté numéro $i$ par la différence
+Dans le tenseur de sortie, l'ordre d'apparition correspond à l'ordre de publication des PDW interceptés. Il faut donc encoder l'information des ToA dans une coordonnée des PDW. Pour éviter d'entraîner le modèle sur une fonction croissante non bornée, nous exploitons la corrélation temporelle entre la séquence d'entrée et de sortie : le PDW interceptée à la position $i$ caractérise généralement un PDW dont la ToA est proche de $i$.\\
+
+Finalement, la variable temporelle, notée $\Delta\text{ToA}$, qui encode la date d'arrivé du PDW intercepté numéro $i$, s'écrit :
 \begin{equation}
 \label{eq:timeencodingout}
-\text{ToA}(PDW) - i
+\Delta\text{ToA} = \text{ToA}(PDW) - i
 \end{equation}
 \, \\
 
 Cette transformation recentre la distribution de la variable temporelle cible autour de zéro et borne sa variance. Ce pré-traitement stationnaire assure la stabilité de la fonction de perte durant l'optimisation et garantit l'invariance temporelle du réseau à l'inférence.
 
-
 \subsection{Architecture et implémentation}
 Cette sous-section justifie le choix de l'architecture neuronale et détaille la mécanique de son implémentation, de la gestion des flux à l'application des masques de traitement.
 
 \subsubsection{Choix et fonctionnement du Transformer}
+\label{seq:Transfonc}
 Dans le cadre du paradigme séquence vers séquence (\textit{seq2seq}) traitant des longueurs variables, les architectures récurrentes (RNN et variantes) et le Transformer constituent les deux options de référence. Pour une approche globale de transduction, les modèles récurrents doivent impérativement compresser l'intégralité de l'information de la séquence source dans un unique vecteur de contexte latent avant d'initier le décodage, comme expliqué en \ref{seq:RNNPrincipe}. Cette spécificité structurelle constitue dans notre cas un goulot d'étranglement qui entraîne une déperdition d'information, entravant les capacités du réseau dès que les séquences dépassent une dizaine de PDW.
 
 Face à cette limite, nous retenons l'architecture Transformer. En s'affranchissant de la compression temporelle, elle préserve une représentation explicite de la séquence d'entrée et autorise une comparaison directe entre tous ses éléments via l'attention croisée. L'architecture déployée, illustrée par la figure \ref{fig:GTAFTrans}, s'appuie sur les fondements détaillés en section \ref{seq:Transformer}. Afin de nous conformer à la nomenclature standard du traitement du langage naturel dont cette architecture est issue, nous adopterons désormais les termes de \textit{séquence source} et \textit{séquence cible} pour désigner respectivement le flux des PDW incidents en entrée, et le flux des PDW interceptés en sortie. Par extension, cette nomenclature s'appliquera également aux ensembles de données (ensemble source et ensemble cible).\\
@@ -175,6 +179,7 @@ Considérons une séquence cible $\mathbf{y}$ et sa prédiction associée $\hat{
 L'application du masque de signal $\mathbf{m}^{(sig)}$, au moyen d'un produit terme à terme, permet d'annuler mathématiquement le calcul sur les positions de remplissage, restreignant ainsi l'évaluation aux seuls $K = \|\mathbf{m}^{(sig)}\|_1$ éléments physiques valides. Enfin, cette distance est normalisée par la quantité totale de scalaires sommés ($K \times d_{out}$).
 L'équation de l'erreur brute s'écrit de la façon suivante :\\
 \begin{equation}
+\label{eq:Eraw}
 E_{raw}(\hat{\mathbf{y}}, \mathbf{y}) = \frac{\|(\hat{\mathbf{y}} - \sigma(\mathbf{y})) \odot \mathbf{m}^{(sig)}\|_2}{\sqrt{\|\mathbf{m}^{(sig)}\|_1 \times d_{\text{out}}}}
 \end{equation}
 
@@ -184,12 +189,14 @@ Afin d'uniformiser la contribution de chaque séquence indépendamment de sa var
 Afin d'uniformiser la contribution de chaque séquence, nous utilisons l'erreur d'un prédicteur naïf comme facteur de normalisation. Ce prédicteur génère une séquence constituée de la répétition de $\bar{\mathbf{y}}$, le vecteur moyen calculé exclusivement sur les $K$ éléments valides de la séquence cible $\mathbf{y}$.\\
 
 \begin{equation}
+\label{eq:Eref}
 E_{ref}(\mathbf{y}) = E_{raw}((\underbrace{\bar{\mathbf{y}}, \cdots, \bar{\mathbf{y}}}_{M+1 \text{ fois}}), \mathbf{y})
 \end{equation}
 
 L'erreur pondérée pour la séquence s'écrit alors :
 
 \begin{equation}
+\label{eq:Ewei}
 E_{weighted}(\hat{\mathbf{y}}, \mathbf{y}) = \frac{E_{raw}(\hat{\mathbf{y}}, \mathbf{y})}{E_{ref}(\mathbf{y})}
 \end{equation}
 
@@ -198,6 +205,7 @@ Sans cette normalisation, un scénario composé d'impulsions physiquement très 
 La fonction de coût de reconstruction $\mathcal{L}_{rec}$ correspond à la moyenne quadratique de ces erreurs pondérées sur l'ensemble du lot de $B$ séquences de sortie $\mathbf{Y} = (\mathbf{y}_k)_{1 \leq K \leq B}$ et des séquences prédites correspondantes $\hat{\mathbf{Y}} = (\mathbf{\hat{y}}_k)_{1 \leq K \leq B}$.\\
 
 \begin{equation}
+\label{eq:Lrec}
 \mathcal{L}_{rec}(\hat{\mathbf{Y}}, \mathbf{Y}) = \sqrt{\frac{1}{B} \sum_{k=1}^B E_{weighted}(\hat{\mathbf{y}}_k, \mathbf{y}_k)^2}
 \end{equation}
 
@@ -214,6 +222,7 @@ La fonction de coût finale $\mathcal{L}_{total}$ minimisée lors de l'entraîne
 
 
 \subsection{Résultats expérimentaux}
+\label{seq:blocresu}
 L'évaluation initiale de cette approche globale est réalisée sur des séquences courtes. La configuration retenue simule des scénarios composés de $N=20$ PDW incidents, générant des séquences cibles de longueur variable limitées à 30 PDW. Le modèle Transformer (10 couches, dimension latente 128, 4 têtes d'attention) a été entraîné sur un ensemble de 8 millions de séquences durant 150 époques.
 
 \subsubsection{Convergence de l'apprentissage}
@@ -257,3 +266,174 @@ L'observation des graphiques prouve que le modèle a assimilé la logique comple
 \end{itemize}
 
 De plus, l'absence de divergence visuelle entre le mode guidé et le mode auto-régressif valide la stabilité de la génération. Les erreurs locales d'approximation continue dans $\mathbb{R}^d$ ne provoquent pas de dérive causale catastrophique sur l'horizon de 30 impulsions. Cette preuve de concept valide la capacité du Transformer à agir comme modèle de substitution pour le DCI sur des fenêtres limitées.
+
+
+\section{Séquence vers séquence par fenêtrage}
+L'approche globale présentée dans la section précédente valide la capacité structurelle du Transformer à modéliser les traitements réalisés par le DCIS. Toutefois, la complexité spatiale et temporelle de l'attention $\mathcal{O}(N^2)$ limite cette approche à des fenêtres d'observation restreintes. Pour traiter un scénario de longueur arbitraire, il est impératif de segmenter le flux de données.\\
+
+La motivation de cette segmentation repose sur une observation de la physique du système : la décroissance de l'influence temporelle. Le traitement d'une impulsion à l'instant $t$ dépend fortement de l'état des mémoires du capteur, lui-même conditionné par les impulsions passées. Cependant, comme observé sur la figure \ref{fig:ResetEnv}, une purge complète de la mémoire du DCIS n'engendre que des erreurs transitoires. Le système retrouve son régime permanent après l'assimilation de quelques dizaines d'impulsions.\\
+
+\begin{figure}[htbp]
+\begin{center} 
+\includegraphics[scale=0.3]{ResetEnv.png} 
+\end{center}
+\caption{Évaluation de la résilience du DCIS face à des pertes de mémoire. À gauche, la séquence de PDW interceptés sans perturbation est visualisée dans un plan temps-fréquence. Au milieu, la séquence de PDW est interceptés alors que les mémoires sont purgés tous les 100 pas de temps. À droite, on représente la différence entre la séquence d'origine et la séquence perturbée (rouge pour manquante, vert pour rajoutée). Le vidage des mémoires provoque des perturbations locales de la séquence d'impulsions interceptées, qui s'estompent rapidement, suggérant que la mémoire retrouve son régime permanent.}
+\label{fig:ResetEnv}
+\end{figure}
+
+Cette résilience justifie l'utilisation d'une méthode de fenêtrage glissant avec recouvrement. L'objectif est de découper le flux en segments successifs, où le recouvrement d'une fenêtre à l'autre suffit pour retrouver un régime permanent avant de générer de nouvelles prédictions.
+
+\subsection{Création et préparation des données}
+La génération des données suit le protocole établi pour l'approche globale en \ref{seq:gencontr}. La différence se fait dans la longueur des scénarios, typiquement fixés à $N=500$ PDW incidents, générant des ensembles d'entrée de dimension $B \times N \times d_{in}$ et de sortie $B \times M \times d_{out}$. L'usage de scénarios de 500 PDW, bien plus court que les cas d'usage réels, génère un nombre restreint de fenêtres (environ une dizaine des fenêtres de taille $N_f = 50$). Néanmoins, comme le traitement de chaque fenêtre est identique, ce nombre est suffisant pour extrapoler les performances à des milliers de fenêtres en situation réelle.
+
+\subsubsection{Découpage structurel et Algorithme}
+Afin de formaliser cette restructuration en fenêtre, notons $\mathbf{x} = (x_1, \dots, x_N)$ la séquence incidente et $\mathbf{y} = (y_1, \dots, y_K)$ la séquence interceptée réduite à ses $K \leq M$ réels PDW. On désignera l'instant d'arrivée d'une impulsion $v$ par $ToA(v)$, sa durée par $LI(v)$, et sa date de publication $ToE(v) = ToA(v) + LI(v) + T_{maintien}$ si c'est une impulsion interceptée. Le passage des séquences entières aux séquences fenêtrées est défini dans l'algorithme \ref{algo:windowing}. Le paramètre $N_f$ définit le nombre d'impulsion incidente par fenêtre, $M_f$ majore le nombre d'impulsion intercepté par fenêtre. Les paramètres $N_c$ et $M_c$ (typiquement $M_c = 1.2N_c$) définissent la taille des contextes passés ajoutés à la source et à la cible. Par convention, tout appel à un indice négatif $i$ pour $x_i$ ou $y_i$ renvoie un vecteur associé au jeton \texttt{PAD}. La valeur de $ToA(\texttt{E})$ vaudra $ToA(x_N)$ pour la séquence incidente. La valeur de $ToE(\texttt{E})$ vaudra $ToE(y_K)$ pour la séquence interceptée.\\
+
+\begin{algorithm}[htbp]
+\DontPrintSemicolon
+\SetAlgoLined
+\KwIn{Séquences entières $\mathbf{x}$ (longueur $N$) et $\mathbf{y}$ (longueur $K$)}
+\KwOut{Ensembles de sous-séquences d'entrée $\mathbf{X}_{win}$ et cible $\mathbf{Y}_{win}$}
+$n_f \leftarrow \lfloor N / N_f \rfloor + 1$\;
+Compléter $\mathbf{x}$ avec un jeton de fin \texttt{E} puis des jetons \texttt{PAD} jusqu'à la taille $n_f \times N_f$\;
+Compléter $\mathbf{y}$ avec un jeton de fin \texttt{E}\;
+$\mathbf{X}_{win} \leftarrow \emptyset, \; \mathbf{Y}_{win} \leftarrow \emptyset$\;
+$k_2^{(in)} \leftarrow 0 \; k_2^{(out)} \leftarrow 0$\;
+\For{$i \leftarrow 1$ \KwTo $n_f$}{
+    $k_1^{(in)} \leftarrow k_{i+1}^{(in)}$\;
+    $k_2^{(in)} \leftarrow iN_f + 1$\;
+    $k_1^{(out)} \leftarrow k_{i+1}^{(out)}$\;
+    Déterminer $k_2^{(out)}$ tel que $ToE(y_{k_2^{(out)}}) \geq k_2^{(in)}$ et $(ToE(y_{k_2^{(out)} - 1}) < k_2^{(in)})$ \;
+    \tcp{Extraction des impulsions de la fenêtre temporelle $\llbracket k_1^{(in)}; k_2^{(in)}\llbracket$}
+    $\mathbf{x}^{+} \leftarrow (x_k)_{k_1^{(in)} \leq k < k_2^{(in)}}$\;
+    $\mathbf{y}^{+} \leftarrow (y_k)_{k_1^{(out)} \leq k < k_2^{(out)}}$\;
+    \tcp{Extraction du contexte passé ($N_c$ PDW source et $M_c$ PDW cible)}
+    $\mathbf{x}^{-} \leftarrow (x_k)_{k_1^{(in) - N_c} \leq k < k_1^{(in)}}$\;
+    $\mathbf{y}^{-} \leftarrow (y_k)_{k_1^{(out) - M_c} \leq k < k_1^{(out)}}$\;
+    \tcp{Fusion et uniformisation des séquences}
+    $\mathbf{x}^{(i)} \leftarrow \mathbf{x}^{-} \oplus \mathbf{x}^{+}$\;
+    $\mathbf{y}^{(i)} \leftarrow \mathbf{y}^{-} \oplus \mathbf{y}^{+}$\;
+    Compléter $\mathbf{y}^{(i)}$ avec des \texttt{PAD} jusqu'à la longueur fixe $M_c + M_f$\;
+    Ajouter $\mathbf{x}^{(i)}$ à $\mathbf{X}_{win}$ et $\mathbf{y}^{(i)}$ à $\mathbf{Y}_{win}$\;
+}
+\Return{$\mathbf{X}_{win}, \mathbf{Y}_{win}$}
+\caption{Génération des sous-séquences fenêtrées}
+\label{algo:windowing}
+\end{algorithm}
+
+L'agrégation de ces partitions $\mathbf{X}_{win}$ et $\mathbf{Y}_{win}$ pour chaque séquence $\mathbf{x}$ et $\mathbf{y}$ des ensembles initiaux aboutit à deux nouveaux tenseurs d'entrée et de sortie que l'on notera $\mathbf{X}$ et $\mathbf{Y}$, dont les dimensions respectives sont $B \cdot n_f \times (N_c + N_f) \times d_{in}$ et $B \cdot n_f \times (M_c + M_f) \times d_{out}$. 
+
+\subsubsection{Encodage du temps}
+Le principe de l'approche est de traiter chaque fenêtre de manière identique, uniquement à partir des informations présentes à l'échelle locale (nouveaux PDW incidents et contexte). Or, l'encodage du temps des PDW interceptés introduit en \ref{eq:timeencodingout} exploite l'indice global du PDW dans la séquence entière, ce qui va à l'encontre de la philosophie de l'approche. Ainsi, l'encodage du temps des PDW interceptés nécessite une révision.\\
+
+Dans une fenêtre $i$, nous proposons de déplacer l'origine des temps au premier PDW incident de la fenêtre, $ToA(x_{N_c + 1})$. Pour contrer la croissance des temps d'arrivé, ce qui était l'objectif de l'encodage proposé pour les séquences entières \ref{seq:timeencoding}, nous réintégrons une soustraction de l'indice local du PDW intercepté, translaté par l'indice du premier PDW intercepté de la fenêtre (indice $M_c$).\\
+
+Finalement, la variable temporelle encodée, notée $\Delta\text{ToA}$, pour un PDW cible $y_k$ où $k \in \llbracket 1; M_c + M_f\rrbracket$, s'écrit :
+\begin{equation}
+\label{eq:timeencodingoutwin}
+\Delta\text{ToA}(y_k) = \text{ToA}(y_k) - ToA(x_{N_c + 1}) - (k - M_c)
+\end{equation}
+
+
+\subsection{Architecture et Implémentation}
+L'architecture validée pour l'approche globale (section \ref{seq:blocresu}) est intégralement conservée. L'adaptation au fenêtrage s'opère exclusivement sur la structure des données en entrée et en sortie, ainsi que sur l'application des filtres associés.
+
+\subsubsection{Transformer adapté}
+Le changement topologique des séquences est illustré par la figure \ref{fig:WinTrans}.
+
+\begin{figure}[htbp]
+\begin{center}
+  \framebox{\parbox{0.8\textwidth}{\centering
+    \vspace{3cm}
+    \textbf{Image Placeholder} \\
+    \small\textit{TransWin.png}
+    \vspace{3cm}
+  }}
+\end{center}
+\caption{Architecture Transformer d'encodage-décodage adaptée au fenêtrage. Le jeton de séparation \texttt{S} est inséré entre le contexte passé et la zone courante, tant pour la séquence source $\mathbf{x}$ que pour la cible $\mathbf{y}$.}
+\label{fig:WinTrans}
+\end{figure}
+
+La séquence source $\mathbf{x}$ est composée des $N_c$ derniers PDW incidents précédant la fenêtre traitée, notés $\mathbf{x}^-$, suivis d'un jeton de début \texttt{S} servant de délimitation, puis des $N_f$ PDW incidents de la fenêtre courante, notés $\mathbf{x}^+$ (éventuellement complétés par des jetons \texttt{PAD}).
+
+De manière analogue, la séquence cible $\mathbf{y}$ fournie au décodeur intègre le contexte intercepté $\mathbf{y}^-$ (composé des $M_c$ derniers PDW interceptés), le jeton \texttt{S}, et enfin les $M_f$ emplacements alloués aux prédictions courantes $\mathbf{y}^+$ (complétés par des \texttt{PAD}).
+
+La séquence prédite $\hat{\mathbf{y}}$ produite par le réseau n'est évaluée que sur ses $M_f + 1$ derniers éléments, notés $\hat{\mathbf{y}}^+$, qui correspondent à la partie $\mathbf{y}^+$ de la séquence cible. Le processus interne de traitement de $\mathbf{x}$ et $\mathbf{y}$ (projection dans l'espace latent, encodage positionnel, blocs d'attention et rétro-projection) demeure strictement identique au fonctionnement détaillé en section \ref{seq:Transfonc}.
+
+\subsubsection{Mise en œuvre des masques et métrique}
+La séquence cible donnée au décodeur, de taille globale $M_c + 1 + M_f$, se structure ainsi pour la fenêtre $i$ :
+\begin{align*}
+\mathbf{y} &= \mathbf{y}^- \oplus \texttt{S} \oplus \mathbf{y}^+ \\
+&= (\underbrace{\texttt{PDW}, \dots, \texttt{PDW}}_{M_c \text{ fois}}, \texttt{S}, \underbrace{\texttt{PDW}, \dots, \texttt{PDW}}_{K_i \text{ fois}}, \underbrace{\texttt{PAD}, \dots, \texttt{PAD}}_{M_f - K_i \text{ fois}})
+\end{align*}
+
+Le jeton \texttt{PAD}, à l'instar des jetons \texttt{S} et \texttt{E}, est un vecteur appris par le modèle. La prédiction générée $\hat{\mathbf{y}} = (\hat{y}_1, \dots, \hat{y}_{M_c + M_f + 1})$ nécessite un partitionnement strict de l'erreur :
+\begin{itemize}
+\item $\forall j \leq M_c$ : le contexte est connu, aucune contrainte n'est appliquée sur $\hat{y}_j$.
+\item $\forall j \in \llbracket M_c + 1; M_c + K_i \rrbracket$ : signal physique, $\hat{y}_j$ doit correspondre au PDW cible $y_{j+1}$.
+\item $\forall j > M_c + K_i$ : remplissage neutre, aucune contrainte sur $\hat{y}_j$.
+\end{itemize}
+
+Pour aligner la prédiction $\hat{\mathbf{y}}$ avec la cible $\mathbf{y}$, nous appliquons la permutation circulaire vers la gauche, notée $\sigma$. La restriction de l'évaluation aux $K_i$ nouvelles impulsions se formalise par le masque binaire $\mathbf{m}^{(sig)}$, isolant la zone d'intérêt dans la séquence réalignée $\sigma(\mathbf{y})$ :
+\begin{equation}
+\mathbf{m}^{(sig)} = (\underbrace{0, \dots, 0}_{M_c \text{ fois}}, \underbrace{1, \dots, 1}_{K_i \text{ fois}}, \underbrace{0, \dots, 0}_{M_f + 1 - K_i \text{ fois}})
+\end{equation}
+
+Lors du traitement par lots, ces vecteurs sont agrégés dans un tenseur $\mathbf{M}^{(sig)}$. L'optimisation du modèle s'effectue en réinvestissant à l'identique la métrique de régression pondérée introduite à la section précédente. Les calculs formels décrits par les équations \ref{eq:Eraw}, \ref{eq:Eref}, \ref{eq:Ewei} et \ref{eq:Lrec} sont appliqués entre les séquences cibles $\mathbf{Y}$ et les prédictions $\hat{\mathbf{Y}}$ du lot courant, en utilisant le nouveau tenseur de masquage $\mathbf{M}^{(sig)}$.
+
+Le jeton de fin \texttt{E} n'intervenant plus dans la formulation cible d'une fenêtre continue, l'erreur de terminaison $\mathcal{L}_{fin}$ est évacuée. La fonction de coût totale régissant l'apprentissage fenêtré se réduit donc à l'erreur de reconstruction :
+\begin{equation}
+\mathcal{L}_{total} = \mathcal{L}_{rec}
+\end{equation}
+
+
+
+
+
+\subsection{Architecture et Implémentation}
+[faire qqch de similaire à la section précédente]
+Cette section présente l'architecture mise en place, similaire à celle de la section précédente, et les filtres.
+
+\subsubsection{Transformer adapté}
+Nous reprenons une architecture Transformer, dont la pertinence pour le traitement de séquence de PDW est démontré par nos résultats sur l'approche en bloc \ref{seq:blocresu}.\\
+
+Le changement dans l'architecture réside dans la structure des données, comme illustré dans la figure \ref{fig:WinTrans}. \\
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[scale=0.7]{TransWin.png}
+\end{center}
+\caption{légende}
+\label{fig:WinScenario}
+\end{figure}
+
+La séquence source $\mathbf{x}$ est composée des $N_c$ derniers PDW incidents précédents la fenêtre traitée, notés $\mathbf{x}^-$, suivi d'un jeton de début \texttt{S} servant de délimitation, suivi finalement des $N_f$ PDW incidents sur la fenêtre traitée, notés $\mathbf{x}^+$ (dont certains peuvent être des compléments artificiels \texttt{PAD}).
+La séquence cible $\mathbf{y}$ est similairement composé des $M_c$ derniers PDW interceptés précédents la fenêtre traitée, notés $\mathbf{y}^-$, suivi d'un jeton de début \texttt{S} servant de délimitation, suivi finalement des $M_f$ PDW interceptés sur la fenêtre traitée, notés $\mathbf{y}^+$ (dont certains sont des compléments artificiels \texttt{PAD}).
+La séquence prédite $\hat{\mathbf{y}}$ n'est observée que sur ces $M_f + 1$ derniers éléments, notés $\hat{\mathbf{y}}^+$, elle contient les éléments qui doivent être comparés à la partie $\mathbf{y}^+$ de la séquence cible.
+Concernant le traitement de $\mathbf{x}$ et $\mathbf{y}$ pour produire $\hat{\mathbf{y}}$, il est similaire en tout point à celui du cas \ref{seq:Transfonc} [faut-il répéter ?] entre projection dans l'espace latent, ajout d'un encodage des positions, passages dans les blocs Transformer et rétro-projection dans l'espace des PDW.
+
+\subsubsection{Mise en oeuvre des masques}
+[je fais un raccourci en faisant ref à l'autre section si ce n'est pas assez complet et normal pour le niveau scientifique, restructurer comme dans la section précédente avec une cohérence sur le vocabulaire]
+Cette fois, la séquence cible donnée au décodeur est de taille $M_c + 1 + M_f$ et se structure ainsi sur la fenêtre $i$:
+\begin{align*}
+\mathbf{y} = & \mathbf{y}^- \oplus \texttt{S} \oplus \mathbf{y}^+ \\
+= & (\underbrace{\texttt{PDW}, \cdots, \texttt{PDW}}_{M_c \text{ fois}}, \texttt{S}, \underbrace{\texttt{PDW}, \cdots, \texttt{PDW}}_{K_i \text{ fois}}, \underbrace{\texttt{PAD}, \cdots, \texttt{PAD}}_{M_f - K_i \text{ fois}})
+\end{align*}
+
+Le jeton \texttt{PAD}, comme les jetons \texttt{S} et \texttt{E}, est appris.
+La prédiction $\hat{\mathbf{y}} = (\hat{y}_1, \cdots, \hat{y}_{M_c + M_f + 1})$ est partitionnée ainsi : 
+\begin{itemize}
+\item $\forall i \leq M_c$, pas de contrainte sur $\hat{y_i}$
+\item $\forall i \in \llbracket M_c + 1; M_c + K_i\rrbracket$, $\hat{y_i}$ doit correspondre à $y_{i+1}$
+\item $\forall i > M_c + K_i$, pas de contrainte sur $\hat{y_i}$
+\end{itemize}
+
+Pour aligner $\mathbf{\hat{y}}$ et $\mathbf{y}$, on utilise la permutation circulaire vers la gauche $\sigma$. Nous définissons un masque $\mathbf{m}^{(sig)}$ permettant de représenter la partie de $\sigma(\mathbf{y})$ important pour la prédiction, qui est pour cette fenêtre $i$ composée de $K_i$ nouveaux PWD interceptés :\\
+$$(\underbrace{0, \cdots, 0}_{M_c \text{ fois}}, \underbrace{1, \cdots, 1}_{K_i \text{ fois}}, \underbrace{0, \cdots, 0}_{M_f + 1 - K_i \text{ fois}}$$
+
+Ils sont agrégé dans un tenseur $\mathbf{M}^{(sig)}$.
+
+\subsection{Métrique}
+[est-ce qu'on devrait pas le mettre dans le sous-section précédente ? si oui il faut aussi restructurer la première partie ? car ici c'est court, mais avant c'était plus long]
+Nous reprenons la métrique introduite en \ref{eq:Lrec}. Cette équation est appliquée en suivant [mal dit mais tu comprends ?] les équations \ref{eq:Eraw}, \ref{eq:Eref}, \ref{eq:Ewei} et \ref{eq:Lrec} avec les séquences cibles $\mathbf{Y}$ et les prédictions associés du modèle $\mathbf{\hat{Y}}$, ainsi que les masques $\mathbf{M}^{(sig)}$.
+$$\mathcal{L}_{total} = \mathcal{L}_{rec}$$
