@@ -1,71 +1,71 @@
 \relax 
 \providecommand\zref@newlabel[2]{}
 \providecommand\hyper@newdestlabel[2]{}
-\@writefile{toc}{\contentsline {chapter}{\numberline {7}Sérialisation du problème : une approche événementielle}{99}{chapter.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {7}Sérialisation du problème : une approche événementielle}{95}{chapter.7}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
 \@writefile{loa}{\addvspace {10\p@ }}
-\@writefile{toc}{\contentsline {section}{\numberline {7.1}Motivation : Du traitement de séquence à la modélisation dynamique}{99}{section.7.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.1.1}Le goulot d'étranglement des architectures pour le Seq2Seq}{99}{subsection.7.1.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.1.2}Le DCI comme système dynamique réactif}{100}{subsection.7.1.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7.2}Formalisation du problème "Flux-à-flux"}{100}{section.7.2}\protected@file@percent }
-\newlabel{seq:serialisation}{{7.2}{100}{Formalisation du problème "Flux-à-flux"}{section.7.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2.1}Contraintes de l'approche et choix de conception}{101}{subsection.7.2.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Contrainte 1 : Discrétisation de la réponse}{101}{paragraph*.40}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Contrainte 2 : Condition d'arrêt}{101}{paragraph*.41}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Contrainte 3 : Maintien du contexte}{101}{paragraph*.42}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2.2}Sérialisation : transformation et préparation des données}{101}{subsection.7.2.2}\protected@file@percent }
-\newlabel{eq:seqfusion}{{7.1}{102}{Sérialisation : transformation et préparation des données}{equation.7.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2.3}Préparation des données et ingénierie des caractéristiques}{103}{subsection.7.2.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.2.3.1}Encodage local du temps}{103}{subsubsection.7.2.3.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.2.3.2}Gestion des masques et exemple de sérialisation}{104}{subsubsection.7.2.3.2}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {7.1}{\ignorespaces Compilation de l'ensemble des données (entrées, sortie, masques) qui permettent de superviser l'entrainement d'un modèle. Dans cet exemple, la séquence sérialisée \ref {eq:seqfusion} est de longueur 8 mais est prolongée jusqu'à 10, ce qui correspond à l'étape d'uniformisation des longueurs des séquences permettant un entrainement en parallèle de nos modèles.}}{105}{table.caption.43}\protected@file@percent }
-\newlabel{tab:seqfusion}{{7.1}{105}{Compilation de l'ensemble des données (entrées, sortie, masques) qui permettent de superviser l'entrainement d'un modèle. Dans cet exemple, la séquence sérialisée \ref {eq:seqfusion} est de longueur 8 mais est prolongée jusqu'à 10, ce qui correspond à l'étape d'uniformisation des longueurs des séquences permettant un entrainement en parallèle de nos modèles}{table.caption.43}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {7.3}Validation de l'approche sur architectures récurrentes}{105}{section.7.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3.1}Les architectures}{106}{subsection.7.3.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3.2}Résultats expérimentaux}{106}{subsection.7.3.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {7.1}{\ignorespaces Représentation du cœur des trois principales architectures comparées. Chaque architecure dispose d'une mémoire latente $h_t$ qu'elle met à jour à partir d'une entrée courante $x_t$ et qu'elle peut exploiter pour produire une prédiction. source : \textit  {https://colah.github.io/posts/2015-08-Understanding-LSTMs/}}}{107}{figure.caption.44}\protected@file@percent }
-\newlabel{fig:compareRNN}{{7.1}{107}{Représentation du cœur des trois principales architectures comparées. Chaque architecure dispose d'une mémoire latente $h_t$ qu'elle met à jour à partir d'une entrée courante $x_t$ et qu'elle peut exploiter pour produire une prédiction. source : \textit {https://colah.github.io/posts/2015-08-Understanding-LSTMs/}}{figure.caption.44}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {7.2}{\ignorespaces Configurations optimales des architectures évaluées.}}{107}{table.caption.45}\protected@file@percent }
-\newlabel{tab:hypRNN}{{7.2}{107}{Configurations optimales des architectures évaluées}{table.caption.45}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {7.3}{\ignorespaces Comparaison des performances (NRMSE) en mode Forecasting en fonction de la longueur de la séquence.}}{108}{table.caption.46}\protected@file@percent }
-\newlabel{tab:resRNN}{{7.3}{108}{Comparaison des performances (NRMSE) en mode Forecasting en fonction de la longueur de la séquence}{table.caption.46}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7.2}{\ignorespaces Comparaison qualitative de séquences incidentes (gauche), cible (milieu), prédite par le modèle (droite). La séquence source est composée de 50 PDW. Le modèle utilisé pour prédire la séquence est le LSTMAT-L. Les encadrés verts permettent d'observer la capacité de notre modèle à reproduire les artefacts propre au traitement du DCI \ref {fig:IOex}}}{108}{figure.caption.47}\protected@file@percent }
-\newlabel{fig:RNNgen}{{7.2}{108}{Comparaison qualitative de séquences incidentes (gauche), cible (milieu), prédite par le modèle (droite). La séquence source est composée de 50 PDW. Le modèle utilisé pour prédire la séquence est le LSTMAT-L. Les encadrés verts permettent d'observer la capacité de notre modèle à reproduire les artefacts propre au traitement du DCI \ref {fig:IOex}}{figure.caption.47}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {7.4}Extension des essais : Généralisation à d'autres architectures}{109}{section.7.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.4.1}Sélection des architectures}{109}{subsection.7.4.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.4.1.1}Le Transformer (Attention Mechanism)}{109}{subsubsection.7.4.1.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.4.1.2}Le TCN (Temporal Convolutional Network)}{109}{subsubsection.7.4.1.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {7.3}{\ignorespaces Illustration de l'architecture Transformer utilisé pour le traitement flux-à-flux, où l'auto-attention de référence \ref {encoder transformer} est remplacée par de l'auto-attention masquée.}}{110}{figure.caption.48}\protected@file@percent }
-\newlabel{fig:linTrans}{{7.3}{110}{Illustration de l'architecture Transformer utilisé pour le traitement flux-à-flux, où l'auto-attention de référence \ref {encoder transformer} est remplacée par de l'auto-attention masquée}{figure.caption.48}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7.4}{\ignorespaces Comparaison structurelle des architectures convolutives unidimensionnelles. À gauche (a), une convolution causale standard où l'horizon d'interaction croît linéairement avec la profondeur. À droite (b), une convolution causale dilatée où le facteur de dilatation $d$ croît exponentiellement ($d=1, 2, 4$). Figure reproduite d'après \blx@tocontentsinit {0}\cite {bai_empirical_2018}.}}{111}{figure.caption.49}\protected@file@percent }
-\newlabel{fig:TCN}{{7.4}{111}{Comparaison structurelle des architectures convolutives unidimensionnelles. À gauche (a), une convolution causale standard où l'horizon d'interaction croît linéairement avec la profondeur. À droite (b), une convolution causale dilatée où le facteur de dilatation $d$ croît exponentiellement ($d=1, 2, 4$). Figure reproduite d'après \cite {bai_empirical_2018}}{figure.caption.49}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.4.1.3}Le GRU (Recurrent Network)}{111}{subsubsection.7.4.1.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.4.1.4}Structure commune et hyper-paramètres}{111}{subsubsection.7.4.1.4}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {7.4}{\ignorespaces Hyper-paramètres géométriques retenus pour chaque architecture.}}{112}{table.caption.51}\protected@file@percent }
-\newlabel{tab:hyperparams}{{7.4}{112}{Hyper-paramètres géométriques retenus pour chaque architecture}{table.caption.51}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.4.2}Fonction de perte et métriques d'évaluation}{112}{subsection.7.4.2}\protected@file@percent }
-\newlabel{seq:metrique}{{7.4.2}{112}{Fonction de perte et métriques d'évaluation}{subsection.7.4.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7.5}{\ignorespaces Schéma des structures neuronales qui précèdent (à gauche) et succèdent (à droite) le cœur du modèle (constitué soit d'une GRU, TCN ou Transformer). Les opérations réalisés dans ces modules sont appliquées aux éléments indépendamment, contrairement au cœur du modèle qui constitue le module du traitement de séquence. La séquence prise pour exemple correspond à la séquence \ref {tab:seqfusion}.}}{113}{figure.caption.50}\protected@file@percent }
-\newlabel{fig:LinProcess}{{7.5}{113}{Schéma des structures neuronales qui précèdent (à gauche) et succèdent (à droite) le cœur du modèle (constitué soit d'une GRU, TCN ou Transformer). Les opérations réalisés dans ces modules sont appliquées aux éléments indépendamment, contrairement au cœur du modèle qui constitue le module du traitement de séquence. La séquence prise pour exemple correspond à la séquence \ref {tab:seqfusion}}{figure.caption.50}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.4.2.1}Erreur de reconstruction pondérée ($\mathcal  {L}_{reg}$)}{113}{subsubsection.7.4.2.1}\protected@file@percent }
-\newlabel{eq:loss}{{7.4}{114}{Erreur de reconstruction pondérée ($\mathcal {L}_{reg}$)}{equation.7.4}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.4.2.2}Erreur de classification par MCC différentiable ($\mathcal  {L}_{class}$)}{114}{subsubsection.7.4.2.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.4.3}Résultats et Analyse Comparative}{115}{subsection.7.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.4.3.1}Performance globale et convergence}{115}{subsubsection.7.4.3.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {7.6}{\ignorespaces Comparaison des dynamiques d'apprentissage. Le Transformer montre une convergence plus lente initialement mais atteint un plateau asymptotique plus bas que le GRU.}}{116}{figure.caption.52}\protected@file@percent }
-\newlabel{fig:learning_curves}{{7.6}{116}{Comparaison des dynamiques d'apprentissage. Le Transformer montre une convergence plus lente initialement mais atteint un plateau asymptotique plus bas que le GRU}{figure.caption.52}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {7.5}{\ignorespaces Performances comparées sur le jeu de test (valeurs fictives pour illustration). Le Transformer excelle en précision mais le GRU reste le plus rapide en inférence séquentielle.}}{116}{table.caption.53}\protected@file@percent }
-\newlabel{tab:global_results}{{7.5}{116}{Performances comparées sur le jeu de test (valeurs fictives pour illustration). Le Transformer excelle en précision mais le GRU reste le plus rapide en inférence séquentielle}{table.caption.53}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.4.3.2}Robustesse face à la longueur de séquence}{116}{subsubsection.7.4.3.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {7.7}{\ignorespaces Évolution de la performance de régression en fonction de la longueur de la séquence traitée. Contrairement aux approches globales, les architectures auto-régressives maintiennent une performance stable sur le long terme.}}{117}{figure.caption.54}\protected@file@percent }
-\newlabel{fig:length_robustness}{{7.7}{117}{Évolution de la performance de régression en fonction de la longueur de la séquence traitée. Contrairement aux approches globales, les architectures auto-régressives maintiennent une performance stable sur le long terme}{figure.caption.54}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.4.3.3}Analyse qualitative des générations}{117}{subsubsection.7.4.3.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {7.8}{\ignorespaces Exemple de reconstruction sur une fenêtre complexe. Le modèle identifie correctement qu'une impulsion incidente $I_k$ doit générer deux impulsions de sortie $O_a, O_b$ avant de passer à la suivante (prédiction correcte des tokens \texttt  {NEXT}).}}{117}{figure.caption.55}\protected@file@percent }
-\newlabel{fig:qualitative}{{7.8}{117}{Exemple de reconstruction sur une fenêtre complexe. Le modèle identifie correctement qu'une impulsion incidente $I_k$ doit générer deux impulsions de sortie $O_a, O_b$ avant de passer à la suivante (prédiction correcte des tokens \texttt {NEXT})}{figure.caption.55}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.4.4}Conclusion sur les extensions}{117}{subsection.7.4.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7.1}Motivation : Du traitement de séquence à la modélisation dynamique}{95}{section.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1.1}Le goulot d'étranglement des architectures pour le Seq2Seq}{95}{subsection.7.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1.2}Le DCI comme système dynamique réactif}{96}{subsection.7.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7.2}Formalisation du problème "Flux-à-flux"}{96}{section.7.2}\protected@file@percent }
+\newlabel{seq:serialisation}{{7.2}{96}{Formalisation du problème "Flux-à-flux"}{section.7.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2.1}Contraintes de l'approche et choix de conception}{97}{subsection.7.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Contrainte 1 : Discrétisation de la réponse}{97}{paragraph*.38}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Contrainte 2 : Condition d'arrêt}{97}{paragraph*.39}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Contrainte 3 : Maintien du contexte}{97}{paragraph*.40}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2.2}Sérialisation : transformation et préparation des données}{97}{subsection.7.2.2}\protected@file@percent }
+\newlabel{eq:seqfusion}{{7.1}{98}{Sérialisation : transformation et préparation des données}{equation.7.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2.3}Préparation des données et ingénierie des caractéristiques}{99}{subsection.7.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.2.3.1}Encodage local du temps}{99}{subsubsection.7.2.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.2.3.2}Gestion des masques et exemple de sérialisation}{100}{subsubsection.7.2.3.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {7.1}{\ignorespaces Compilation de l'ensemble des données (entrées, sortie, masques) qui permettent de superviser l'entrainement d'un modèle. Dans cet exemple, la séquence sérialisée \ref {eq:seqfusion} est de longueur 8 mais est prolongée jusqu'à 10, ce qui correspond à l'étape d'uniformisation des longueurs des séquences permettant un entrainement en parallèle de nos modèles.}}{101}{table.caption.41}\protected@file@percent }
+\newlabel{tab:seqfusion}{{7.1}{101}{Compilation de l'ensemble des données (entrées, sortie, masques) qui permettent de superviser l'entrainement d'un modèle. Dans cet exemple, la séquence sérialisée \ref {eq:seqfusion} est de longueur 8 mais est prolongée jusqu'à 10, ce qui correspond à l'étape d'uniformisation des longueurs des séquences permettant un entrainement en parallèle de nos modèles}{table.caption.41}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7.3}Validation de l'approche sur architectures récurrentes}{101}{section.7.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3.1}Les architectures}{102}{subsection.7.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3.2}Résultats expérimentaux}{102}{subsection.7.3.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7.1}{\ignorespaces Représentation du cœur des trois principales architectures comparées. Chaque architecure dispose d'une mémoire latente $h_t$ qu'elle met à jour à partir d'une entrée courante $x_t$ et qu'elle peut exploiter pour produire une prédiction. source : \textit  {https://colah.github.io/posts/2015-08-Understanding-LSTMs/}}}{103}{figure.caption.42}\protected@file@percent }
+\newlabel{fig:compareRNN}{{7.1}{103}{Représentation du cœur des trois principales architectures comparées. Chaque architecure dispose d'une mémoire latente $h_t$ qu'elle met à jour à partir d'une entrée courante $x_t$ et qu'elle peut exploiter pour produire une prédiction. source : \textit {https://colah.github.io/posts/2015-08-Understanding-LSTMs/}}{figure.caption.42}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {7.2}{\ignorespaces Configurations optimales des architectures évaluées.}}{103}{table.caption.43}\protected@file@percent }
+\newlabel{tab:hypRNN}{{7.2}{103}{Configurations optimales des architectures évaluées}{table.caption.43}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {7.3}{\ignorespaces Comparaison des performances (NRMSE) en mode Forecasting en fonction de la longueur de la séquence.}}{104}{table.caption.44}\protected@file@percent }
+\newlabel{tab:resRNN}{{7.3}{104}{Comparaison des performances (NRMSE) en mode Forecasting en fonction de la longueur de la séquence}{table.caption.44}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7.2}{\ignorespaces Comparaison qualitative de séquences incidentes (gauche), cible (milieu), prédite par le modèle (droite). La séquence source est composée de 50 PDW. Le modèle utilisé pour prédire la séquence est le LSTMAT-L. Les encadrés verts permettent d'observer la capacité de notre modèle à reproduire les artefacts propre au traitement du DCI \ref {fig:IOex}}}{104}{figure.caption.45}\protected@file@percent }
+\newlabel{fig:RNNgen}{{7.2}{104}{Comparaison qualitative de séquences incidentes (gauche), cible (milieu), prédite par le modèle (droite). La séquence source est composée de 50 PDW. Le modèle utilisé pour prédire la séquence est le LSTMAT-L. Les encadrés verts permettent d'observer la capacité de notre modèle à reproduire les artefacts propre au traitement du DCI \ref {fig:IOex}}{figure.caption.45}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7.4}Extension des essais : Généralisation à d'autres architectures}{105}{section.7.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4.1}Sélection des architectures}{105}{subsection.7.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.4.1.1}Le Transformer (Attention Mechanism)}{105}{subsubsection.7.4.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.4.1.2}Le TCN (Temporal Convolutional Network)}{105}{subsubsection.7.4.1.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7.3}{\ignorespaces Illustration de l'architecture Transformer utilisé pour le traitement flux-à-flux, où l'auto-attention de référence \ref {encoder transformer} est remplacée par de l'auto-attention masquée.}}{106}{figure.caption.46}\protected@file@percent }
+\newlabel{fig:linTrans}{{7.3}{106}{Illustration de l'architecture Transformer utilisé pour le traitement flux-à-flux, où l'auto-attention de référence \ref {encoder transformer} est remplacée par de l'auto-attention masquée}{figure.caption.46}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7.4}{\ignorespaces Comparaison structurelle des architectures convolutives unidimensionnelles. À gauche (a), une convolution causale standard où l'horizon d'interaction croît linéairement avec la profondeur. À droite (b), une convolution causale dilatée où le facteur de dilatation $d$ croît exponentiellement ($d=1, 2, 4$). Figure reproduite d'après \blx@tocontentsinit {0}\cite {bai_empirical_2018}.}}{107}{figure.caption.47}\protected@file@percent }
+\newlabel{fig:TCN}{{7.4}{107}{Comparaison structurelle des architectures convolutives unidimensionnelles. À gauche (a), une convolution causale standard où l'horizon d'interaction croît linéairement avec la profondeur. À droite (b), une convolution causale dilatée où le facteur de dilatation $d$ croît exponentiellement ($d=1, 2, 4$). Figure reproduite d'après \cite {bai_empirical_2018}}{figure.caption.47}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.4.1.3}Le GRU (Recurrent Network)}{107}{subsubsection.7.4.1.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.4.1.4}Structure commune et hyper-paramètres}{107}{subsubsection.7.4.1.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {7.4}{\ignorespaces Hyper-paramètres géométriques retenus pour chaque architecture.}}{108}{table.caption.49}\protected@file@percent }
+\newlabel{tab:hyperparams}{{7.4}{108}{Hyper-paramètres géométriques retenus pour chaque architecture}{table.caption.49}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4.2}Fonction de perte et métriques d'évaluation}{108}{subsection.7.4.2}\protected@file@percent }
+\newlabel{seq:metrique}{{7.4.2}{108}{Fonction de perte et métriques d'évaluation}{subsection.7.4.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7.5}{\ignorespaces Schéma des structures neuronales qui précèdent (à gauche) et succèdent (à droite) le cœur du modèle (constitué soit d'une GRU, TCN ou Transformer). Les opérations réalisés dans ces modules sont appliquées aux éléments indépendamment, contrairement au cœur du modèle qui constitue le module du traitement de séquence. La séquence prise pour exemple correspond à la séquence \ref {tab:seqfusion}.}}{109}{figure.caption.48}\protected@file@percent }
+\newlabel{fig:LinProcess}{{7.5}{109}{Schéma des structures neuronales qui précèdent (à gauche) et succèdent (à droite) le cœur du modèle (constitué soit d'une GRU, TCN ou Transformer). Les opérations réalisés dans ces modules sont appliquées aux éléments indépendamment, contrairement au cœur du modèle qui constitue le module du traitement de séquence. La séquence prise pour exemple correspond à la séquence \ref {tab:seqfusion}}{figure.caption.48}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.4.2.1}Erreur de reconstruction pondérée ($\mathcal  {L}_{reg}$)}{109}{subsubsection.7.4.2.1}\protected@file@percent }
+\newlabel{eq:loss}{{7.4}{110}{Erreur de reconstruction pondérée ($\mathcal {L}_{reg}$)}{equation.7.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.4.2.2}Erreur de classification par MCC différentiable ($\mathcal  {L}_{class}$)}{110}{subsubsection.7.4.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4.3}Résultats et Analyse Comparative}{111}{subsection.7.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.4.3.1}Performance globale et convergence}{111}{subsubsection.7.4.3.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7.6}{\ignorespaces Comparaison des dynamiques d'apprentissage. Le Transformer montre une convergence plus lente initialement mais atteint un plateau asymptotique plus bas que le GRU.}}{112}{figure.caption.50}\protected@file@percent }
+\newlabel{fig:learning_curves}{{7.6}{112}{Comparaison des dynamiques d'apprentissage. Le Transformer montre une convergence plus lente initialement mais atteint un plateau asymptotique plus bas que le GRU}{figure.caption.50}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {7.5}{\ignorespaces Performances comparées sur le jeu de test (valeurs fictives pour illustration). Le Transformer excelle en précision mais le GRU reste le plus rapide en inférence séquentielle.}}{112}{table.caption.51}\protected@file@percent }
+\newlabel{tab:global_results}{{7.5}{112}{Performances comparées sur le jeu de test (valeurs fictives pour illustration). Le Transformer excelle en précision mais le GRU reste le plus rapide en inférence séquentielle}{table.caption.51}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.4.3.2}Robustesse face à la longueur de séquence}{112}{subsubsection.7.4.3.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7.7}{\ignorespaces Évolution de la performance de régression en fonction de la longueur de la séquence traitée. Contrairement aux approches globales, les architectures auto-régressives maintiennent une performance stable sur le long terme.}}{113}{figure.caption.52}\protected@file@percent }
+\newlabel{fig:length_robustness}{{7.7}{113}{Évolution de la performance de régression en fonction de la longueur de la séquence traitée. Contrairement aux approches globales, les architectures auto-régressives maintiennent une performance stable sur le long terme}{figure.caption.52}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.4.3.3}Analyse qualitative des générations}{113}{subsubsection.7.4.3.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7.8}{\ignorespaces Exemple de reconstruction sur une fenêtre complexe. Le modèle identifie correctement qu'une impulsion incidente $I_k$ doit générer deux impulsions de sortie $O_a, O_b$ avant de passer à la suivante (prédiction correcte des tokens \texttt  {NEXT}).}}{113}{figure.caption.53}\protected@file@percent }
+\newlabel{fig:qualitative}{{7.8}{113}{Exemple de reconstruction sur une fenêtre complexe. Le modèle identifie correctement qu'une impulsion incidente $I_k$ doit générer deux impulsions de sortie $O_a, O_b$ avant de passer à la suivante (prédiction correcte des tokens \texttt {NEXT})}{figure.caption.53}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4.4}Conclusion sur les extensions}{113}{subsection.7.4.4}\protected@file@percent }
 \@setckpt{Stage}{
-\setcounter{page}{119}
+\setcounter{page}{115}
 \setcounter{equation}{6}
 \setcounter{enumi}{3}
 \setcounter{enumii}{0}
@@ -97,7 +97,7 @@
 \setcounter{section@level}{0}
 \setcounter{Item}{8}
 \setcounter{Hfootnote}{0}
-\setcounter{bookmark@seq@number}{101}
+\setcounter{bookmark@seq@number}{99}
 \setcounter{tabx@nest}{0}
 \setcounter{listtotal}{0}
 \setcounter{listcount}{0}

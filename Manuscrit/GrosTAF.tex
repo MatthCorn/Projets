@@ -1,31 +1,3 @@
-\chapter*{L'approche séquence vers séquence}
-\label{chap:seq2seq}
-On introduit l'étude, on aborde les difficultés du problème de base et qu'on étudie ici un problème similaire simplifié.
-\section*{Description du problème}
-On introduit le problème simplifié, en insistant sur les modifications avec le problème de base et les apports de cette étude.
-\subsection*{Encodage du temps}
-\label{seq:timeencoding}
-\begin{equation}
-\label{eq:timeencodingin}
-a = b + 1
-\text{Ici on montre comment le temps est encodé dans les séquences}
-\end{equation}
-
-\begin{equation}
-\label{eq:timeencodingout}
-a = b + 1
-\text{Ici on montre comment le temps est encodé dans les séquences}
-\end{equation}
-\section*{Architectures employées}
-On introduit les architectures étudiées pour cette partie, il faut justifier ces choix. Il s'agit d'un transformer mais on pourra ajouter des résultats sur les RNNs permettant de les disqualifier. Les CNNs ne s'adapte pas au traitement seq2seq.
-\section*{Suite : (ce n'est pas un titre de section}
-Dans la suite on présentera comme dans la soumission à CAID.
-\section*{Traitement de séquence entière}
-\section*{Fenêtrage}
-\section*{Discussion}
-\label{seq:discseq2seq}
-
-
 \chapter{L'approche séquence vers séquence}
 Ce chapitre présente la principale approche mise en place dans la thèse : la transduction séquence vers séquence. Ces travaux s'appuient sur un article soumis à la conférence CAID. Le chapitre s'articule en trois sections. Nous exposons d'abord les motivations de cette approche, en formulant nos attentes et nos réserves.  Ensuite, nous étudions le traitement de séquences entières, dont les limites sont liées à la longueur des séquences traitées. Enfin, nous introduisons un mécanisme de fenêtrage permettant de traiter ces longues séquences par segments, et détaillons son intégration aux architectures de traitement de séquences.
 
@@ -166,7 +138,7 @@ Pour représenter mathématiquement ces partitions, nous définissions deux masq
 
 Lors du traitement par batchs, ces masques sont agrégés pour former deux tenseurs binaires de dimension $B \times (M+1)$ (où $B$ est la taille du batch), notés $\mathbf{M}^{(sig)}$ et $\mathbf{M}^{(fin)}$. Ils permettent le calcul vectoriel de l'erreur à minimiser.
 
-\subsection{Métrique d'entraînement : la fonction de coût normalisée}
+\subsubsection{Métrique d'entraînement : la fonction de coût normalisée}
 La transduction de PDW s'opérant dans un espace continu, l'entropie croisée est inapplicable. Nous concevons une métrique de régression évaluant la distance entre deux séquences de variables hétérogènes. \\
 
 De manière générale, quantifier mathématiquement l'écart entre deux séquences est un problème complexe en raison des enjeux d'alignement. Un simple décalage temporel ou une permutation d'éléments (par exemple, comparer la séquence $(y_1, y_2, \dots, y_5, y_6)$ à $(y_1, y_6, y_2, \dots, y_5)$ engendre une erreur maximale lors d'une comparaison terme à terme, bien que les séquences partagent une forte similarité structurelle. Pour les séries de variables continues, le contournement de ce désalignement requiert typiquement des algorithmes d'appariement coûteux, tels que la déformation temporelle dynamique \cite{berndt_using_1994}.
@@ -220,6 +192,26 @@ La fonction de coût finale $\mathcal{L}_{total}$ minimisée lors de l'entraîne
 \mathcal{L}_{total}(\hat{\mathbf{Y}}, \mathbf{Y}) = \mathcal{L}_{rec}(\hat{\mathbf{Y}}, \mathbf{Y}) + \lambda \mathcal{L}_{fin}(\hat{\mathbf{Y}}, \mathbf{Y})
 \end{equation}
 
+\subsubsection{Inférence de la prédiction d'une séquence}
+[mettre un peu les formes pour introduire ces propos]
+La procédure bout-en-bout permettant de prédire une séquence $\mathbf{\hat{y}}$ uniquement à partir d'une séquence incidente $\mathbf{x}$ est présentée dans l'algorithme \ref{algo:genglobal}.
+
+\begin{itemize}
+\item Input : $\mathbf{x}$
+\item Output : $\mathbf{\hat{y}}$
+\item initialisation :
+\item $\mathbf{y} \leftarrow (\texttt{S}, \underbrace{\texttt{PAD}, \cdots, \texttt{PAD})}_{M \text{ fois}}$
+\item $continue \leftarrow Vraie$
+\item $i \leftarrow 0$
+\item tant que $continue$:
+	\begin{itemize}
+	\item le modèle prédit $\mathbf{\hat{y}}$ à partir de $\mathbf{x}$ et $\mathbf{y}$
+	\item $e \leftarrow \frac{\|(\hat{y}_i - \texttt{E})} \|_2}{\sqrt{d_{\text{out}}}}$
+	\item si $e < \epsilon$ ou $i = M+1$, $continue \leftarrow Faux$
+	\item sinon $i \leftarrow i+1$ et $\mathbf{y} \leftarrow (\texttt{S}, \hat{y}_1
+, \cdots, \hat{y}_i,  \underbrace{\texttt{PAD}, \cdots, \texttt{PAD})}_{M - i \text{ fois}}$
+	\end{itemize}
+\end{itemize}
 
 \subsection{Résultats expérimentaux}
 \label{seq:blocresu}
@@ -336,104 +328,91 @@ Finalement, la variable temporelle encodée, notée $\Delta\text{ToA}$, pour un 
 
 
 \subsection{Architecture et Implémentation}
-L'architecture validée pour l'approche globale (section \ref{seq:blocresu}) est intégralement conservée. L'adaptation au fenêtrage s'opère exclusivement sur la structure des données en entrée et en sortie, ainsi que sur l'application des filtres associés.
+L'architecture validée pour l'approche globale (section \ref{seq:blocresu}) est intégralement conservée. L'adaptation au fenêtrage s'opère exclusivement sur la structure des données en entrée (source) et en sortie (cible), ainsi que sur l'application des filtres associés.
 
 \subsubsection{Transformer adapté}
-Le changement topologique des séquences est illustré par la figure \ref{fig:WinTrans}.
-
-\begin{figure}[htbp]
-\begin{center}
-  \framebox{\parbox{0.8\textwidth}{\centering
-    \vspace{3cm}
-    \textbf{Image Placeholder} \\
-    \small\textit{TransWin.png}
-    \vspace{3cm}
-  }}
-\end{center}
-\caption{Architecture Transformer d'encodage-décodage adaptée au fenêtrage. Le jeton de séparation \texttt{S} est inséré entre le contexte passé et la zone courante, tant pour la séquence source $\mathbf{x}$ que pour la cible $\mathbf{y}$.}
-\label{fig:WinTrans}
-\end{figure}
-
-La séquence source $\mathbf{x}$ est composée des $N_c$ derniers PDW incidents précédant la fenêtre traitée, notés $\mathbf{x}^-$, suivis d'un jeton de début \texttt{S} servant de délimitation, puis des $N_f$ PDW incidents de la fenêtre courante, notés $\mathbf{x}^+$ (éventuellement complétés par des jetons \texttt{PAD}).
-
-De manière analogue, la séquence cible $\mathbf{y}$ fournie au décodeur intègre le contexte intercepté $\mathbf{y}^-$ (composé des $M_c$ derniers PDW interceptés), le jeton \texttt{S}, et enfin les $M_f$ emplacements alloués aux prédictions courantes $\mathbf{y}^+$ (complétés par des \texttt{PAD}).
-
-La séquence prédite $\hat{\mathbf{y}}$ produite par le réseau n'est évaluée que sur ses $M_f + 1$ derniers éléments, notés $\hat{\mathbf{y}}^+$, qui correspondent à la partie $\mathbf{y}^+$ de la séquence cible. Le processus interne de traitement de $\mathbf{x}$ et $\mathbf{y}$ (projection dans l'espace latent, encodage positionnel, blocs d'attention et rétro-projection) demeure strictement identique au fonctionnement détaillé en section \ref{seq:Transfonc}.
-
-\subsubsection{Mise en œuvre des masques et métrique}
-La séquence cible donnée au décodeur, de taille globale $M_c + 1 + M_f$, se structure ainsi pour la fenêtre $i$ :
-\begin{align*}
-\mathbf{y} &= \mathbf{y}^- \oplus \texttt{S} \oplus \mathbf{y}^+ \\
-&= (\underbrace{\texttt{PDW}, \dots, \texttt{PDW}}_{M_c \text{ fois}}, \texttt{S}, \underbrace{\texttt{PDW}, \dots, \texttt{PDW}}_{K_i \text{ fois}}, \underbrace{\texttt{PAD}, \dots, \texttt{PAD}}_{M_f - K_i \text{ fois}})
-\end{align*}
-
-Le jeton \texttt{PAD}, à l'instar des jetons \texttt{S} et \texttt{E}, est un vecteur appris par le modèle. La prédiction générée $\hat{\mathbf{y}} = (\hat{y}_1, \dots, \hat{y}_{M_c + M_f + 1})$ nécessite un partitionnement strict de l'erreur :
-\begin{itemize}
-\item $\forall j \leq M_c$ : le contexte est connu, aucune contrainte n'est appliquée sur $\hat{y}_j$.
-\item $\forall j \in \llbracket M_c + 1; M_c + K_i \rrbracket$ : signal physique, $\hat{y}_j$ doit correspondre au PDW cible $y_{j+1}$.
-\item $\forall j > M_c + K_i$ : remplissage neutre, aucune contrainte sur $\hat{y}_j$.
-\end{itemize}
-
-Pour aligner la prédiction $\hat{\mathbf{y}}$ avec la cible $\mathbf{y}$, nous appliquons la permutation circulaire vers la gauche, notée $\sigma$. La restriction de l'évaluation aux $K_i$ nouvelles impulsions se formalise par le masque binaire $\mathbf{m}^{(sig)}$, isolant la zone d'intérêt dans la séquence réalignée $\sigma(\mathbf{y})$ :
-\begin{equation}
-\mathbf{m}^{(sig)} = (\underbrace{0, \dots, 0}_{M_c \text{ fois}}, \underbrace{1, \dots, 1}_{K_i \text{ fois}}, \underbrace{0, \dots, 0}_{M_f + 1 - K_i \text{ fois}})
-\end{equation}
-
-Lors du traitement par lots, ces vecteurs sont agrégés dans un tenseur $\mathbf{M}^{(sig)}$. L'optimisation du modèle s'effectue en réinvestissant à l'identique la métrique de régression pondérée introduite à la section précédente. Les calculs formels décrits par les équations \ref{eq:Eraw}, \ref{eq:Eref}, \ref{eq:Ewei} et \ref{eq:Lrec} sont appliqués entre les séquences cibles $\mathbf{Y}$ et les prédictions $\hat{\mathbf{Y}}$ du lot courant, en utilisant le nouveau tenseur de masquage $\mathbf{M}^{(sig)}$.
-
-Le jeton de fin \texttt{E} n'intervenant plus dans la formulation cible d'une fenêtre continue, l'erreur de terminaison $\mathcal{L}_{fin}$ est évacuée. La fonction de coût totale régissant l'apprentissage fenêtré se réduit donc à l'erreur de reconstruction :
-\begin{equation}
-\mathcal{L}_{total} = \mathcal{L}_{rec}
-\end{equation}
-
-
-
-
-
-\subsection{Architecture et Implémentation}
-[faire qqch de similaire à la section précédente]
-Cette section présente l'architecture mise en place, similaire à celle de la section précédente, et les filtres.
-
-\subsubsection{Transformer adapté}
-Nous reprenons une architecture Transformer, dont la pertinence pour le traitement de séquence de PDW est démontré par nos résultats sur l'approche en bloc \ref{seq:blocresu}.\\
-
-Le changement dans l'architecture réside dans la structure des données, comme illustré dans la figure \ref{fig:WinTrans}. \\
+Le changement topologique des séquences est illustré par la figure \ref{fig:WinTrans}.\\
 
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[scale=0.7]{TransWin.png}
 \end{center}
-\caption{légende}
-\label{fig:WinScenario}
+\caption{Architecture Transformer d'encodage-décodage adaptée au fenêtrage. Le jeton de séparation \texttt{S} est inséré entre le contexte passé et la zone courante, tant pour la séquence source $\mathbf{x}$ que pour la cible $\mathbf{y}$.}
+\label{fig:WinTrans}
 \end{figure}
 
-La séquence source $\mathbf{x}$ est composée des $N_c$ derniers PDW incidents précédents la fenêtre traitée, notés $\mathbf{x}^-$, suivi d'un jeton de début \texttt{S} servant de délimitation, suivi finalement des $N_f$ PDW incidents sur la fenêtre traitée, notés $\mathbf{x}^+$ (dont certains peuvent être des compléments artificiels \texttt{PAD}).
-La séquence cible $\mathbf{y}$ est similairement composé des $M_c$ derniers PDW interceptés précédents la fenêtre traitée, notés $\mathbf{y}^-$, suivi d'un jeton de début \texttt{S} servant de délimitation, suivi finalement des $M_f$ PDW interceptés sur la fenêtre traitée, notés $\mathbf{y}^+$ (dont certains sont des compléments artificiels \texttt{PAD}).
-La séquence prédite $\hat{\mathbf{y}}$ n'est observée que sur ces $M_f + 1$ derniers éléments, notés $\hat{\mathbf{y}}^+$, elle contient les éléments qui doivent être comparés à la partie $\mathbf{y}^+$ de la séquence cible.
-Concernant le traitement de $\mathbf{x}$ et $\mathbf{y}$ pour produire $\hat{\mathbf{y}}$, il est similaire en tout point à celui du cas \ref{seq:Transfonc} [faut-il répéter ?] entre projection dans l'espace latent, ajout d'un encodage des positions, passages dans les blocs Transformer et rétro-projection dans l'espace des PDW.
+Pour une séquence incident $\mathbf{x} = (x_1, \cdots, x_{N_c + N_f})$ de nos ensembles de données, le modèle reçoit une séquence source composée
+en trois partie. D'abord, les premiers PDW incidents présentent le contexte passé de la fenêtre, noté $\mathbf{x}^- = (x_1, \cdots, x_{N_c})$. Ensuite, un jeton de début \texttt{S} sert de délimitation. Enfin, les $N_f$ derniers PDW incidents (éventuellement composé de jetons \texttt{PAD}) représentent les nouveaux PDW incidents de la fenêtre, noté $\mathbf{x}^+ = (x_{N_c + 1}, \cdots, x_{N_c + N_f})$ . Cette séquence cible sera aussi baptisée $\mathbf{x}$ telle que 
+$$\mathbf{x} = \mathbf{x}^- \oplus \mathbf{x}^+ = (x_1, \cdots, x_{N_c + N_f + 1})$$
+De manière analogue, la séquence cible fournie au décodeur intègre le contexte intercepté $\mathbf{y}^-$ (composé des $M_c$ derniers PDW interceptés), le jeton \texttt{S}, et enfin les $M_f$ emplacements alloués aux prédictions courantes $\mathbf{y}^+$ (complétés par des \texttt{PAD}). Nous continuons de l'appeler $\mathbf{y}$ telle que 
+$$\mathbf{y} = \mathbf{y}^- \oplus \mathbf{y}^+ = (y_1, \cdots, y_{M_c + M_f + 1})$$
+Le jeton \texttt{PAD}, comme les jetons \texttt{S} et \texttt{E}, est un vecteur appris par le modèle.\\
 
-\subsubsection{Mise en oeuvre des masques}
-[je fais un raccourci en faisant ref à l'autre section si ce n'est pas assez complet et normal pour le niveau scientifique, restructurer comme dans la section précédente avec une cohérence sur le vocabulaire]
-Cette fois, la séquence cible donnée au décodeur est de taille $M_c + 1 + M_f$ et se structure ainsi sur la fenêtre $i$:
-\begin{align*}
-\mathbf{y} = & \mathbf{y}^- \oplus \texttt{S} \oplus \mathbf{y}^+ \\
-= & (\underbrace{\texttt{PDW}, \cdots, \texttt{PDW}}_{M_c \text{ fois}}, \texttt{S}, \underbrace{\texttt{PDW}, \cdots, \texttt{PDW}}_{K_i \text{ fois}}, \underbrace{\texttt{PAD}, \cdots, \texttt{PAD}}_{M_f - K_i \text{ fois}})
-\end{align*}
+Le processus interne de traitement de $\mathbf{x}$ et $\mathbf{y}$ (projection dans l'espace latent, encodage positionnel, blocs d'attention et rétro-projection) demeure strictement identique au fonctionnement détaillé en section \ref{seq:Transfonc}, pour produire une séquence $\mathbf{\hat{y}}$.
 
-Le jeton \texttt{PAD}, comme les jetons \texttt{S} et \texttt{E}, est appris.
-La prédiction $\hat{\mathbf{y}} = (\hat{y}_1, \cdots, \hat{y}_{M_c + M_f + 1})$ est partitionnée ainsi : 
+\subsubsection{Mise en œuvre des masques}
+\label{seq:masquewin}
+Le modèle prédit une séquence qui s'aligne sur la séquence cible donnée au décodeur. Ainsi, si cette séquence cible est composé de PDW et jetons \texttt{PAD} tel que 
+$$\mathbf{y} = \underbrace{(\texttt{PDW}, \dots, \texttt{PDW}}_{M_c \text{ fois}}, \texttt{S}, \underbrace{\texttt{PDW}, \dots, \texttt{PDW}}_{K \text{ fois}}, \underbrace{\texttt{PAD}, \dots, \texttt{PAD})}_{M_f - K \text{ fois}}$$
+alors la prédiction générée $\hat{\mathbf{y}} = (\hat{y}_1, \dots, \hat{y}_{M_c + M_f + 1})$ est partitionnée de la manière suivante :
 \begin{itemize}
-\item $\forall i \leq M_c$, pas de contrainte sur $\hat{y_i}$
-\item $\forall i \in \llbracket M_c + 1; M_c + K_i\rrbracket$, $\hat{y_i}$ doit correspondre à $y_{i+1}$
-\item $\forall i > M_c + K_i$, pas de contrainte sur $\hat{y_i}$
+\item $\forall j \leq M_c$ : aucune contrainte n'est appliquée sur $\hat{y}_j$.
+\item $\forall j \in \llbracket M_c + 1; M_c + K \rrbracket$ : $\hat{y}_j$ doit correspondre au PDW cible $y_{j+1}$.
+\item $\forall j > M_c + K_i$ : remplissage neutre, aucune contrainte sur $\hat{y}_j$.
+\end{itemize}
+\; \\
+
+Pour aligner la prédiction $\hat{\mathbf{y}}$ avec la cible $\mathbf{y}$, nous appliquons la permutation circulaire vers la gauche, notée $\sigma$. La restriction de l'évaluation aux $K$ nouvelles impulsions se formalise par le masque binaire $\mathbf{m}^{(sig)}$, isolant la zone d'intérêt dans la séquence réalignée $\sigma(\mathbf{y})$ :
+\begin{equation}
+\mathbf{m}^{(sig)} = \underbrace{(0, \dots, 0}_{M_c \text{ fois}}, \underbrace{1, \dots, 1}_{K \text{ fois}}, \underbrace{0, \dots, 0)}_{M_f + 1 - K \text{ fois}}
+\end{equation}
+
+Lors du traitement par lots, ces vecteurs sont agrégés dans un tenseur $\mathbf{M}^{(sig)}$. 
+
+\subsubsection{Métrique d'entrainement}
+L'optimisation du modèle s'effectue en réinvestissant à l'identique la métrique de régression pondérée introduite à la section précédente. Les calculs formels décrits par les équations \ref{eq:Eraw}, \ref{eq:Eref}, \ref{eq:Ewei} et \ref{eq:Lrec} sont appliqués entre les séquences cibles $\mathbf{Y}$ et les prédictions $\hat{\mathbf{Y}}$ du lot courant, en utilisant le nouveau tenseur de masquage $\mathbf{M}^{(sig)}$.
+
+Le jeton de fin \texttt{E} étant considéré comme le dernier PDW de chaque séquence entière, l'erreur de terminaison $\mathcal{L}_{fin}$ n'est plus nécessaire. La fonction de coût totale régissant l'apprentissage se réduit donc à l'erreur de reconstruction :
+\begin{equation}
+\mathcal{L}_{total} = \mathcal{L}_{rec}
+\end{equation}
+
+\subsubsection{Inférence de la prédiction d'une séquence entière}
+Dans l'approche de traitement en bloc des séquences entières présenté en \ref{seq:seq2seqblock}, la fin de l'inférence d'une séquence était détecté par la prédiction du jeton \texttt{E}. Dans l'approche fenêtré, le modèle alignera avec le dernier PDW intercepté de la fenêtre $\mathbf{y_K}$ une prédiction $\mathbf{\hat{y}_{K+1}}$ qui ne subit aucune contrainte pendant l'apprentissage, comme nous l'avons mentionné plus tôt \ref{seq:masquewin}.\\
+
+Néanmoins, nous parvenons à déterminer à quelle moment le modèle a terminé l'inférence des impulsions interceptées de la fenêtre. Si le modèle parvient à reproduire fidèlement l'interception des impulsions, alors la prédiction $\mathbf{\hat{y}_{K+1}}$ devrait correspondre à une impulsion publié en dehors de la fenêtre traitée.\\
+
+Ainsi, nous intégrons ce principe dans la procédure de prédiction, que nous décrivons dans l'algorithme \ref{algo:genwin}. Cet algorithme présente de bout-en-bout le processus de prédiction d'une séquence entière, avec l'approche par fenêtrage.
+
+[est-ce qu'on devrait découper en un algo prédiction sur la fenêtre, et l'autre algo reconstruisant la séquence entière ?]
+\begin{itemize}
+\item Input : séquence entière $\mathbf{x}$
+\item Output : séquence entière $\mathbf{\hat{y}}$
+\item Création des séquences $\mathbf{X}_{win}$ avec l'algorithme \ref{algo:windowing}
+\item $n_f \leftarrow \lfloor N / N_f \rfloor + 1$
+\item $\mathbf{y}^{(i)} \leftarrow \underbrace{(\texttt{PAD}, \dots, \texttt{PAD}}_{M_c \text{ fois}}, \texttt{S}, \underbrace{\texttt{PAD}, \dots, \texttt{PAD})}_{M_f \text{ fois}}$
+\item $K_i \leftarrow 0$ le nombre d'impulsion intercepté du contexte passé.
+\item $\mathbf{\hat{y}} \leftarrow \emptyset$
+\item pour chaque fenêtre $1 \leq i \leq n_f$:
+	\begin{itemize}
+	\item $K_{i-1} = min(K_i, M_c)$ taille du contexte passé
+	\item $\mathbf{y}^{(i)} \leftarrow \underbrace{(\texttt{PAD}, \dots, \texttt{PAD}}_{M_c - K_{i-1} \text{ fois}}, \underbrace{\hat{y}_{M_c + K_i - K_{i-1}}, \cdots, \hat{y}_{M_c + K_i - 1}, \hat{y}_{M_c + K_i}}_{K_{i-1} \text{ termes}}, \texttt{S}, \underbrace{\texttt{PAD}, \dots, \texttt{PAD})}_{M_f \text{ fois}}$
+	\item $continue \leftarrow Vrai$
+	\item encoder les ToA des impulsions interceptés de  $\mathbf{y}^{(i)}$ avec l'équation \ref{eq:timeencodingoutwin}
+	\item $j \leftarrow 0$ le nombre d'impulsion intercepté sur la fenêtre
+	\item tant que continue:
+		\begin{itemize}
+		\item prédite $\mathbf{\hat{y}}^{(i)}$ avec le modèle en donnant $\mathbf{x}^{(i)}$ et $\mathbf{y}^{(i)}$
+		\item $ToE = \Delta\text{ToA}(\hat{y}^{(i)}_{M_c + j}) + j + \text{LI}(\hat{y}^{(i)}_{M_c + j})$ décodage du ToA et calcul du ToE local
+		\item si $ToE > N_f$ ou $j = M_f+1$ : $continue \leftarrow Faux$
+		\item sinon $y^{(i)}_{M_c + 1 + j} \leftarrow \hat{y}^{(i)}_{M_c + j} $ et $j \leftarrow j+1$
+		\end{itemize}
+	\item $K_i \leftarrow j$ et $j \leftarrow 0$
+	\item décoder les ToA des impulsions de $\mathbf{y^{(i)}}$ en inversant l'équation \ref{eq:timeencodingoutwin}
+	\item ajout de $(\hat{y}^{(i)}_{M_c + 1}, \cdots, \hat{y}^{(i)}_{M_c + K_i})$ à la fin de $\mathbf{\hat{y}}$
+	\end{itemize}
+\item renvoyer la prédiction $\mathbf{\hat{y}}$
 \end{itemize}
 
-Pour aligner $\mathbf{\hat{y}}$ et $\mathbf{y}$, on utilise la permutation circulaire vers la gauche $\sigma$. Nous définissons un masque $\mathbf{m}^{(sig)}$ permettant de représenter la partie de $\sigma(\mathbf{y})$ important pour la prédiction, qui est pour cette fenêtre $i$ composée de $K_i$ nouveaux PWD interceptés :\\
-$$(\underbrace{0, \cdots, 0}_{M_c \text{ fois}}, \underbrace{1, \cdots, 1}_{K_i \text{ fois}}, \underbrace{0, \cdots, 0}_{M_f + 1 - K_i \text{ fois}}$$
 
-Ils sont agrégé dans un tenseur $\mathbf{M}^{(sig)}$.
 
-\subsection{Métrique}
-[est-ce qu'on devrait pas le mettre dans le sous-section précédente ? si oui il faut aussi restructurer la première partie ? car ici c'est court, mais avant c'était plus long]
-Nous reprenons la métrique introduite en \ref{eq:Lrec}. Cette équation est appliquée en suivant [mal dit mais tu comprends ?] les équations \ref{eq:Eraw}, \ref{eq:Eref}, \ref{eq:Ewei} et \ref{eq:Lrec} avec les séquences cibles $\mathbf{Y}$ et les prédictions associés du modèle $\mathbf{\hat{Y}}$, ainsi que les masques $\mathbf{M}^{(sig)}$.
-$$\mathcal{L}_{total} = \mathcal{L}_{rec}$$

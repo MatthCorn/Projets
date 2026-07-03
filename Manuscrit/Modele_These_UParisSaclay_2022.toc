@@ -106,59 +106,57 @@
 \contentsline {subsection}{\numberline {5.2.2}Génération de l'environnement : la séquence d'impulsions incidentes}{74}{subsection.5.2.2}%
 \contentsline {subsection}{\numberline {5.2.3}Simulation de l'acquisition et du suivi temporel}{75}{subsection.5.2.3}%
 \contentsline {section}{\numberline {5.3}Pertinence de la simulation simplifiée}{76}{section.5.3}%
-\contentsline {chapter}{\numberline {6}L'approche séquence vers séquence}{81}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Motivations}{81}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Séquence vers séquence en bloc}{81}{section.6.2}%
-\contentsline {subsection}{\numberline {6.2.1}Problématique de la modélisation neuronale}{82}{subsection.6.2.1}%
-\contentsline {subsection}{\numberline {6.2.2}Génération et préparation des données}{83}{subsection.6.2.2}%
-\contentsline {subsubsection}{\numberline {6.2.2.1}Structure des données}{83}{subsubsection.6.2.2.1}%
-\contentsline {subsubsection}{\numberline {6.2.2.2}Génération sous contrainte}{83}{subsubsection.6.2.2.2}%
-\contentsline {subsubsection}{\numberline {6.2.2.3}Encodage du temps}{84}{subsubsection.6.2.2.3}%
-\contentsline {subsection}{\numberline {6.2.3}Architecture et implémentation}{85}{subsection.6.2.3}%
-\contentsline {subsubsection}{\numberline {6.2.3.1}Choix et fonctionnement du Transformer}{85}{subsubsection.6.2.3.1}%
-\contentsline {subsubsection}{\numberline {6.2.3.2}Mise en œuvre et gestion des masques de séquences}{86}{subsubsection.6.2.3.2}%
-\contentsline {subsection}{\numberline {6.2.4}Métrique d'entraînement : la fonction de coût normalisée}{87}{subsection.6.2.4}%
-\contentsline {subsection}{\numberline {6.2.5}Résultats expérimentaux}{89}{subsection.6.2.5}%
-\contentsline {subsubsection}{\numberline {6.2.5.1}Convergence de l'apprentissage}{89}{subsubsection.6.2.5.1}%
-\contentsline {subsubsection}{\numberline {6.2.5.2}Analyse temporelle et qualitative}{89}{subsubsection.6.2.5.2}%
-\contentsline {section}{\numberline {6.3}Séquence vers séquence par fenêtrage}{91}{section.6.3}%
-\contentsline {subsection}{\numberline {6.3.1}Création et préparation des données}{91}{subsection.6.3.1}%
-\contentsline {subsubsection}{\numberline {6.3.1.1}Découpage structurel et Algorithme}{92}{subsubsection.6.3.1.1}%
-\contentsline {subsubsection}{\numberline {6.3.1.2}Encodage du temps}{93}{subsubsection.6.3.1.2}%
-\contentsline {subsection}{\numberline {6.3.2}Architecture et Implémentation}{94}{subsection.6.3.2}%
-\contentsline {subsubsection}{\numberline {6.3.2.1}Transformer adapté}{94}{subsubsection.6.3.2.1}%
-\contentsline {subsubsection}{\numberline {6.3.2.2}Mise en œuvre des masques et métrique}{95}{subsubsection.6.3.2.2}%
-\contentsline {subsection}{\numberline {6.3.3}Architecture et Implémentation}{95}{subsection.6.3.3}%
-\contentsline {subsubsection}{\numberline {6.3.3.1}Transformer adapté}{95}{subsubsection.6.3.3.1}%
-\contentsline {subsubsection}{\numberline {6.3.3.2}Mise en oeuvre des masques}{96}{subsubsection.6.3.3.2}%
-\contentsline {subsection}{\numberline {6.3.4}Métrique}{97}{subsection.6.3.4}%
-\contentsline {chapter}{\numberline {7}Sérialisation du problème : une approche événementielle}{99}{chapter.7}%
-\contentsline {section}{\numberline {7.1}Motivation : Du traitement de séquence à la modélisation dynamique}{99}{section.7.1}%
-\contentsline {subsection}{\numberline {7.1.1}Le goulot d'étranglement des architectures pour le Seq2Seq}{99}{subsection.7.1.1}%
-\contentsline {subsection}{\numberline {7.1.2}Le DCI comme système dynamique réactif}{100}{subsection.7.1.2}%
-\contentsline {section}{\numberline {7.2}Formalisation du problème "Flux-à-flux"}{100}{section.7.2}%
-\contentsline {subsection}{\numberline {7.2.1}Contraintes de l'approche et choix de conception}{101}{subsection.7.2.1}%
-\contentsline {paragraph}{Contrainte 1 : Discrétisation de la réponse}{101}{paragraph*.40}%
-\contentsline {paragraph}{Contrainte 2 : Condition d'arrêt}{101}{paragraph*.41}%
-\contentsline {paragraph}{Contrainte 3 : Maintien du contexte}{101}{paragraph*.42}%
-\contentsline {subsection}{\numberline {7.2.2}Sérialisation : transformation et préparation des données}{101}{subsection.7.2.2}%
-\contentsline {subsection}{\numberline {7.2.3}Préparation des données et ingénierie des caractéristiques}{103}{subsection.7.2.3}%
-\contentsline {subsubsection}{\numberline {7.2.3.1}Encodage local du temps}{103}{subsubsection.7.2.3.1}%
-\contentsline {subsubsection}{\numberline {7.2.3.2}Gestion des masques et exemple de sérialisation}{104}{subsubsection.7.2.3.2}%
-\contentsline {section}{\numberline {7.3}Validation de l'approche sur architectures récurrentes}{105}{section.7.3}%
-\contentsline {subsection}{\numberline {7.3.1}Les architectures}{106}{subsection.7.3.1}%
-\contentsline {subsection}{\numberline {7.3.2}Résultats expérimentaux}{106}{subsection.7.3.2}%
-\contentsline {section}{\numberline {7.4}Extension des essais : Généralisation à d'autres architectures}{109}{section.7.4}%
-\contentsline {subsection}{\numberline {7.4.1}Sélection des architectures}{109}{subsection.7.4.1}%
-\contentsline {subsubsection}{\numberline {7.4.1.1}Le Transformer (Attention Mechanism)}{109}{subsubsection.7.4.1.1}%
-\contentsline {subsubsection}{\numberline {7.4.1.2}Le TCN (Temporal Convolutional Network)}{109}{subsubsection.7.4.1.2}%
-\contentsline {subsubsection}{\numberline {7.4.1.3}Le GRU (Recurrent Network)}{111}{subsubsection.7.4.1.3}%
-\contentsline {subsubsection}{\numberline {7.4.1.4}Structure commune et hyper-paramètres}{111}{subsubsection.7.4.1.4}%
-\contentsline {subsection}{\numberline {7.4.2}Fonction de perte et métriques d'évaluation}{112}{subsection.7.4.2}%
-\contentsline {subsubsection}{\numberline {7.4.2.1}Erreur de reconstruction pondérée ($\mathcal {L}_{reg}$)}{113}{subsubsection.7.4.2.1}%
-\contentsline {subsubsection}{\numberline {7.4.2.2}Erreur de classification par MCC différentiable ($\mathcal {L}_{class}$)}{114}{subsubsection.7.4.2.2}%
-\contentsline {subsection}{\numberline {7.4.3}Résultats et Analyse Comparative}{115}{subsection.7.4.3}%
-\contentsline {subsubsection}{\numberline {7.4.3.1}Performance globale et convergence}{115}{subsubsection.7.4.3.1}%
-\contentsline {subsubsection}{\numberline {7.4.3.2}Robustesse face à la longueur de séquence}{116}{subsubsection.7.4.3.2}%
-\contentsline {subsubsection}{\numberline {7.4.3.3}Analyse qualitative des générations}{117}{subsubsection.7.4.3.3}%
-\contentsline {subsection}{\numberline {7.4.4}Conclusion sur les extensions}{117}{subsection.7.4.4}%
+\contentsline {chapter}{\numberline {6}L'approche séquence vers séquence}{79}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Motivations}{79}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Séquence vers séquence en bloc}{79}{section.6.2}%
+\contentsline {subsection}{\numberline {6.2.1}Problématique de la modélisation neuronale}{80}{subsection.6.2.1}%
+\contentsline {subsection}{\numberline {6.2.2}Génération et préparation des données}{81}{subsection.6.2.2}%
+\contentsline {subsubsection}{\numberline {6.2.2.1}Structure des données}{81}{subsubsection.6.2.2.1}%
+\contentsline {subsubsection}{\numberline {6.2.2.2}Génération sous contrainte}{81}{subsubsection.6.2.2.2}%
+\contentsline {subsubsection}{\numberline {6.2.2.3}Encodage du temps}{82}{subsubsection.6.2.2.3}%
+\contentsline {subsection}{\numberline {6.2.3}Architecture et implémentation}{83}{subsection.6.2.3}%
+\contentsline {subsubsection}{\numberline {6.2.3.1}Choix et fonctionnement du Transformer}{83}{subsubsection.6.2.3.1}%
+\contentsline {subsubsection}{\numberline {6.2.3.2}Mise en œuvre et gestion des masques de séquences}{84}{subsubsection.6.2.3.2}%
+\contentsline {subsection}{\numberline {6.2.4}Métrique d'entraînement : la fonction de coût normalisée}{85}{subsection.6.2.4}%
+\contentsline {subsection}{\numberline {6.2.5}Résultats expérimentaux}{87}{subsection.6.2.5}%
+\contentsline {subsubsection}{\numberline {6.2.5.1}Convergence de l'apprentissage}{87}{subsubsection.6.2.5.1}%
+\contentsline {subsubsection}{\numberline {6.2.5.2}Analyse temporelle et qualitative}{87}{subsubsection.6.2.5.2}%
+\contentsline {section}{\numberline {6.3}Séquence vers séquence par fenêtrage}{89}{section.6.3}%
+\contentsline {subsection}{\numberline {6.3.1}Création et préparation des données}{89}{subsection.6.3.1}%
+\contentsline {subsubsection}{\numberline {6.3.1.1}Découpage structurel et Algorithme}{90}{subsubsection.6.3.1.1}%
+\contentsline {subsubsection}{\numberline {6.3.1.2}Encodage du temps}{91}{subsubsection.6.3.1.2}%
+\contentsline {subsection}{\numberline {6.3.2}Architecture et Implémentation}{92}{subsection.6.3.2}%
+\contentsline {subsubsection}{\numberline {6.3.2.1}Transformer adapté}{92}{subsubsection.6.3.2.1}%
+\contentsline {subsubsection}{\numberline {6.3.2.2}Mise en œuvre des masques}{93}{subsubsection.6.3.2.2}%
+\contentsline {subsubsection}{\numberline {6.3.2.3}Métrique}{93}{subsubsection.6.3.2.3}%
+\contentsline {subsubsection}{\numberline {6.3.2.4}Prédiction de la fenêtre}{94}{subsubsection.6.3.2.4}%
+\contentsline {chapter}{\numberline {7}Sérialisation du problème : une approche événementielle}{95}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Motivation : Du traitement de séquence à la modélisation dynamique}{95}{section.7.1}%
+\contentsline {subsection}{\numberline {7.1.1}Le goulot d'étranglement des architectures pour le Seq2Seq}{95}{subsection.7.1.1}%
+\contentsline {subsection}{\numberline {7.1.2}Le DCI comme système dynamique réactif}{96}{subsection.7.1.2}%
+\contentsline {section}{\numberline {7.2}Formalisation du problème "Flux-à-flux"}{96}{section.7.2}%
+\contentsline {subsection}{\numberline {7.2.1}Contraintes de l'approche et choix de conception}{97}{subsection.7.2.1}%
+\contentsline {paragraph}{Contrainte 1 : Discrétisation de la réponse}{97}{paragraph*.38}%
+\contentsline {paragraph}{Contrainte 2 : Condition d'arrêt}{97}{paragraph*.39}%
+\contentsline {paragraph}{Contrainte 3 : Maintien du contexte}{97}{paragraph*.40}%
+\contentsline {subsection}{\numberline {7.2.2}Sérialisation : transformation et préparation des données}{97}{subsection.7.2.2}%
+\contentsline {subsection}{\numberline {7.2.3}Préparation des données et ingénierie des caractéristiques}{99}{subsection.7.2.3}%
+\contentsline {subsubsection}{\numberline {7.2.3.1}Encodage local du temps}{99}{subsubsection.7.2.3.1}%
+\contentsline {subsubsection}{\numberline {7.2.3.2}Gestion des masques et exemple de sérialisation}{100}{subsubsection.7.2.3.2}%
+\contentsline {section}{\numberline {7.3}Validation de l'approche sur architectures récurrentes}{101}{section.7.3}%
+\contentsline {subsection}{\numberline {7.3.1}Les architectures}{102}{subsection.7.3.1}%
+\contentsline {subsection}{\numberline {7.3.2}Résultats expérimentaux}{102}{subsection.7.3.2}%
+\contentsline {section}{\numberline {7.4}Extension des essais : Généralisation à d'autres architectures}{105}{section.7.4}%
+\contentsline {subsection}{\numberline {7.4.1}Sélection des architectures}{105}{subsection.7.4.1}%
+\contentsline {subsubsection}{\numberline {7.4.1.1}Le Transformer (Attention Mechanism)}{105}{subsubsection.7.4.1.1}%
+\contentsline {subsubsection}{\numberline {7.4.1.2}Le TCN (Temporal Convolutional Network)}{105}{subsubsection.7.4.1.2}%
+\contentsline {subsubsection}{\numberline {7.4.1.3}Le GRU (Recurrent Network)}{107}{subsubsection.7.4.1.3}%
+\contentsline {subsubsection}{\numberline {7.4.1.4}Structure commune et hyper-paramètres}{107}{subsubsection.7.4.1.4}%
+\contentsline {subsection}{\numberline {7.4.2}Fonction de perte et métriques d'évaluation}{108}{subsection.7.4.2}%
+\contentsline {subsubsection}{\numberline {7.4.2.1}Erreur de reconstruction pondérée ($\mathcal {L}_{reg}$)}{109}{subsubsection.7.4.2.1}%
+\contentsline {subsubsection}{\numberline {7.4.2.2}Erreur de classification par MCC différentiable ($\mathcal {L}_{class}$)}{110}{subsubsection.7.4.2.2}%
+\contentsline {subsection}{\numberline {7.4.3}Résultats et Analyse Comparative}{111}{subsection.7.4.3}%
+\contentsline {subsubsection}{\numberline {7.4.3.1}Performance globale et convergence}{111}{subsubsection.7.4.3.1}%
+\contentsline {subsubsection}{\numberline {7.4.3.2}Robustesse face à la longueur de séquence}{112}{subsubsection.7.4.3.2}%
+\contentsline {subsubsection}{\numberline {7.4.3.3}Analyse qualitative des générations}{113}{subsubsection.7.4.3.3}%
+\contentsline {subsection}{\numberline {7.4.4}Conclusion sur les extensions}{113}{subsection.7.4.4}%
