@@ -82,7 +82,7 @@ Dans le tenseur d'entrée, les PDW incidents sont triés chronologiquement. La d
 
 Dans le tenseur de sortie, l'ordre d'apparition correspond à l'ordre de publication des PDW interceptés. Il faut donc encoder l'information des ToA dans une coordonnée des PDW. Pour éviter d'entraîner le modèle sur une fonction croissante non bornée, nous exploitons la corrélation temporelle entre la séquence d'entrée et de sortie : le PDW interceptée à la position $i$ caractérise généralement un PDW dont la ToA est proche de $i$.\\
 
-Finalement, la variable temporelle, notée $\Delta\text{ToA}$, qui encode la date d'arrivé du PDW intercepté numéro $i$, s'écrit :
+Finalement, la variable temporelle, notée $\Delta\text{ToA}$, qui encode la date d'arrivée du PDW intercepté numéro $i$, s'écrit :
 \begin{equation}
 \label{eq:timeencodingout}
 \Delta\text{ToA} = \text{ToA}(PDW) - i
@@ -108,9 +108,13 @@ Face à cette limite, nous retenons l'architecture Transformer. En s'affranchiss
 \label{fig:GTAFTrans}
 \end{figure}
 
-Le traitement de l'information s'articule autour de deux flux distincts. À gauche, la séquence source (les PDW incidents composant le scénario) alimente l'encodeur. Les vecteurs physiques sont projetés dans l'espace latent, complétés par un encodage positionnel, puis traités par une pile de $N_{enc}$ blocs d'encodage. Ce processus génère une représentation latente riche du scénario global.
+Le traitement de l'information s'articule autour de deux flux distincts. À gauche, la séquence source $\mathbf{x}$ (les PDW incidents composant le scénario) alimente l'encodeur. Les vecteurs physiques sont projetés dans l'espace latent, complétés par un encodage positionnel, puis traités par une pile de $N_{enc}$ blocs d'encodage. Ce processus génère une représentation latente riche du scénario global.
 
-À droite, la séquence cible (les PDW interceptés) est introduite dans le décodeur. Pour initier et décaler le flux, un jeton de début de séquence (\texttt{S}) est inséré en première position. Après projection latente et ajout de l'encodage positionnel, cette séquence traverse $N_{dec}$ blocs de décodage. La sortie latente du décodeur est finalement rétro-projetée vers l'espace physique pour fournir la prédiction des PDW interceptés. 
+À droite, la séquence cible $\mathbf{y}$ (les PDW interceptés) est introduite dans le décodeur. Pour initier et décaler le flux, un jeton de début de séquence (\texttt{S}) est inséré en première position. Après projection latente et ajout de l'encodage positionnel, cette séquence traverse $N_{dec}$ blocs de décodage. La sortie latente du décodeur est finalement rétro-projetée vers l'espace physique pour fournir la prédiction des PDW interceptés, donnant la séquence prédite $\hat{\mathbf{y}}$ telle qu'en désignant par $f_{\theta}$ notre modèle :
+\begin{equation}
+\label{eq:predforce}
+\hat{\mathbf{y}} = f_{\theta}(\mathbf{x}, \mathbf{y})
+\end{equation} 
 
 \subsubsection{Mise en œuvre et gestion des masques de séquences}
 Comme mentionné en \ref{seq:structuredonnées}, l'ensemble de sortie est composé de séquences complétées artificiellement pour atteindre une longueur fixe $M$. Si une séquence de sortie contient un nombre de PDW valides $K \le M$, la séquence cible d'entrée du décodeur, illustré figure \ref{fig:GTAFTrans}, se structure ainsi : 
@@ -127,7 +131,7 @@ La prédiction du réseau de neurone, $\hat{\mathbf{y}} = (\hat{y}_1, \dots, \ha
 
 Pour aligner la prédiction $\hat{\mathbf{y}}$ et la cible $\mathbf{y}$, nous appliquons une permutation circulaire vers la gauche, notée $\sigma$, telle que 
 $$\sigma(\mathbf{y}) = (y_1, \dots, y_M, \texttt{S})$$
-et ainsi pour les indices $1 \leq i \leq K$, $\hat{y}_i$ devra correspondre à $y_i$.
+et ainsi pour les indices $1 \leq i \leq K$, $\hat{y}_i$ devra correspondre à $y_i$.\\
 
 Pour représenter mathématiquement ces partitions, nous définissions deux masques binaires de longueur $M+1$, notés $\mathbf{m}^{(sig)}$ et $\mathbf{m}^{(fin)}$, isolant respectivement dans $\sigma(\mathbf{y})$ les positions des PDW et de la position du premier jeton $\texttt{PAD}$.
 
@@ -145,9 +149,7 @@ De manière générale, quantifier mathématiquement l'écart entre deux séquen
 
 Néanmoins, notre procédure d'apprentissage s'appuie sur la technique du forçage de l'enseignant (\textit{teacher forcing}) \cite{williams_learning_1989}. Lors de l'entraînement, la prédiction $\hat{y}_i$ est conditionnée exclusivement par la séquence source complète $\mathbf{x}$ et par l'historique exact de la véritable séquence cible $(y_1, \dots, y_{i-1})$. Ce conditionnement par la vérité terrain empêche toute prolifération des erreurs : une mauvaise approximation locale à l'instant $i-1$ n'induit aucun décalage temporel sur la prédiction à l'instant $i$. Cette propriété garantit que la prédiction $\hat{y}_i$ partage systématiquement le même contexte historique que sa cible $y_i$, autorisant ainsi une comparaison terme à terme.\\
 
-Pour créer cette métrique, nous réinvestissons et adaptons le principe de l'erreur pondérée par séquence introduit au chapitre \ref{chap:eusipco}.
-
-Considérons une séquence cible $\mathbf{y}$ et sa prédiction associée $\hat{\mathbf{y}}$. L'erreur brute de reconstruction est évaluée en mesurant la distance euclidienne entre la prédiction et la cible préalablement réalignée par permutation, notée $\sigma(\mathbf{y})$.
+Pour créer cette métrique, nous réinvestissons et adaptons le principe de l'erreur pondérée par séquence introduit au chapitre \ref{chap:eusipco}. Considérons une séquence cible $\mathbf{y}$ et sa prédiction associée $\hat{\mathbf{y}}$. L'erreur brute de reconstruction est évaluée en mesurant la distance euclidienne entre la prédiction et la cible préalablement réalignée par permutation, notée $\sigma(\mathbf{y})$.
 L'application du masque de signal $\mathbf{m}^{(sig)}$, au moyen d'un produit terme à terme, permet d'annuler mathématiquement le calcul sur les positions de remplissage, restreignant ainsi l'évaluation aux seuls $K = \|\mathbf{m}^{(sig)}\|_1$ éléments physiques valides. Enfin, cette distance est normalisée par la quantité totale de scalaires sommés ($K \times d_{out}$).
 L'équation de l'erreur brute s'écrit de la façon suivante :\\
 \begin{equation}
@@ -155,8 +157,7 @@ L'équation de l'erreur brute s'écrit de la façon suivante :\\
 E_{raw}(\hat{\mathbf{y}}, \mathbf{y}) = \frac{\|(\hat{\mathbf{y}} - \sigma(\mathbf{y})) \odot \mathbf{m}^{(sig)}\|_2}{\sqrt{\|\mathbf{m}^{(sig)}\|_1 \times d_{\text{out}}}}
 \end{equation}
 
-Afin d'uniformiser la contribution de chaque séquence indépendamment de sa variance physique, nous utilisons l'erreur d'un prédicteur naïf \ref{eq:naif} comme facteur de normalisation. Ce prédicteur génère une séquence constante, constituée de la répétition de $\bar{\mathbf{y}}$, le vecteur moyen de la séquence $\mathbf{y}$ calculé exclusivement sur les $K$ éléments valides de la cible. 
-
+Afin d'uniformiser la contribution de chaque séquence indépendamment de sa variance physique, nous utilisons l'erreur d'un prédicteur naïf \ref{eq:naif} comme facteur de normalisation. Ce prédicteur génère une séquence constante, constituée de la répétition de $\bar{\mathbf{y}}$, le vecteur moyen de la séquence $\mathbf{y}$ calculé exclusivement sur les $K$ éléments valides de la cible. \\
 
 Afin d'uniformiser la contribution de chaque séquence, nous utilisons l'erreur d'un prédicteur naïf comme facteur de normalisation. Ce prédicteur génère une séquence constituée de la répétition de $\bar{\mathbf{y}}$, le vecteur moyen calculé exclusivement sur les $K$ éléments valides de la séquence cible $\mathbf{y}$.\\
 
@@ -181,7 +182,7 @@ La fonction de coût de reconstruction $\mathcal{L}_{rec}$ correspond à la moye
 \mathcal{L}_{rec}(\hat{\mathbf{Y}}, \mathbf{Y}) = \sqrt{\frac{1}{B} \sum_{k=1}^B E_{weighted}(\hat{\mathbf{y}}_k, \mathbf{y}_k)^2}
 \end{equation}
 
-Parallèlement, l'erreur de terminaison $\mathcal{L}_{fin}$ évalue la distance euclidienne entre la prédiction isolée par le masque de fin et la représentation latent du jeton de fin $\texttt{E}$. Cette erreur est calculé par l'équation \ref{eq:termine}, appliquée directement sur le lot de prédictions $\hat{\mathbf{Y}}$ et de sorties $\mathbf{Y}$.
+Parallèlement, l'erreur de terminaison $\mathcal{L}_{fin}$ évalue la distance euclidienne entre la prédiction isolée par le masque de fin et la représentation latent du jeton de fin $\texttt{E}$. Cette erreur est calculée par l'équation \ref{eq:termine}, appliquée directement sur le lot de prédictions $\hat{\mathbf{Y}}$ et de sorties $\mathbf{Y}$.
 \begin{equation}
 \label{eq:termine}
 \mathcal{L}_{fin}(\hat{\mathbf{Y}}, \mathbf{Y}) = \frac{\|(\hat{\mathbf{Y}} - \texttt{E}) \odot \mathbf{M}^{(fin)} \|_2}{\sqrt{B \times d_{\text{out}}}}
@@ -189,75 +190,139 @@ Parallèlement, l'erreur de terminaison $\mathcal{L}_{fin}$ évalue la distance 
 
 La fonction de coût finale $\mathcal{L}_{total}$ minimisée lors de l'entraînement combine l'erreur de reconstruction et l'erreur de terminaison, équilibrées par un hyperparamètre $\lambda$ :
 \begin{equation}
+\label{eq:Ltot}
 \mathcal{L}_{total}(\hat{\mathbf{Y}}, \mathbf{Y}) = \mathcal{L}_{rec}(\hat{\mathbf{Y}}, \mathbf{Y}) + \lambda \mathcal{L}_{fin}(\hat{\mathbf{Y}}, \mathbf{Y})
 \end{equation}
 
 \subsubsection{Inférence de la prédiction d'une séquence}
-[mettre un peu les formes pour introduire ces propos]
-La procédure bout-en-bout permettant de prédire une séquence $\mathbf{\hat{y}}$ uniquement à partir d'une séquence incidente $\mathbf{x}$ est présentée dans l'algorithme \ref{algo:genglobal}.
+\label{seq:infglob}
+Lors de la phase d'inférence, qui correspond à l'utilisation opérationnelle du modèle, le modèle procède à une génération auto-régressive : le décodeur s'alimente itérativement de ses propres prédictions pour construire entièrement une séquence. L'Algorithme \ref{algo:genglobal} formalise cette procédure de bout en bout. Nous faisons référence à $f_{\theta}$, qui désigne notre modèle, ainsi qu'à un seuil $\epsilon$ permettant de détecté la prédiction de la fin de la séquence.\\
 
+$\epsilon$ est choisi pour maximiser le Coefficient de Corrélation de Matthews (MCC), qui permet d'évaluer les performances d'un modèle de classification binaire (robuste lors d'un déséquilibre dans la représentation des classes). Ce coefficient repose sur les notions de vrai/faux positif et de vrai/faux négatif. Pour se faire, une séquence est prédite par forçage de l'enseignement (teacher forcing) $\hat{\mathbf{y}} = f_{\theta}(\mathbf{x}, \mathbf{y})$, puis ses $K + 1 = \|\mathbf{m}^{(sig)}\|_1 + 1$ premiers éléments sont évalués tels que :
 \begin{itemize}
-\item Input : $\mathbf{x}$
-\item Output : $\mathbf{\hat{y}}$
-\item initialisation :
-\item $\mathbf{y} \leftarrow (\texttt{S}, \underbrace{\texttt{PAD}, \cdots, \texttt{PAD})}_{M \text{ fois}}$
-\item $continue \leftarrow Vraie$
-\item $i \leftarrow 0$
-\item tant que $continue$:
-	\begin{itemize}
-	\item le modèle prédit $\mathbf{\hat{y}}$ à partir de $\mathbf{x}$ et $\mathbf{y}$
-	\item $e \leftarrow \frac{\|(\hat{y}_i - \texttt{E})} \|_2}{\sqrt{d_{\text{out}}}}$
-	\item si $e < \epsilon$ ou $i = M+1$, $continue \leftarrow Faux$
-	\item sinon $i \leftarrow i+1$ et $\mathbf{y} \leftarrow (\texttt{S}, \hat{y}_1
-, \cdots, \hat{y}_i,  \underbrace{\texttt{PAD}, \cdots, \texttt{PAD})}_{M - i \text{ fois}}$
-	\end{itemize}
+\item Si $1 \leq k \leq K$ et $\frac{\|\hat{y}_{k} - \texttt{E}\|_2}{\sqrt{d_{out}}} < \epsilon$, c'est un vrai positif \texttt{TP}
+\item Si $1 \leq k \leq K$ et $\frac{\|\hat{y}_{k} - \texttt{E}\|_2}{\sqrt{d_{out}}} \geq \epsilon$, c'est un faux négatif \texttt{FN}
+\item Si $k = K+1$ et $\frac{\|\hat{y}_{k} - \texttt{E}\|_2}{\sqrt{d_{out}}} \geq \epsilon$, c'est un vrai négatif \texttt{TN}
+\item Si $k = K+1$ et $\frac{\|\hat{y}_{k} - \texttt{E}\|_2}{\sqrt{d_{out}}} < \epsilon$, c'est un faux positif \texttt{FP}
 \end{itemize}
+Calculé sur un grand nombre de séquences, le MCC s'exprime ainsi :
+\begin{equation}
+\label{eq:MCCinf}
+ MCC = \frac{\texttt{TP}\times \texttt{TN} - \texttt{FP} \times \texttt{FN}}{\sqrt{(\texttt{TP} + \texttt{FP})(\texttt{TP} + \texttt{FN})(\texttt{TN} + \texttt{FP})(\texttt{TN} + \texttt{FN})}}
+\end{equation}
+
+\begin{algorithm}[htbp]
+\DontPrintSemicolon
+\SetAlgoLined
+\KwIn{Séquence incidente $\mathbf{x}$}
+\KwOut{Séquence prédite $\hat{\mathbf{y}}$}
+$\mathbf{y} \leftarrow (\texttt{S}, \underbrace{\texttt{PAD}, \dots, \texttt{PAD}}_{M \text{ fois}})$\;
+$continue \leftarrow \text{Vrai}$\;
+$m \leftarrow 0$\;
+\tcp*[l]{Boucle de prédiction itérative des interceptions}
+\While{$continue$}{
+    $\hat{\mathbf{y}} \leftarrow f_\theta(\mathbf{x}, \mathbf{y})$
+    $e \leftarrow \frac{\|\hat{y}_{m+1} - \texttt{E}\|_2}{\sqrt{d_{out}}}$\;
+    \eIf{$e < \epsilon$ \textbf{ou} $m = M+1$}{
+        $continue \leftarrow \text{Faux}$\;
+    }{
+        $m \leftarrow m + 1$\;
+        $\mathbf{y} \leftarrow (\texttt{S}, \hat{y}_1, \dots, \hat{y}_m, \underbrace{\texttt{PAD}, \dots, \texttt{PAD}}_{M - m \text{ fois}})$\;
+    }
+}
+\tcp*[l]{Récupération de la séquence prédite}
+$\hat{\mathbf{y}} \leftarrow (\hat{y}_1, \cdots, \hat{y}_m)$
+\Return{la séquence prédite $\hat{\mathbf{y}}$}
+\caption{Inférence auto-régressive d'une séquence globale}
+\label{algo:genglobal}
+\end{algorithm}
+
 
 \subsection{Résultats expérimentaux}
 \label{seq:blocresu}
-L'évaluation initiale de cette approche globale est réalisée sur des séquences courtes. La configuration retenue simule des scénarios composés de $N=20$ PDW incidents, générant des séquences cibles de longueur variable limitées à 30 PDW. Le modèle Transformer (10 couches, dimension latente 128, 4 têtes d'attention) a été entraîné sur un ensemble de 8 millions de séquences durant 150 époques.
+Dans cette section, nous présentons les résultats expérimentaux obtenus avec l'approche de traitement en bloc sur des séquences entières.
+
+\subsubsection{Configuration}
+Les conditions expérimentales se déclinent selon trois axes : la structure des données, le dimensionnement du réseau et la stratégie d'optimisation. Ses conditions sont résumées dans le \ref{tab:params_bloc}. L'ensemble des paramètres de l'architecture et de l'optimisation sont issus d'un processus d'optimisation global, assurant qu'un défaut de performance ne puisse être attribué à de mauvais choix.\\
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{lc}
+\toprule
+\textbf{Paramètre} & \textbf{Valeur} \\
+\midrule
+\multicolumn{2}{c}{\textit{Jeux de données}} \\
+\midrule
+Taille de l'ensemble d'entraînement & $2 \cdot 10^6$ scénarios \\
+Taille de l'ensemble de validation & $1000$ scénarios \\
+Nombre d'impulsions incidentes ($N$) & 28 \\
+Plage des moyennes fréquentielles ($\mu$) & $[-5 ; 5]$ \\
+Plage des écarts-types ($\sigma$) & $[0.2 ; 5]$ \\
+\midrule
+\multicolumn{2}{c}{\textit{Architecture (Transformer)}} \\
+\midrule
+Nombre de couches d'encodage ($N_{enc}$) & 11 \\
+Nombre de couches de décodage ($N_{dec}$) & 3 \\
+Dimension de l'espace latent ($d_{model}$) & 256 \\
+Nombre de têtes d'attention ($h$) & 16 \\
+\midrule
+\multicolumn{2}{c}{\textit{Optimisation}} \\
+\midrule
+Optimiseur & Adam \\
+Taux d'apprentissage & $1.5 \times 10^{-4}$ \\
+Taille de lot (\textit{Batch size}) & 500 séquences \\
+Nombre d'époques & 100 \\
+\bottomrule
+\end{tabular}
+\caption{Synthèse des conditions de l'expérimentation.}
+\label{tab:params_bloc}
+\end{table}
+
+Voici en retour en détails sur les différents paramètres.\\
+\textbf{Les paramètres du jeu de données} décrivent les dimensions et contraintes appliquées à la création des ensembles de données. Pour l'entrainement, nous avons travaillé avec $B = 2000000$ de scénarios, composés de $N=28$ impulsions incidentes. Ces scénarios sont contraints (cf \ref{seq:gencontr} et \ref{algo:post}) selon des intervalles $[-5; 5] \times [0.2; 5]$. Les séquences d'impulsions interceptées sont complétées jusqu'à $M = 35$ éléments. Concernant la validation, nous avons utilisé $B = 1000$ séquences avec des dimensions et des contraintes identiques.\\
+\textbf{Les hyperparamètres du modèle} régisse la forme du modèle, qui est un Transformer dont l'architecture est présenté en \ref{seq:Transfonc}. Le modèle dispose de 11 encodeurs, 3 décodeurs, une dimension latente (dimension d'attention) de 256 et 16 têtes d'attention. Ces hyperparamètres ont été sélectionnés par un processus d'optimisation.
+\textbf{Les paramètres de l'optimisation} décrivent les conditions dans lesquelles l'entrainement est réalisé.\\
+L'optimisation du modèle est réalisé avec l'optimiseur \texttt{ADAM} sur l'ensemble des poids du modèle. L'entrainement est réalisé par $100$ itération sur l'ensemble des données d'entrainement, avec une moyenne du gradient réalisée sur des lots de $500$ séquences. Ainsi, $400 000$ mise-à-jour de l'ensemble des poids du modèle sont réalisé au total, par un optimiseur ADAM ayant un taux d'apprentissage de $1.5e^{-4}$.
+
 
 \subsubsection{Convergence de l'apprentissage}
-La figure \ref{fig:loss_short} illustre l'évolution de la fonction de coût $\mathcal{L}$ sur les ensembles d'entraînement et de validation.
+La figure \ref{fig:loss_short} illustre l'évolution de la fonction de coût de reconstruction $\mathcal{L}_{tot}$ sur les ensembles d'entraînement et de validation.
 
 \begin{figure}[htbp]
-  \centering
-  \framebox{\parbox{0.8\textwidth}{\centering
-    \vspace{3cm}
-    \textbf{Image Placeholder} \\
-    \small\textit{Figure de convergence de l'apprentissage.}
-    \vspace{3cm}
-  }}
-  \caption{Évolution de l'erreur pondérée en validation et en entraînement pour des séquences courtes ($N=20$). La barre horizontale noire symbolise l'erreur du prédicteur naïf (valeur 1.0).}
-  \label{fig:loss_short}
+\begin{center}
+\includegraphics[scale=0.70]{ErreurGlobal.png}
+\end{center}
+\caption{Évolution de l'erreur pondérée en validation et en entraînement pour des séquences courtes ($N=28$). La barre horizontale noire symbolise l'erreur d'un prédicteur naïf (valeur 1.0). L'erreur de validation converge au dessous de $0.1$.}
+\label{fig:loss_short}
 \end{figure}
 
-L'erreur de validation converge et se stabilise autour de $0.06$. Ce résultat, strictement inférieur au seuil critique de $1.0$, confirme la validité de la formulation en régression. Le réseau ne se contente pas d'approximer la moyenne de la séquence cible ; il extrait les règles physiques sous-jacentes pour prédire la position exacte des descripteurs dans l'espace $\mathbb{R}^d$.
+L'erreur de validation converge rapidement et se stabilise autour de $0.097$. Ce résultat, situé très en dessous de la valeur critique de $1.0$ (caractérisant les performances du prédicteur naïf de référence), confirme la pertinence du modèle pour apprendre à reproduire le traitement complexe du DCIS. 
 
-\subsubsection{Analyse temporelle et qualitative}
-Pour évaluer la conformité des prédictions aux traitements algorithmiques du capteur, nous analysons visuellement les séquences dans le plan temps-fréquence. La figure \ref{fig:gen_short} compare la séquence incidente (vérité terrain du scénario), la séquence cible (sortie attendue du DCI) et les séquences générées par le modèle sous deux régimes d'inférence distincts.
+\subsubsection{Analyse qualitative}
+Bien que la métrique $\mathcal{L}_{tot}$ quantifie l'erreur de reconstruction globale, elle ne permet pas de se rendre compte de la qualité des prédictions du point de vue physique, prédictions qui pourraient être victimes d'un effet de lissage des détails par exemple. En revanche, la bonne reproduction des règles expertes du capteur peut être qualifié à travers une analyse morphologique dans le plan temps-fréquence des séquences d'impulsions produites par notre modèle.\\
+
+La figure \ref{fig:gen_short_dense} illustre les séquences prédites sur un scénario dense, caractérisé par une forte proximité des impulsions (écart-type fréquentiel contraint à $\sigma \approx 0.5$). Elle met en perspective la séquence générée en régime de forçage de l'enseignant (\textit{Teacher Forcing}), correspondant aux conditions d'apprentissage guidées par l'équation \ref{eq:predforce}, et celle produite en régime auto-régressif pur (utilisation opérationnelle guidée par l'algorithme \ref{algo:genglobal}). La figure \ref{fig:gen_short_light} présente une analyse analogue pour un scénario plus clairsemé ($\sigma \approx 2$).\\
 
 \begin{figure}[htbp]
-  \centering
-  \framebox{\parbox{0.8\textwidth}{\centering
-    \vspace{3cm}
-    \textbf{Image Placeholder} \\
-    \small\textit{Figure d'analyse temps-fréquence.}
-    \vspace{3cm}
-  }}
-  \caption{Comparaison qualitative dans le plan temps-fréquence. En haut : séquence incidente source et séquence cible du DCI. En bas : séquences prédites par le modèle en mode guidé (gauche) et auto-régressif (droite). L'axe des couleurs représente l'amplitude des PDW.}
-  \label{fig:gen_short}
+\begin{center}
+\includegraphics[scale=0.45]{VisuGlobalDense.png}
+\end{center}
+\caption{Illustration pour un scénario fréquentiellement dense dans le plan temps-fréquence. Séquence source (en haut à gauche), séquence cible (en haut à droite), séquence prédite de manière auto-régressive (en bas à gauche) et séquence prédite en apprentissage guidé (en bas à droite). Le modèle reproduit avec succès les artéfacts de (a) fusion, (b) disparition et (d) troncature avant.}
+\label{fig:gen_short_dense}
 \end{figure}
 
-Le premier régime évalué est le mode guidé (\textit{teacher-forced}), correspondant aux conditions d'entraînement où l'entrée du décodeur est forcée avec la séquence cible réelle. Le second régime est le mode auto-régressif, correspondant à l'utilisation opérationnelle, où chaque prédiction du modèle est réinjectée comme entrée pour l'étape suivante.
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[scale=0.45]{VisuGlobalLight.png}
+\end{center}
+\caption{Illustration pour un scénario fréquentiellement clairsemé dans le plan temps-fréquence. Séquence source (en haut à gauche), séquence cible (en haut à droite), séquence prédite de manière auto-régressive (en bas à gauche) et séquence prédite en apprentissage guidé (en bas à droite). Le modèle reproduit fidèlement les artéfacts de (a) fusion, (c) scission et (e) troncature arrière.}
+\label{fig:gen_short_light}
+\end{figure}
 
-L'observation des graphiques prouve que le modèle a assimilé la logique complexe du système DCI. On identifie formellement la reproduction de deux artefacts caractéristiques :
-\begin{itemize}
-    \item \textbf{La fusion :} Deux PDW incidents proches temporellement et fréquentiellement sont correctement agglomérés en un unique PDW de sortie.
-    \item \textbf{La fragmentation :} Une impulsion incidente continue subit une scission artificielle en deux PDW distincts, reproduisant le comportement du capteur face à une saturation transitoire.
-\end{itemize}
+Dans les deux configurations de densité, le modèle reproduit fidèlement la dynamique d'interception du DCIS. Au-delà d'une simple "copie" des PDW dans l'espace des descripteurs, le réseau génère de lui-même les artéfacts complexes inhérents à la logique du capteur (fusions, disparition, scissions, troncatures), identifiés initialement en section \ref{seq:CapFonc} et qui constituent le cœur de la difficulté de la simulation.\\
 
-De plus, l'absence de divergence visuelle entre le mode guidé et le mode auto-régressif valide la stabilité de la génération. Les erreurs locales d'approximation continue dans $\mathbb{R}^d$ ne provoquent pas de dérive causale catastrophique sur l'horizon de 30 impulsions. Cette preuve de concept valide la capacité du Transformer à agir comme modèle de substitution pour le DCI sur des fenêtres limitées.
+Enfin, l'analyse comparative entre l'inférence guidée et l'inférence auto-régressive ne révèle aucune dérive de la prédiction. Malgré l'accumulation potentielle des erreurs lors de la réinjection des PDW prédits, la séquence générée reste stable. Cette preuve de concept valide l'aptitude de l'architecture Transformer à modéliser le traitement du DCIS sur des séquences courtes.
+
 
 
 \section{Séquence vers séquence par fenêtrage}
@@ -318,7 +383,7 @@ L'agrégation de ces partitions $\mathbf{X}_{win}$ et $\mathbf{Y}_{win}$ pour ch
 \subsubsection{Encodage du temps}
 Le principe de l'approche est de traiter chaque fenêtre de manière identique, uniquement à partir des informations présentes à l'échelle locale (nouveaux PDW incidents et contexte). Or, l'encodage du temps des PDW interceptés introduit en \ref{eq:timeencodingout} exploite l'indice global du PDW dans la séquence entière, ce qui va à l'encontre de la philosophie de l'approche. Ainsi, l'encodage du temps des PDW interceptés nécessite une révision.\\
 
-Dans une fenêtre $i$, nous proposons de déplacer l'origine des temps au premier PDW incident de la fenêtre, $ToA(x_{N_c + 1})$. Pour contrer la croissance des temps d'arrivé, ce qui était l'objectif de l'encodage proposé pour les séquences entières \ref{seq:timeencoding}, nous réintégrons une soustraction de l'indice local du PDW intercepté, translaté par l'indice du premier PDW intercepté de la fenêtre (indice $M_c$).\\
+Dans une fenêtre $i$, nous proposons de déplacer l'origine des temps au premier PDW incident de la fenêtre, $ToA(x_{N_c + 1})$. Pour contrer la croissance des temps d'arrivée, ce qui était l'objectif de l'encodage proposé pour les séquences entières \ref{seq:timeencoding}, nous réintégrons une soustraction de l'indice local du PDW intercepté, translaté par l'indice du premier PDW intercepté de la fenêtre (indice $M_c$).\\
 
 Finalement, la variable temporelle encodée, notée $\Delta\text{ToA}$, pour un PDW cible $y_k$ où $k \in \llbracket 1; M_c + M_f\rrbracket$, s'écrit :
 \begin{equation}
@@ -380,39 +445,53 @@ Le jeton de fin \texttt{E} étant considéré comme le dernier PDW de chaque sé
 \subsubsection{Inférence de la prédiction d'une séquence entière}
 Dans l'approche de traitement en bloc des séquences entières présenté en \ref{seq:seq2seqblock}, la fin de l'inférence d'une séquence était détecté par la prédiction du jeton \texttt{E}. Dans l'approche fenêtré, le modèle alignera avec le dernier PDW intercepté de la fenêtre $\mathbf{y_K}$ une prédiction $\mathbf{\hat{y}_{K+1}}$ qui ne subit aucune contrainte pendant l'apprentissage, comme nous l'avons mentionné plus tôt \ref{seq:masquewin}.\\
 
-Néanmoins, nous parvenons à déterminer à quelle moment le modèle a terminé l'inférence des impulsions interceptées de la fenêtre. Si le modèle parvient à reproduire fidèlement l'interception des impulsions, alors la prédiction $\mathbf{\hat{y}_{K+1}}$ devrait correspondre à une impulsion publié en dehors de la fenêtre traitée.\\
+Néanmoins, nous parvenons à déterminer à quel moment le modèle a terminé l'inférence des impulsions interceptées de la fenêtre : si le modèle parvient à reproduire fidèlement l'interception des impulsions, alors la prédiction $\mathbf{\hat{y}_{K+1}}$ devrait correspondre à une impulsion publiée en dehors de la fenêtre traitée.\\
 
-Ainsi, nous intégrons ce principe dans la procédure de prédiction, que nous décrivons dans l'algorithme \ref{algo:genwin}. Cet algorithme présente de bout-en-bout le processus de prédiction d'une séquence entière, avec l'approche par fenêtrage.
+Ainsi, nous intégrons ce principe dans la procédure de prédiction, que nous décrivons dans l'algorithme \ref{algo:genwin}. Cet algorithme présente de bout-en-bout le processus de prédiction d'une séquence entière, avec l'approche par fenêtrage. Nous y faisons référence à $f_{\theta}$ qui représente notre modèle, ainsi qu'à $\epsilon$ qui est un seuil séparant les impulsions interceptés dans la fenêtre de celles interceptés en dehors.\\
 
-[est-ce qu'on devrait découper en un algo prédiction sur la fenêtre, et l'autre algo reconstruisant la séquence entière ?]
+Comme pour en \ref{seq:infglob}, $\epsilon$ est choisi pour maximiser le Coefficient de Corrélation de Matthews (MCC), dont les vrai/faux positifs et de vrai/faux négatifs obéissent à la règle suivante. Une séquence est prédite sur une fenêtre par forçage de l'enseignement (teacher forcing) $\hat{\mathbf{y}} = f_{\theta}(\mathbf{x}, \mathbf{y})$, puis les éléments aux positions $k \in  \llbracket M_c + 1; M_c + K + 1 \rrbracket$ où $K= \|\mathbf{m}^{(sig)}\|_1$ sont observés ($\text{ToE}_{loc}$ comme calculé dans l'algorithme \ref{algo:genwin}) tels que :
 \begin{itemize}
-\item Input : séquence entière $\mathbf{x}$
-\item Output : séquence entière $\mathbf{\hat{y}}$
-\item Création des séquences $\mathbf{X}_{win}$ avec l'algorithme \ref{algo:windowing}
-\item $n_f \leftarrow \lfloor N / N_f \rfloor + 1$
-\item $\mathbf{y}^{(i)} \leftarrow \underbrace{(\texttt{PAD}, \dots, \texttt{PAD}}_{M_c \text{ fois}}, \texttt{S}, \underbrace{\texttt{PAD}, \dots, \texttt{PAD})}_{M_f \text{ fois}}$
-\item $K_i \leftarrow 0$ le nombre d'impulsion intercepté du contexte passé.
-\item $\mathbf{\hat{y}} \leftarrow \emptyset$
-\item pour chaque fenêtre $1 \leq i \leq n_f$:
-	\begin{itemize}
-	\item $K_{i-1} = min(K_i, M_c)$ taille du contexte passé
-	\item $\mathbf{y}^{(i)} \leftarrow \underbrace{(\texttt{PAD}, \dots, \texttt{PAD}}_{M_c - K_{i-1} \text{ fois}}, \underbrace{\hat{y}_{M_c + K_i - K_{i-1}}, \cdots, \hat{y}_{M_c + K_i - 1}, \hat{y}_{M_c + K_i}}_{K_{i-1} \text{ termes}}, \texttt{S}, \underbrace{\texttt{PAD}, \dots, \texttt{PAD})}_{M_f \text{ fois}}$
-	\item $continue \leftarrow Vrai$
-	\item encoder les ToA des impulsions interceptés de  $\mathbf{y}^{(i)}$ avec l'équation \ref{eq:timeencodingoutwin}
-	\item $j \leftarrow 0$ le nombre d'impulsion intercepté sur la fenêtre
-	\item tant que continue:
-		\begin{itemize}
-		\item prédite $\mathbf{\hat{y}}^{(i)}$ avec le modèle en donnant $\mathbf{x}^{(i)}$ et $\mathbf{y}^{(i)}$
-		\item $ToE = \Delta\text{ToA}(\hat{y}^{(i)}_{M_c + j}) + j + \text{LI}(\hat{y}^{(i)}_{M_c + j})$ décodage du ToA et calcul du ToE local
-		\item si $ToE > N_f$ ou $j = M_f+1$ : $continue \leftarrow Faux$
-		\item sinon $y^{(i)}_{M_c + 1 + j} \leftarrow \hat{y}^{(i)}_{M_c + j} $ et $j \leftarrow j+1$
-		\end{itemize}
-	\item $K_i \leftarrow j$ et $j \leftarrow 0$
-	\item décoder les ToA des impulsions de $\mathbf{y^{(i)}}$ en inversant l'équation \ref{eq:timeencodingoutwin}
-	\item ajout de $(\hat{y}^{(i)}_{M_c + 1}, \cdots, \hat{y}^{(i)}_{M_c + K_i})$ à la fin de $\mathbf{\hat{y}}$
-	\end{itemize}
-\item renvoyer la prédiction $\mathbf{\hat{y}}$
+\item Si $M_c + 1 \leq k \leq M_c + K$ et $\text{ToE}_{loc} < N_f + \epsilon$, c'est un vrai positif \texttt{TP}
+\item Si $M_c + 1 \leq k \leq M_c + K$ et $\text{ToE}_{loc} \geq N_f + \epsilon$, c'est un faux négatif \texttt{FN}
+\item Si $k = M_c + K + 1$ et $\text{ToE}_{loc} \geq N_f + \epsilon$, c'est un vrai négatif \texttt{TN}
+\item Si $k = M_c + K + 1$ et $\text{ToE}_{loc} < N_f + \epsilon$, c'est un faux positif \texttt{FP}
 \end{itemize}
+Calculé sur un grand nombre de séquences, le MCC toujours d'après l'équation établie précédemment \ref{eq:MCCinf}.
 
-
-
+\begin{algorithm}[htbp]
+\DontPrintSemicolon
+\SetAlgoLined
+\KwIn{Séquence incidente entière $\mathbf{x}$}
+\KwOut{Séquence prédite entière $\hat{\mathbf{y}}$}
+$\mathbf{X}_{win} = \{\mathbf{x}^{(1)}, \dots, \mathbf{x}^{(n_f)}\}$ est généré via l'algo \ref{algo:windowing}\;
+$\hat{\mathbf{y}} \leftarrow \emptyset$\;
+$K \leftarrow 0$
+\tcp{Boucle sur les fenêtres}
+\For{$i \leftarrow 1$ \KwTo $n_f$}{
+	\tcp{Conservation du contexte passé}
+    $K_{prev} \leftarrow \min(K, M_c)$ 
+    $\mathbf{y}^{(i)} \leftarrow \underbrace{(\texttt{PAD}, \cdots, \texttt{PAD}}_{M_c - K_{prev}}, \underbrace{\hat{y}_{K_i - K_{prev} + 1}, \dots, \hat{y}_{K_i}}_{K_{prev} \text{ termes du contexte}}, \texttt{S}, \underbrace{\texttt{PAD}, \cdots, \texttt{PAD})}_{M_f \text{ fois}}$\;
+    Encoder les ToA de $\mathbf{y}^{(i)}$ via l'équation \ref{eq:timeencodingoutwin}\;
+    $j \leftarrow 0$
+    $continue \leftarrow \text{Vrai}$\;
+    \tcp{Boucle pour la prédiction des interceptions de la fenêtre}
+    \While{$continue$}{
+        $\hat{\mathbf{y}}^{(i)} \leftarrow f_\theta(\mathbf{x}^{(i)}, \mathbf{y}^{(i)})$\;
+        \tcp{Vérification de la fin de la fenêtre}
+        $\text{ToE}_{loc} \leftarrow \Delta\text{ToA}(\hat{y}^{(i)}_{M_c + j + 1}) + j + \text{LI}(\hat{y}^{(i)}_{M_c + j + 1}) + T_{maintien}$\;
+        \eIf{$\text{ToE}_{loc} > N_f + \epsilon$ \textbf{ou} $j = M_f + 1$}{
+            $continue \leftarrow \text{Faux}$\;
+        }{
+            $y^{(i)}_{M_c + 2 + j} \leftarrow \hat{y}^{(i)}_{M_c + j + 1}$\;
+            $j \leftarrow j + 1$\;
+        }
+    }
+    $K \leftarrow j$\;
+    Décoder les ToA de $\hat{\mathbf{y}}^{(i)}$ en inversant l'équation \ref{eq:timeencodingoutwin}\;
+    \tcp{Ajout des prédictions de la fenêtre à la séquence globale}
+    $\hat{\mathbf{y}} \leftarrow \hat{\mathbf{y}} \oplus (\hat{y}^{(i)}_{M_c + 1}, \dots, \hat{y}^{(i)}_{M_c + K})$
+}
+\Return{$\hat{\mathbf{y}}$}
+\caption{Inférence auto-régressive d'un scénario complet par fenêtrage}
+\label{algo:genwin}
+\end{algorithm}

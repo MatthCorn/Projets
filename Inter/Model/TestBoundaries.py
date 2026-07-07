@@ -59,12 +59,12 @@ if __name__ == '__main__':
     # --- CONFIGURATION ET SIMULATION ---
     df = 0.1
     N_total = 500
-    n = 10
+    n = 6
     range_plot = N_total + n
     dim = 10
 
     # S = Simulator(n, N_total, dim, sensitivity=df, seed=None)
-    S = FreqBiasedSimulator(1.2, 1, 100, n, N_total, dim, sensitivity=df, seed=None)
+    S = FreqBiasedSimulator(0.5, 1, 100, n, N_total, dim, sensitivity=df, seed=None)
     S.run()
 
     # --- INITIALISATION FIGURE (1 ligne, 2 colonnes, AXES LIÉS) ---
@@ -143,51 +143,109 @@ if __name__ == '__main__':
         ax2.add_patch(rect)
     R2 = R
 
-
-    # Fonction pour créer une signature unique par rectangle
-    # L'arrondi empêche les erreurs liées à la précision des nombres flottants
-    def get_signature(i, r):
-        T1 = i - r[-1]
-        F = r[0]
-        duration = r[-2]
-        return (round(T1, 5), round(F, 5), round(duration, 5))
+    # --- 3. PLOT DIFFERENCE SYMETRIQUE DES UNIONS (DROITE) ---
+    from collections import defaultdict
+    def get_sig(i, r):
+        # Arrondi pour éviter les erreurs de flottants
+        return (round(i - r[-1], 5), round(r[0], 5), round(r[-2], 5))
 
 
-    # Création des dictionnaires de signatures
-    dict_R1 = {get_signature(i, r): r for i, r in enumerate(R1)}
-    dict_R2 = {get_signature(i, r): r for i, r in enumerate(R2)}
+    dict_R1 = {get_sig(i, r): r for i, r in enumerate(R1)}
+    dict_R2 = {get_sig(i, r): r for i, r in enumerate(R2)}
 
-    # Extraction des clés pour la comparaison
     set_R1 = set(dict_R1.keys())
     set_R2 = set(dict_R2.keys())
 
-    # 1. Impulsions présentes UNIQUEMENT dans la sortie standard -> ROUGE
-    only_in_R1 = set_R1 - set_R2
-    for key in only_in_R1:
-        T1, F, duration = key
+    # 1. Optimisation : Différence symétrique des ensembles discrets
+    only_R1_sigs = set_R1 - set_R2
+    only_R2_sigs = set_R2 - set_R1
 
-        # Mise à jour min/max pour l'échelle Y
-        y_min_data = min(y_min_data, F)
-        y_max_data = max(y_max_data, F)
 
-        rect = Rectangle((T1, F - df), duration, 2 * df,
-                         facecolor=(1, 0, 0, 0.8),  # Rouge
-                         edgecolor='k', linewidth=0.3)
-        ax3.add_patch(rect)
+    # 2. Conversion en intervalles [début, fin] groupés par Fréquence
+    def build_intervals(sig_set):
+        intervals_by_F = defaultdict(list)
+        for sig in sig_set:
+            T1, F, duration = sig
+            intervals_by_F[F].append([T1, T1 + duration])
+        return intervals_by_F
 
-    # 2. Impulsions présentes UNIQUEMENT dans la sortie avec reset -> VERT
-    only_in_R2 = set_R2 - set_R1
-    for key in only_in_R2:
-        T1, F, duration = key
 
-        # Mise à jour min/max pour l'échelle Y
-        y_min_data = min(y_min_data, F)
-        y_max_data = max(y_max_data, F)
+    intervals_R1 = build_intervals(only_R1_sigs)
+    intervals_R2 = build_intervals(only_R2_sigs)
 
-        rect = Rectangle((T1, F - df), duration, 2 * df,
-                         facecolor=(0, 1, 0, 0.8),  # Vert
-                         edgecolor='k', linewidth=0.3)
-        ax3.add_patch(rect)
+    # ou dans le cas où il y a plein de petites erreurs de positionnement (traitement bien plus long)
+    # intervals_R1 = build_intervals(set_R1)
+    # intervals_R2 = build_intervals(set_R2)
+
+    # Toutes les fréquences concernées par des différences
+    all_F = set(intervals_R1.keys()).union(set(intervals_R2.keys()))
+
+
+    # 3. Fonction pour fusionner les intervalles (Calcul de l'Union)
+    def merge_intervals(intervals):
+        if not intervals: return []
+        # Tri par temps de départ
+        intervals.sort(key=lambda x: x[0])
+        merged = [list(intervals[0])]
+        for current in intervals[1:]:
+            prev = merged[-1]
+            # Si chevauchement ou contiguïté parfaite
+            if current[0] <= prev[1]:
+                prev[1] = max(prev[1], current[1])
+            else:
+                merged.append(list(current))
+        return merged
+
+
+    # 4. Fonction pour la soustraction géométrique (A \ B)
+    def subtract_intervals(A, B):
+        result = []
+        for a in A:
+            current_pieces = [a]
+            for b in B:
+                next_pieces = []
+                for p in current_pieces:
+                    # Aucun chevauchement
+                    if b[1] <= p[0] or b[0] >= p[1]:
+                        next_pieces.append(p)
+                    else:
+                        # Si b coupe p, on conserve les morceaux restants de p
+                        if p[0] < b[0]:
+                            next_pieces.append([p[0], b[0]])
+                        if p[1] > b[1]:
+                            next_pieces.append([b[1], p[1]])
+                current_pieces = next_pieces
+            result.extend(current_pieces)
+        return result
+
+
+    # 5. Calcul de la différence symétrique et tracé
+    for F in all_F:
+        U1 = merge_intervals(intervals_R1.get(F, []))
+        U2 = merge_intervals(intervals_R2.get(F, []))
+
+        # (U1 \ U2) U (U2 \ U1)
+        diff_1 = subtract_intervals(U1, U2)
+        diff_2 = subtract_intervals(U2, U1)
+
+        # Concaténation des deux listes (elles sont disjointes par nature)
+        sym_diff = diff_1 + diff_2
+
+        for segment in sym_diff:
+            T_start = segment[0]
+            duration = segment[1] - segment[0]
+
+            # Mise à jour min/max pour l'échelle Y
+            y_min_data = min(y_min_data, F)
+            y_max_data = max(y_max_data, F)
+
+            # Affichage en gris
+            rect = Rectangle((T_start, F - df), duration, 2 * df,
+                             facecolor=(0.5, 0.5, 0.5, 0.8),  # Gris
+                             edgecolor='k', linewidth=0.3)
+            ax3.add_patch(rect)
+
+    ax3.set_title("Différence symétrique géométrique")
 
     # --- REGLAGE DES LIMITES ---
     margin_y = 5 * df

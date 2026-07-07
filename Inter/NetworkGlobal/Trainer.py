@@ -256,7 +256,7 @@ if __name__ == '__main__':
         ValidationError = []
         PlottingError = []
 
-        window_index ,j ,p, k = 0, 0, 0, 0
+        window_index, j, p, k = 0, 0, 0, 0
 
         best_state_dict = N.state_dict().copy()
 

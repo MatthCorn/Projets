@@ -20,7 +20,8 @@ L'intégration du capteur s'inscrit dans une architecture de traitement séquent
 Ce flux continu de PDW alimente ensuite les algorithmes de traitement en aval. Une étape de désentrelacement regroupe d'abord les impulsions par émetteur sur un horizon temporel court, isolant les trains d'impulsions cohérents. Ces regroupements élémentaires sont ensuite consolidés par un processus de pistage (tracking) qui suit l'évolution des émetteurs sur le long terme pour en caractériser la cinématique et le mode de fonctionnement. Finalement, ces pistes enrichies sont confrontées à des bases de données de signatures pour identifier le système d'arme associé, évaluer le niveau de menace immédiat et donc pouvoir prendre les actions de contre-mesures adéquates le cas échéant.\\
 
 
-\subsection{Architecture et fonctionnement du capteur} 
+\subsection{Architecture et fonctionnement du capteur}
+\label{seq:CapFonc}
 Le fonctionnement interne du capteur ESM ne se limite pas à une simple conversion analogique-numérique ; il constitue une chaîne de traitements physiques et logiques qui conditionne structurellement la qualité des données produites. Les traitements décrits ci-après, et illustrés de manière simplifiée dans la figure \ref{fig:env0}, constituent le socle architectural de la plupart des récepteurs numériques modernes, bien que des variantes d'implémentation puissent exister selon les différentes lignes de produit des différents fabricants. Ces variations sont dictées par des contraintes matérielles ou industrielles comme l'encombrement, la consommation ou le coût.\\
 
 

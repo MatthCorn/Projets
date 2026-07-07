@@ -43,11 +43,13 @@ if __name__ == '__main__':
                  "type": "cos"
              },
              "mult_grad": 10000,
+             "grad_norm_clip": 1.,
              "weight_decay": 1e-3,
              "NDataT": 100000,
              "NDataV": 100,
              "batch_size": 1000,
              "n_iter": 100,
+             "cut_early": 20,
              "training_strategy": [
                  {"mean": [-5, 5], "std": [0.2, 1]},
              ],
@@ -321,6 +323,7 @@ if __name__ == '__main__':
                                 abs(WindowMask.sum() - batch_size) * d_out).sqrt()
 
                     (param["mult_grad"] * err).backward()
+                    torch.nn.utils.clip_grad_norm_(N.parameters(), param['grad_norm_clip'])
                     optimizer.step()
                     if lr_scheduler is not None:
                         lr_scheduler.step()
@@ -400,6 +403,10 @@ if __name__ == '__main__':
                             f.write(f"{j + n_iter_window * window_index} {ValidationError[-1] if ValidationError else float('inf')}\n")
                     except Exception as e:
                         print(f"[WARN] Could not write progress: {e}", flush=True)
+
+                if param['cut_early'] > -1:
+                    if (window_index * n_iter_window + j) > param['cut_early']:
+                        sys.exit()
 
             if error == min(TrainingError):
                 best_state_dict = N.state_dict().copy()

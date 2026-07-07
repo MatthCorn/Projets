@@ -27,41 +27,55 @@
 \newlabel{seq:Transfonc}{{6.2.3.1}{83}{Choix et fonctionnement du Transformer}{subsubsection.6.2.3.1}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {6.1}{\ignorespaces Architecture Transformer d'encodage-décodage adaptée à la transduction de séquences de PDW. La longueur $M$ est ajustée à la longueur maximale des séquences de sortie, soit $1.2N$. Chaque prédiction $\hat  {y}_k$ n'est calculée qu'à partir des PDW déjà interceptés dans sa propre temporalité $(y_1, \dots  , y_{k-1})$ et de la séquence source complète $(x_1, \dots  , x_N)$, assurant la causalité de l'opération de prédiction.}}{84}{figure.caption.32}\protected@file@percent }
 \newlabel{fig:GTAFTrans}{{6.1}{84}{Architecture Transformer d'encodage-décodage adaptée à la transduction de séquences de PDW. La longueur $M$ est ajustée à la longueur maximale des séquences de sortie, soit $1.2N$. Chaque prédiction $\hat {y}_k$ n'est calculée qu'à partir des PDW déjà interceptés dans sa propre temporalité $(y_1, \dots , y_{k-1})$ et de la séquence source complète $(x_1, \dots , x_N)$, assurant la causalité de l'opération de prédiction}{figure.caption.32}{}}
+\newlabel{eq:predforce}{{6.5}{84}{Choix et fonctionnement du Transformer}{equation.6.5}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.3.2}Mise en œuvre et gestion des masques de séquences}{84}{subsubsection.6.2.3.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2.4}Métrique d'entraînement : la fonction de coût normalisée}{85}{subsection.6.2.4}\protected@file@percent }
-\newlabel{eq:Eraw}{{6.5}{86}{Métrique d'entraînement : la fonction de coût normalisée}{equation.6.5}{}}
-\newlabel{eq:Eref}{{6.6}{86}{Métrique d'entraînement : la fonction de coût normalisée}{equation.6.6}{}}
-\newlabel{eq:Ewei}{{6.7}{86}{Métrique d'entraînement : la fonction de coût normalisée}{equation.6.7}{}}
-\newlabel{eq:Lrec}{{6.8}{87}{Métrique d'entraînement : la fonction de coût normalisée}{equation.6.8}{}}
-\newlabel{eq:termine}{{6.9}{87}{Métrique d'entraînement : la fonction de coût normalisée}{equation.6.9}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2.5}Résultats expérimentaux}{87}{subsection.6.2.5}\protected@file@percent }
-\newlabel{seq:blocresu}{{6.2.5}{87}{Résultats expérimentaux}{subsection.6.2.5}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.5.1}Convergence de l'apprentissage}{87}{subsubsection.6.2.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.5.2}Analyse temporelle et qualitative}{87}{subsubsection.6.2.5.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.2}{\ignorespaces Évolution de l'erreur pondérée en validation et en entraînement pour des séquences courtes ($N=20$). La barre horizontale noire symbolise l'erreur du prédicteur naïf (valeur 1.0).}}{88}{figure.caption.33}\protected@file@percent }
-\newlabel{fig:loss_short}{{6.2}{88}{Évolution de l'erreur pondérée en validation et en entraînement pour des séquences courtes ($N=20$). La barre horizontale noire symbolise l'erreur du prédicteur naïf (valeur 1.0)}{figure.caption.33}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6.3}{\ignorespaces Comparaison qualitative dans le plan temps-fréquence. En haut : séquence incidente source et séquence cible du DCI. En bas : séquences prédites par le modèle en mode guidé (gauche) et auto-régressif (droite). L'axe des couleurs représente l'amplitude des PDW.}}{88}{figure.caption.34}\protected@file@percent }
-\newlabel{fig:gen_short}{{6.3}{88}{Comparaison qualitative dans le plan temps-fréquence. En haut : séquence incidente source et séquence cible du DCI. En bas : séquences prédites par le modèle en mode guidé (gauche) et auto-régressif (droite). L'axe des couleurs représente l'amplitude des PDW}{figure.caption.34}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {6.3}Séquence vers séquence par fenêtrage}{89}{section.6.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.3.1}Création et préparation des données}{89}{subsection.6.3.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.4}{\ignorespaces Évaluation de la résilience du DCIS face à des pertes de mémoire. À gauche, la séquence de PDW interceptés sans perturbation est visualisée dans un plan temps-fréquence. Au milieu, la séquence de PDW est interceptés alors que les mémoires sont purgés tous les 100 pas de temps. À droite, on représente la différence entre la séquence d'origine et la séquence perturbée (rouge pour manquante, vert pour rajoutée). Le vidage des mémoires provoque des perturbations locales de la séquence d'impulsions interceptées, qui s'estompent rapidement, suggérant que la mémoire retrouve son régime permanent.}}{90}{figure.caption.35}\protected@file@percent }
-\newlabel{fig:ResetEnv}{{6.4}{90}{Évaluation de la résilience du DCIS face à des pertes de mémoire. À gauche, la séquence de PDW interceptés sans perturbation est visualisée dans un plan temps-fréquence. Au milieu, la séquence de PDW est interceptés alors que les mémoires sont purgés tous les 100 pas de temps. À droite, on représente la différence entre la séquence d'origine et la séquence perturbée (rouge pour manquante, vert pour rajoutée). Le vidage des mémoires provoque des perturbations locales de la séquence d'impulsions interceptées, qui s'estompent rapidement, suggérant que la mémoire retrouve son régime permanent}{figure.caption.35}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.1.1}Découpage structurel et Algorithme}{90}{subsubsection.6.3.1.1}\protected@file@percent }
-\@writefile{loa}{\contentsline {algocf}{\numberline {4}{\ignorespaces Génération des sous-séquences fenêtrées}}{91}{algocf.4}\protected@file@percent }
-\newlabel{algo:windowing}{{4}{91}{Découpage structurel et Algorithme}{algocf.4}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.1.2}Encodage du temps}{91}{subsubsection.6.3.1.2}\protected@file@percent }
-\newlabel{eq:timeencodingoutwin}{{6.11}{92}{Encodage du temps}{equation.6.11}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.3.2}Architecture et Implémentation}{92}{subsection.6.3.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.2.1}Transformer adapté}{92}{subsubsection.6.3.2.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.5}{\ignorespaces Architecture Transformer d'encodage-décodage adaptée au fenêtrage. Le jeton de séparation \texttt  {S} est inséré entre le contexte passé et la zone courante, tant pour la séquence source $\mathbf  {x}$ que pour la cible $\mathbf  {y}$.}}{92}{figure.caption.37}\protected@file@percent }
-\newlabel{fig:WinTrans}{{6.5}{92}{Architecture Transformer d'encodage-décodage adaptée au fenêtrage. Le jeton de séparation \texttt {S} est inséré entre le contexte passé et la zone courante, tant pour la séquence source $\mathbf {x}$ que pour la cible $\mathbf {y}$}{figure.caption.37}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.2.2}Mise en œuvre des masques}{93}{subsubsection.6.3.2.2}\protected@file@percent }
-\newlabel{seq:masquewin}{{6.3.2.2}{93}{Mise en œuvre des masques}{subsubsection.6.3.2.2}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.2.3}Métrique}{93}{subsubsection.6.3.2.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.2.4}Prédiction de la fenêtre}{94}{subsubsection.6.3.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.3.3}Métrique d'entraînement : la fonction de coût normalisée}{85}{subsubsection.6.2.3.3}\protected@file@percent }
+\newlabel{eq:Eraw}{{6.6}{86}{Métrique d'entraînement : la fonction de coût normalisée}{equation.6.6}{}}
+\newlabel{eq:Eref}{{6.7}{86}{Métrique d'entraînement : la fonction de coût normalisée}{equation.6.7}{}}
+\newlabel{eq:Ewei}{{6.8}{86}{Métrique d'entraînement : la fonction de coût normalisée}{equation.6.8}{}}
+\newlabel{eq:Lrec}{{6.9}{87}{Métrique d'entraînement : la fonction de coût normalisée}{equation.6.9}{}}
+\newlabel{eq:termine}{{6.10}{87}{Métrique d'entraînement : la fonction de coût normalisée}{equation.6.10}{}}
+\newlabel{eq:Ltot}{{6.11}{87}{Métrique d'entraînement : la fonction de coût normalisée}{equation.6.11}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.3.4}Inférence de la prédiction d'une séquence}{87}{subsubsection.6.2.3.4}\protected@file@percent }
+\newlabel{seq:infglob}{{6.2.3.4}{87}{Inférence de la prédiction d'une séquence}{subsubsection.6.2.3.4}{}}
+\newlabel{eq:MCCinf}{{6.12}{88}{Inférence de la prédiction d'une séquence}{equation.6.12}{}}
+\@writefile{loa}{\contentsline {algocf}{\numberline {4}{\ignorespaces Inférence auto-régressive d'une séquence globale}}{88}{algocf.4}\protected@file@percent }
+\newlabel{algo:genglobal}{{4}{88}{Inférence de la prédiction d'une séquence}{algocf.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2.4}Résultats expérimentaux}{88}{subsection.6.2.4}\protected@file@percent }
+\newlabel{seq:blocresu}{{6.2.4}{88}{Résultats expérimentaux}{subsection.6.2.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.4.1}Configuration}{88}{subsubsection.6.2.4.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {6.1}{\ignorespaces Synthèse des conditions de l'expérimentation.}}{89}{table.caption.34}\protected@file@percent }
+\newlabel{tab:params_bloc}{{6.1}{89}{Synthèse des conditions de l'expérimentation}{table.caption.34}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.4.2}Convergence de l'apprentissage}{90}{subsubsection.6.2.4.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6.2}{\ignorespaces Évolution de l'erreur pondérée en validation et en entraînement pour des séquences courtes ($N=28$). La barre horizontale noire symbolise l'erreur d'un prédicteur naïf (valeur 1.0). L'erreur de validation converge au dessous de $0.1$.}}{90}{figure.caption.35}\protected@file@percent }
+\newlabel{fig:loss_short}{{6.2}{90}{Évolution de l'erreur pondérée en validation et en entraînement pour des séquences courtes ($N=28$). La barre horizontale noire symbolise l'erreur d'un prédicteur naïf (valeur 1.0). L'erreur de validation converge au dessous de $0.1$}{figure.caption.35}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.4.3}Analyse qualitative}{90}{subsubsection.6.2.4.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6.3}{\ignorespaces Illustration pour un scénario fréquentiellement dense dans le plan temps-fréquence. Séquence source (en haut à gauche), séquence cible (en haut à droite), séquence prédite de manière auto-régressive (en bas à gauche) et séquence prédite en apprentissage guidé (en bas à droite). Le modèle reproduit avec succès les artéfacts de (a) fusion, (b) disparition et (d) troncature avant.}}{91}{figure.caption.36}\protected@file@percent }
+\newlabel{fig:gen_short_dense}{{6.3}{91}{Illustration pour un scénario fréquentiellement dense dans le plan temps-fréquence. Séquence source (en haut à gauche), séquence cible (en haut à droite), séquence prédite de manière auto-régressive (en bas à gauche) et séquence prédite en apprentissage guidé (en bas à droite). Le modèle reproduit avec succès les artéfacts de (a) fusion, (b) disparition et (d) troncature avant}{figure.caption.36}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6.3}Séquence vers séquence par fenêtrage}{91}{section.6.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6.4}{\ignorespaces Illustration pour un scénario fréquentiellement clairsemé dans le plan temps-fréquence. Séquence source (en haut à gauche), séquence cible (en haut à droite), séquence prédite de manière auto-régressive (en bas à gauche) et séquence prédite en apprentissage guidé (en bas à droite). Le modèle reproduit fidèlement les artéfacts de (a) fusion, (c) scission et (e) troncature arrière.}}{92}{figure.caption.37}\protected@file@percent }
+\newlabel{fig:gen_short_light}{{6.4}{92}{Illustration pour un scénario fréquentiellement clairsemé dans le plan temps-fréquence. Séquence source (en haut à gauche), séquence cible (en haut à droite), séquence prédite de manière auto-régressive (en bas à gauche) et séquence prédite en apprentissage guidé (en bas à droite). Le modèle reproduit fidèlement les artéfacts de (a) fusion, (c) scission et (e) troncature arrière}{figure.caption.37}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3.1}Création et préparation des données}{92}{subsection.6.3.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6.5}{\ignorespaces Évaluation de la résilience du DCIS face à des pertes de mémoire. À gauche, la séquence de PDW interceptés sans perturbation est visualisée dans un plan temps-fréquence. Au milieu, la séquence de PDW est interceptés alors que les mémoires sont purgés tous les 100 pas de temps. À droite, on représente la différence entre la séquence d'origine et la séquence perturbée (rouge pour manquante, vert pour rajoutée). Le vidage des mémoires provoque des perturbations locales de la séquence d'impulsions interceptées, qui s'estompent rapidement, suggérant que la mémoire retrouve son régime permanent.}}{93}{figure.caption.38}\protected@file@percent }
+\newlabel{fig:ResetEnv}{{6.5}{93}{Évaluation de la résilience du DCIS face à des pertes de mémoire. À gauche, la séquence de PDW interceptés sans perturbation est visualisée dans un plan temps-fréquence. Au milieu, la séquence de PDW est interceptés alors que les mémoires sont purgés tous les 100 pas de temps. À droite, on représente la différence entre la séquence d'origine et la séquence perturbée (rouge pour manquante, vert pour rajoutée). Le vidage des mémoires provoque des perturbations locales de la séquence d'impulsions interceptées, qui s'estompent rapidement, suggérant que la mémoire retrouve son régime permanent}{figure.caption.38}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.1.1}Découpage structurel et Algorithme}{93}{subsubsection.6.3.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.1.2}Encodage du temps}{93}{subsubsection.6.3.1.2}\protected@file@percent }
+\@writefile{loa}{\contentsline {algocf}{\numberline {5}{\ignorespaces Génération des sous-séquences fenêtrées}}{94}{algocf.5}\protected@file@percent }
+\newlabel{algo:windowing}{{5}{94}{Découpage structurel et Algorithme}{algocf.5}{}}
+\newlabel{eq:timeencodingoutwin}{{6.13}{95}{Encodage du temps}{equation.6.13}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3.2}Architecture et Implémentation}{95}{subsection.6.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.2.1}Transformer adapté}{95}{subsubsection.6.3.2.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6.6}{\ignorespaces Architecture Transformer d'encodage-décodage adaptée au fenêtrage. Le jeton de séparation \texttt  {S} est inséré entre le contexte passé et la zone courante, tant pour la séquence source $\mathbf  {x}$ que pour la cible $\mathbf  {y}$.}}{95}{figure.caption.40}\protected@file@percent }
+\newlabel{fig:WinTrans}{{6.6}{95}{Architecture Transformer d'encodage-décodage adaptée au fenêtrage. Le jeton de séparation \texttt {S} est inséré entre le contexte passé et la zone courante, tant pour la séquence source $\mathbf {x}$ que pour la cible $\mathbf {y}$}{figure.caption.40}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.2.2}Mise en œuvre des masques}{96}{subsubsection.6.3.2.2}\protected@file@percent }
+\newlabel{seq:masquewin}{{6.3.2.2}{96}{Mise en œuvre des masques}{subsubsection.6.3.2.2}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.2.3}Métrique d'entrainement}{96}{subsubsection.6.3.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.2.4}Inférence de la prédiction d'une séquence entière}{97}{subsubsection.6.3.2.4}\protected@file@percent }
+\@writefile{loa}{\contentsline {algocf}{\numberline {6}{\ignorespaces Inférence auto-régressive d'un scénario complet par fenêtrage}}{98}{algocf.6}\protected@file@percent }
+\newlabel{algo:genwin}{{6}{98}{Inférence de la prédiction d'une séquence entière}{algocf.6}{}}
 \@setckpt{GrosTAF}{
-\setcounter{page}{95}
-\setcounter{equation}{13}
+\setcounter{page}{99}
+\setcounter{equation}{15}
 \setcounter{enumi}{0}
 \setcounter{enumii}{0}
 \setcounter{enumiii}{0}
@@ -75,13 +89,13 @@
 \setcounter{subsubsection}{4}
 \setcounter{paragraph}{0}
 \setcounter{subparagraph}{0}
-\setcounter{figure}{5}
-\setcounter{table}{0}
+\setcounter{figure}{6}
+\setcounter{table}{1}
 \setcounter{parentequation}{0}
 \setcounter{AlgoLine}{0}
-\setcounter{algocfline}{4}
-\setcounter{algocfproc}{4}
-\setcounter{algocf}{4}
+\setcounter{algocfline}{6}
+\setcounter{algocfproc}{6}
+\setcounter{algocf}{6}
 \setcounter{caption@flags}{2}
 \setcounter{continuedfloat}{0}
 \setcounter{mdf@globalstyle@cnt}{0}
@@ -92,7 +106,7 @@
 \setcounter{section@level}{0}
 \setcounter{Item}{0}
 \setcounter{Hfootnote}{0}
-\setcounter{bookmark@seq@number}{83}
+\setcounter{bookmark@seq@number}{82}
 \setcounter{tabx@nest}{0}
 \setcounter{listtotal}{0}
 \setcounter{listcount}{0}
