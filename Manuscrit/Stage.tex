@@ -479,19 +479,21 @@ Surtout, ces résultats confirment que la reformulation du problème en flux cau
 
 \chapter{Sérialisation du problème : une approche évènementielle}
 
-Ce chapitre introduit une méthodologie alternative pour la reproduction par apprentissage profond du mécanisme de Détection et Caractérisation des Impulsions (DCI). En rupture avec l'approche de traduction globale \textit{sequence-to-sequence} (Seq2Seq) abordée au chapitre précédent, nous proposons une reformulation du problème axée sur la stricte causalité et le traitement flux-à-flux (\textit{stream processing}). 
+Ce chapitre introduit une méthodologie alternative pour la reproduction par apprentissage profond du fonctionnement du DCIS présenté dans le chapitre \ref{chap:newfocus}. En rupture avec l'approche \textit{sequence-to-sequence} (Seq2Seq) abordée au chapitre précédent \ref{chap:seq2seq}, nous proposons une reformulation du problème axée sur la causalité et le traitement flux-à-flux (\textit{stream processing}).
 
-Cette transition méthodologique s'appuie sur le concept de \textbf{sérialisation événementielle}, démarche consistant à réorganiser les flux asynchrones d'entrée (impulsions incidentes) et de sortie (PDW publiés) sur une ligne temporelle unique.
+Cette transition méthodologique s'appuie sur le concept de \textbf{sérialisation événementielle}, démarche consistant à réorganiser les flux asynchrones d'entrée (impulsions incidentes) et de sortie (PDW publiés) sur une ligne temporelle unique. Ce concept sera approfondi dans la sous-section \ref{seq:serialisation}.
 
-\section{Motivation : du traitement de séquence à la modélisation dynamique}
-L'approche Seq2Seq traite l'intégralité d'une séquence d'impulsions source avant d'initier le décodage. Cette méthode se heurte à deux limitations fondamentales. Premièrement, le traitement d'une séquence globale constitue un goulot d'étranglement calculatoire :
+\section{Motivation : du traitement de séquence au traitement de flux}
+L'approche Seq2Seq traite l'intégralité d'une séquence d'impulsions source avant d'initier le décodage. Cette méthode se heurte à deux limitations.\\ 
+
+Premièrement, le traitement d'une séquence globale constitue un goulot d'étranglement calculatoire :
 \begin{itemize}
-\item Les architectures récurrentes (RNN/LSTM) peinent à maintenir le flux du gradient sur de très longues séquences.
+\item Les architectures récurrentes (RNN/LSTM) peinent à propager le gradient sur de longues séquences, rendant l'apprentissage des dépendances à longue distance compliqué.
 \item Les architectures attentionnelles (Transformers) présentent une complexité spatiale et temporelle quadratique $\mathcal{O}(N^2)$, provoquant une saturation rapide de la mémoire vidéo (V-RAM) face à des scénarios massifs.
 \end{itemize}
-Si des mécanismes de fenêtrage permettent de contourner ces limites matérielles, ils altèrent la continuité théorique du signal. 
+Si des mécanismes de fenêtrage permettent de contourner ces limites matérielles du Transformer, ils introduisent des problématiques de continuité aux interfaces entre les fenêtres, comme illustré en \textcolor{red}{REFERENCE AUX RESULTATS A VENIR}. \\
 
-Le second obstacle est de nature physique. Modéliser le DCI via une fonction globale $f(\mathbf{X}_{total}) \to \mathbf{Y}_{total}$ masque la réalité du module matériel. Le DCI est un système dynamique réactif, mis à jour par l'occurrence d'événements temporels locaux : l'apparition d'une impulsion, sa disparition, ou la publication d'une interception provoquant une libération de mémoire. L'approche flux-à-flux vise à reproduire ce mécanisme réactif en contraignant le modèle à opérer de manière strictement causale : à la réception d'une impulsion incidente, le modèle doit inférer la cascade d'interceptions générées avant l'arrivée de l'impulsion suivante.
+Le second obstacle est de nature physique. Modéliser le DCIS via une fonction créant une représentation latente $\mathbf{h}$ d'une séquence incidente $\mathbb{x}$ pour ensuite générer une prédiction $\mathbf{y}$, comme c'est le cas dans le traitement \textit{séquence-vers-séquence}, revient à ignorer que le DCIS est un système dynamique réactif. Il est mis à jour par l'occurrence d'événements temporels locaux : l'apparition ou la disparition d'impulsion, ou la publication d'une interception provoquant une libération de mémoire. L'approche flux-à-flux vise à reproduire cette logique de mise-à-jour en contraignant le modèle à opérer de manière causale et à l'échelle du PDW, qui sera notre évènement déclencheur.
 
 \section{Formalisation du problème "Flux-à-flux"}
 \label{seq:serialisation}
