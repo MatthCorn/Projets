@@ -1,15 +1,15 @@
 {
 	"translatorID": "5e385e77-2f51-41b4-a29b-908e23d5d3e8",
+	"translatorType": 4,
 	"label": "NCBI Nucleotide",
 	"creator": "Martin Fenner",
 	"target": "^https?://(www\\.)?ncbi\\.nlm\\.nih\\.gov/nuccore/",
 	"minVersion": "3.0",
-	"maxVersion": "",
+	"maxVersion": null,
 	"priority": 100,
 	"inRepository": true,
-	"translatorType": 4,
 	"browserSupport": "gcs",
-	"lastUpdated": "2021-06-07 11:25:19"
+	"lastUpdated": "2026-07-22 16:30:00"
 }
 
 /**
@@ -92,7 +92,7 @@ function getIds(doc) {
 }
 
 function getJSON(ids) {
-	var baseURL = "//eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=nucleotide&retmode=json&id=";
+	var baseURL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=nucleotide&retmode=json&id=";
 	var jsonURL = baseURL + encodeURIComponent(ids.join(","));
 	Z.debug(jsonURL);
 	ZU.doGet(jsonURL, parseJSON);

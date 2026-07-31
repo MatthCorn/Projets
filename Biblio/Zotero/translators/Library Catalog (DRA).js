@@ -1,15 +1,15 @@
 {
 	"translatorID": "fb12ae9e-f473-cab4-0546-27ab88c64101",
+	"translatorType": 4,
 	"label": "Library Catalog (DRA)",
 	"creator": "Simon Kornblith",
 	"target": "/web2/tramp2\\.exe/(see\\_record/|authority\\_hits/|do_keyword_search|form/|goto/.*\\?.*screen=(MARC)?Record\\.html)",
 	"minVersion": "3.0",
-	"maxVersion": "",
+	"maxVersion": null,
 	"priority": 260,
 	"inRepository": true,
-	"translatorType": 4,
 	"browserSupport": "gcsbv",
-	"lastUpdated": "2016-12-04 12:47:41"
+	"lastUpdated": "2026-07-22 16:30:00"
 }
 
 /*
@@ -63,11 +63,11 @@ function doWeb(doc, url) {
 			//Here we need first to go to another website which will then also
 			//create a session to continue.
 			if (marclink) {
-				url = "//" + doc.location.host + marclink;
+				url = marclink;
 			} else {
 				var pos = metalink.indexOf("URL=");
 				var link = metalink.substring(pos+4).replace('/log_out/', '/see_record/');
-				url = "//" + doc.location.host + link;
+				url = link;
 			}
 			ZU.processDocuments([url], scrape);
 		} else {

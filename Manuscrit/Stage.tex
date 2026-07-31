@@ -1,121 +1,115 @@
-\chapter{Sérialisation du problème : une approche événementielle}
+\chapter{Sérialisation du problème : une approche évènementielle}
 
-Ce chapitre introduit une méthodologie alternative pour la reproduction par IA du mécanisme de Détection et Caractérisation des Impulsions (DCI). En rupture avec l'approche de type \textit{sequence-to-sequence} (Seq2Seq) abordées dans le chapitre précédent \ref{chap:seq2seq}, nous proposons ici une reformulation du problème axée sur la causalité et le traitement flux-à-flux (\textit{stream processing}). 
+Ce chapitre introduit une méthodologie alternative pour la reproduction par apprentissage profond du fonctionnement du DCIS présenté dans le chapitre \ref{chap:newfocus}. En rupture avec l'approche \textit{sequence-to-sequence} (Seq2Seq) abordée au chapitre précédent \ref{chap:seq2seq}, nous proposons une reformulation du problème axée sur la causalité et le traitement flux-à-flux (\textit{stream processing}).
 
-Cette transition méthodologique repose sur un concept de \textbf{sérialisation événementielle}. Il s'agit d'une démarche consistant à réorganiser les flux parallèles et asynchrones d'entrée (les impulsions incidentes) et de sortie (les PDW publiés) en une unique ligne temporelle. Ce concept sera approfondi dans la sous-section \ref{seq:serialisation}.
+Cette transition méthodologique s'appuie sur le concept de \textbf{sérialisation événementielle}, démarche consistant à réorganiser les flux asynchrones d'entrée (impulsions incidentes) et de sortie (PDW publiés) sur une ligne temporelle unique. Ce concept sera approfondi dans la sous-section \ref{seq:serialisation}.
 
-\section{Motivation : Du traitement de séquence à la modélisation dynamique}
-L'approche Seq2Seq consiste à traiter l'intégralité d'une séquence d'impulsions source dans un encodeur avant l'utilisation de l'information issue de ce traitement par un décodeur pour produire itérativement la séquence d'impulsions cible. Cette approche se heurte alors à deux obstacles majeurs. Premièrement, le traitement de la séquence source entière par un encodeur constitue un goulot d'étranglement calculatoire problématique pour les séquences longues. Deuxièmement, l'inférence de ce modèle est dissonante avec le mécanisme de traitement du système réel, qui lui n'attend pas la fin des impulsions incidentes pour publier des interceptions, et exploite une mémoire locale. L'approche flux-à-flux, que nous formalisons dans cette section, vise à reproduire ce mécanisme de production d'interceptions en direct présent dans le DCI, en forçant l'exploitation d'une information locale et causale de la séquence source pour les prédictions.
-\subsection{Le goulot d'étranglement des architectures pour le Seq2Seq}
-Le premier obstacle à l'approche Seq2Seq est la difficulté à traiter des séquences longues, bien que la cause varie en fonction de l'architecture : neuronales actuelles à maintenir des dépendances temporelles sur de longs horizons :
+\section{Motivation : du traitement de séquence au traitement de flux}
+L'approche Seq2Seq traite l'intégralité d'une séquence d'impulsions source avant d'initier le décodage. Cette méthode se heurte à deux limitations.\\ 
+
+Premièrement, le traitement d'une séquence constitue un goulot d'étranglement calculatoire :
 \begin{itemize}
-\item \textbf{Architectures récurrentes (RNN/LSTM) :} La propagation du gradient à travers le temps (car ces modèles traitent itérativement chaque élément de la séquence) sur de longues séquences est exposé à des problèmes de disparition, ce qui rend difficile le maintient des dépendances temporelles sur de longs horizons.
-\item \textbf{Architectures attentionnelles (Transformers) :} Plus robustes au problème de maintient de dépendance temporelle, cette architecture présente une complexité algorithmique quadratique $\mathcal{O}(N^2)$ en fonction de la longueur de la séquence. Le traitement de séquence longues devient alors un problème challengeant du point de vue matériel (limitation V-RAM).
+\item Les architectures récurrentes (RNN/LSTM) peinent à propager le gradient sur de longues séquences, rendant l'apprentissage des dépendances à longue distance compliqué.
+\item Les architectures attentionnelles (Transformers) présentent une complexité spatiale et temporelle quadratique $\mathcal{O}(N^2)$, provoquant une saturation rapide de la mémoire vidéo (V-RAM) face à des scénarios massifs.
 \end{itemize}
-Ces limitations imposent la mise en place de mécanismes de segmentation, tel que le découpage en fenêtres étudié au chapitre précédent \ref{chap:seq2seq}, qui nuisent à la continuité du traitement et altère donc la séquence globale des PDW émis \ref{seq:discseq2seq}.
+Si des mécanismes de fenêtrage permettent de contourner ces limites matérielles du Transformer, ils introduisent des problématiques de continuité aux interfaces entre les fenêtres, comme illustré en \ref{seq:winseq2seq}. \\
 
-\subsection{Le DCI comme système dynamique réactif}
-Le second obstacle est d'ordre conceptuel. Modéliser le DCI comme une fonction globale $f(\mathbf{X}_{total}) \to \mathbf{Y}_{total}$ est une hypothèse forte qui masque la réalité physique du module. Le DCI est système dynamique réactifs qui est régis par l'arrivé de trois type d'\textit{évènements} :
-\begin{enumerate}
-\item \textbf{L'arrivée d'une impulsion incidente} déclenche un nouveau calcul des DNA et une mise à jour de l'état des mémoires internes.
-\item \textbf{La disparition d'une impulsion incidente} déclenche aussi le calcul des DNA et une mise à jour de l'état des mémoires internes.
-\item \textbf{L'émission d'une impulsion interceptée} provoque la libération de ressources mémoires.
-\end{enumerate}
-Bien que non-mentionné de cette manière auparavant, cette notion d'évènement était déjà centrale pour le DCI. Par exemple, les deux premiers évènements liées à l'apparition ou la disparition d'impulsions incidentes modelait les \textit{paliers} (dont un exemple est illustré figure \ref{fig:window}). Le DCI traite donc les séquences d'impulsions incidentes itérativement comme une séquence d'évènement, entre lesquels s'entrelaçent des évènements liés à la publication d'impulsion. Finalement, il apparaît intéressant de chercher à rapprocher le traitement de nos architectures de ce comportement "pas-à-pas". Nous proposons est de transformer le problème de prédiction globale en un problème de prédiction locale causale : étant donné une impulsion incidente, le modèle doit prédire la cascade d'événements (émissions) qui surviennent avant l'arrivée de l'impulsion incidente suivante.
+Le second obstacle est de nature physique. Modéliser le DCIS via une fonction créant une représentation latente $\mathbf{h}$ d'une séquence incidente $\mathbb{x}$ pour ensuite générer une prédiction $\mathbf{y}$, comme c'est le cas dans le traitement \textit{séquence-vers-séquence}, revient à ignorer que le DCIS est un système dynamique réactif. Il est mis à jour par l'occurrence d'événements temporels locaux : l'apparition ou la disparition d'impulsion, ou la publication d'une interception provoquant une libération de mémoire. L'approche flux-à-flux vise à reproduire cette logique de mise-à-jour en contraignant le modèle à opérer de manière causale et à l'échelle du PDW, qui sera notre évènement déclencheur.
 
 \section{Formalisation du problème "Flux-à-flux"}
 \label{seq:serialisation}
-L'implémentation de cette approche avec un réseau de neurones passe par une étape de réflexion sur la manière, afin de faire de l'idée de la formulation flux-à-flux un réel problème d'entrainement bien définit. Nous analysons ici les contraintes qu'impose l'approche proposée pour y associé des choix que nous faisons. Ces choix concernent aussi bien l'architecture que le mode d'inférence ou encore la transformation des données. Ils visent à relier chaque situation observable (par exemple, l'arrivée d'un certain PDW incident) à une unique sortie (par exemple la prédiction d'une PDW émis), mais aussi inversement qu'à chaque sortie ne corresponde qu'une situation observable. De ce fait, l'entrainement supervisé pourra être réalisé sans embuche.
+La première partie du travail consiste à formaliser cette notion d'approche flux-à-flux. Elle est particulièrement complexe parce que les évènements composants le flux d'entrée et le flux de sortie sont asynchrones. 
 
 \subsection{Contraintes de l'approche et choix de conception}
-Un réseau de neurones standard est une fonction $f: \mathcal{X} \to \mathcal{Y}$ qui associe un tenseur de sortie unique à un tenseur d'entrée unique. Cette définition rigide nous impose plusieurs contraintes pour le traitement d'un flux d'impulsions incidentes $\{I_k\}$ et d'impulsions émises (sorties) $\{O_k\}$ :
-\paragraph{Contrainte 1 : Discrétisation de la réponse}
-Le modèle ne peut pas "simplement" générer un nombre variable d'impulsions de sortie pour une seule impulsion d'entrée, scénario qu'on rentre fréquemment. Il doit être adapté à la génération de sortie de taille variable. 
-\begin{itemize}
-\item \textit{Choix de conception :} Nous adoptons une approche itérative. Nous interrogeons le réseau de manière répétée avec la même impulsion incidente tant qu'il reste des impulsions à générer avant la sortie de la prochaine impulsion.
-\end{itemize}
-\paragraph{Contrainte 2 : Condition d'arrêt}
-Puisque le nombre de sorties est variable (potentiellement nul), le modèle doit posséder un moyen explicite de signaler la fin de la séquence d'émission associée à l'impulsion incidente courante.
-\begin{itemize}
-\item \textit{Choix de conception :} Nous introduisons un jeton de contrôle spécial, noté \texttt{NEXT}. La prédiction de ce jeton par le réseau signifie "Il n'y a plus d'émission à générer, passez à l'impulsion incidente suivante".
-\end{itemize}
-\paragraph{Contrainte 3 : Maintien du contexte}
-Le modèle doit produire des prédictions en fonction du contexte passé, ce qui inclue savoir les impulsions incidentes précédentes, mais aussi être capable de se situer dans une salve d'émissions (doit-il prédire la première ou la troisième impulsion associée à une impulsion incidente ?).
-\begin{itemize}
-\item \textit{Choix de conception :} Cette contrainte restreint nos modèles à disposer d'un système de mémoire (RNN) ou bien être capable de traiter un contexte passé ayant une structure de séquence (CNN, Transformer) pour construire une représentation latente associée à une mémoire. Ce choix respecte la philosophie du DCI, disposant lui-même d'une mémoire mise-à-jour à chaque évènement. Ces architectures sont compatibles avec l'inférence itérative mentionnée plus haut.
-\item \textit{Choix de conception :} Nous guidons le modèle à construire sa mémoire en fournissant une double entrée qui rappelle le contexte immédiat. Le modèle reçoit à chaque pas :
-\begin{enumerate}
-\item L'impulsion incidente courante $I_k$.
-\item La dernière prédiction effectuée $P_{t-1}$ (ou un jeton \texttt{NEXT}).
-\end{enumerate}
-\end{itemize}
+\subsubsection{Rappel : rupture avec l'approche séquentielle}
+Le réseau de neurones $f: \mathcal{X} \to \mathcal{Y}$ n'est plus une architecture complexe pouvant traiter des entrées de taille variable comme les séquences de PDW. Nous choisissons à présent de travailler uniquement avec des évènements, qui ne sont numériquement que des PDW incidents ou interceptés. Ainsi même si un évènement d'entrée (PDW incident) est suivi de plusieurs évènements de sortie (PDW interceptés), ou que plusieurs évènement d'entrée se suivent avant qu'un nouvel évènement de sortie n'apparaisse, on rompt avec les solutions architecturales ayant cette capacité de traiter la variabilité des longueurs des données d'entrée ou de sortie, qui s'associe à l'approche séquentielle.
+
+\subsubsection{Passage à la suite}
+Comme nous venons de le mentionner, les évènements d'entrées peuvent se succéder avant qu'un ou plusieurs évènements de sortie n'arrivent. De ce fait, on attend du modèle de prédire, pour un évènement d'entrée donné, soit le prochain évènement de sortie, soit un jeton \texttt{NEXT} informant que le prochain évènement est un évènement d'entrée. Ainsi, un modèle sera interrogé avec un même évènement d'entrée (PDW incident) tant qu'il produira des évènements de sortie (PDW interceptés) jusqu'à produire un jeton \texttt{NEXT}. Sa prochaine interrogation sera alors effectué avec l'évènement d'entrée suivant (le prochain PDW incident) en répétant la même logique.
+
+\subsubsection{Cohérence des données}
+Une architecture récurrente peut générer des réponses distinctes pour une même entrée selon l'état de sa mémoire. Ainsi, interroger un modèle avec le même évènement d'entrée à répétition peut conduire à des réponses différentes, prédisant successivement les évènements de sortie avec le prochain évènement incident. Néanmoins, nous choisissons d'enrichir les informations que le modèle dispose en entrée pour prédire sa sortie : le évènement incident avec lequel le modèle est questionné sera cote-à-cote avec sa dernière prédiction, qu'elle soit un jeton \texttt{NEXT} ayant causé l'évènement d'entrée à passer au suivant, ou la prédiction d'un véritable évènement de sortie. 
+
+\subsubsection{Conclusion sur la formalisation}
+Finalement, ces mesures prises assurent que le modèle prenne toujours en entrée le même format de donnée : un couple d'évènement composé d'un PDW incident et d'un PDW intercepté. De plus, le changement d'évènement d'entrée (passage au prochain PDW incident) est déclenché par la prédiction du modèle lui-même.
+
 
 \subsection{Sérialisation : transformation et préparation des données}
 L'opération de \textbf{sérialisation événementielle} est un processus algorithmique qui consiste à fusionner plusieurs flux de données parallèles (arrivée d'impulsions incidentes et publication d'impulsion interceptée) et asynchrones (sans correspondance temporelle un-à-un entre les deux flux) en une unique séquence. L'ordonnancement de cette nouvelle séquence est strictement chronologique et régi par la date effective de chaque événement (date d'arrivée pour une impulsion incidente, ou date de publication pour un PDW intercepté). En alignant ces évènements sur une même frise temporelle, la sérialisation événementielle permet de ramener un problème de dynamique asynchrone complexe à un problème de traitement auto-régressif causal classique.\\
 
-Nous illustrons cet algorithme à l'aide d'un exemple. Considérons une séquence de PDW incidents $[I_1, I_2, I_3]$ et la séquence de PDW interceptés correspondants $[O_1, O_2, O_3, O_4, O_5]$. Alors considérées comme deux séquences d'évènements à auxquels une date est associé (la date d'arrivée pour les impulsions incidentes, la date de publication pour les impulsions interceptées), nous obtenons par sérialisation une unique séquence trié par ordre chronologique :
+Considérons par exemple une séquence de PDW incidents $[I_1, I_2, I_3]$ et la séquence de PDW interceptés correspondants $[O_1, O_2, O_3, O_4, O_5]$. Alors considérées comme deux séquences d'évènements à auxquels une date est associé (la date d'arrivée pour les impulsions incidentes, la date de publication pour les impulsions interceptées), la sérialisation de ces séquences conduit à une unique séquence trié par ordre chronologique des évènements la composant, dont la séquence suivante pourrait en être le résultat :
 \begin{equation}
 \label{eq:seqfusion}
 \text{Séquence sérialisée} : [I_1, O_1, O_2, O_3, I_2, I_3, O_4, O_5]
 \end{equation}
 
-D'après nos choix de conceptions réalisé plus tôt et les contraintes qu'imposent l'approche, l'objectif pour nos modèles sera de prédire itérativement les évènements de publications se réalisant entre l'arrivé de chaque impulsion incidente, ainsi que de prédire l'absence de nouvelle prédiction sur l'intervalle, grâce à l'observation de la dernière impulsion incidente arrivé et du dernier évènement prédit, soulageant le rôle de la mémoire. Ce processus conduit au déroulé des opérations qui explique à chaque instant ce que le modèle observe et ce qu'on attend du modèle en retour. Ci-dessous ce déroulé des opérations pour notre exemple, où nous rappelons entre parenthèses les traitements attendus :
+C'est à partir de cette séquence que la logique de traitement que nous avons décrite précédemment s'applique. Ainsi, nous faisons apparaître dans le tableau \ref{tab:seqfusion}, pour chacun des 8 évènements que compose la séquence sérialisée \ref{eq:seqfusion} (8 premiers pas de temps), à quoi correspond le couple d'entrée dun modèle et à quoi doit correspondre la sortie du modèle. Ces données que composent l'exemple du tableau \ref{tab:seqfusion} sont en fait obtenues à partir de l'algorithme \ref{algo:serialize_data}. Il transforme une séquence sérialisée en trois séquences : la séquence des premiers éléments du couple donné au modèle (l'évènement d'entrée), la séquence des deuxièmes éléments du couple donné au modèle (le dernier évènement prédit) et la  séquence des évènements cibles que le modèle doit prédire (les évènements de sortie). Ses séquences permettent de définir un problème d'apprentissage supervisé.
 
-\begin{enumerate}
-\item \textbf{Traitement de $I_1$ (3 émissions associées) :}
+\begin{table}[htbp]
+\centering
+\begin{tabular}{l|c|c|c|c|c|c|c|c}
+\toprule
+\textbf{Pas de temps} & \textbf{t=1} & \textbf{t=2} & \textbf{t=3} & \textbf{t=4} & \textbf{t=5} & \textbf{t=6} & \textbf{t=7} & \textbf{t=8}\\
+\midrule
+\textbf{Input 1 ($I_{actif}$)} & $I_1$ & $I_1$ & $I_1$ & $I_1$ & $I_2$ &$I_3$ & $I_3$&$I_3$\\
+\textbf{Input 2 ($O_{prev}$)} & \texttt{NEXT}& $O_1$ & $O_2$ & $O_3$ & \texttt{NEXT} & \texttt{NEXT}& $O_4$  & $O_5$\\
+\textbf{Cible} & $O_1$ & $O_2$ & $O_3$ & \texttt{NEXT} & \texttt{NEXT}& $O_4$  & $O_5$ & \texttt{NEXT}\\
+\bottomrule
+\end{tabular}
+\caption{Tableau récapitulatif de la séquence des premières entrées du modèle (Input 1), la séquence des deuxièmes entrées du modèle (Input 2) et la séquence des cibles des prédictions du modèle. Ces séquences sont obtenues grâce à l'algorithme \ref{algo:serialize_data} à partir de la séquence sérialisée \ref{seq:serialisation}.}
+\label{tab:seqfusion}
+\end{table}
+
+
+\begin{algorithm}[htbp]
+\DontPrintSemicolon
+\SetAlgoLined
+\KwIn{Séquence chronologique sérialisée $S$}
+\KwOut{séquences d'entraînement : $\mathbf{In}_1$, $\mathbf{In}_2$, $\mathbf{Cible}$}
+$\mathbf{In}_1 \leftarrow \emptyset$, $\mathbf{In}_2 \leftarrow \emptyset$\;
+\For{$s \in S$}{
+    \eIf{$s$ correspond à un PDW incident}{
+    		$I_{actif} \leftarrow s$\;
+        ajouter $I_{actif}$ à la fin de la liste $\mathbf{In}_1$\;
+        ajouter $\texttt{NEXT}$ à la fin de la liste $\mathbf{In}_2$ 
+    }{
+        \tcp{$s$ correspond à un PDW intercepté}
+        ajouter $I_{actif}$ à la fin de la liste $\mathbf{In}_1$\;
+        ajouter $s$ à la fin de la liste $\mathbf{In}_2$
+    }
+}
+$\mathbf{Cible} \leftarrow \text{permutation circulaire de } \mathbf{In}_2$ \tcp*{composition d'indices $i \leftarrow i+1$}
+\Return{$\mathbf{In}_1$, $\mathbf{In}_2$, $\mathbf{Cible}$}
+\caption{Création des triplets d'entraînement par sérialisation événementielle}
+\label{algo:serialize_data}
+\end{algorithm}
+
+\subsection{Encodage local du temps}
+Les PDW que composent les séquences $\mathbf{In}_1$, $\mathbf{In}_2$ et $\mathbf{Cible}$ respectent la logique d'encodage du temps présenté en \ref{seq:timeencoding}. Ces encodages, relatifs aux positions des PDW dans leur séquence incidente et séquence intercepté avant la sérialisation, nécessite une redéfinition à une échelle locale.
+
 \begin{itemize}
-\item \textit{Entrée :} $(I_1, \texttt{NEXT})$ $\rightarrow$ \textit{Cible :} $O_1$ (Le modèle sait qu'il n'a rien prédit depuis l'arrivée de $I_1$ et doit prédire la première publication $O_1$).
-\item \textit{Entrée :} $(I_1, O_1)$ $\rightarrow$ \textit{Cible :} $O_2$ (Le modèle sait qu'il a émis $O_1$ et doit prédire la publication suivante $O_2$).
-\item \textit{Entrée :} $(I_1, O_2)$ $\rightarrow$ \textit{Cible :} $O_3$ (Le modèle sait qu'il a émis $O_2$ et doit prédire la publication suivante $O_3$).
-\item \textit{Entrée :} $(I_1, O_3)$ $\rightarrow$ \textit{Cible :} \texttt{NEXT} (Le modèle sait qu'il a émis $O_3$ et doit prédire l'absence de nouvelle émission avant $I_2$).
-\end{itemize}
-\item \textbf{Traitement de $I_2$ (0 émission associée) :}
-\begin{itemize}
-    \item \textit{Entrée :} $(I_2, \texttt{NEXT})$ $\rightarrow$ \textit{Cible :} \texttt{NEXT} (Le modèle sait qu'il n'a rien prédit depuis l'arrivée de $I_2$ doit prédire l'absence de nouvelle émission avant $I_3$).
-\end{itemize}
-
-\item \textbf{Traitement de $I_3$ (2 émissions associées) :}
-\begin{itemize}
-    \item \textit{Entrée :} $(I_3, \texttt{NEXT})$ $\rightarrow$ \textit{Cible :} $O_4$ (Le modèle sait qu'il n'a rien prédit depuis l'arrivée de $I_2$ et doit prédire la publication suivante $O_4$).
-    \item \textit{Entrée :} $(I_3, O_4)$ $\rightarrow$ \textit{Cible :} $O_5$ (Le modèle sait qu'il a émis $O_4$ et doit prédire la publication suivante $O_5$).
-    \item \textit{Entrée :} $(I_3, O_5)$ $\rightarrow$ \textit{Cible :} \texttt{NEXT} (Le modèle sait qu'il a émis $O_5$ et doit prédire l'absence de nouvelle émission).
-\end{itemize}
-\end{enumerate}
-Au final, les séquences de PDW incidents $[I_1, I_2, I_3]$ et de PDW interceptés $[O_1, O_2, O_3, O_4, O_5]$ sont fusionnées en une unique séquence $$[(I_1, \texttt{NEXT}), (I_1, O_1), (I_1, O_2), (I_1, O_3), (I_2, \texttt{NEXT}), (I_3, \texttt{NEXT}), (I_3, O_4), (I_3, O_5)]$$ faisant office d'entrées données itérativement à notre modèle, dont les sorties devront correspondre à une autre nouvelle séquence $$[O_1, O_2, O_3, \texttt{NEXT}, \texttt{NEXT}, O_4, O_5, \texttt{NEXT}]$$, faisant office de cible de prédiction.
-
-\subsection{Préparation des données et ingénierie des caractéristiques}
-Le passage d'une modélisation globale (\textit{séquence vers séquence}) à une modélisation locale (\textit{flux-à-flux}) nécessite, en plus de la redéfinition du problème que nous avons réalisé, une adaptation de la représentation des données. En effet, nous devons nous assurer que les informations temporelles, qui étaient prévues pour être décodée lors d'un traitement des séquences entières comme c'est le cas dans la modélisation Seq2Seq, puissent être encore décodée lors du traitement des séquences de manières locales. De plus, la structure des données doit être adaptée à un traitement automatique par un algorithme, ce qui comprend l'utilisation de masques caractérisant le type de données (émission ou jeton \texttt{NEXT}) ainsi que le padding (prolongations artificielles des séquences permettant d'uniformiser leurs tailles pour un traitement en parallèle). 
-
-\subsubsection{Encodage local du temps}
-Dans l'approche globale Seq2Seq, les données encodaient le temps d'arrivée relativement à la position dans la séquence afin d'éviter la croissance incontrôlée des valeurs \ref{seq:timeencoding}. Cependant, dans l'approche flux-à-flux où les traitements des éléments ont vocation à être réalisés de manière locale, la pertinence de cet encodage est remise en question.
-Bien que, mathématiquement, l'encodage globale reste décodable à l'échelle locale du flux-à-flux par la présence de la mémoire et parce que la sérialisation est réversible, notre problématique ne porte pas sur la décodabilité théorique, mais sur la difficulté d'extraction de cette information par le réseau de neurones. \\
-
-Nous nous intéressons ici à la difficulté de décoder les informations temporelles dans le cadre d'une sous-séquence (typiquement avec un début tronqué). Ce scénario simule l'horizon limité que le modèle peut se représenter dans son espace latent et sa mémoire, en accord avec la philosophie de l'approche qui vise à reproduire les contraintes du matériel (DCI).\\
-
-\begin{itemize}
-\item Concernant l'encodage du temps dans les PDW incidents ($(I_i)_{1 \leq i \leq N}$) : \\ 
-Nos séquences de PDW incidents encodent le temps d'arrivé par la position dans la séquence \ref{eq:timeencodingin}. Cette encodage, facilité par la simplicité du problème, permet de comprendre le temps d'arrivé des impulsions de manière relative, c'est-à-dire qu'un PDW arrive toujours une unité de temps après le PDW qu'il succède. Ainsi, cet encodage du temps ne pose pas de problème à l'échelle locale, car cela redéfinit simplement une origine des temps au temps d'arrivé du premier PDW de la sous-séquence. Il suffit que toutes les informations temporelles soient redéfinies par rapport à cette nouvelle origine.\\
-
-\item Concernant les besoins pour la prédiction du bon nombre d'évènement :\\
-Nous avons définit la tâche du réseau, lorsqu'il observe pour la première fois un PDW incident $I_i$, comme celle de prédire toutes les émissions $O_{i_1}, ..., O_{i_k}$ publiés avant l'arrivée du PDW $I_{i+1}$. Cette mission ne peut naturellement pas être remplie sans une connaissance a priori de l'intervalle de temps séparant l'arrivée des deux PDW $i_i$ et $I_{i+1}$. Nous enrichissons ainsi la représentation de chaque PDW  $I_i$ en concaténant à ses caractéristiques la différence de temps d'arrivé avec l'impulsion suivante : 
-$$\Delta T_{i} = TOA(I_{i+1}) - TOA(I_{i})$$
-Cette information permet au modèle d'estimer la "fenêtre temporelle" disponible pour ses émissions. Dans le cas d'une fin de séquence, une valeur assez grande est utilisée pour signifier au modèle qu'il doit vider sa mémoire (générer toutes les réponses restantes).\\
-
-\item Pour les impulsions interceptées ($(O_i)_{0 \leq i \leq M}$) : \\ 
-Dans la configuration \textit{seq2seq}, l'encodage du temps d'émission est réalisé en soustrayant à cette valeur (information globale) réelle la position dans la séquence (information globale) \ref{eq:timeencodingout}. Bien que cette information soit toujours récupérable par inversion de la sérialisation, on considère que retrouver localement la position qu'une prédiction aurait eu dans la séquence cible globale n'est pas dans l'esprit de l'approche. La synchronisation des flux permet d'adopter un encodage local plus pertinent : le temps d'arrivé d'un PDW intercepté $O_i$ (qu'il soit en entrée ou à prédire) est encodé relativement au temps d'arrivée de l'impulsion incidente courante $I_j$.
-$$TOA(O_i) - TOA(I_j)$$
-Par exemple dans le cadre de la séquence sérialisée liée à \ref{tab:seqfusion}, le troisième élément est constitué d'une entrée $(I_1, O_2)$ et d'une cible $O_3$. Alors le temps d'arrivé de $O_2$ sera encodé localement $TOA(O_2) - TOA(I_1)$ et le temps d'arrivé de $O_3$ sera encodé $TOA(O_3) - TOA(I_1)$.
-\end{itemize}
-
-\subsubsection{Gestion des masques et exemple de sérialisation}
-Comme abordé précédemment, l'approche flux-à-flux nécessite la gestion de plusieurs masques pour piloter l'apprentissage supervisé et le calcul de la fonction de coût.
-\begin{itemize}
-\item MI (Mask Input) : Indique si l'entrée secondaire (Input 2) est le jeton \texttt{NEXT} (1) ou un PDW (0). Ce masque est fourni au modèle pour qu'il remplace sa deuxième entrée (Input 2) par un vecteur latent appris qu'il stock en interne, représentant le rôle du jeton \texttt{NEXT} si ce n'est pas un PDW.
-\item MO (Mask Output) : Indique si la cible attendue est le jeton \texttt{NEXT} (1) ou une PDW valide (0). Ce masque est utilisé pour l'apprentissage, afin de pouvoir séparer le calcul de l'erreur sur les positions où on attend un PDW (calcule d'une erreur de reconstruction) des positions où l'on attend la détection de la fin des émissions et le passage au PDW incident suivant (calcule d'une erreur de classification).
-\item MP (Mask Padding) : Indique si la position est valide (1) ou si elle relève du remplissage (padding) de fin de batch (0). Ce masque est utilisé pour l'apprentissage, afin de simplement ignorer les sorties du modèle sur ces positions, où il n'aurait pas du être interrogé en inférence.\\
+\item \textbf{L'origine des temps :} Pour un pas de temps donné, l'origine des temps est définit à la date d'arrivé de \textbf{Input 1}. Ainsi si l'impulsion $I_n$ est l'\textbf{Input 1}, l'origine des temps vaut $\text{ToA}(I_n)$. Le nombre de pas de temps peut être dénombré pour déduire des prédictions du modèle les réels temps décrits dans les PDW.
+\item \textbf{Information incidente (Input 1) :} Pour que le modèle puisse appeler le jeton \texttt{NEXT} au bon moment, il doit connaitre la durée avant le prochain événement d'entrée. Ainsi si l'impulsion $I_n$ est l'\textbf{Input 1}, on ajoute une coordonnée au PDW le décrivant, qui contient la différence d'arrivée avec la suivante : 
+$$\Delta T_n = \text{ToA}(I_{n+1}) - \text{ToA}(I_n)$$
+Si $I_n$ est le dernier PDW incidents, on remplace $\Delta T_n$ par une valeur très grande assurant la prédiction de tous les PDW interceptés restant.
+\item \textbf{Information interceptée (Input 2 et Cible) :} Si $O_m$ est le PDW de \textbf{Input 2} ou encore le PDW de \textbf{Cible}, et que l'impulsion $I_n$ est l'\textbf{Input 1}, alors la date d'arrivée de $O_m$ est remplacé par sa valeur dans le référentiel d'origine $\text{ToA}(I_n)$. Ainsi l'encodage de son temps d'arrivé sera $$\Delta \text{ToA}(O_m) = \text{ToA}(O_m) - \text{ToA}(I_n)$$
 \end{itemize}
 
-Nous illustrons ce mécanisme dans le tableau \ref{tab:seqfusion} qui reprend l'exemple de la séquence sérialisée $[I_1, O_1, O_2, O_3, I_2, I_3, O_4, O_5]$ présentée plus tôt \ref{eq:seqfusion} . Ce tableau présente pour chaque pas de temps (les prédictions itératives réalisées par le modèle) la réponse attendu du modèle ainsi que la valeur de chaque masque. 
+\subsection{Création des données d'entrainement}
+Les données d'entrainement proviennent du DCIS décrit dans le chapitre \ref{chap:newfocus}. Voici la procédure de création des données pour l'apprentissage supervisé de l'approche événementielle de ce chapitre :
+
+\begin{itemize}
+\item Le scénario (PDW incidents) sont générés via l'algorithme \ref{algo:generation_sequence_scenario}, avec un nombre d'impulsions $N$ choisi au préalable.
+\item Les PDW interceptés sont générés via l'algorithme \ref{algo:capteur_process}.
+\item Une séquence sérialisée est créer par la fusion de ces deux séquences.
+\item Les séquences \textbf{Input 1}, \textbf{Input 2} et \textbf{Cible} sont créées à partir de la séquence sérialisée, via l'algorithme \ref{algo:serialize_data}.
+\item Les séquences \textbf{Input 1}, \textbf{Input 2} et \textbf{Cible} sont complétées artificiellement (\texttt{PAD}) à la longueur $N + M$, où $M = 1.2N$ est généralement choisi.
+\item Le masque MI (Mask Input) est créé. Il indique si l'entrée secondaire (\textbf{Input 2}) est le jeton \texttt{NEXT} (1), un PDW (0) ou un remplissage (\texttt{PAD}).
+\item Le masque MO (Mask Output) est créé. Il indique si la cible attendue est le jeton \texttt{NEXT} (1), un PDW (0) ou un remplissage (\texttt{PAD}). 
+\item Le masque MP (Mask Padding) est créé. Il indique si la position est valide (1) ou si elle relève d'un remplissage \texttt{PAD} (0).\\
+\end{itemize}   
+
+Le tableau \ref{tab:seqfusion2} présente ces valeurs pour l'exemple de séquence sérialisée \ref{seq:serialisation}.\\
 
 \begin{table}[h]
 \centering
@@ -138,26 +132,16 @@ Nous illustrons ce mécanisme dans le tableau \ref{tab:seqfusion} qui reprend l'
 \hline
 \end{tabular}
 \caption{Compilation de l'ensemble des données (entrées, sortie, masques) qui permettent de superviser l'entrainement d'un modèle. Dans cet exemple, la séquence sérialisée \ref{eq:seqfusion} est de longueur 8 mais est prolongée jusqu'à 10, ce qui correspond à l'étape d'uniformisation des longueurs des séquences permettant un entrainement en parallèle de nos modèles.}
-\label{tab:seqfusion}
+\label{tab:seqfusion2}
 \end{table}
 
+Cette procédure permet de constituer des ensembles d'entrainement dont nous écrirons les dimensions $B \times L \times d_{in}$ pour l'entrée \textbf{Input 1}, et $B \times L \times d_{out}$ pour l'entrée \textbf{Input 2} et la cible \textbf{Cible}. Les masques sont, quand-à-eux, des tenseurs de dimension $B \times L$.
+
 \section{Validation de l'approche sur architectures récurrentes}
-Dans cette section, nous présentons les résultats publiés lors de la conférence CAID \textcolor{red}{REF}. Cet article démontre que pour la modélisation du traitement radar, l'approche "flux-à-flux" (ici désignée par le terme Forecasting) est particulièrement pertinente pour capturer la causalité temporelle du système. L'étude établit également quelle variante d'architecture récurrente offre les meilleures performances.
-Cette section se concentre exclusivement sur les résultats obtenus en mode "prévision" (forecasting), qui correspond à la configuration opérationnelle cible. Nous omettrons ici la description des métriques spécifiques utilisées pour l'optimisation car elles sont détaillés dans l'article et sont très proches des métriques développés dans la section suivante \ref{seq:metrique} consacrée aux extensions de ces travaux à d'autres architectures. 
+Le problème d'apprentissage comme nous venons de le définir a été approché avec des réseaux de neurones récurrents, et nos résultats ont été publié dans le conférence CAID \cite{lagarde_surrogates_2025}. Cette section présente ces résultats, où l'on évalue la capacité des architectures récurrentes canoniques à capturer cette dynamique événementielle qui représente le fonctionnement du DCIS. L'étude couvre non-seulement les architectures récurrentes "classiques", c'est à dire RNN, LSTM et GRU, mais aussi des architectures de LSTM augmentées par des mécanismes d'attention \cite{luong_effective_2015}, \cite{bahdanau_neural_2014}. Nous ne présenterons pas les résultats des architectures augmentées qui exploitent un traitement séquentiel de leurs mémoires passées, approche avec laquelle nous souhaitons rompre dans cette section.
 
-\subsection{Les architectures}
-Afin d'identifier la structure la plus adaptée, nous avons évalué un panel d'architectures récurrentes classiques. 
-Ce choix est motivé par la correspondance entre la nature causale et itérative des architectures récurrentes et le fonctionnement itératif du DCI. Les modèles comparés sont les suivants :
-
-\begin{itemize} 
-\item \textbf{RNN (Vanilla Recurrent Neural Network)} : Il constitue l'architecture de référence la plus simple. Bien que théoriquement capable de traiter des séquences, il souffre notoirement du problème de disparition du gradient, limitant sa capacité à retenir l'information sur de longues périodes. 
-\item \textbf{LSTM (Long Short-Term Memory)} : Cette architecture introduit des portes logiques (entrée, oubli, sortie) pour réguler le flux d'information. Elle est conçue spécifiquement pour capturer les dépendances à long terme qui échappent aux RNN simples. 
-\item \textbf{GRU (Gated Recurrent Unit)} : Variante simplifiée du LSTM, le GRU fusionne certaines portes pour réduire le nombre de paramètres tout en conservant une capacité de mémoire comparable. Il offre souvent une convergence plus rapide et une meilleure stabilité numérique. 
-\item \textbf{LSTMAT (LSTM + Attention Additive)} : Il s'agit d'un décodeur LSTM augmenté d'un mécanisme d'attention de type Bahdanau. À chaque pas de temps, le modèle calcule un score additif pour pondérer l'importance des états cachés passés, permettant de "relire" l'historique pertinent. 
-\item \textbf{LSTMAT-L (LSTM + Attention de Luong)} : Cette variante utilise un mécanisme d'attention scalaire, réputée plus efficace calculatoirement et mieux adaptée aux séquences longues. \\
-\end{itemize}
-
-Quelque soit le modèle, son architecture général est identique et reprend l'architecture canonique des réseaux de neurones récurrents \ref{RNN base} présentée dans le chapitre \ref{chap:SOTA}. C'est le bloc réalisant la propagation de la mémoire et sa mise-à-jour qui distinguera les modèles. La figure \ref{fig:compareRNN} propose une comparaison de ces trois blocs élémentaires.
+\subsection{Configurations architecturales}
+La nature événementiel du DCIS s'aligne naturellement avec l'équation de mise à jour de l'état caché $h_t = f(h_{t-1}, x_t)$ des réseaux récurrents \ref{eq:recurrent}. Nous avons comparé trois architectures : RNN standard, GRU et LSTM. Quelque soit le modèle, son architecture général est identique et reprend l'architecture canonique des réseaux de neurones récurrents \ref{RNN base} présentée dans le chapitre \ref{chap:SOTA}. C'est le bloc réalisant la propagation de la mémoire et sa mise-à-jour qui distinguera les modèles. La figure \ref{fig:compareRNN} propose une comparaison de ces trois blocs élémentaires.\\
 
 \begin{figure}[htbp]
 \begin{center} 
@@ -167,424 +151,17 @@ Quelque soit le modèle, son architecture général est identique et reprend l'a
 \label{fig:compareRNN}
 \end{figure}
 
-\subsection{Résultats expérimentaux}
-L'évaluation concerne ici uniquement la configuration \textit{Forecasting}, où le modèle ne dispose d'aucun accès au futur et génère les impulsions de manière purement causale.
-Afin de garantir une comparaison équitable, chaque architecture a fait l'objet d'une optimisation de ses hyper-paramètres. Cette étape a permis de s'assurer que les écarts de performance observés sont structurels et non liés à un mauvais hyper-paramétrage. Le tableau \ref{tab:hypRNN} résume la configuration (nombre de couches $L$ et dimension latente $H$) retenue pour chaque modèle à l'issue de cette optimisation.\\
+L'architecture, pensée pour le flux-à-flux, est illustré dans le figure \ref{fig:fluxaflux}, qui est reprise avec ces notations de la figure \ref{RNN comparaison} présentée dans le chapitre \ref{chap:SOTA}. Les deux entrées \textbf{Input 1} et \textbf{Input 2} sont concaténées en un unique vecteur fourni en entrée du modèle.\\
 
-\begin{table}[h]
-\centering
-\begin{tabular}{l c c}
-\hline
-\textbf{Architecture} & \textbf{Dimension cachée ($H$)} & \textbf{Nombre de couches ($L$)} \\
-\hline
-RNN & 640 & 4 \\
-GRU & 640 & 5 \\
-LSTM & 768 & 4 \\
-LSTMAT (Basic) & 768 & 4 \\
-LSTMAT-L (Luong) & 768 & 6 \\
-\hline
-\end{tabular}
-\caption{Configurations optimales des architectures évaluées.}
-\label{tab:hypRNN}
-\end{table}
-
-Les résultats finaux ont été obtenus après un entraînement réalisé sur un ensemble de 500 000 séquences et mesurent la performances des différents modèles par l'erreur de reconstruction normalisée \ref{eq:loss} sur des séquences de taille croissante (10, 20 et 50 impulsions). Avant d'observer ces résultats résumés dans le tableau \ref{tab:resRNN}, nous faisons un court rappel permettant d'appréhender le sens des valeurs numériques présentes dans le tableau.\\
-
-Afin d'interpréter correctement les résultats du Tableau \ref{tab:resRNN}, il convient de préciser le comportement de cette métrique. La normalisation de l'erreur de reconstruction fournit un repère quantitatif absolu : par construction, une erreur de $1$ correspond à la performance d'un prédicteur naïf (qui prédit par exemple toujours la même séquence quelque soit la séquence de PDW incidents). C'est la valeur qu'on obtient en mesurant l'erreur de reconstruction entre une séquence de PDW incidents et une séquence de PDW intercepté ne lui correspondant pas. Ce seuil de référence est typiquement observé lors des toutes premières itérations de l'entraînement. En revanche, une erreur strictement inférieure à $1$ signifie que le modèle a dépassé ce niveau de base et a réussi à capturer la logique sous-jacente des données. Dans le tableau \ref{tab:resRNN}, l'ensemble de nos modèles atteint des scores significativement inférieurs à cette unité de référence, confirmant leur aptitude à modéliser mathématiquement le problème de transduction.\\
-
-\begin{table}[h] 
-\centering 
-\begin{tabular}{l c c c} 
-\hline 
-\textbf{Modèle} & \textbf{10 impulsions} & \textbf{20 impulsions} & \textbf{50 impulsions} \\ 
-\hline 
-RNN & 0.1261 & 0.2109 & 0.2156 \\
-GRU & 0.1260 & 0.1981 & 0.1945 \\ 
-LSTM & 0.1146 & 0.2192 & 0.2001 \\ 
-LSTMAT (Basic) & 0.1053 & 0.1757 & 0.1684 \\ 
-\textbf{LSTMAT-L (Luong)} & \textbf{0.0744} & \textbf{0.1566} & \textbf{0.1542} \\ 
-\hline 
-\end{tabular} 
-\caption{Comparaison des performances (NRMSE) en mode Forecasting en fonction de la longueur de la séquence.} 
-\label{tab:resRNN}
-\end{table}
-
-En complément de cette évaluation quantitative, la figure \ref{fig:RNNgen} illustre les capacités génératives du modèle de manière qualitative. Cette représentation permet la comparaison des séquences incidente (à gauche), cible (au milieu) et générée par le modèle (à droite). Nous pouvons alors distinguer dans la séquence générée les même artefacts que ceux de la séquence cible (encadrés en vert), prouvant la pertinence de cette approche pour l'apprentissage automatique, mais aussi la faculté du modèle à comprendre et reproduire le traitement du DCI.\\
-
-\begin{figure}
+\begin{figure}[htbp]
 \begin{center} 
-\includegraphics[scale=0.5]{genRNN.png}
+\includegraphics[scale=0.35]{fluxaflux.png}
 \end{center}
-\caption{Comparaison qualitative de séquences incidentes (gauche), cible (milieu), prédite par le modèle (droite). La séquence source est composée de 50 PDW. Le modèle utilisé pour prédire la séquence est le LSTMAT-L. Les encadrés verts permettent d'observer la capacité de notre modèle à reproduire les artefacts propre au traitement du DCI \ref{fig:IOex}}
-\label{fig:RNNgen}
+\caption{Illustration d'un réseau récurrent adapté au traitement de flux. Il est constitué de $L=3$ couches. La matrice $W_2$ est la matrice de projection vers l’espace latent. Les matrices $W_1^1$, $W_1^2$ et $W_1^3$ sont la matrice de persistance de la mémoire pour les 3 couches du modèle. La matrice $W_3$ est une matrice de projection dans l’espace des prédiction.}
+\label{fig:fluxaflux}
 \end{figure}
 
-Cette étude valide expérimentalement la pertinence de l'approche flux-à-flux couplée à une architecture récurrente. La très faible variation de l'erreur observée entre 20 et 50 PDW, proche de 0, confirme que notre approche permet de passer à l'échelle sur de plus longues séquences. De plus, l'invariance de la tâche itérative à réaliser sur le traitement du flux assure que le modèle ne nécessite pas d'un entrainement supplémentaire pour traiter ces longues séquences. Ces travaux, présentés sous forme de poster à la conférence CAID \textcolor{red}{REF}, ont reçu un accueil favorable, confirmant l'intérêt de la communauté pour des modèles neuronaux capables de reproduire la causalité fine des chaînes de traitement signal. Ces résultats constituent le socle sur lequel nous bâtissons les extensions présentées dans la section suivante.
-
-\section{Extension des essais : Généralisation à d'autres architectures}
-Cette section étend la discussion sur la pertinence de la sérialisation des données initiée avec les travaux présentés à la conférence CAID \textcolor{red}{REF}. En effet, cette nouvelle formulation flux-à-flux du problème permet en réalité l'utilisation de toutes architectures de traitement de séquence, au delà des architectures récurrentes, à condition qu'elles opèrent de manière auto-régressive et respectent donc la contrainte de causalité. Nous réitérons les expériences en introduisant deux nouvelles familles d'architectures : les Réseaux Convolutifs et les Transformers. Bien qu'elles ne disposent pas de mémoire, ces architectures peuvent accéder aux derniers éléments passées pour en construire une représentation latent, jouant un rôle similaire à la mémoire. \\
-
-Nous détaillons ici les adaptations nécessaires au pré-traitement des données pour maximiser l'efficacité de ces modèles, la sélection des architectures, ainsi que les métriques spécifiques définies pour guider l'apprentissage, avant de présenter les résultats et nos conclusions.
-
-\subsection{Sélection des architectures}
-Nous comparons trois architectures distinctes, choisies pour leur représentativité des différents paradigmes de traitement séquentiel.
-
-\subsubsection{Le Transformer (Attention Mechanism)}
-Le modèle utilisé est un Encodeur Transformer modifié, inspiré de l'architecture proposé par Vaswani \cite{vaswani_attention_2017}. Contrairement à l'encodeur standard qui voit tout le contexte, notre encodeur remplace les modules de Self-Attention \ref{MHAeq} par un module de Masked Self-Attention \ref{maskedattention} pour garantir la causalité. Cette architecture est particulièrement adaptée pour capturer des dépendances complexes et non-locales dans la séquence sérialisée. Elle est illustrée dans la figure \ref{fig:linTrans}.
-
-\begin{figure}
-\begin{center}
-\includegraphics[scale=0.4]{enc_transformer_lin.png}
-\end{center}
-\caption{Illustration de l'architecture Transformer utilisé pour le traitement flux-à-flux, où l'auto-attention de référence \ref{encoder transformer} est remplacée par de l'auto-attention masquée.}
-\label{fig:linTrans}
-\end{figure}
-
-\subsubsection{Le TCN (Temporal Convolutional Network)}
-
-Le TCN (Temporal Convolutional Network, \cite{bai_empirical_2018}) est une architecture convolutionnelle spécifiquement adaptée aux séquences unidimensionnelles. Contrairement aux réseaux récurrents (RNN), il traite l'information de manière massivement parallèle via des convolutions causales dilatées. Ces convolutions se définissent par l'application d'un filtre dont la portée s'étend de manière exponentielle avec la profondeur de la couche, sans pour autant augmenter le nombre de paramètres.\\
-
-Formellement, pour une séquence d'entrée $x$, l'opération de convolution causale dilatée est définie par la taille du noyau $m$ et le facteur de dilatation $d$. La sortie $F(k)$ à la position $k$ s'exprime par la somme pondérée suivante :
-$$F(k) = \sum_{j=0}^{m-1} w_j \cdot x_{k - d\cdot j}$$
-
-Dans l'architecture TCN, le facteur de dilatation croît exponentiellement avec la profondeur de la couche $i$, tel que $d = \alpha^i$ (avec typiquement $\alpha = 2$). La couche $i$ calcule ainsi son état en agrégeant des éléments distants de $d = \alpha^i$ pas de temps dans la couche inférieure, distance qui croît exponentiellement avec la profondeur de la couche. Pour la première couche ($i = 0$, soit $d = 1$), l'équation se réduit à la convolution causale canonique. La figure \ref{fig:TCN} illustre la croissance du champ récepteur et la compare à la convolution causale.\\
-
-\begin{figure}
-\begin{center}
-\includegraphics[scale=0.35]{TCN.png}
-\end{center}
-\caption{Comparaison structurelle des architectures convolutives unidimensionnelles. À gauche (a), une convolution causale standard où l'horizon d'interaction croît linéairement avec la profondeur. À droite (b), une convolution causale dilatée où le facteur de dilatation $d$ croît exponentiellement ($d=1, 2, 4$). Figure reproduite d'après \cite{bai_empirical_2018}.}
-\label{fig:TCN}
-\end{figure}
-
-Cette architecture s'est particulièrement distinguée dans la littérature en surpassant les modèles récurrents (LSTM, GRU) sur une vaste majorité de tâches standards de modélisation de séquences \cite{bai_empirical_2018}. Elle offre notamment une stabilité d'optimisation supérieure en s'affranchissant du problème de disparition du gradient inhérent aux longues boucles de récurrence, tout en réduisant considérablement les temps d'entraînement grâce à sa parallélisation totale. Dans le cadre de notre étude, l'introduction du TCN permet de tester une hypothèse structurelle fondamentale : il s'agit d'évaluer si une modélisation hiérarchique locale, dotée d'un champ récepteur fixe mais large, peut s'avérer plus efficace qu'une mémoire récurrente infinie pour capturer la dynamique algorithmique temporelle du DCI.
-
-\subsubsection{Le GRU (Recurrent Network)}
-Pour représenter la famille des réseaux récurrents, nous avons écarté les variantes à attention (LSTMAT) car leur mécanisme de "relecture" du passé les rapproche conceptuellement des Transformers, diluant l'intérêt de la comparaison "orthogonale". Au vu des résultats précédents \ref{tab:resRNN}, nous retenons le GRU (Gated Recurrent Unit), qui s'est avéré être le compromis le plus performant et stable pour le traitement des longues séquences sérialisées. Le GRU est illustré à droite de la figure \ref{fig:compareRNN}.
-
-\subsubsection{Structure commune et hyper-paramètres}
-Afin de garantir une comparaison rigoureuse, toutes les architectures évaluées partagent une topologie modulaire commune et un même principe d'inférence, structurés comme suit :\\
-
-\begin{itemize}
-\item Un vecteur d'état spécial $\hat{h}$ : Il s'agit d'une représentation latente apprenable du jeton \texttt{NEXT}. Ce vecteur est destiné à être inséré dynamiquement dans la séquence pour signaler les changements de contexte.
-
-\item Une couche d'embedding : Elle projette la séquence d'entrée brute vers l'espace latent du modèle, élément par élément, transformant les caractéristiques physiques des impulsions en une représentation vectorielle latente initiale.
-
-\item Un mécanisme de substitution conditionnelle : À l'aide du masque binaire $MI$, les représentations latentes situées aux positions de contexte (Input 2) sont substituées par le vecteur $\hat{h}$. Cette opération prépare la séquence pour le traitement auto-régressif.
-
-\item Le corps du modèle : Selon l'architecture testée (GRU, TCN ou Transformer), ce bloc traite la séquence latente de manière strictement causale. Il enrichit progressivement les représentations par agrégation du contexte temporel passé, produisant en sortie une séquence latente à haute teneur sémantique.
-
-\item Un décodeur (Tête de régression) : Il transforme chaque élément de la séquence latente enrichie en une prédiction dans l'espace des PDW (caractéristiques physiques) et retourne cette estimation.
-
-\item Un comparateur (Tête de classification) : Ce module calcule la similarité (\textit{cosine similarity}) entre chaque représentation latente enrichie finale et le vecteur $\hat{h}$. Ces scores, normalisés entre 0 et 1, quantifient la probabilité que chaque prédiction corresponde au jeton \texttt{NEXT}.
-\end{itemize}
-\; \\
-
-Mise à part le corps du modèle, qui constitue le module de traitement de séquence, tous les modules présentés ci-dessus agissent élément par élément, de manière totalement indépendante. La figure \ref{fig:LinProcess} schématise la transformation des éléments dans les modules qui (à gauche) précédent le corps du modèle (GRU, TCN ou Transformer), ainsi que les modules qui le succèdent (à droite). 
-
-\begin{figure}
-\begin{center}
-\includegraphics[scale=0.55]{LinProcess.png}
-\end{center}
-\caption{Schéma des structures neuronales qui précèdent (à gauche) et succèdent (à droite) le cœur du modèle (constitué soit d'une GRU, TCN ou Transformer). Les opérations réalisés dans ces modules sont appliquées aux éléments indépendamment, contrairement au cœur du modèle qui constitue le module du traitement de séquence. La séquence prise pour exemple correspond à la séquence \ref{tab:seqfusion}.}
-\label{fig:LinProcess}
-\end{figure}
-
-Les hyper-paramètres de chaque architecture ont été optimisés via une recherche bayésienne afin de s'assurer que les écarts de performances proviennent directement de la capacité de l'architecture à apprendre les dépendances des données. Nous avons choisi des plages de variation de ces paramètres permettant aux modèles d'atteindre le même nombre maximal de paramètre, soit environ $5$ millions. Les valeurs caractérisant la géométrie des modèles (largeur, profondeur) sont données dans le tableau \ref{tab:hyperparams}, à côté de la valeur maximale possible.
-
-\begin{table}[h]
-\centering
-\begin{tabular}{|l|c|c|c|}
-\hline
-\textbf{Paramètre} & \textbf{Transformer} & \textbf{TCN} & \textbf{GRU} \\
-\hline
-Dimension Latente & 300/300 & 300/300 & 300/300 \\
-Nombre de couches & 12/12 & 4/5 & 6/8 \\
-Nombre de tête & 4 & - & - \\
-Taille du noyau & - & 3 & - \\
-Nombre de paramètres & 1/5040696 & 1/4967712 & 1/5066712 \\
-\hline
-\end{tabular}
-\caption{Hyper-paramètres géométriques retenus pour chaque architecture.}
-\label{tab:hyperparams}
-\end{table}
-
-
-\subsection{Fonction de perte et métriques d'évaluation}
-\label{seq:metrique}
-L'apprentissage est guidé par une fonction de perte composite qui minimise simultanément l'erreur de reconstruction des PDW $\mathcal{L}_{rec}$ et l'erreur de détection du jeton \texttt{NEXT} (classification) $\mathcal{L}_{class}$. Un coefficient $\lambda \in ]0; 1[$ permet de pondéré ces deux facteurs, définissant la fonction de perte qui s'écrit alors :
-$$\mathcal{L}_{total} = (1 - \lambda)\mathcal{L}_{rec} + \lambda \mathcal{L}_{class}$$
-
-\subsubsection{Erreur de reconstruction pondérée ($\mathcal{L}_{reg}$)}
-Cette composante évalue la qualité des caractéristiques prédites, mais uniquement pour les positions correspondant à une impulsion valide. Elle ignore donc les positions de padding ($MP=0$) ainsi que les positions où le jeton \texttt{NEXT} est attendu ($MO=1$).\\
-
-Considérons un lot (batch) de $B$ séquences de longueur maximale $T$, où chaque impulsion est un vecteur de dimension $D$. L'ensemble des séquences cibles $\mathbf{Y}$ comme l'ensemble des séquences prédites $\hat{\mathbf{Y}}$ peuvent être considéré comme des tenseurs de dimension $B \times T \times D$. Les masques peuvent eux être associés à des tenseurs de dimensions $B \times T$, naturellement étendu en tenseur de taille $B \times T \times D$ pour les opérations élément par élément tel que la multiplication de Hadamard $\odot$. L'erreur brute est définie comme une distance euclidienne (RMSE) entre une prédiction $\hat{\mathbf{Y}}_k$ et une cible $\mathbf{Y}_k$, normalisée par le nombre total d'éléments scalaires à la fois valides, défini par $MP_k$, et à la fois ne devant pas être un jeton \texttt{NEXT}, défini par $1 - MO_k$. Elle s'écrit :
-
-\begin{equation}
-\mathcal{L}{raw}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k) = \frac{\| (\hat{\mathbf{Y}}_k - \mathbf{Y}_k) \odot (1 - \mathbf{MO}_k) \odot \mathbf{MP_k} \|_2}{\| ((1 - \mathbf{MO}_k) \odot \mathbf{MP}_k \|_2\sqrt{D}}
-\end{equation}
-
-Le terme au dénominateur assure que la perte est invariante au nombre d'éléments considéré dans le calcul. Pour équilibrer l'apprentissage face à la diversité des séquences, nous définissons à partir de cette expression l'erreur de référence $\mathcal{L}_{ref}$, calculée similairement à \ref{eq:Lref} :
-
-\begin{align*}
-\boldsymbol{\mu}_k & = & \underset{Y \in \mathbb{R}^{D}}{\operatorname{argmin}} \mathcal{L}{raw}(\mathbf{1}Y^\top, \mathbf{Y}_k) \\
-\mathcal{L}_{ref}(\mathbf{Y}_k) & = & \mathcal{L}{raw}(\mathbf{1}\boldsymbol{\mu}_k^\top, \mathbf{Y}_k)
-\end{align*}
-
-$\mathbf{1}\boldsymbol{\mu}_k^\top$ est la séquence répétant $T$ fois l'élément $\boldsymbol{\mu}_k$, et correspond à la meilleure répétition d'éléments à prédire pour minimiser la distance à $\mathbf{Y}_k$. La valeur de $\mathcal{L}_{ref}(\mathbf{Y}_k)$ indique donc à quel point la séquence $\mathbf{Y}_k$ est loin d'être une répétition d'éléments similaires, qu'un modèle pourrait prédire aisément sans réellement avoir appris à reproduire le DCI.\\
-
-L'erreur de reconstruction entre une prédiction $\hat{\mathbf{Y}}_k$ et une cible $\mathbf{Y}_k$ s'écrit donc comme le rapport entre l'erreur brute $\mathcal{L}{raw}$ et l'erreur de référence $\mathcal{L}_{ref}$, permettant de renforcer la contribution des séquences "proches" de la répétition d'un même élément, ce qui correspond à des cas critiques où l'interaction entre PDW est forte et où nous considérons que l'apprentissage du modèle doit se concentrer. Elle s'écrit :
-\begin{equation}
-\mathcal{L}{weighted}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k) = \frac{\mathcal{L}{raw}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k)}{\mathcal{L}_{ref}(\mathbf{Y}_k)}
-\end{equation}
-
-Finalement, la fonction de perte caractérisant l'erreur de reconstruction est la moyenne quadratique de l'erreur pondéré présenté avant et elle s'écrit :
-\begin{equation}
-\label{eq:loss}
-\mathcal{L}{rec}(\hat{\mathbf{Y}}, \mathbf{Y}) = \sqrt{\frac{1}{B} \sum_{k=1}^B \mathcal{L}_{weighted}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k)^2}
-\end{equation}
-
-\subsubsection{Erreur de classification par MCC différentiable ($\mathcal{L}_{class}$)}
-La seconde tête du réseau prédit un tenseur de probabilités $\mathbf{P}$, dont la cible est $\mathbf{MO}$ de dimension $B \times T$, où chaque élément $p_{k,t} \in [0, 1]$ représente la probabilité que la cible $t \in [|1; T|]$ de la séquence $k \in [|1; B|]$ soit un jeton \texttt{NEXT}.\\
-
-Pour optimiser la performance sur ce problème de classification binaire déséquilibré, nous maximisons une version différentiable ("soft") du Coefficient de Corrélation de Matthews (MCC). Le MCC est une métrique permettant d'évaluer les performances d'un modèle de classification binaire, particulièrement robuste lors d'un déséquilibre dans la représentation des classes. Le MCC repose sur le calcul du nombre de vrai positif $TP$, de faux positif $FP$, de vrai négatif $TN$ et de faux négatif $FN$, obtenu en comparant les classes prédites et les classes attendues, et s'exprime ainsi :
-$$ MCC = \frac{TP\times TN - FP \times FN}{\sqrt{(TP + FP)(TP + FN)(TN + FP)(TN + FN)}}$$
-La version "soft" repose sur un calcul souple se basant sur les probabilités d'attributions des classes : 
-\begin{itemize}
-\item une probabilité prédite de $0.34$ associée à la cible "positif" (1) est a $34\%$ un vrai positif et à $66\%$ un faux négatif
-\item une probabilité prédite de $0.34$ associée à la cible "négatif" (0) est a $34\%$ un faux positif et à $66\%$ un vrai négatif
-\end{itemize} 
-
-Cette souplesse permet de conserver la différentiabilité du $MCC_{soft}$ par rapport aux prédiction du modèle, et donc de propager le gradient pour l'apprentissage.En notant $\Sigma(\cdot)$ l'opérateur  qui calcule la somme de tous les éléments d'un tenseur, les versions "soft" de $TP, TN, FP, FN$ s'expriment ainsi : 
-\begin{align*}
-TP &= \Sigma(\mathbf{MO} \odot \mathbf{P} \odot \mathbf{MP} )\\
-TN &= \Sigma((\mathbf{1} - \mathbf{MO}) \odot (\mathbf{1} - \mathbf{P}) \odot \mathbf{MP}) \\
-FP &= \Sigma( (\mathbf{1} - \mathbf{MO}) \odot \mathbf{P} \odot \mathbf{MP}) \\
-FN &= \Sigma(\mathbf{MO} \odot (\mathbf{1} - \mathbf{P}) \odot \mathbf{MP})
-\end{align*}
-
-Le score MCC différentiable est alors donné par :
-\begin{equation}
-MCC_{soft} = \frac{TP \cdot TN - FP \cdot FN}{\sqrt{(TP+FP)(TP+FN)(TN+FP)(TN+FN) + \epsilon}}
-\end{equation}
-
-La perte de classification est définie pour tendre vers 0 lorsque la corrélation est parfaite ($MCC \to 1$) :
-\begin{equation}
-\mathcal{L}{class} = 1 - MCC_{soft}
-\end{equation}
-
-\subsection{Résultats et Analyse Comparative}
-Cette section présente les performances comparées des trois architectures (GRU, TCN, Transformer) sur la tâche de génération de flux évènementiel. Les modèles ont été entraînés et évalués selon le protocole décrit précédemment, avec un facteur de pondération $\lambda = 0.5$ équilibrant la régression et la classification.
-
-\subsubsection{Performance globale et convergence}
-Dans un premier temps, nous évaluons la capacité des modèles à converger vers une solution stable et à généraliser sur l'ensemble de test. La figure ci-dessous illustre la dynamique d'apprentissage.
-
-\begin{figure}[htbp]
-\centering
-\fbox{\begin{minipage}{0.9\textwidth}
-\centering
-\vspace{1cm}
-[Insérer ici : Courbes d'apprentissage]
-\vspace{1cm}
-\
-\textbf{Gauche :} Évolution de la perte totale $\mathcal{L}_{total}$ (train/val) par époque. \
-\textbf{Droite :} Évolution du score MCC (validation) par époque.
-\end{minipage}}
-\caption{Comparaison des dynamiques d'apprentissage. Le Transformer montre une convergence plus lente initialement mais atteint un plateau asymptotique plus bas que le GRU.}
-\label{fig:learning_curves}
-\end{figure}
-
-Le tableau \ref{tab:global_results} synthétise les métriques finales obtenues sur le jeu de test. Nous rapportons l'erreur de reconstruction ($\mathcal{L}_{reg}$), le coefficient de corrélation de Matthews ($MCC$) pour la détection du jeton \texttt{NEXT}, ainsi que le temps d'inférence moyen par impulsion générée.\\
-
-\begin{table}[h]
-\centering
-\begin{tabular}{l c c c}
-\hline
-\textbf{Architecture} & \textbf{Régression ($\mathcal{L}_{reg}$)} $\downarrow$ & \textbf{Classification (MCC)} $\uparrow$ & \textbf{Inférence ($\mu_s$/step)} $\downarrow$ \\
-\hline
-GRU (Baseline) & 0.145 & 0.892 & \textbf{12.4} \\
-TCN & 0.152 & 0.885 & 18.1 \\
-Transformer & \textbf{0.131} & \textbf{0.915} & 24.6 \\
-\hline
-\end{tabular}
-\caption{Performances comparées sur le jeu de test (valeurs fictives pour illustration). Le Transformer excelle en précision mais le GRU reste le plus rapide en inférence séquentielle.}
-\label{tab:global_results}
-\end{table}
-
-On observe que l'architecture Transformer offre la meilleure fidélité de reconstruction ($\mathcal{L}_{reg} = 0.131$) et la meilleure capacité de discrimination des événements d'arrêt ($MCC = 0.915$). Cela suggère que le mécanisme d'attention, même masqué, capture plus finement les dépendances complexes entre les caractéristiques des impulsions incidentes et interceptées que la mémoire récurrente du GRU.\\
-
-Le TCN, bien que performant, semble légèrement en retrait sur cette tâche spécifique, potentiellement limité par son champ réceptif fixe malgré les dilatations, face à la variabilité des dynamiques temporelles du DCI.
-En revanche, le GRU conserve un avantage significatif en termes de coût computationnel à l'inférence, un critère crucial pour une application temps-réel.
-
-\subsubsection{Robustesse face à la longueur de séquence}
-L'une des motivations principales du passage au "flux-à-flux" était de s'affranchir de la dégradation des performances sur les séquences longues, observée avec les approches Seq2Seq classiques. Pour vérifier cette hypothèse, nous avons évalué les modèles sur des séquences de test de longueurs croissantes, allant de 50 à 500 impulsions incidentes.\\
-
-\begin{figure}[htbp]
-\centering
-
-\fbox{
-\begin{minipage}{0.9\textwidth}
-\centering
-\vspace{1cm}
-[Insérer ici : Graphique en ligne]
-\vspace{1cm}
-\
-\textbf{Axe X :} Longueur de la séquence (nombre d'impulsions). \
-\textbf{Axe Y :} Erreur $\mathcal{L}_{reg}$ (ou MCC). \
-\textbf{Courbes :} Une courbe par architecture.
-\end{minipage}
-}
-\caption{Évolution de la performance de régression en fonction de la longueur de la séquence traitée. Contrairement aux approches globales, les architectures auto-régressives maintiennent une performance stable sur le long terme.}
-\label{fig:length_robustness}
-\end{figure}
-
-Comme l'illustre la figure \ref{fig:length_robustness}, les trois architectures démontrent une stabilité remarquable quelle que soit la longueur de la séquence (courbes quasi-plates). L'encodage relatif local du temps et la gestion événementielle par le token \texttt{NEXT} permettent effectivement de "réinitialiser" implicitement le contexte, empêchant la dérive temporelle ou la saturation de la mémoire souvent constatée sur les LSTM/GRU en mode Seq2Seq global.
-
-\subsubsection{Analyse qualitative des générations}
-Enfin, il est pertinent d'observer visuellement la qualité des séquences générées. La figure \ref{fig:qualitative} présente un exemple de sérialisation pour une séquence complexe où plusieurs impulsions incidentes se chevauchent temporellement.
-\begin{figure}[htbp]
-\centering
-\fbox{
-\begin{minipage}{0.9\textwidth}
-\centering
-\vspace{2cm}
-[Insérer ici : Comparaison visuelle Vérité Terrain vs Prédiction]
-\vspace{2cm}
-\
-Visualisation temporelle (Scatter plot). \
-En haut : Vérité Terrain. En bas : Prédiction Transformer.
-\end{minipage}
-}
-\caption{Exemple de reconstruction sur une fenêtre complexe. Le modèle identifie correctement qu'une impulsion incidente $I_k$ doit générer deux impulsions de sortie $O_a, O_b$ avant de passer à la suivante (prédiction correcte des tokens \texttt{NEXT}).}
-\label{fig:qualitative}
-\end{figure}
-
-L'analyse qualitative confirme que le modèle a bien appris la logique de causalité du DCI :
-\begin{itemize}
-\item La synchronisation est respectée : les $\Delta t$ prédits positionnent correctement les impulsions émises.
-\item La gestion du flux est cohérente : le modèle ne "bloque" pas indéfiniment sur une entrée et sait passer à la suivante via le jeton \texttt{NEXT} (score de similarité $> 0.5$).
-\end{itemize}
-
-\subsection{Conclusion sur les extensions}
-Ces expériences complémentaires valident la généralité de l'approche par sérialisation évènementielle. Si le Transformer s'impose comme la référence en termes de précision pure, confirmant la puissance des mécanismes d'attention pour la modélisation fine des signaux radar, le GRU reste une alternative très pertinente pour les environnements à fortes contraintes de latence. Le TCN offre un compromis intermédiaire mais ne semble pas apporter d'avantage décisif sur cette topologie de données spécifique.\\
-
-Surtout, ces résultats confirment que la reformulation du problème en flux causal résout structurellement la limitation de longueur des séquences, ouvrant la voie à la simulation de scénarios électromagnétiques de durée indéfinie.
-
-
-
-
-
-
-
-
-\chapter{Sérialisation du problème : une approche évènementielle}
-
-Ce chapitre introduit une méthodologie alternative pour la reproduction par apprentissage profond du fonctionnement du DCIS présenté dans le chapitre \ref{chap:newfocus}. En rupture avec l'approche \textit{sequence-to-sequence} (Seq2Seq) abordée au chapitre précédent \ref{chap:seq2seq}, nous proposons une reformulation du problème axée sur la causalité et le traitement flux-à-flux (\textit{stream processing}).
-
-Cette transition méthodologique s'appuie sur le concept de \textbf{sérialisation événementielle}, démarche consistant à réorganiser les flux asynchrones d'entrée (impulsions incidentes) et de sortie (PDW publiés) sur une ligne temporelle unique. Ce concept sera approfondi dans la sous-section \ref{seq:serialisation}.
-
-\section{Motivation : du traitement de séquence au traitement de flux}
-L'approche Seq2Seq traite l'intégralité d'une séquence d'impulsions source avant d'initier le décodage. Cette méthode se heurte à deux limitations.\\ 
-
-Premièrement, le traitement d'une séquence globale constitue un goulot d'étranglement calculatoire :
-\begin{itemize}
-\item Les architectures récurrentes (RNN/LSTM) peinent à propager le gradient sur de longues séquences, rendant l'apprentissage des dépendances à longue distance compliqué.
-\item Les architectures attentionnelles (Transformers) présentent une complexité spatiale et temporelle quadratique $\mathcal{O}(N^2)$, provoquant une saturation rapide de la mémoire vidéo (V-RAM) face à des scénarios massifs.
-\end{itemize}
-Si des mécanismes de fenêtrage permettent de contourner ces limites matérielles du Transformer, ils introduisent des problématiques de continuité aux interfaces entre les fenêtres, comme illustré en \textcolor{red}{REFERENCE AUX RESULTATS A VENIR}. \\
-
-Le second obstacle est de nature physique. Modéliser le DCIS via une fonction créant une représentation latente $\mathbf{h}$ d'une séquence incidente $\mathbb{x}$ pour ensuite générer une prédiction $\mathbf{y}$, comme c'est le cas dans le traitement \textit{séquence-vers-séquence}, revient à ignorer que le DCIS est un système dynamique réactif. Il est mis à jour par l'occurrence d'événements temporels locaux : l'apparition ou la disparition d'impulsion, ou la publication d'une interception provoquant une libération de mémoire. L'approche flux-à-flux vise à reproduire cette logique de mise-à-jour en contraignant le modèle à opérer de manière causale et à l'échelle du PDW, qui sera notre évènement déclencheur.
-
-\section{Formalisation du problème "Flux-à-flux"}
-\label{seq:serialisation}
-Pour formuler cet ancrage événementiel sous forme de problème d'apprentissage supervisé, le réseau doit pouvoir modéliser l'incertitude quant au nombre de publications à générer (de zéro à plusieurs) pour un événement d'entrée donné.
-
-\subsection{Contraintes de l'approche et choix de conception}
-Un réseau de neurones standard est une fonction déterministe $f: \mathcal{X} \to \mathcal{Y}$. Le traitement asynchrone du flux radar impose l'adaptation de ce paradigme selon trois axes :
-\begin{itemize}
-\item \textbf{Discrétisation temporelle de la réponse :} Le modèle ne pouvant pas générer un nombre stochastique d'impulsions en une seule passe, le traitement s'opère itérativement. Le réseau est interrogé de manière répétée avec la même impulsion incidente tant qu'il estime devoir générer des interceptions.
-\item \textbf{Condition d'arrêt interne :} Le nombre de sorties étant variable, le modèle doit explicitement signaler la fin des émissions liées à un événement source. Nous introduisons un jeton de contrôle \texttt{NEXT}, dont la prédiction par le réseau stoppe la génération courante et commande la lecture de l'impulsion incidente suivante.
-\item \textbf{Maintien du contexte :} Le modèle doit justifier ses prédictions par l'historique des impulsions traitées et se situer au sein d'une salve d'émissions. Le réseau prend ainsi la forme d'un modèle d'état, recevant à l'instant $t$ une double entrée : l'impulsion incidente courante $\mathbf{x}_t$ et la dernière prédiction effectuée $\hat{y}_{t-1}$ (pouvant être un PDW ou un jeton \texttt{NEXT}).
-\end{itemize}
-
-\subsection{Sérialisation : transformation et algorithme des données}
-L'opération de sérialisation événementielle consiste à fusionner le flux d'entrée (impulsions incidentes) et le flux de sortie (PDW interceptés) en une séquence chronologique unique, triée par dates effectives de disponibilité (date d'arrivée $ToA$ pour l'incident, date de publication $ToE$ pour l'intercepté). 
-
-Considérons une séquence de PDW incidents $I = [I_1, I_2, I_3]$ et la séquence des PDW interceptés correspondants $O = [O_1, O_2, O_3, O_4, O_5]$. La sérialisation aligne ces événements :
-\begin{equation}
-\label{eq:seqfusion}
-\text{Séquence sérialisée} : [I_1, O_1, O_2, O_3, I_2, I_3, O_4, O_5]
-\end{equation}
-
-Pour convertir cette chronologie en une structure d'entraînement supervisé, l'Algorithme \ref{algo:serialize_data} extrait itérativement les triplets (Entrée 1, Entrée 2, Cible). L'objectif du modèle est de prédire l'événement suivant (Cible) à partir du PDW incident actif (Entrée 1) et de l'événement précédent (Entrée 2).
-
-\begin{algorithm}[htbp]
-\DontPrintSemicolon
-\SetAlgoLined
-\KwIn{Séquence chronologique sérialisée $S$ (contenant $I_n$ et $O_m$)}
-\KwOut{Tenseurs d'entraînement : $\mathbf{In}_1$, $\mathbf{In}_2$, $\mathbf{Cible}$}
-$I_{actif} \leftarrow \emptyset$\;
-$O_{prev} \leftarrow \texttt{NEXT}$ \tcp*{Dernier événement généré, initialisé à NEXT}
-$k \leftarrow 1$\;
-\For{$s \in S$}{
-    \eIf{$s$ est de type Incident ($I_n$)}{
-        \If{$I_{actif} \neq \emptyset$}{
-            \tcp{Clôture de la salve précédente}
-            $\mathbf{In}_1[k] \leftarrow I_{actif}$\;
-            $\mathbf{In}_2[k] \leftarrow O_{prev}$\;
-            $\mathbf{Cible}[k] \leftarrow \texttt{NEXT}$\;
-            $k \leftarrow k + 1$\;
-        }
-        $I_{actif} \leftarrow s$\;
-        $O_{prev} \leftarrow \texttt{NEXT}$\;
-    }{
-        \tcp{$s$ est de type Intercepté ($O_m$)}
-        $\mathbf{In}_1[k] \leftarrow I_{actif}$\;
-        $\mathbf{In}_2[k] \leftarrow O_{prev}$\;
-        $\mathbf{Cible}[k] \leftarrow s$\;
-        $O_{prev} \leftarrow s$\;
-        $k \leftarrow k + 1$\;
-    }
-}
-\Return{$\mathbf{In}_1, \mathbf{In}_2, \mathbf{Cible}$}
-\caption{Création des triplets d'entraînement par sérialisation événementielle}
-\label{algo:serialize_data}
-\end{algorithm}
-
-Le Tableau \ref{tab:seqfusion} compile le résultat de cette transformation sur la séquence d'exemple.
-
-\begin{table}[htbp]
-\centering
-\begin{tabular}{l|c|c|c|c|c|c|c|c|c|c}
-\toprule
-\textbf{Pas de temps} & \textbf{t=1} & \textbf{t=2} & \textbf{t=3} & \textbf{t=4} & \textbf{t=5} & \textbf{t=6} & \textbf{t=7} & \textbf{t=8} & \textbf{t=9} & \textbf{t=10}\\
-\midrule
-\textbf{Input 1 ($I_{actif}$)} & $I_1$ & $I_1$ & $I_1$ & $I_1$ & $I_2$ &$I_3$ & $I_3$&$I_3$ & PAD & PAD\\
-\textbf{Input 2 ($O_{prev}$)} & \texttt{NEXT}& $O_1$ & $O_2$ & $O_3$ & \texttt{NEXT} & \texttt{NEXT}& $O_4$  & $O_5$ & PAD & PAD\\
-\textbf{Cible} & $O_1$ & $O_2$ & $O_3$ & \texttt{NEXT} & \texttt{NEXT}& $O_4$  & $O_5$ & \texttt{NEXT} & PAD & PAD\\
-\midrule
-\textbf{MI} ($In_2$ est NEXT) & 1 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0\\
-\textbf{MO} (Cible est NEXT)  & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 1 & 0 & 0\\
-\textbf{MP} (Masque Validité) & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 0 & 0\\
-\bottomrule
-\end{tabular}
-\caption{Structure de supervision post-sérialisation. Les séquences sont complétées par des jetons PAD pour l'entraînement par lots. Les masques MI, MO et MP pilotent le comportement architectural et le calcul de la fonction de perte.}
-\label{tab:seqfusion}
-\end{table}
-
-\subsection{Préparation des données et encodage local du temps}
-La redéfinition du problème contraint l'encodage du temps. L'approche flux-à-flux traitant les données localement, l'utilisation d'un indice temporel absolu (global) entraînerait un hors-distribution rapide à l'inférence. Le temps est donc réécrit sous forme de différentiels locaux stricts.
-
-\begin{itemize}
-\item \textbf{Information incidente (Input 1) :} Pour que le réseau décide du nombre d'émissions à générer avant le prochain événement, il doit estimer l'horizon temporel disponible. L'impulsion $I_n$ est augmentée de la différence d'arrivée avec la suivante : $\Delta T_n = \text{ToA}(I_{n+1}) - \text{ToA}(I_n)$. Dans le cas d'une fin de séquence, une valeur asymptotique contraint le modèle à vider sa mémoire.
-\item \textbf{Information interceptée (Input 2 et Cible) :} L'encodage relatif à la position globale est abandonné. La date d'arrivée d'une impulsion interceptée $O_m$ est encodée relativement au ToA de l'impulsion incidente active $I_n$ l'ayant déclenchée : $\Delta \text{ToA}(O_m) = \text{ToA}(O_m) - \text{ToA}(I_n)$.
-\end{itemize}
-
-\section{Validation de l'approche sur architectures récurrentes}
-Cette section présente les résultats de validation de l'approche flux-à-flux, initialement publiés lors de la conférence CAID \cite{ref_caid}. L'étude évalue la capacité des architectures récurrentes canoniques à capturer cette dynamique événementielle.
-
-\subsection{Configurations architecturales}
-La nature itérative du modèle événementiel s'aligne naturellement avec l'équation de mise à jour de l'état caché $h_t = f(h_{t-1}, x_t)$ des réseaux récurrents. Nous avons comparé cinq architectures fondatrices : RNN standard, GRU, LSTM, ainsi que deux LSTM augmentés de mécanismes d'attention (Additive et Luong) pour favoriser la relecture des états passés. L'optimisation géométrique des modèles a abouti aux configurations du Tableau \ref{tab:hypRNN}.
+L'optimisation des hyper-paramètres des modèles a abouti aux configurations du Tableau \ref{tab:hypRNN}.
 
 \begin{table}[htbp]
 \centering
@@ -595,16 +172,36 @@ La nature itérative du modèle événementiel s'aligne naturellement avec l'éq
 RNN & 640 & 4 \\
 GRU & 640 & 5 \\
 LSTM & 768 & 4 \\
-LSTMAT (Additive) & 768 & 4 \\
-LSTMAT-L (Luong) & 768 & 6 \\
 \bottomrule
 \end{tabular}
 \caption{Configurations optimales des architectures récurrentes évaluées.}
 \label{tab:hypRNN}
 \end{table}
 
+\subsection{La métrique}
+La métrique utilisé pour l'entrainement est une pondération de deux métriques, l'une qui mesure la qualité de reconstruction et l'autre qui mesure la qualité de la classification (pour le passage à l'impulsion suivante avec le jeton \texttt{NEXT}). Cette métrique pondérée est très semblable à celle introduite dans le chapitre \ref{chap:seq2seq} (équation \ref{eq:Ltot}) dans l'approche en bloc. \\
+
+Considérons un lot (batch) de $B$ séquences de longueur maximale $T$, où chaque impulsion est un vecteur de dimension $D$. L'ensemble des séquences cibles $\mathbf{Y}$ comme l'ensemble des séquences prédites $\hat{\mathbf{Y}}$ peuvent être considéré comme des tenseurs de dimension $B \times T \times D$. Les masques peuvent eux être associés à des tenseurs de dimensions $B \times T$, naturellement étendu en tenseur de taille $B \times T \times D$ pour les opérations élément par élément tel que la multiplication de Hadamard $\odot$. On définit alors, de manière semblable à l'équation \ref{eq:Eraw}, l'erreur brute du lot de prédictions, normalisée par le nombre total d'éléments scalaires à la fois valides, défini par $MP_k$, et à la fois ne devant pas être un jeton \texttt{NEXT}, défini par $1 - MO_k$. Elle s'écrit :
+
+\begin{equation}
+\mathcal{E}{raw}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k) = \frac{\| (\hat{\mathbf{Y}}_k - \mathbf{Y}_k) \odot (1 - \mathbf{MO}_k) \odot \mathbf{MP_k} \|_2}{\| ((1 - \mathbf{MO}_k) \odot \mathbf{MP}_k \|_2\sqrt{D}}
+\end{equation}
+
+Ensuite, nous injectons ce terme dans les équations \ref{eq:Eref}, \ref{eq:Ewei} et \ref{eq:Lrec} pour obtenir (de manière tout à fait identique à ce que nous avions fait en \ref{seq:metseq2seq}) l'erreur de régression $\mathcal{L}_{rec}$.\\
+
+L'erreur de classification du jeton \texttt{NEXT} identique à l'équation \ref{eq:termine}, si nous désignons par $\texttt{N}$ la représentation latent du jeton \texttt{NEXT} :
+\begin{equation}
+\mathcal{L}_{fin}(\hat{\mathbf{Y}}, \mathbf{Y}) = \frac{\|(\hat{\mathbf{Y}} - \texttt{N}) \odot \mathbf{MO} \odot \mathbf{MP_k} \|_2}{\| \mathbf{MO}_k \odot \mathbf{MP}_k \|_2\sqrt{D}}
+\end{equation}
+
+La fonction de coût finale $\mathcal{L}_{total}$ minimisée lors de l'entraînement combine l'erreur de reconstruction et l'erreur de classification, équilibrées par un hyperparamètre $\lambda$ :
+\begin{equation}
+\label{eq:ssmloss}
+\mathcal{L}_{total}(\hat{\mathbf{Y}}, \mathbf{Y}) = \mathcal{L}_{rec}(\hat{\mathbf{Y}}, \mathbf{Y}) + \lambda \mathcal{L}_{fin}(\hat{\mathbf{Y}}, \mathbf{Y})
+\end{equation}
+
 \subsection{Résultats expérimentaux}
-Le Tableau \ref{tab:resRNN} synthétise la métrique de régression (Erreur pondérée de reconstruction, où $1.0$ représente un prédicteur constant naïf) sur des séquences opérationnelles (inférence aveugle) de longueurs croissantes. 
+Le Tableau \ref{tab:resRNN} synthétise l'erreur totale obtenue, où $1.0$ représente un prédicteur constant naïf. Les résultats ont été obtenus après un entraînement réalisé sur un ensemble de 500 000 séquences et mesurent la performances des différents modèles par l'erreur de reconstruction normalisée \ref{eq:ssmloss} sur des séquences de taille croissante (10, 20 et 50 impulsions). Avant d'observer ces résultats résumés dans le tableau \ref{tab:resRNN}, nous faisons un court rappel permettant d'appréhender le sens des valeurs numériques présentes dans le tableau.\\
 
 \begin{table}[htbp] 
 \centering 
@@ -615,130 +212,33 @@ Le Tableau \ref{tab:resRNN} synthétise la métrique de régression (Erreur pond
 RNN & 0.1261 & 0.2109 & 0.2156 \\
 GRU & 0.1260 & 0.1981 & 0.1945 \\ 
 LSTM & 0.1146 & 0.2192 & 0.2001 \\ 
-LSTMAT (Additive) & 0.1053 & 0.1757 & 0.1684 \\ 
-\textbf{LSTMAT-L (Luong)} & \textbf{0.0744} & \textbf{0.1566} & \textbf{0.1542} \\ 
 \bottomrule
 \end{tabular} 
-\caption{Comparaison des performances (NRMSE) en mode prédictif en fonction du volume d'impulsions traitées.} 
+\caption{Comparaison des performances en fonction du volume d'impulsions traitées.} 
 \label{tab:resRNN}
 \end{table}
 
-Toutes les architectures atteignent une erreur structurellement inférieure à 1.0, prouvant leur capacité à modéliser la tâche. Surtout, la très faible dégradation des scores entre les séquences de 20 et 50 PDW démontre la validité mathématique de la sérialisation : le modèle maintient son régime permanent indépendamment de l'horizon temporel global.
+Toutes les architectures atteignent une erreur structurellement inférieure à 1.0, prouvant leur capacité à modéliser la tâche. Bien plus important, nous constatons que l'erreur ne varie que très peu entre les séquences de 20 et 50 PDW. Ces résultats illustrent la validité de cette approche événementielle : le modèle maintient son régime permanent indépendamment de l'horizon temporel global. Ainsi, le prédiction de très longues séquences n'est numériquement que la répétition d'une tâche que le modèle sait déjà faire.\\
 
-\section{Généralisation à d'autres architectures}
-Afin d'éprouver la robustesse de l'approche événementielle, nous l'étendons aux architectures ne possédant pas de mémoire récurrente explicite, mais exploitant une fenêtre de contexte passée. Nous comparons le GRU de référence à un réseau convolutionnel temporel (TCN) et à un Transformer causal.
 
-\subsection{Sélection et structure commune}
-Le TCN \cite{bai_empirical_2018} déploie des convolutions causales dilatées permettant de modéliser un horizon temporel exponentiel sans rétroaction. Le Transformer, adapté pour garantir un calcul causal strict via l'auto-attention masquée, agrège le contexte par interactions directes élément à élément.
+En complément de cette évaluation quantitative, la figure \ref{fig:RNNgen} illustre les capacités génératives du modèle de manière qualitative. Cette représentation permet la comparaison des séquences incidente (à gauche), cible (au milieu) et générée par le modèle (à droite). Nous pouvons alors distinguer dans la séquence générée les même artefacts que ceux de la séquence cible (encadrés), confirmant encore la pertinence de cette approche pour l'apprentissage automatique, mais aussi la faculté du modèle à comprendre et reproduire le traitement du DCIS.\\
 
-Afin de focaliser l'évaluation sur le cœur de traitement séquentiel, toutes les architectures s'insèrent dans un pipeline commun :
-\begin{itemize}
-\item \textbf{Vecteur d'état $\hat{h}$ :} Représentation latente apprenable du jeton \texttt{NEXT}. À l'aide du masque $MI$, l'entrée 2 est substituée par $\hat{h}$ lorsqu'aucune interception passée n'est disponible.
-\item \textbf{Corps du modèle (Core) :} GRU, TCN ou Transformer traitant la séquence latente fusionnée.
-\item \textbf{Têtes de décision :} Le corps du modèle se divise en une tête de régression (estimant les caractéristiques physiques $\hat{y}$) et une tête de classification calculant la similarité cosinus avec $\hat{h}$ pour émettre la probabilité $P \in [0,1]$ du signal \texttt{NEXT}.
-\end{itemize}
-
-\subsection{Fonction de perte : Régression et MCC Soft}
-L'apprentissage optimise une perte composite : $\mathcal{L}_{total} = (1 - \lambda)\mathcal{L}_{rec} + \lambda \mathcal{L}_{class}$.
-
-L'erreur de reconstruction brute restreint la distance euclidienne aux seuls emplacements d'impulsions physiques valides (masques d'exclusion de remplissage $MP$ et de cibles \texttt{NEXT} $MO$) :
-\begin{equation}
-\mathcal{L}_{raw}(\hat{\mathbf{Y}}, \mathbf{Y}) = \frac{\| (\hat{\mathbf{Y}} - \mathbf{Y}) \odot (1 - \mathbf{MO}) \odot \mathbf{MP} \|_2}{\| (1 - \mathbf{MO}) \odot \mathbf{MP} \|_1 \sqrt{D}}
-\end{equation}
-Cette valeur est ensuite pondérée par l'erreur du prédicteur naïf $\mathcal{L}_{ref}(\mathbf{Y})$ (répétition de la valeur moyenne locale) pour former $\mathcal{L}_{rec}$, comme détaillé dans la formulation en bloc.
-
-La perte de classification exploite une version différentiable du Coefficient de Corrélation de Matthews ($MCC_{soft}$). L'usage des probabilités prédites $\mathbf{P}$ permet de propager le gradient, en posant :
-\begin{align*}
-TP &= \| \mathbf{MO} \odot \mathbf{P} \odot \mathbf{MP} \|_1 \\
-TN &= \| (\mathbf{1} - \mathbf{MO}) \odot (\mathbf{1} - \mathbf{P}) \odot \mathbf{MP} \|_1 \\
-FP &= \| (\mathbf{1} - \mathbf{MO}) \odot \mathbf{P} \odot \mathbf{MP} \|_1 \\
-FN &= \| \mathbf{MO} \odot (\mathbf{1} - \mathbf{P}) \odot \mathbf{MP} \|_1
-\end{align*}
-L'erreur de classe est alors $\mathcal{L}_{class} = 1 - \frac{TP \cdot TN - FP \cdot FN}{\sqrt{(TP+FP)(TP+FN)(TN+FP)(TN+FN) + \epsilon}}$.
-
-\subsection{Algorithme d'inférence flux-à-flux}
-Le formalisme événementiel contraint la prédiction opérationnelle. Le modèle interroge itérativement la dernière impulsion incidente reçue jusqu'à l'émission du jeton d'arrêt, avant de consommer l'observation radar suivante. L'Algorithme \ref{algo:infer_stream} décrit ce processus auto-régressif causal.
-
-\begin{algorithm}[htbp]
-\DontPrintSemicolon
-\SetAlgoLined
-\KwIn{Flux d'impulsions incidentes $I = (I_1, I_2, \dots)$, Seuil de décision \texttt{NEXT} $\gamma$}
-\KwOut{Flux d'impulsions prédites $\hat{O} = (\hat{O}_1, \hat{O}_2, \dots)$}
-$\hat{O} \leftarrow \emptyset$\;
-$\mathbf{Contexte} \leftarrow \emptyset$ \tcp*{Vecteur ou tenseur mémoire de l'architecture}
-\For{$n \leftarrow 1$ \textbf{à} $|I|$}{
-    $O_{prev} \leftarrow \texttt{NEXT}$\;
-    $continue \leftarrow \text{Vrai}$\;
-    \While{$continue$}{
-        \tcp{Inférence d'un pas de temps}
-        $\hat{y}, P_{next}, \mathbf{Contexte} \leftarrow f_\theta(I_n, O_{prev}, \mathbf{Contexte})$\;
-        \eIf{$P_{next} \geq \gamma$}{
-            $continue \leftarrow \text{Faux}$ \tcp*{Le modèle stoppe l'émission pour cet incident}
-        }{
-            $\hat{O} \leftarrow \hat{O} \cup \{\hat{y}\}$\;
-            $O_{prev} \leftarrow \hat{y}$ \tcp*{L'émission devient la nouvelle entrée de contexte}
-        }
-    }
-}
-\Return{$\hat{O}$}
-\caption{Inférence opérationnelle par flux événementiel}
-\label{algo:infer_stream}
-\end{algorithm}
-
-\subsection{Résultats et analyse comparative}
-
-\begin{figure}[htbp]
-\centering
-\framebox{\parbox{0.8\textwidth}{\centering
-  \vspace{1cm}
-  \textbf{Image Placeholder: Courbes d'apprentissage} \\
-  \small\textit{Évolution de la perte totale et du score MCC}
-  \vspace{1cm}
-}}
-\caption{Comparaison des dynamiques d'apprentissage.}
-\label{fig:learning_curves}
+\begin{figure}
+\begin{center} 
+\includegraphics[scale=0.5]{genRNN.png}
+\end{center}
+\caption{Comparaison qualitative de séquences incidentes (gauche), cible (milieu), prédite par le modèle (droite). La séquence source est composée de 50 PDW. Le modèle utilisé pour prédire la séquence est le LSTMAT-L. Les encadrés verts permettent d'observer la capacité de notre modèle à reproduire les artefacts propre au traitement du DCI \ref{fig:IOex}}
+\label{fig:RNNgen}
 \end{figure}
 
-Le tableau \ref{tab:global_results} synthétise les métriques de test. L'architecture Transformer offre la meilleure fidélité de reconstruction ($\mathcal{L}_{reg}$) et discrimine avec le plus de justesse l'événement d'arrêt ($MCC$). Toutefois, la compacité du GRU lui assure une vitesse d'inférence supérieure, critique pour les applications temps-réel stricts. Le TCN, pénalisé par son horizon fixe, s'avère moins adapté à l'irrégularité des salves radar.
+\section{Discussion et Perspectives}
+La reformulation du problème de transduction sous la forme d'un flux événementiel sérialisé apporte une réponse structurelle aux limites rencontrées par l'approche globale et le fenêtrage. En forçant une inférence causale pas-à-pas, cette méthode s'aligne sur la dynamique de mise-à-jour du DCIS.\\
 
-\begin{table}[htbp]
-\centering
-\begin{tabular}{l c c c}
-\toprule
-\textbf{Architecture} & \textbf{Régression ($\mathcal{L}_{reg}$)} $\downarrow$ & \textbf{Classification (MCC)} $\uparrow$ & \textbf{Inférence ($\mu_s$/step)} $\downarrow$ \\
-\midrule
-GRU (Baseline) & 0.145 & 0.892 & \textbf{12.4} \\
-TCN & 0.152 & 0.885 & 18.1 \\
-Transformer & \textbf{0.131} & \textbf{0.915} & 24.6 \\
-\bottomrule
-\end{tabular}
-\caption{Performances comparées sur le jeu de test.}
-\label{tab:global_results}
-\end{table}
+Premièrement, cette modélisation garantit une cohérence tout au long du traitement d'une séquence. Contrairement au mécanisme de fenêtrage qui souffre d'erreurs de reconstruction asymétriques aux interfaces de fenêtres, le traitement flux-à-flux maintient un état latent au cours des itérations. Les expériences montrent que la précision de reconstruction reste invariante quelle que soit la longueur du scénario.\\
 
-\begin{figure}[htbp]
-\centering
-\framebox{\parbox{0.8\textwidth}{\centering
-  \vspace{1cm}
-  \textbf{Image Placeholder: Graphique en ligne} \\
-  \small\textit{Axe X : Longueur de la séquence. Axe Y : Erreur $\mathcal{L}_{reg}$}
-  \vspace{1cm}
-}}
-\caption{Stabilité de la performance de régression en fonction de la longueur de la séquence traitée.}
-\label{fig:length_robustness}
-\end{figure}
+Deuxièmement, cette formulation causale offre une grande flexibilité architecturale. Bien que la validation initiale ait ciblé les réseaux récurrents canoniques (LSTM, GRU), le formalisme événementiel peut s'étendre à toute architecture capable d'auto-régression. L'utilisation de réseaux convolutifs causaux dilatés (TCN, \cite{bai_empirical_2018}) ou de Transformers est ainsi possible. À ce titre, une perspective d'évolution réside dans l'intégration des récents Modèles d'Espaces d'États (SSM), tels que S4 \cite{gu_efficiently_2022} ou Mamba \cite{zgurovsky_linear-time_2026}. Ces architectures émergentes promettent de concilier la capacité de mémoire infinie des réseaux récurrents à l'inférence avec la parallélisation totale des calculs lors de l'entraînement, surmontant ainsi la principale faiblesse historique des RNN.\\
 
-\begin{figure}[htbp]
-\centering
-\framebox{\parbox{0.8\textwidth}{\centering
-  \vspace{1cm}
-  \textbf{Image Placeholder: Comparaison visuelle} \\
-  \small\textit{Vérité Terrain vs Prédiction Transformer}
-  \vspace{1cm}
-}}
-\caption{Exemple de reconstruction sur un chevauchement complexe. Le modèle infère que l'impulsion $I_k$ nécessite la publication consécutive de deux interceptions avant l'activation du jeton \texttt{NEXT}.}
-\label{fig:qualitative}
-\end{figure}
+Cependant, la question de l'accélération des simulations révèle la limite de cette approche. L'inférence du modèle reste itérative : la génération d'un scénario impose une boucle, reproduisant de fait le fonctionnement pas-à-pas du véritable DCIS. En s'affranchissant de la complexité quadratique inhérente au mécanisme d'attention, et grâce à la légèreté paramétrique des architectures employées, cette méthode offre un gain de vitesse supérieur à ce que l'approche Séquence-vers-Séquence permettrait dans les mêmes conditions de causalité stricte. Néanmoins, ce gain demeure limité par l'impossibilité de paralléliser temporellement la boucle d'inférence, le réglant pas la question du cas d'usage de la génération en temps réel.\\
 
-La figure \ref{fig:length_robustness} corrobore l'hypothèse fondatrice de cette approche : l'erreur reste invariante face à la longueur du scénario. Le formalisme flux-à-flux s'affranchit de la dérive mémorielle, ouvrant la voie à la simulation ininterrompue de flux électromagnétiques de durée indéfinie.
+En définitive, comme soulevé lors de l'étude de l'approche globale \ref{disc:seq2seq}, l'obtention d'une accélération logicielle décisive nécessite d'exploiter la puissance du calcul matriciel unifié des GPU via la dimension \textit{Batch}. Ce véritable gain de vitesse peut être obtenu en mettant en œuvre une technique traitant des sous-scénarios se chevauchant, que l'on pourra considérer comme indépendants et traiter en parallèle. L'isolement des prédictions centrales de ses sous-scénarios, considérés comme en régime permanent, constitue encore une fois la clé pour accélérer la simulation avec l'approche flux-à-flux.
 

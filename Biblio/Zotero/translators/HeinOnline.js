@@ -3,13 +3,13 @@
 	"translatorType": 4,
 	"label": "HeinOnline",
 	"creator": "Frank Bennett",
-	"target": "^https?://(www\\.)?heinonline\\.org/HOL/(LuceneSearch|Page|IFLPMetaData|AuthorProfile)\\?",
+	"target": "^https?://access\\.heinonline\\.com/HOL/(LuceneSearch|Page|IFLPMetaData|AuthorProfile)\\?",
 	"minVersion": "3.0",
 	"maxVersion": null,
 	"priority": 100,
 	"inRepository": true,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2026-01-09 20:40:00"
+	"lastUpdated": "2026-07-07 16:00:00"
 }
 
 /*

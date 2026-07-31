@@ -9,7 +9,7 @@
 	"priority": 100,
 	"inRepository": true,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2026-06-03 15:50:00"
+	"lastUpdated": "2026-06-26 16:10:00"
 }
 
 /*
@@ -128,17 +128,13 @@ function parseAnneFrankURL(url) {
 }
 
 function buildAPIURL(lang, endpoint, uuid) {
-	var apiURL = "https://research.annefrank.org/" + lang + "/api/" + endpoint;
-	if (uuid) {
-		apiURL += "/" + uuid;
-	}
-	return apiURL + "?format=json";
+	return "https://research.annefrank.org/" + lang + "/api/" + endpoint + "/" + uuid;
 }
 
 function buildSearchAPIURL(lang, query) {
-	var apiURL = "https://research.annefrank.org/" + lang + "/api/search?format=json";
+	var apiURL = "https://research.annefrank.org/" + lang + "/api/search";
 	if (query) {
-		apiURL += "&q=" + encodeURIComponent(query);
+		apiURL += "?q=" + encodeURIComponent(query);
 	}
 	return apiURL;
 }
@@ -159,7 +155,7 @@ function translateRecord(type, data, lang, doc) {
 	var item = new Zotero.Item("encyclopediaArticle");
 	item.title = getItemTitle(type, data, lang);
 	item.abstractNote = getLocalized(data, "summary", lang);
-	item.url = data.url || "";
+	item.url = getCanonicalURL(type, data, lang);
 	item.encyclopediaTitle = getPublicationTitle(lang);
 	item.publisher = getPublisher(lang);
 	item.place = "Amsterdam";
@@ -212,6 +208,29 @@ function getDisplayTitle(type, data, lang) {
 
 function getLocalized(data, base, lang) {
 	return data[base + "_" + lang] || data[base] || data[base + "_en"] || data[base + "_nl"] || "";
+}
+
+function getCanonicalURL(type, data, lang) {
+	var slug = typeToSlug(type);
+	if (data.uuid && slug) {
+		return "https://research.annefrank.org/" + lang + "/" + slug + "/" + data.uuid + "/";
+	}
+	return data.url || "";
+}
+
+function typeToSlug(type) {
+	switch (type) {
+		case "person":
+			return "personen";
+		case "event":
+		case "aw_event":
+			return "gebeurtenissen";
+		case "location":
+			return "locaties";
+		case "subject":
+			return "onderwerpen";
+	}
+	return "";
 }
 
 function getPublicationTitle(lang) {

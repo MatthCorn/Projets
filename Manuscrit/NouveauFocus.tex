@@ -7,7 +7,7 @@ Le premier réside dans la complexité du traitement opéré par le DCI. Les ph�
 
 Le second obstacle est inhérent à l'exigence de reproductibilité de la recherche scientifique. L'utilisation d'un simulateur industriel impose des contraintes de confidentialité, limitant la diffusion des jeux de données et empêchant la validation indépendante des résultats.  \\
 
-Pour pallier ces limitations, nous proposons un environnement de simulation simplifié, désigné par le terme DCIS (Module de Détection et de Caractérisation des Impulsions Simplifié). Cet outil offre des leviers de contrôle sur les mécanismes générateurs d'artéfacts, facilitant la conception des réseaux de neurones, tout en s'affranchissant des restrictions de diffusion de données industrielles. 
+Pour pallier ces limitations, nous proposons un environnement de simulation simplifié, désigné par le terme Module DCIS (Module de Détection et de Caractérisation des Impulsions Simplifié) voir simplement DCIS. Cet outil offre des leviers de contrôle sur les mécanismes générateurs d'artéfacts, facilitant la conception des réseaux de neurones, tout en assouplissant les contraintes liées à la diffusion de données. 
 
 
 \section{Modélisation systémique du DCIS}
@@ -65,16 +65,16 @@ La première étape de la simulation consiste à synthétiser l'environnement é
 \While{$T < N$}{
 Générer une nouvelle impulsion $v_{new}$\;
 Ajouter $v_{new}$ à la fin de $\mathcal{L}$ et $\mathcal{V}$ \; 
-Ajouter l'âge $0$ à la fin $\mathcal{A}$\;
-}
+Ajouter l'âge $0$ à la fin de $\mathcal{A}$\;
 \If{$T > n$}{
 Soit $m$ la taille de $\mathcal{V}$\;
 Sélectionner un indice $k \in [1, m]$ avec probabilité $P(k) = \frac{\mathcal{A}_k + 1}{\sum_{i=1}^{m} \mathcal{A}_i + m}$\;
 Extraire $v_k$ de $\mathcal{V}$ et $\mathcal{A}_k$ de $\mathcal{A}$\;
-Mettre à jour $v_k$ dans $\mathcal{L}$ avec son âge de clôture $(\mathcal{A}_k + 1)$
+Concaténer $(\mathcal{A}_k + 1)$ aux infos de $v_k$ se trouvant dans $\mathcal{L}$
 }
 $T \leftarrow T + 1$\;
 Incrémenter tous les éléments de $\mathcal{A}$ de 1\;
+}
 \Return $\mathcal{L}$
 
 \caption{Génération stochastique de la séquence d'impulsions incidentes}
@@ -109,10 +109,10 @@ Extraire les DNA : $\mathcal{D} \leftarrow \mathcal{F}_{\text{DNA}}(\mathcal{F}_
 Chercher la piste active $p \in \mathcal{P}$ vérifiant $\|F_\mathcal{I} - F_{p}\| \le \delta f$ avec la plus haute énergie\;
 \eIf{Une piste $p$ valide est trouvée}{
 Associer $\mathcal{I}$ à $p$ (mise à jour)\;
-Mettre à jour l'âge de suivi associé $t_p \leftarrow t$\;
+$t_p \leftarrow t$ \tcp*{L'âge associé à $p$ est mise à jour}
 }{
 \If{$|\mathcal{P}| < N_{max}$}{
-Créer une nouvelle piste $p_{new}$ à partir de $\mathcal{I}$\;
+Créer une nouvelle piste $p_{new}$ à partir de $\mathcal{I}$ \tcp*{l'énergie de $p_{new}$ est fixée ici}
 Ajouter $p_{new}$ à $\mathcal{P}$ et la date $t$ à $\mathcal{T}$\;
 }
 }
@@ -133,9 +133,9 @@ Retirer $p$ de $\mathcal{P}$ et $t_p$ de $\mathcal{T}$\;
 \end{algorithm}
 
 \section{Pertinence de la simulation simplifiée}
-Le développement de cet environnement contrôlé répond aux exigences de notre étude (Section \ref{seq:FormaPb}). Bien que structurellement simplifiée, cette modélisation n'entrave pas l'étude des capacités d'apprentissage des réseaux de neurones. La dynamique de transformation opérée par le DCIS reste fondamentalement homologue à celle du capteur réel.\\
+Le développement de cet environnement contrôlé répond aux exigences de notre étude (Section \ref{seq:FormaPb}). Bien que structurellement simplifiée, cette modélisation n'entrave pas l'étude des capacités d'apprentissage des réseaux de neurones. La dynamique de transformation opérée par le DCIS reste homologue à celle du capteur réel.\\
 
-Comme l'illustre la Figure \ref{fig:IOsimple}, la projection des séquences incidentes et interceptées met en évidence l'émergence d'artéfacts canoniques (fusions de signaux, disparitions, scissions artificielles, troncatures), identiques à ceux observés sur le DCI (Figure \ref{fig:IOex}).\\
+La Figure \ref{fig:IOsimple} illustre les séquences incidentes et interceptées  dans des plan temps-fréquence. Elle fait apparaitre que le DCIS émerger des artéfacts (fusions de signaux, disparitions, scissions artificielles, troncatures), identiques à ceux observés sur le DCI (Figure \ref{fig:IOex}).\\
 
 \begin{figure}[htbp]
 \begin{center} 

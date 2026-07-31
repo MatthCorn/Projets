@@ -260,7 +260,10 @@ L'histoire de cette approche débute avec les RNN classiques \cite{elman_finding
 \subsubsection{Principe de récurrence et mise à jour de l'état mémoire}
 \label{seq:RNNPrincipe}
 L'interaction des architectures récurrentes (RNN) ou des modèles d'espaces d'états (SSM) avec la séquence repose sur un principe de persistance de l'information, radicalement différent de la localité spatiale des convolutions. Au lieu d'agréger un voisinage statique, ces modèles introduisent une variable latente dynamique, l'état caché $h_t$, qui agit comme une mémoire compressée de l'historique causal. Mathématiquement, la modélisation d'une telle trajectoire dynamique se formalise comme un problème de valeur initiale. Elle nécessite impérativement de définir une condition d'ancrage $h_0 \in \mathbb{R}^n$ (où $n$ dépend de l'espace décrivant l'état du système modélisé) avant de décrire la loi d'évolution $f$. Pour une séquence d'entrée $x = (x_1, x_2, \cdots, x_t, \cdots, x_T)$, $x_t$ correspondant à la stimulation du système à l'instant $t$, l'évolution du modèle est ainsi entièrement décrit par le couple d'équations suivant :
-$$\begin{cases} h_0 = \lambda \\ h_t = f_{\theta}(h_{t-1}, x_t) \quad \forall t \ge 1 \end{cases}$$
+\begin{equation}
+\label{eq:recurrent}
+\begin{cases} h_0 = \lambda \\ h_t = f_{\theta}(h_{t-1}, x_t) \quad \forall t \ge 1 \end{cases}
+\end{equation}
 La première équation initialise l'état de la mémoire avant toute observation. Bien que la convention standard pose un vecteur nul ($\lambda = \vec{0} \in \mathbb{R}^n$), supposant une mémoire vierge, l'apprentissage machine laisse la possibilité au réseau d'optimiser l'encodage de cette mémoire vierge sous la forme d'un paramètre appris $\lambda$. La seconde équation décrit la mise à jour récursive où $f$ est une fonction de transition paramétrée par $\theta$. Cette formulation implique que $h_t$ ne dépend pas seulement de l'entrée locale $x_t$, mais aussi indirectement de toute la trajectoire passée $(x_0, \dots, x_{t-1})$ accumulée dans $h_{t-1}$.\\
 
 En pratique, l'opérateur de transition $f_\theta$ s'applique uniformément à chaque pas de temps. Ce partage temporel des paramètres garantit l'invariance de la dynamique de mise à jour pour une tâche donnée (par exemple dans la traduction, une configuration matricielle dédiée à l'encodage de la phrase, et une autre dédiée à son décodage, créant la traduction). Historiquement, les architectures récurrentes originelles, antérieures aux mécanismes de portes logiques (LSTM, GRU), modélisaient cette transition par de simples projections affines. Les paramètres se résument alors à une matrice $W_{ih}$ projetant l'observation courante dans l'espace latent, une matrice $W_{hh}$ contrôlant la persistance de l'état précédent, et un vecteur de biais $b$. En notant $\phi$ la fonction d'activation non-linéaire, l'équation de récurrence s'écrit alors:
@@ -293,7 +296,7 @@ En fonction de la fonction accomplie par l'architecture récurrente, les états 
 \begin{center} 
 \includegraphics[scale=0.4]{ComparaisonRNN.png}
 \end{center}
-\caption{Topologies d'application des architectures récurrentes : traitement de flux (gauche) et traduction globale (droite). Les matrices $W_1$ et $W_4$ sont les matrices de projections vers l'espace latent (notées $W_{ih}$ dans \ref{eq:RNN}) . Les matrices $W_2$ et $W_5$ sont les matrices de persistance de la mémoire (notées $W_{hh}$ dans \ref{eq:RNN}). La matrice $W_3$ est une matrice de projection dans l'espace des prédiction.}
+\caption{Topologies d'application des architectures récurrentes : traitement de flux (gauche) et traduction globale (droite). Les matrices $W_1$ et $W_4$ sont les matrices de persistance de la mémoire (notées $W_{hh}$ dans \ref{eq:RNN}). Les matrices $W_2$ et $W_5$ sont les matrices de projections vers l'espace latent (notées $W_{ih}$ dans \ref{eq:RNN}) . La matrice $W_3$ est une matrice de projection dans l'espace des prédiction.}
 \label{RNN comparaison}
 \end{figure}
 

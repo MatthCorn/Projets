@@ -31,6 +31,7 @@
 \newlabel{eq:predforce}{{6.5}{84}{Choix et fonctionnement du Transformer}{equation.6.5}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.3.2}Mise en œuvre et gestion des masques de séquences}{84}{subsubsection.6.2.3.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.3.3}Métrique d'entraînement : la fonction de coût normalisée}{85}{subsubsection.6.2.3.3}\protected@file@percent }
+\newlabel{seq:metseq2seq}{{6.2.3.3}{85}{Métrique d'entraînement : la fonction de coût normalisée}{subsubsection.6.2.3.3}{}}
 \newlabel{eq:Eraw}{{6.6}{86}{Métrique d'entraînement : la fonction de coût normalisée}{equation.6.6}{}}
 \newlabel{eq:Eref}{{6.7}{86}{Métrique d'entraînement : la fonction de coût normalisée}{equation.6.7}{}}
 \newlabel{eq:Ewei}{{6.8}{86}{Métrique d'entraînement : la fonction de coût normalisée}{equation.6.8}{}}
@@ -51,11 +52,12 @@
 \@writefile{lof}{\contentsline {figure}{\numberline {6.2}{\ignorespaces Évolution de l'erreur pondérée en validation et en entraînement pour des séquences courtes ($N=28$). La barre horizontale noire symbolise l'erreur d'un prédicteur naïf (valeur 1.0). L'erreur de validation converge au dessous de $0.1$.}}{90}{figure.caption.35}\protected@file@percent }
 \newlabel{fig:loss_short}{{6.2}{90}{Évolution de l'erreur pondérée en validation et en entraînement pour des séquences courtes ($N=28$). La barre horizontale noire symbolise l'erreur d'un prédicteur naïf (valeur 1.0). L'erreur de validation converge au dessous de $0.1$}{figure.caption.35}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.4.3}Analyse qualitative}{90}{subsubsection.6.2.4.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.3}{\ignorespaces Illustration pour un scénario fréquentiellement dense dans le plan temps-fréquence. Séquence source (en haut à gauche), séquence cible (en haut à droite), séquence prédite de manière auto-régressive (en bas à gauche) et séquence prédite en apprentissage guidé (en bas à droite). Le modèle reproduit avec succès les artéfacts de (a) fusion, (b) disparition et (d) troncature avant.}}{91}{figure.caption.36}\protected@file@percent }
-\newlabel{fig:gen_short_dense}{{6.3}{91}{Illustration pour un scénario fréquentiellement dense dans le plan temps-fréquence. Séquence source (en haut à gauche), séquence cible (en haut à droite), séquence prédite de manière auto-régressive (en bas à gauche) et séquence prédite en apprentissage guidé (en bas à droite). Le modèle reproduit avec succès les artéfacts de (a) fusion, (b) disparition et (d) troncature avant}{figure.caption.36}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6.3}{\ignorespaces Illustration pour un scénario fréquentiellement dense dans le plan temps-fréquence de : la séquence source (en haut à gauche), la séquence cible (en haut à droite), la séquence prédite de manière auto-régressive (en bas à gauche) et la séquence prédite en apprentissage guidé (en bas à droite). Le modèle reproduit avec succès les artéfacts de (a) fusion, (b) disparition et (d) troncature avant.}}{91}{figure.caption.36}\protected@file@percent }
+\newlabel{fig:gen_short_dense}{{6.3}{91}{Illustration pour un scénario fréquentiellement dense dans le plan temps-fréquence de : la séquence source (en haut à gauche), la séquence cible (en haut à droite), la séquence prédite de manière auto-régressive (en bas à gauche) et la séquence prédite en apprentissage guidé (en bas à droite). Le modèle reproduit avec succès les artéfacts de (a) fusion, (b) disparition et (d) troncature avant}{figure.caption.36}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {6.3}Séquence vers séquence par fenêtrage}{91}{section.6.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6.4}{\ignorespaces Illustration pour un scénario fréquentiellement clairsemé dans le plan temps-fréquence. Séquence source (en haut à gauche), séquence cible (en haut à droite), séquence prédite de manière auto-régressive (en bas à gauche) et séquence prédite en apprentissage guidé (en bas à droite). Le modèle reproduit fidèlement les artéfacts de (a) fusion, (c) scission et (e) troncature arrière.}}{92}{figure.caption.37}\protected@file@percent }
-\newlabel{fig:gen_short_light}{{6.4}{92}{Illustration pour un scénario fréquentiellement clairsemé dans le plan temps-fréquence. Séquence source (en haut à gauche), séquence cible (en haut à droite), séquence prédite de manière auto-régressive (en bas à gauche) et séquence prédite en apprentissage guidé (en bas à droite). Le modèle reproduit fidèlement les artéfacts de (a) fusion, (c) scission et (e) troncature arrière}{figure.caption.37}{}}
+\newlabel{seq:winseq2seq}{{6.3}{91}{Séquence vers séquence par fenêtrage}{section.6.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6.4}{\ignorespaces Illustration pour un scénario fréquentiellement clairsemé dans le plan temps-fréquence de : la séquence source (en haut à gauche), la séquence cible (en haut à droite), la séquence prédite de manière auto-régressive (en bas à gauche) et la séquence prédite en apprentissage guidé (en bas à droite). Le modèle reproduit fidèlement les artéfacts de (a) fusion, (c) scission et (e) troncature arrière.}}{92}{figure.caption.37}\protected@file@percent }
+\newlabel{fig:gen_short_light}{{6.4}{92}{Illustration pour un scénario fréquentiellement clairsemé dans le plan temps-fréquence de : la séquence source (en haut à gauche), la séquence cible (en haut à droite), la séquence prédite de manière auto-régressive (en bas à gauche) et la séquence prédite en apprentissage guidé (en bas à droite). Le modèle reproduit fidèlement les artéfacts de (a) fusion, (c) scission et (e) troncature arrière}{figure.caption.37}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.3.1}Création et préparation des données}{92}{subsection.6.3.1}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {6.5}{\ignorespaces Évaluation de la résilience du DCIS face à des pertes de mémoire. À gauche, la séquence de PDW interceptés sans perturbation est visualisée dans un plan temps-fréquence. Au milieu, la séquence de PDW est interceptés alors que les mémoires sont purgés tous les 100 pas de temps. À droite, on représente la différence entre la séquence d'origine et la séquence perturbée (rouge pour manquante, vert pour rajoutée). Le vidage des mémoires provoque des perturbations locales de la séquence d'impulsions interceptées, qui s'estompent rapidement, suggérant que la mémoire retrouve son régime permanent.}}{93}{figure.caption.38}\protected@file@percent }
 \newlabel{fig:ResetEnv}{{6.5}{93}{Évaluation de la résilience du DCIS face à des pertes de mémoire. À gauche, la séquence de PDW interceptés sans perturbation est visualisée dans un plan temps-fréquence. Au milieu, la séquence de PDW est interceptés alors que les mémoires sont purgés tous les 100 pas de temps. À droite, on représente la différence entre la séquence d'origine et la séquence perturbée (rouge pour manquante, vert pour rajoutée). Le vidage des mémoires provoque des perturbations locales de la séquence d'impulsions interceptées, qui s'estompent rapidement, suggérant que la mémoire retrouve son régime permanent}{figure.caption.38}{}}
@@ -72,10 +74,35 @@
 \newlabel{seq:masquewin}{{6.3.2.2}{96}{Mise en œuvre des masques}{subsubsection.6.3.2.2}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.2.3}Métrique d'entrainement}{96}{subsubsection.6.3.2.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.2.4}Inférence de la prédiction d'une séquence entière}{97}{subsubsection.6.3.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3.3}Résultats expérimentaux}{97}{subsection.6.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.3.1}Configuration}{97}{subsubsection.6.3.3.1}\protected@file@percent }
 \@writefile{loa}{\contentsline {algocf}{\numberline {6}{\ignorespaces Inférence auto-régressive d'un scénario complet par fenêtrage}}{98}{algocf.6}\protected@file@percent }
 \newlabel{algo:genwin}{{6}{98}{Inférence de la prédiction d'une séquence entière}{algocf.6}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {6.2}{\ignorespaces Synthèse des conditions de l'expérimentation pour l'approche par fenêtrage.}}{99}{table.caption.42}\protected@file@percent }
+\newlabel{tab:params_win}{{6.2}{99}{Synthèse des conditions de l'expérimentation pour l'approche par fenêtrage}{table.caption.42}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.3.2}Convergence de l'apprentissage}{99}{subsubsection.6.3.3.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6.7}{\ignorespaces Évolution de l'erreur pondérée en entrainement et en validation pour l'approche par fenêtrage. La barre horizontale noire symbolise l'erreur d'un prédicteur naïf (valeur 1.0). L'erreur de validation converge vers un plateau situé autour de $0.25$.}}{100}{figure.caption.43}\protected@file@percent }
+\newlabel{fig:loss_win}{{6.7}{100}{Évolution de l'erreur pondérée en entrainement et en validation pour l'approche par fenêtrage. La barre horizontale noire symbolise l'erreur d'un prédicteur naïf (valeur 1.0). L'erreur de validation converge vers un plateau situé autour de $0.25$}{figure.caption.43}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.3.3}Analyse qualitative}{100}{subsubsection.6.3.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6.4}Discussion et Perspectives}{100}{section.6.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6.8}{\ignorespaces Illustration dans le plan temps-fréquence de l'ensemble du scénario (500 PDW incidents), où les séquences sont reconstruites par fenêtrage glissant. On y trouve la séquence source (en haut à gauche), la séquence cible (en haut à droite), la séquence prédite de manière auto-régressive (en bas à gauche) et la séquence prédite en apprentissage guidé (en bas à droite). La densité spectrale globale et les dynamiques principales du capteur semblent visuellement préservées.}}{101}{figure.caption.44}\protected@file@percent }
+\newlabel{fig:gen_win_full}{{6.8}{101}{Illustration dans le plan temps-fréquence de l'ensemble du scénario (500 PDW incidents), où les séquences sont reconstruites par fenêtrage glissant. On y trouve la séquence source (en haut à gauche), la séquence cible (en haut à droite), la séquence prédite de manière auto-régressive (en bas à gauche) et la séquence prédite en apprentissage guidé (en bas à droite). La densité spectrale globale et les dynamiques principales du capteur semblent visuellement préservées}{figure.caption.44}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6.9}{\ignorespaces Zoom dans l'illustration \ref {fig:gen_win_full} sur la fenêtre temporelle $[180; 265]$. Nous pouvons y observer des défauts dans les prédictions (encerclés en rouge), particulièrement pour l'inférence auto-régressive (en bas à gauche) qui s'accumule au niveau des frontières entre les différentes fenêtres (symbolisées par les traits verticaux noirs)}}{101}{figure.caption.45}\protected@file@percent }
+\newlabel{fig:gen_win_zoom}{{6.9}{101}{Zoom dans l'illustration \ref {fig:gen_win_full} sur la fenêtre temporelle $[180; 265]$. Nous pouvons y observer des défauts dans les prédictions (encerclés en rouge), particulièrement pour l'inférence auto-régressive (en bas à gauche) qui s'accumule au niveau des frontières entre les différentes fenêtres (symbolisées par les traits verticaux noirs)}{figure.caption.45}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4.1}Analyse de la perte du contexte dynamique}{102}{subsection.6.4.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6.10}{\ignorespaces Erreur de reconstruction en fonction de la position du PDW dans la fenêtre de génération. L'erreur est asymétrique : elle est maximale au début de la prédiction (immédiatement après le contexte) et diminue progressivement.}}{102}{figure.caption.46}\protected@file@percent }
+\newlabel{fig:image66}{{6.10}{102}{Erreur de reconstruction en fonction de la position du PDW dans la fenêtre de génération. L'erreur est asymétrique : elle est maximale au début de la prédiction (immédiatement après le contexte) et diminue progressivement}{figure.caption.46}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4.2}Modélisation explicite de l'état mémoire}{103}{subsection.6.4.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6.11}{\ignorespaces Preuve de concept d'une architecture Transformer modifiée, intégrant la réception d'un état mémoire explicite $m_k$ et la prédiction de son état futur $\setbox \z@ \hbox {\mathsurround \z@ $\textstyle m_{k+1}$}\mathaccent "0362{m_{k+1}}$ pour transmission inter-fenêtres. Dans ce schéma, les dernières impulsions incidentes passées sont dénotées $sx_k^-$, les nouvelles impulsions incidentes de la fenêtre sont dénotées $sx_k$, les dernières impulsions interceptés passées sont dénotées $sy_k^-$, les nouvelles impulsions à intercepter sur la fenêtre sont dénotées $sy_k$ et les prédictions du modèle sur la fenêtre sont dénotées $\setbox \z@ \hbox {\mathsurround \z@ $\textstyle sy_k$}\mathaccent "0362{sy_k}$}}{103}{figure.caption.47}\protected@file@percent }
+\newlabel{fig:modelSSM}{{6.11}{103}{Preuve de concept d'une architecture Transformer modifiée, intégrant la réception d'un état mémoire explicite $m_k$ et la prédiction de son état futur $\widehat {m_{k+1}}$ pour transmission inter-fenêtres. Dans ce schéma, les dernières impulsions incidentes passées sont dénotées $sx_k^-$, les nouvelles impulsions incidentes de la fenêtre sont dénotées $sx_k$, les dernières impulsions interceptés passées sont dénotées $sy_k^-$, les nouvelles impulsions à intercepter sur la fenêtre sont dénotées $sy_k$ et les prédictions du modèle sur la fenêtre sont dénotées $\widehat {sy_k}$}{figure.caption.47}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6.12}{\ignorespaces Répartition de l'erreur positionnelle pour un modèle classique fondé uniquement sur l'historique des PDW passés (forte asymétrie initiale).}}{104}{figure.caption.48}\protected@file@percent }
+\newlabel{fig:image67}{{6.12}{104}{Répartition de l'erreur positionnelle pour un modèle classique fondé uniquement sur l'historique des PDW passés (forte asymétrie initiale)}{figure.caption.48}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6.13}{\ignorespaces Répartition de l'erreur positionnelle pour le modèle disposant de l'état explicite des mémoires $m_k$. L'asymétrie initiale disparaît, l'erreur devenant constante et globalement plus faible.}}{104}{figure.caption.49}\protected@file@percent }
+\newlabel{fig:image70}{{6.13}{104}{Répartition de l'erreur positionnelle pour le modèle disposant de l'état explicite des mémoires $m_k$. L'asymétrie initiale disparaît, l'erreur devenant constante et globalement plus faible}{figure.caption.49}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4.3}Bénéfice opérationnel : Parallélisation massive et méthode Overlap-Save}{105}{subsection.6.4.3}\protected@file@percent }
+\newlabel{disc:seq2seq}{{6.4.3}{105}{Bénéfice opérationnel : Parallélisation massive et méthode Overlap-Save}{subsection.6.4.3}{}}
 \@setckpt{GrosTAF}{
-\setcounter{page}{99}
+\setcounter{page}{107}
 \setcounter{equation}{15}
 \setcounter{enumi}{0}
 \setcounter{enumii}{0}
@@ -85,13 +112,13 @@
 \setcounter{mpfootnote}{0}
 \setcounter{part}{0}
 \setcounter{chapter}{6}
-\setcounter{section}{3}
-\setcounter{subsection}{2}
-\setcounter{subsubsection}{4}
+\setcounter{section}{4}
+\setcounter{subsection}{3}
+\setcounter{subsubsection}{0}
 \setcounter{paragraph}{0}
 \setcounter{subparagraph}{0}
-\setcounter{figure}{6}
-\setcounter{table}{1}
+\setcounter{figure}{13}
+\setcounter{table}{2}
 \setcounter{parentequation}{0}
 \setcounter{AlgoLine}{0}
 \setcounter{algocfline}{6}
@@ -107,7 +134,7 @@
 \setcounter{section@level}{0}
 \setcounter{Item}{0}
 \setcounter{Hfootnote}{0}
-\setcounter{bookmark@seq@number}{82}
+\setcounter{bookmark@seq@number}{87}
 \setcounter{tabx@nest}{0}
 \setcounter{listtotal}{0}
 \setcounter{listcount}{0}

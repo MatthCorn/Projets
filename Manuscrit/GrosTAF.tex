@@ -144,6 +144,7 @@ Pour représenter mathématiquement ces partitions, nous définissions deux masq
 Lors du traitement par batchs, ces masques sont agrégés pour former deux tenseurs binaires de dimension $B \times (M+1)$ (où $B$ est la taille du batch), notés $\mathbf{M}^{(sig)}$ et $\mathbf{M}^{(fin)}$. Ils permettent le calcul vectoriel de l'erreur à minimiser.
 
 \subsubsection{Métrique d'entraînement : la fonction de coût normalisée}
+\label{seq:metseq2seq}
 La transduction de PDW s'opérant dans un espace continu, l'entropie croisée est inapplicable. Nous concevons une métrique de régression évaluant la distance entre deux séquences de variables hétérogènes. \\
 
 De manière générale, quantifier mathématiquement l'écart entre deux séquences est un problème complexe en raison des enjeux d'alignement. Un simple décalage temporel ou une permutation d'éléments (par exemple, comparer la séquence $(y_1, y_2, \dots, y_5, y_6)$ à $(y_1, y_6, y_2, \dots, y_5)$ engendre une erreur maximale lors d'une comparaison terme à terme, bien que les séquences partagent une forte similarité structurelle. Pour les séries de variables continues, le contournement de ce désalignement requiert typiquement des algorithmes d'appariement coûteux, tels que la déformation temporelle dynamique \cite{berndt_using_1994}.
@@ -158,7 +159,7 @@ L'équation de l'erreur brute s'écrit de la façon suivante :\\
 E_{raw}(\hat{\mathbf{y}}, \mathbf{y}) = \frac{\|(\hat{\mathbf{y}} - \sigma(\mathbf{y})) \odot \mathbf{m}^{(sig)}\|_2}{\sqrt{\|\mathbf{m}^{(sig)}\|_1 \times d_{\text{out}}}}
 \end{equation}
 
-Afin d'uniformiser la contribution de chaque séquence indépendamment de sa variance physique, nous utilisons l'erreur d'un prédicteur naïf \ref{eq:naif} comme facteur de normalisation. Ce prédicteur génère une séquence constante, constituée de la répétition de $\bar{\mathbf{y}}$, le vecteur moyen de la séquence $\mathbf{y}$ calculé exclusivement sur les $K$ éléments valides de la cible. \\
+Afin d'uniformiser la contribution de chaque séquence indépendamment de sa variance physique, nous utilisons l'erreur d'un prédicteur naïf \ref{eq:Eref} comme facteur de normalisation. Ce prédicteur génère une séquence constante, constituée de la répétition de $\bar{\mathbf{y}}$, le vecteur moyen de la séquence $\mathbf{y}$ calculé exclusivement sur les $K$ éléments valides de la cible. \\
 
 Afin d'uniformiser la contribution de chaque séquence, nous utilisons l'erreur d'un prédicteur naïf comme facteur de normalisation. Ce prédicteur génère une séquence constituée de la répétition de $\bar{\mathbf{y}}$, le vecteur moyen calculé exclusivement sur les $K$ éléments valides de la séquence cible $\mathbf{y}$.\\
 
@@ -257,6 +258,7 @@ Les conditions expérimentales se déclinent selon trois axes : la structure des
 Taille de l'ensemble d'entraînement & $2 \cdot 10^6$ scénarios \\
 Taille de l'ensemble de validation & $1000$ scénarios \\
 Nombre d'impulsions incidentes ($N$) & 28 \\
+Nombre maximal d'impulsions interceptées ($M$) & 35 \\
 Plage des moyennes fréquentielles ($\mu$) & $[-5 ; 5]$ \\
 Plage des écarts-types ($\sigma$) & $[0.2 ; 5]$ \\
 \midrule
@@ -308,7 +310,7 @@ La figure \ref{fig:gen_short_dense} illustre les séquences prédites sur un sc�
 \begin{center}
 \includegraphics[scale=0.45]{VisuGlobalDense.png}
 \end{center}
-\caption{Illustration pour un scénario fréquentiellement dense dans le plan temps-fréquence. Séquence source (en haut à gauche), séquence cible (en haut à droite), séquence prédite de manière auto-régressive (en bas à gauche) et séquence prédite en apprentissage guidé (en bas à droite). Le modèle reproduit avec succès les artéfacts de (a) fusion, (b) disparition et (d) troncature avant.}
+\caption{Illustration pour un scénario fréquentiellement dense dans le plan temps-fréquence de : la séquence source (en haut à gauche), la séquence cible (en haut à droite), la séquence prédite de manière auto-régressive (en bas à gauche) et la séquence prédite en apprentissage guidé (en bas à droite). Le modèle reproduit avec succès les artéfacts de (a) fusion, (b) disparition et (d) troncature avant.}
 \label{fig:gen_short_dense}
 \end{figure}
 
@@ -316,7 +318,7 @@ La figure \ref{fig:gen_short_dense} illustre les séquences prédites sur un sc�
 \begin{center}
 \includegraphics[scale=0.45]{VisuGlobalLight.png}
 \end{center}
-\caption{Illustration pour un scénario fréquentiellement clairsemé dans le plan temps-fréquence. Séquence source (en haut à gauche), séquence cible (en haut à droite), séquence prédite de manière auto-régressive (en bas à gauche) et séquence prédite en apprentissage guidé (en bas à droite). Le modèle reproduit fidèlement les artéfacts de (a) fusion, (c) scission et (e) troncature arrière.}
+\caption{Illustration pour un scénario fréquentiellement clairsemé dans le plan temps-fréquence de : la séquence source (en haut à gauche), la séquence cible (en haut à droite), la séquence prédite de manière auto-régressive (en bas à gauche) et la séquence prédite en apprentissage guidé (en bas à droite). Le modèle reproduit fidèlement les artéfacts de (a) fusion, (c) scission et (e) troncature arrière.}
 \label{fig:gen_short_light}
 \end{figure}
 
@@ -327,6 +329,7 @@ Enfin, l'analyse comparative entre l'inférence guidée et l'inférence auto-ré
 
 
 \section{Séquence vers séquence par fenêtrage}
+\label{seq:winseq2seq}
 L'approche globale présentée dans la section précédente valide la capacité structurelle du Transformer à modéliser les traitements réalisés par le DCIS. Toutefois, la complexité spatiale et temporelle de l'attention $\mathcal{O}(N^2)$ limite cette approche à des fenêtres d'observation restreintes. Pour traiter un scénario de longueur arbitraire, il est impératif de segmenter le flux de données.\\
 
 La motivation de cette segmentation repose sur une observation de la physique du système : la décroissance de l'influence temporelle. Le traitement d'une impulsion à l'instant $t$ dépend fortement de l'état des mémoires du capteur, lui-même conditionné par les impulsions passées. Cependant, comme observé sur la figure \ref{fig:ResetEnv}, une purge complète de la mémoire du DCIS n'engendre que des erreurs transitoires. Le système retrouve son régime permanent après l'assimilation de quelques dizaines d'impulsions.\\
@@ -496,3 +499,151 @@ $K \leftarrow 0$
 \caption{Inférence auto-régressive d'un scénario complet par fenêtrage}
 \label{algo:genwin}
 \end{algorithm}
+
+
+\subsection{Résultats expérimentaux}
+Cette section évalue les performances de l'approche par fenêtrage. L'objectif ici consiste à comparer le traitement par fenêtrage au traitement en bloc. Par conséquent, l'architecture du modèle (profondeur, dimension latente) et les paramètres d'optimisation sont identique par rapport à l'approche en bloc. Seule la mise en forme des données est différente. Cette approche à architecture constante garantit que les variations de performance observées sont exclusivement dues au mécanisme de fenêtrage.
+
+\subsubsection{Configuration}
+Les paramètres expérimentaux, synthétisés dans le tableau \ref{tab:params_win}, reflètent l'adaptation aux séquences longues.\\
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{lc}
+\toprule
+\textbf{Paramètre} & \textbf{Valeur} \\
+\midrule
+\multicolumn{2}{c}{\textit{Jeux de données}} \\
+\midrule
+Taille de l'ensemble d'entraînement & $112 \cdot 10^3$ scénarios \\
+Taille de l'ensemble de validation & $50$ scénarios \\
+Nombre d'impulsions incidentes globales ($N$) & 500 \\
+Nombre maximal d'impulsions interceptées globales ($M$) & 700 \\
+Plages de distribution fréquentielle ($\mu$ et $\sigma$) & $[-5 ; 5]$ et $[0.2 ; 5]$ \\
+\midrule
+\multicolumn{2}{c}{\textit{Dimensionnement du Fenêtrage}} \\
+\midrule
+Nouvelles impulsions incidentes par fenêtre ($N_f$) & 28 \\
+Impulsions incidentes de contexte ($N_c$) & 12 \\
+Nouvelles impulsions interceptées maximales ($M_f$) & 35 \\
+Impulsions interceptées de contexte ($M_c$) & 15 \\
+\midrule
+\multicolumn{2}{c}{\textit{Architecture}} \\
+\midrule
+Nombre de couches d'encodage ($N_{enc}$) & 11 \\
+Nombre de couches de décodage ($N_{dec}$) & 3 \\
+Dimension de l'espace latent ($d_{model}$) & 256 \\
+Nombre de têtes d'attention ($h$) & 16 \\
+\midrule
+\multicolumn{2}{c}{\textit{Optimisation}} \\
+\midrule
+Optimiseur & Adam \\
+Taux d'apprentissage & $1.5 \times 10^{-4}$ \\
+Taille de lot (\textit{Batch size}) & 500 séquences \\
+Nombre d'époques & 200 \\
+\bottomrule
+\end{tabular}
+\caption{Synthèse des conditions de l'expérimentation pour l'approche par fenêtrage.}
+\label{tab:params_win}
+\end{table}
+
+La taille de l'ensemble d'entraînement a été choisi pour conserver un volume de données traitées équivalent à l'approche en bloc: un scénario de $N=500$ impulsions génère $n_f = \lfloor 500 / 28 \rfloor + 1 = 18$ fenêtres. En utilisant $112\,000$ scénarios, le modèle est exposé à environ $2016 \cdot 10^3$ sous-séquences différentes, comparables aux $2 \cdot 10^6$ séquences courtes de l'approche en bloc.
+
+\subsubsection{Convergence de l'apprentissage}
+La figure \ref{fig:loss_win} retrace l'évolution de la fonction de coût de reconstruction $\mathcal{L}_{rec}$ au fil des époques.\\
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[scale=0.28]{ErreurWin.png}
+\end{center}
+\caption{Évolution de l'erreur pondérée en entrainement et en validation pour l'approche par fenêtrage. La barre horizontale noire symbolise l'erreur d'un prédicteur naïf (valeur 1.0). L'erreur de validation converge vers un plateau situé autour de $0.25$.}
+\label{fig:loss_win}
+\end{figure}
+
+La convergence de l'erreur à $0.25$, bien en dessous de la valeur critique de $1.0$ (caractérisant les performances du prédicteur naïf de référence), renforce encore notre croyance en la pertinence de l'approche reproduire le traitement du DCIS. En revanche, le plateau asymptotique atteint (environ $0.25$) est significativement supérieur à celui de l'approche globale en bloc ($\sim 0.1$), ce qui suggère que la segmentation induit une perte dans les capacités de prédiction.
+
+\subsubsection{Analyse qualitative}
+L'analyse des représentations temps-fréquence des séquences d'impulsions produites par notre modèle permet de qualifier l'impact de cette dégradation sur le signal physique.\\
+
+La figure \ref{fig:gen_win_full} présente un scénario complet généré par la succession des fenêtres, tandis que la figure \ref{fig:gen_win_zoom} isole une section spécifique pour une observation microscopique.
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[scale=0.28]{VisuWinFull.png}
+\end{center}
+\caption{Illustration dans le plan temps-fréquence de l'ensemble du scénario (500 PDW incidents), où les séquences sont reconstruites par fenêtrage glissant. On y trouve la séquence source (en haut à gauche), la séquence cible (en haut à droite), la séquence prédite de manière auto-régressive (en bas à gauche) et la séquence prédite en apprentissage guidé (en bas à droite). La densité spectrale globale et les dynamiques principales du capteur semblent visuellement préservées.}
+\label{fig:gen_win_full}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[scale=0.28]{VisuWinZoom.png}
+\end{center}
+\caption{Zoom dans l'illustration \ref{fig:gen_win_full} sur la fenêtre temporelle $[180; 265]$. Nous pouvons y observer des défauts dans les prédictions (encerclés en rouge), particulièrement pour l'inférence auto-régressive (en bas à gauche) qui s'accumule au niveau des frontières entre les différentes fenêtres (symbolisées par les traits verticaux noirs)}
+\label{fig:gen_win_zoom}
+\end{figure}
+
+À l'échelle macroscopique, le modèle restitue fidèlement la distribution globale des impulsions : le réseau génère encore de lui-même les artéfacts complexes inhérents à la logique du capteur. Toutefois, l'observation à une échelle plus petite (85 pas de temps) révèle les limites. Les erreurs de reconstruction apparaissent aux interfaces entres les fenêtres, signe de la faiblesse du modèle à reconstruire l'état des mémoires du DCIS à partir du contexte passé fourni. 
+
+\section{Discussion et Perspectives}
+L'étude de la transduction Séquence-vers-Séquence pour la modélisation du DCIS conduit à un bilan contrasté. D'une part, l'approche globale a mise en lumière la pertinence de l'architecture Transformer : le mécanisme d'attention croisée est intrinsèquement capable de capturer et de reproduire les effets des mécanismes du capteur (fusions, troncatures, disparitions) sur des fenêtres d'observation restreintes. D'autre part, le passage à l'échelle via un mécanisme de fenêtrage temporel n'est pas encore mature et a mis en lumière des vulnérabilités structurelles liées à la perte de l'état latent.
+
+\subsection{Analyse de la perte du contexte dynamique}
+La dégradation des performances observée (erreur de $0.25$ contre $0.1$) s'explique par la nature du DCIS. Il s'agit d'un système dynamique dont la réponse à l'instant $t$ dépend de l'état complet de sa mémoire. Dans l'approche par fenêtrage, cet état mémoire initial est inconnu. Le modèle tente de l'inférer de manière implicite à partir du contexte restreint fourni en entrée ($N_c$ derniers PDW incidents et $M_c$ derniers PDW interceptés).\\
+
+Pour quantifier cette faiblesse, nous avons isolé l'erreur de reconstruction en fonction de la position relative $k$ du PDW prédit au sein de la fenêtre (zone d'observation $M_c \le k \le M_f + M_c$). La figure \ref{fig:image66} illustre cette erreur en fonction de la position, évaluée en forçage de l'enseignant sur 200 scénarios (soit 3600 sous-séquences). La courbe illustre une asymétrie dans l'erreur, qui culmine jusqu'à $0.5$ sur les premières prédictions avant de tomber à $0.1$, niveau d'erreur comparable à celui obtenue avec l'approche en bloc. Cette observation confirme que le réseau échoue à reconstruire parfaitement l'état des mémoires du capteur à la frontière de la fenêtre. À mesure que l'inférence progresse, le modèle ingère de nouvelles impulsions, met à jour sa dynamique latente interne, et l'influence de l'état initial erroné s'estompe : l'erreur chute et se stabilise. 
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[scale=0.28]{image66.png}
+\end{center}
+\caption{Erreur de reconstruction en fonction de la position du PDW dans la fenêtre de génération. L'erreur est asymétrique : elle est maximale au début de la prédiction (immédiatement après le contexte) et diminue progressivement.}
+\label{fig:image66}
+\end{figure}
+
+
+\subsection{Modélisation explicite de l'état mémoire}
+Face à cette limitation, une piste d'amélioration exploratoire a été modélisée. Plutôt que de forcer le réseau à deviner l'état du système à partir des derniers PDW de la fenêtre précédente, nous avons envisagé de directement le lui fournir et de lui demander de le mettre à jour. L'architecture (illustrée schématiquement par la figure \ref{fig:modelSSM}) fait état de la modification de la structure des données transmise à l'encodeur du Transformer : il reçoit en plus des PDW incidents le vecteur d'état des mémoires du DCIS à l'instant initial de la fenêtre ($m_k$). La sortie de l'encodeur est exploité pour prédire l'état des mémoires à la fin de la fenêtre ($\widehat{m_{k+1}}$), qui pourra être transmis à l'itération de la fenêtre suivante.\\
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[scale=0.4]{modelSSM.png}
+\end{center}
+\caption{Preuve de concept d'une architecture Transformer modifiée, intégrant la réception d'un état mémoire explicite $m_k$ et la prédiction de son état futur $\widehat{m_{k+1}}$ pour transmission inter-fenêtres. Dans ce schéma, les dernières impulsions incidentes passées sont dénotées $sx_k^-$, les nouvelles impulsions incidentes de la fenêtre sont dénotées $sx_k$, les dernières impulsions interceptés passées sont dénotées $sy_k^-$, les nouvelles impulsions à intercepter sur la fenêtre sont dénotées $sy_k$ et les prédictions du modèle sur la fenêtre sont dénotées $\widehat{sy_k}$}
+\label{fig:modelSSM}
+\end{figure}
+
+Ce concept, que nous appelons l'approche mémorielle, a été évalué via une étude comparative avec l'approche par fenêtrage. La configuration de la plage de distribution fréquentielle ($\mu$ et $\sigma$) vaut $[-5 ; 5]$ et $[2 ; 5]$ (au lieu de $[-5 ; 5]$ et $[0.2 ; 5]$), conduisant à une réduction de l'erreur en moyenne à ne pas confondre avec de meilleurs performances. Dans les deux figures \ref{fig:image67} et \ref{fig:image70}, nous représentons respectivement la répartition de l'erreur positionnelle entre l'approche par fenêtrage et l'approche mémorielle.\\
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[scale=0.28]{image67.png}
+\end{center}
+\caption{Répartition de l'erreur positionnelle pour un modèle classique fondé uniquement sur l'historique des PDW passés (forte asymétrie initiale).}
+\label{fig:image67}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[scale=0.28]{image70.png}
+\end{center}
+\caption{Répartition de l'erreur positionnelle pour le modèle disposant de l'état explicite des mémoires $m_k$. L'asymétrie initiale disparaît, l'erreur devenant constante et globalement plus faible.}
+\label{fig:image70}
+\end{figure}
+
+Dans l'approche mémorielle, il semble que la connaissance explicite de l'état des mémoires du système résout le problème d'imprécision sur les premiers prédictions des fenêtres. Toutefois, il faut noter que ces observations sont réalisées encore en mode forçage de l'enseignement, où le modèle a accès aux véritables états des mémoires $m_k$ en entrée de l'encodeur. En mode opérationnel auto-régressif, l'état des mémoires est retransmise de proche en proche, et nous avons constaté que l'imprécision qu'elle portait nuisait encore à la qualité des prédictions des premiers PDW interceptés des fenêtres. \\
+
+L'approche mémorielle est donc une idée intéressante, qui introduit une nouvelle problématique liée à l'apprentissage par le modèle à correctement prédire l'état des mémoires du système à la fin de chaque fenêtre. Aussi, alors que l'approche par fenêtrage peut facilement être adaptée de notre étude sur le DCIS vers le véritable DCI (que nous cherchons à accélérer), l'approche mémorielle nécessiterait une vraie modification du DCI. Il faudrait récupérer à intervalle de temps régulier (la longueur des fenêtres) l'état des mémoires pour procéder à l'entrainement, ce qui peut être considéré comme une difficulté supplémentaire.
+
+
+\subsection{Bénéfice opérationnel : Parallélisation massive et méthode Overlap-Save}
+\label{disc:seq2seq}
+Bien que la question sur les capacités de l'IA à reproduire le traitement du DCIS soit centrale dans nos travaux, l'objectif final reste l'accélération des simulations à l'aide de modèle d'IA. Il convient en premier lieu de souligner une limitation inhérente au mécanisme de fenêtrage introduit à la section précédente : l'inférence d'une fenêtre requiert la connaissance du contexte passé, c'est-à-dire les interceptions calculées lors de la fenêtre précédente. Cette dépendance causale impose un traitement strictement séquentiel des fenêtres. D'un point de vue matériel, remplacer la boucle itérative du DCIS sur processeur (CPU) par une boucle de fenêtres sur processeur graphique (GPU) n'apporte pas de gain temporel significatif, la complexité locale du Transformer restant quadratique par rapport au nombre d'impulsions traitées. Ainsi le cas d'usage de l'accélération pour une simulation en temps réel constitue une difficulté que l'approche séquence-vers-séquence ne permet pas de résoudre.\\
+
+La véritable capacité d'accélération des réseaux de neurones ne réside pas dans le traitement d'une séquence isolée, mais dans l'exploitation de la dimension \textit{Batch} du GPU, autorisant le traitement simultané de plusieurs milliers de séquences. Cette propriété permet de générer massivement des scénarios courts et indépendants en un temps minimal.\\
+
+Dans le cas d'usage de la génération de données hors-ligne pour un scénario unique et très long (par exemple un million d'impulsions), une méthode d'accélération exploitant le modèle "en bloc" peut être employée, mettant en œuvre encore une technique traitant des sous-scénarios se chevauchant. L'approche consiste à abandonner l'algorithme auto-régressif glissant au profit d'un découpage du scénario géant en milliers de fenêtres totalement indépendantes, se chevauchant largement.
+Par exemple, pour générer la zone cible d'indices d'interception $[100; 200]$, le modèle en bloc prédit les PDW interceptés de la fenêtre élargie $[0; 300]$, mais seule les PDW interceptés prédites avec des dates de publications comprises dans la fenêtre $[100; 200]$ sont finalement conservées (prédictions centrales). Ainsi chaque fenêtre élargie peut être généré indépendamment, et donc en parallèle, parce qu'on considère, en accord avec nos observations sur la résilience du DCIS face à des pertes de mémoire, que l'élargissement des fenêtres permet d'absorber l'effet de bord \ref{fig:ResetEnv}. Cette indépendance forcée permet d'injecter simultanément les $10\,000$ segments composant le scénario complet dans la dimension \textit{Batch} du GPU. L'intégralité des inférences est alors calculée en parallèle, en une unique série d'opérations matricielles. Les prédictions centrales sont concaténées pour former la séquence finale.\\
+
+Bien que cette méthode de génération parallèle introduise un risque résiduel d'erreur aux points de jointure, elle remplace l'exécution de processus séquentiels sur CPU par un calcul matriciel unifié et massivement parallèle sur GPU. C'est en rompant cette chaîne causale que l'architecture Transformer offre un gain de vitesse.
+
