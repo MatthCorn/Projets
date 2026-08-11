@@ -1,5 +1,5 @@
-from Inter.Model.DataMaker import GetData
-from Inter.NetworkGlobal.Network import TransformerTranslator
+from Inter.NetworkGlobal2.Utils import GetData
+from Inter.NetworkGlobal2.Network import TransformerTranslator
 from Complete.LRScheduler import Scheduler
 from GradObserver.GradObserverClass import DictGradObserver
 from Tools.ParamObs import DictParamObserver
@@ -53,10 +53,10 @@ if __name__ == '__main__':
              "plot_distrib": "log",
              "error_weighting": "y",
              "max_lr": 5,
-             "FreqGradObs": 1/3,
+             "FreqGradObs": -1,
              "warmup": 5,
              "resume_from": "r",
-             "period_checkpoint": -1, #15 * 60,  # en seconde
+             "period_checkpoint": 15 * 60,  # en seconde
              "nb_frames_GIF": -1
              }
 
@@ -90,6 +90,7 @@ if __name__ == '__main__':
     ###                                    on initialise les paramètres et le réseau de neurones                                                 ###
 
     d_out = param['d_in'] + 1
+    d_in = d_out
 
     period_checkpoint = param["period_checkpoint"]  # 0 : pas de checkpoint en entrainement, -1 : pas de sauvegarde du tout
 
@@ -105,7 +106,7 @@ if __name__ == '__main__':
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    N = TransformerTranslator(param['d_in'], d_out, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
+    N = TransformerTranslator(d_in, d_out, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
                               n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], len_in=param['len_in'],
                               len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'], width_FF=param['width_FF'])
 
@@ -119,7 +120,7 @@ if __name__ == '__main__':
     weight_f = torch.tensor([1., 0.] + [0.] * (param['d_in'] - 3)).numpy()
     weight_l = torch.tensor([0., 1.] + [0.] * (param['d_in'] - 3)).numpy()
 
-    mini_batch_size = 50000
+    mini_batch_size = min(50000, NDataT)
     n_minibatch = int(NDataT/mini_batch_size)
     batch_size = param["batch_size"]
     n_batch = int(mini_batch_size/batch_size)
@@ -171,7 +172,7 @@ if __name__ == '__main__':
     import pickle
     from Tools.XMLTools import saveObjAsXml
     local = os.path.join(os.path.abspath(__file__)[:(os.path.abspath(__file__).index("Projets"))], "Projets")
-    save_dir = os.path.join(local, 'Inter', 'NetworkGlobal', 'Save')
+    save_dir = os.path.join(local, 'Inter', 'NetworkGlobal2', 'Save')
     data_dir = os.path.join(local, 'Inter', 'Data')
 
     # on essaie de charger un ancien entrainement. pour que ça marche, le chemin spécifié dans "resume_from" doit exister
@@ -290,7 +291,6 @@ if __name__ == '__main__':
             distrib=param["plot_distrib"],
             weight_f=weight_f,
             weight_l=weight_l,
-            type='complete',
             save_path=data_dir,
             parallel=True
         )
