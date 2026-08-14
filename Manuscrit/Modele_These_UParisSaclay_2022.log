@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.11.20)  31 JUL 2026 19:05
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.11.20)  12 AUG 2026 15:19
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1335,8 +1335,8 @@ File: TS1opensans-TOsF.fd 2019/06/24 Font definitions for TS1/opensans-TOsF.
 )
 LaTeX Font Info:    Font shape `TS1/opensans-TOsF/m/n' will be
 (Font)              scaled to size 11.39996pt on input line 14.
- (Introduction.aux) (Problematique.aux) (Etat de l art.aux) (EUSIPCO.aux) (Nouv
-eauFocus.aux) (GrosTAF.aux) (Stage.aux))
+ (Introduction.aux) (Problematique.aux) (Etat de l art.aux)
+(NouveauFocus.aux) (EUSIPCO.aux) (GrosTAF.aux) (Stage.aux))
 \openout1 = `Modele_These_UParisSaclay_2022.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 78.
@@ -2169,10 +2169,81 @@ rans-fert glo-bale du si-mu-la-teur sans les contraintes
  []
 
 [59] [60]
+\openout2 = `NouveauFocus.aux'.
+
+ (NouveauFocus.tex
+Chapitre 4.
+
+Underfull \hbox (badness 10000) in paragraph at lines 4--5
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 6--7
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8--9
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 19--20
+
+ []
+
+[61
+
+
+
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 26--27
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 44--45
+
+ []
+
+[62]
+Underfull \hbox (badness 10000) in paragraph at lines 87--88
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 94--95
+
+ []
+
+[63]
+Underfull \hbox (badness 10000) in paragraph at lines 136--137
+
+ []
+
+
+Overfull \hbox (3.12558pt too wide) in paragraph at lines 138--139
+[]\T1/opensans-TOsF/m/sc/10.95 La Fi-gure [][]4.1[][] illustre les sé-quences i
+n-ci-dentes et in-ter-cep-tées dans des plan temps-fréquence.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 138--139
+
+ []
+
+<IOsimpleexemple.png, id=1191, 1300.1072pt x 544.28343pt>
+File: IOsimpleexemple.png Graphic file (type png)
+<use IOsimpleexemple.png>
+Package pdftex.def Info: IOsimpleexemple.png  used on input line 142.
+(pdftex.def)             Requested size: 455.04433pt x 190.50204pt.
+) [64] [65] [66 <./IOsimpleexemple.png>]
 \openout2 = `EUSIPCO.aux'.
 
  (EUSIPCO.tex
-Chapitre 4.
+Chapitre 5.
 
 Overfull \hbox (16.95181pt too wide) in paragraph at lines 1--1
 |[]\T1/opensans-TOsF/b/n/24.88 L'ordonnancement su-per-visé comme
@@ -2193,7 +2264,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 10--11
 
  []
 
-<DNApb.png, id=1160, 916.1728pt x 201.00093pt>
+<DNApb.png, id=1213, 916.1728pt x 201.00093pt>
 File: DNApb.png Graphic file (type png)
 <use DNApb.png>
 Package pdftex.def Info: DNApb.png  used on input line 15.
@@ -2208,7 +2279,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 23--24
 
  []
 
-[61
+[67
 
 
 
@@ -2231,7 +2302,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 30--31
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [62]
+ [68]
 Underfull \hbox (badness 10000) in paragraph at lines 44--45
 
  []
@@ -2241,12 +2312,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 59--60
 
  []
 
-<Sorting.png, id=1193, 657.05475pt x 386.6445pt>
+<Sorting.png, id=1246, 657.05475pt x 386.6445pt>
 File: Sorting.png Graphic file (type png)
 <use Sorting.png>
 Package pdftex.def Info: Sorting.png  used on input line 63.
 (pdftex.def)             Requested size: 361.38123pt x 212.65512pt.
-[63]
+[69]
 Overfull \hbox (1.94693pt too wide) in paragraph at lines 74--75
 []\T1/opensans-TOsF/m/sc/10.95 Pour ca-rac-té-ri-ser cette me-sure de dif-fi-cu
 lté, nous dé-fi-nis-sons deux mé-triques in-ter-mé-diaires
@@ -2276,7 +2347,7 @@ nsans-TOsF/b/n/10.95 ra-tio de sé-pa-ra-bi-lité $\OML/cmm/m/it/10.95 r$ \T1/ope
 nsans-TOsF/m/sc/10.95 d'une sé-quence, dé-fi-nit comme
  []
 
-[64 <./Sorting.png>]
+[70 <./Sorting.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 95--96
 
  []
@@ -2287,7 +2358,7 @@ Overfull \hbox (20.36792pt too wide) in paragraph at lines 121--121
  neu-ro-nales| 
  []
 
-[65]
+[71]
 
 LaTeX Font Warning: Font shape `U/stmry/b/n' undefined
 (Font)              using `U/stmry/m/n' instead on input line 133.
@@ -2297,7 +2368,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 153--154
 
  []
 
-[66]
+[72]
 LaTeX Font Info:    Trying to load font information for U+dsrom on input line 1
 63.
 
@@ -2330,18 +2401,18 @@ cmr/m/n/10.95 10[]; 1\OML/cmm/m/it/10.95 :\OT1/cmr/m/n/10.95 10[]]$\T1/opensans
 -TOsF/m/sc/10.95 ,
  []
 
-[67]
+[73]
 Overfull \hbox (1.17519pt too wide) in paragraph at lines 186--187
 []\T1/opensans-TOsF/m/sc/10.95 Cette sec-tion pré-sente l'éva-lua-tion des per-
 for-mances des mo-dèles sur la tâche de tri continu. 
  []
 
-<CartoBaseline.png, id=1234, 864.831pt x 397.485pt>
+<CartoBaseline.png, id=1286, 864.831pt x 397.485pt>
 File: CartoBaseline.png Graphic file (type png)
 <use CartoBaseline.png>
 Package pdftex.def Info: CartoBaseline.png  used on input line 196.
 (pdftex.def)             Requested size: 345.92627pt x 158.99118pt.
-[68]
+[74]
 Underfull \hbox (badness 10000) in paragraph at lines 206--207
 
  []
@@ -2351,8 +2422,8 @@ Underfull \hbox (badness 10000) in paragraph at lines 208--209
 
  []
 
-[69 <./CartoBaseline.png>]
-<PerfBaseline.png, id=1249, 462.528pt x 238.491pt>
+[75 <./CartoBaseline.png>]
+<PerfBaseline.png, id=1301, 462.528pt x 238.491pt>
 File: PerfBaseline.png Graphic file (type png)
 <use PerfBaseline.png>
 Package pdftex.def Info: PerfBaseline.png  used on input line 214.
@@ -2367,13 +2438,13 @@ Underfull \hbox (badness 10000) in paragraph at lines 223--224
 
  []
 
-[70 <./PerfBaseline.png>]
-<CartoMethod.png, id=1257, 1377.948pt x 712.46175pt>
+[76 <./PerfBaseline.png>]
+<CartoMethod.png, id=1309, 1377.948pt x 712.46175pt>
 File: CartoMethod.png Graphic file (type png)
 <use CartoMethod.png>
 Package pdftex.def Info: CartoMethod.png  used on input line 227.
 (pdftex.def)             Requested size: 413.38759pt x 213.74017pt.
-<PerfMethod.png, id=1259, 462.528pt x 250.0542pt>
+<PerfMethod.png, id=1311, 462.528pt x 250.0542pt>
 File: PerfMethod.png Graphic file (type png)
 <use PerfMethod.png>
 Package pdftex.def Info: PerfMethod.png  used on input line 237.
@@ -2383,78 +2454,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 244--245
 
  []
 
-[71 <./CartoMethod.png>]) [72 <./PerfMethod.png>]
-\openout2 = `NouveauFocus.aux'.
-
- (NouveauFocus.tex
-Chapitre 5.
-
-Underfull \hbox (badness 10000) in paragraph at lines 4--5
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 6--7
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 8--9
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 19--20
-
- []
-
-[73
-
-
-
-
-]
-Underfull \hbox (badness 10000) in paragraph at lines 26--27
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 44--45
-
- []
-
-[74]
-Underfull \hbox (badness 10000) in paragraph at lines 87--88
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 94--95
-
- []
-
-[75]
-Underfull \hbox (badness 10000) in paragraph at lines 136--137
-
- []
-
-
-Overfull \hbox (3.1464pt too wide) in paragraph at lines 138--139
-[]\T1/opensans-TOsF/m/sc/10.95 La Fi-gure [][]5.1[][] illustre les sé-quences i
-n-ci-dentes et in-ter-cep-tées dans des plan temps-fréquence.
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 138--139
-
- []
-
-<IOsimpleexemple.png, id=1306, 1300.1072pt x 544.28343pt>
-File: IOsimpleexemple.png Graphic file (type png)
-<use IOsimpleexemple.png>
-Package pdftex.def Info: IOsimpleexemple.png  used on input line 142.
-(pdftex.def)             Requested size: 455.04433pt x 190.50204pt.
-) [76] [77] [78 <./IOsimpleexemple.png>]
+[77 <./CartoMethod.png>]) [78 <./PerfMethod.png>]
 \openout2 = `GrosTAF.aux'.
 
  (GrosTAF.tex
@@ -3109,7 +3109,7 @@ ieeexplore . ieee . org / abstract / document / 10825633/$[][]
  []
 
 [127] [128] (Modele_These_UParisSaclay_2022.aux (Introduction.aux)
-(Problematique.aux) (Etat de l art.aux) (EUSIPCO.aux) (NouveauFocus.aux)
+(Problematique.aux) (Etat de l art.aux) (NouveauFocus.aux) (EUSIPCO.aux)
 (GrosTAF.aux) (Stage.aux))
  ***********
 LaTeX2e <2025-11-01>
@@ -3121,7 +3121,7 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 Package rerunfilecheck Info: File `Modele_These_UParisSaclay_2022.out' has not 
 changed.
-(rerunfilecheck)             Checksum: 943AAAA26A48F4670AF92E8B24BBACCF;28852.
+(rerunfilecheck)             Checksum: 64A12E72F754DA83438FA1BF5A306FFF;28852.
 Package logreq Info: Writing requests to 'Modele_These_UParisSaclay_2022.run.xm
 l'.
 \openout1 = `Modele_These_UParisSaclay_2022.run.xml'.
@@ -3168,7 +3168,7 @@ lestroke/dsrom10.pfb><C:/Users/matth/AppData/Local/Programs/MiKTeX/fonts/type1/
 public/amsfonts/euler/eufm10.pfb><C:/Users/matth/AppData/Local/Programs/MiKTeX/
 fonts/type1/public/amsfonts/symbols/msbm10.pfb><C:/Users/matth/AppData/Local/Pr
 ograms/MiKTeX/fonts/type1/public/hoekwater/stmary10.pfb>
-Output written on Modele_These_UParisSaclay_2022.pdf (128 pages, 8932620 bytes)
+Output written on Modele_These_UParisSaclay_2022.pdf (128 pages, 8932636 bytes)
 .
 PDF statistics:
  2381 PDF objects out of 2487 (max. 8388607)

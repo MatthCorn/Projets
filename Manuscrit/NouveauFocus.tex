@@ -1,6 +1,23 @@
 \chapter{Un sujet d'étude pertinent : Module de Détection et Caractérisation des Impulsions Simplifié (DCIS)}
 \label{chap:newfocus}
 \section{Contexte et motivations}
+Cette première contribution, bien que le manuscrit commence par elle, n'est pas la première chose que nous avons fait lors des travaux de thèse. Elle répond en réalité à une problématique que nous avons rencontrer lors de nos premiers essais de faire fonctionner une IA.
+
+Nous avions tenté une application directe du Transformer, considéré comme l'état de l'art, pour la génération des impulsions de sortie du DCI (les impulsions interceptées) à partir des impulsions d'entrées (les impulsions incidentes), dont les détails de l'approche seront expliqué dans le chapitre \ref{chap:seq2seq}. En utilisant déjà à l'époque une erreur de référence, associé à l'erreur d'une prédiction naïve que nous introduirons dans le chapitre \ref{chap:eusipco} et qui deviendra un facteur de normalisation, nous avons constaté numériquement que l'erreur d'apprentissage stagnait à un niveau insatisfaisant (quasiment au niveau de l'erreur de référence qui est à battre absolument). Cet échec est illustré dans la figure \ref{fig:errini}.
+
+\begin{figure}[htbp]
+\begin{center} 
+\includegraphics[scale=0.35]{errini.png}
+\end{center}
+\caption{Illustration de l'évolution l'erreur d'un Transformer sur la tâche de génération de séquence de PDW interceptés au court d'un apprentissage. Les séquences sont longues et donc traités sur des fenêtres glissantes. L'analyse principale  réside dans la proximité entre l'erreur du modèle et l'erreur de référence (en noir). (ici c'est compliqué car on n'a pas les éléments pour vraiment faire comprendre la métrique (il faudrait expliquer comment cette métrique est calculée à partir des prédictions du modèle, et même comment ces prédictions sont produites, ce qu'on ne fera pas ici), mais je trouve que la comparaison des courbes restent pertinente)}
+\label{fig:errini}
+\end{figure}
+
+Notre réponse a été de creuser plus en détail le fonctionnement du DCI avec l'ambition de proposer une architecture de Transformer qui s'inspire du fonctionnement du DCI. Simultanément nous avons mis en place des modules permettant d'extraire des caractéristiques que nous considérions pertinentes, comme les fréquences repliés de chaque PDW pour chaque fréquence d'échantillonnage. Finalement, ces efforts n'ont pas portés leurs fruits et ont plutôt apporté de la complexité supplémentaire aux méthodes mise en oeuvre que nous apprenions à maitriser.
+
+C'est donc face à ce constat décevant que nous avons décidé de recentrer nos efforts dans l'objectif d'obtenir une base fonctionnelle sur laquelle travailler. Pour celà, au lieu de complexifier la solution pour correspondre aux besoins que nous supposions connaitre du DCI, nous avons décider de simplifier le problème (reproduction du fonctionnement du DCI) pour qu'il corresponde à nos capacités, pour enfin faire évoluer en parallèle la complexité du modèle et la complexité du problème et pouvoir identifier et suivre les modifications qu'il faut apporter lors de cette complexification.
+
+\section{Contexte et motivations}
 Lors de nos travaux sur l'évaluation de l'approche sequence-to-sequence (Seq2Seq) pour reproduire les données du DCI, constituant la problématique initiale de ces travaux (Chapitre \ref{chap:prob}), nous nous sommes heurtés à deux obstacles structurels.\\
 
 Le premier réside dans la complexité du traitement opéré par le DCI. Les phénomènes de masquage fréquentiel par repliement de spectre, de saturation des voies d'acquisition, d'intermodulation ou encore la présence d'harmoniques induisent une multitude de facteurs dans la création des artéfacts (illustrés figure \ref{fig:IOex}). Du point de vue de l'apprentissage automatique, cette intrication rend opaque l'identification des causes d'erreur du modèle. Or, la capacité d'isoler la source d'une difficulté, comme diagnostiquer l'incapacité d'une architecture neuronale à modéliser une intermodulation spécifique, est une véritable nécessité méthodologique.\\
