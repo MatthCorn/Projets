@@ -1,11 +1,40 @@
 \chapter{L'approche séquence vers séquence}
 \label{chap:seq2seq}
-Ce chapitre présente la principale approche mise en place dans la thèse : la transduction séquence vers séquence. Ces travaux s'appuient sur un article soumis à la conférence CAID. Le chapitre s'articule en trois sections. Nous exposons d'abord les motivations de cette approche, en formulant nos attentes et nos réserves.  Ensuite, nous étudions le traitement de séquences entières, dont les limites sont liées à la longueur des séquences traitées. Enfin, nous introduisons un mécanisme de fenêtrage permettant de traiter ces longues séquences par segments, et détaillons son intégration aux architectures de traitement de séquences.
+\section{Contexte et motivations}
+Malgré le premier essai infructueux mentionné au chapitre \ref{chap:newfocus}, les travaux introduits au chapitre précédent sur les capacités de discernement du Transformer nous permettent d'aborder la modélisation avec l'assurance que l'architecture possède des prérequis structurels. Il est temps de se rapprocher du cœur du problème : la transduction de la séquence de PDW incidents vers la séquence de PDW interceptés. Alors que les deux chapitres précédents (chapitre \ref{chap:newfocus} et \ref{chap:eusipco}) s'inscrivaient dans une démarche de simplification croissante, ce chapitre marque le début de la remontée en complexité.
 
-\section{Motivations}
+L'objectif de ce chapitre est d'étudier la transduction opérée par le DCIS. La première section maintient encore une simplification : les scénarios étudiés sont courts et traités en un seul bloc. Cette restriction permet d'évacuer temporairement le besoin de fenêtrage, une difficulté inhérente au traitement des séquences longues qui risquerait de s'ajouter à la difficulté de l'apprentissage de la transduction, entravant ainsi l'obtention et l'analyse de nos premiers résultats. Une fois la capacité du modèle validée sur ce périmètre restreint, la seconde section se concentrera sur le traitement des séquences longues, réintroduisant la problématique du fenêtrage temporel glissant.
+
+\section{Positionnement scientifique}
+\label{seq:posscie}
 L'architecture Transformer \cite{vaswani_attention_2017} a redéfini le traitement séquentiel. Initialement conçue pour la traduction automatique, elle s'est imposée en traitement du langage naturel (NLP) avant d'être déployée dans d'autres domaines, tels que la vision par ordinateur avec le Vision Transformer \cite{dosovitskiy_image_2020} ou la biologie structurale \cite{jumper_highly_2021}. Bien que notre objectif diffère d'une traduction linguistique, ce qui implique des modifications dans la procédure d'apprentissage des modèles, l'étude du Transformer constitue un axe central de ces travaux, amorcé au chapitre \ref{chap:eusipco}. L'effort de recherche s'est concentré sur la compréhension et l'adaptation de l'architecture canonique à notre problème, sans recourir aux multiples variantes algorithmiques développées ultérieurement par la communauté.\\
 
 Aborder la modélisation du DCI par une transduction de la séquence de PDW incidents vers la séquence de PDW reconstruits constitue la démarche la plus directe. Du point de vue de l'environnement virtuel, le module DCI génère les impulsions interceptées en un seul bloc avant de les transmettre aux étages de traitement aval. Toutefois, l'architecture Transformer présente une complexité spatiale et temporelle quadratique $\mathcal{O}(N^2)$ par rapport à la longueur de la séquence $N$. Cette propriété rend matériellement impossible le traitement direct de scénarios comportant plusieurs millions d'impulsions (une volumétrie courante en simulation). Pour lever cette réserve quant à la viabilité du modèle sur des flux étendus, nous proposerons un mécanisme de fenêtrage autorisant un traitement par sous-séquences.
+
+
+(Je veux introduire les résultats de ce tableau. En gros, on a fait, en différé que les études de ce chapitre, des tests avec des réseaux de neurone récurrent. Ces testes sont réalisés sur des architectures classiques (RNN, GRU, LSTM) mais aussi des architectures "augmentées" avec des formes primitives d'attention (ce qui permet d'exploiter à un temps t les mémoires des temps précédents t-1, t-2, etc, donc ça fait une sorte de super mémoire du passé, ce qui augmente grandement les capacités de traitement de séquences longues). Ce que les tests montrent, c'est que quelque soit l'architecture, l'erreur augmente dragstiquement lorsqu'on traite des séquences plus longues (même pour les architectures récurrentes augmentées...) et ce dès 10 impulsions, ce qui est très très peu ! En gros c'est un peu l'argument qui dit pourquoi on a pas d'étude approfondie présentée sur les réseaux récurrents pour la transduction. Concernant le tableau, le lecteur doit se concentrer sur l'augmentation de la métrique et n'a pas vraiment besoin de comprendre sa signification, mais on peut quand même dire que c'est une erreur de régression RMSE normalisée. C'est le même genre d'analyse que le lecteur doit avoir que pour la courbe d'apprentissage de \ref{fig:errini} où on disait "Illustration de l'évolution de l'erreur d'un modèle Transformer sur la tâche de génération de séquences de PDW au cours de nos premières expérimentations. Sans nécessiter la compréhension détaillée de la métrique ou de l'implémentation à ce stade, la simple proximité entre la courbe d'erreur du réseau et la courbe de référence (en noir) suffit à mettre en évidence l'incapacité de l'architecture à modéliser la logique de transduction."
+
+Est-ce que tu peux me dire comment introduire ça dans le chapitre 6 ? on le fait dès le début ? pcq c'est une sorte de non question qui n'est plus abordée après donc ça mérite peut-être une explication initiale. Aide moi stp
+
+\begin{table}[htbp] 
+\centering 
+\begin{tabular}{l c c c} 
+\toprule
+\textbf{Modèle} & \textbf{5 impulsions} & \textbf{10 impulsions} & \textbf{20 impulsions} \\ 
+\midrule
+RNN & 0.663 & 0.665 & - \\
+RNN + Luong attention & 0.381 & 0.5685 & - \\
+GRU & 0.528 & 0.681 & - \\ 
+LSTM & 0.471 & 0.684 & - \\ 
+LSTM + Bahdanau attention & 0.356 & 0.543 & - \\ 
+LSTM + Luong attention & 0.118 & 0.181 & 0.296 \\ 
+\bottomrule
+\end{tabular} 
+\caption{Comparaison des performances en fonction du volume d'impulsions traitées.} 
+\label{tab:RNNseq2seq}
+\end{table}
+
+)
 
 \section{Séquence vers séquence en bloc}
 \label{seq:seq2seqblock}
@@ -586,6 +615,7 @@ La figure \ref{fig:gen_win_full} présente un scénario complet généré par la
 À l'échelle macroscopique, le modèle restitue fidèlement la distribution globale des impulsions : le réseau génère encore de lui-même les artéfacts complexes inhérents à la logique du capteur. Toutefois, l'observation à une échelle plus petite (85 pas de temps) révèle les limites. Les erreurs de reconstruction apparaissent aux interfaces entres les fenêtres, signe de la faiblesse du modèle à reconstruire l'état des mémoires du DCIS à partir du contexte passé fourni. 
 
 \section{Discussion et Perspectives}
+\label{seq:discseq}
 L'étude de la transduction Séquence-vers-Séquence pour la modélisation du DCIS conduit à un bilan contrasté. D'une part, l'approche globale a mise en lumière la pertinence de l'architecture Transformer : le mécanisme d'attention croisée est intrinsèquement capable de capturer et de reproduire les effets des mécanismes du capteur (fusions, troncatures, disparitions) sur des fenêtres d'observation restreintes. D'autre part, le passage à l'échelle via un mécanisme de fenêtrage temporel n'est pas encore mature et a mis en lumière des vulnérabilités structurelles liées à la perte de l'état latent.
 
 \subsection{Analyse de la perte du contexte dynamique}

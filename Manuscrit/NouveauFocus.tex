@@ -1,41 +1,67 @@
-\chapter{Un sujet d'étude pertinent : Module de Détection et Caractérisation des Impulsions Simplifié (DCIS)}
+\chapter{Conception d'un environnement d'étude contrôlé : le Module de Détection et Caractérisation des Impulsions Simplifié (DCIS)}
 \label{chap:newfocus}
-\section{Contexte et motivations}
-Cette première contribution, bien que le manuscrit commence par elle, n'est pas la première chose que nous avons fait lors des travaux de thèse. Elle répond en réalité à une problématique que nous avons rencontrer lors de nos premiers essais de faire fonctionner une IA.
 
-Nous avions tenté une application directe du Transformer, considéré comme l'état de l'art, pour la génération des impulsions de sortie du DCI (les impulsions interceptées) à partir des impulsions d'entrées (les impulsions incidentes), dont les détails de l'approche seront expliqué dans le chapitre \ref{chap:seq2seq}. En utilisant déjà à l'époque une erreur de référence, associé à l'erreur d'une prédiction naïve que nous introduirons dans le chapitre \ref{chap:eusipco} et qui deviendra un facteur de normalisation, nous avons constaté numériquement que l'erreur d'apprentissage stagnait à un niveau insatisfaisant (quasiment au niveau de l'erreur de référence qui est à battre absolument). Cet échec est illustré dans la figure \ref{fig:errini}.
+\section{Contexte et motivations}
+L'élaboration de l'environnement virtuel présenté dans ce chapitre ne constitue pas le point de départ chronologique de ces travaux. Elle répond en réalité à une impasse méthodologique rencontrée lors de nos premières expérimentations d'apprentissage automatique.
+
+Initialement, nous avons évalué l'application directe de l'architecture Transformer, considérée comme l'état de l'art, pour générer les impulsions interceptées à partir des impulsions incidentes. Les premiers essais se sont soldés par un échec. Bien que les détails de l'approche ne soit pas données, le chapitre \ref{chap:seq2seq} présente les présentes pour une approche similaire (appliqués à un cas d'usage simplifié). En comparant l'erreur d'apprentissage à une erreur de référence théorique (une notion qui sera définie au chapitre \ref{chap:eusipco}, associé à l'erreur d'un prédicteur naïf), nous avons constaté que les performances du modèle stagnaient à un niveau insatisfaisant, échouant à battre ce seuil de référence. Cet échec est illustré par la figure \ref{fig:errini}.
 
 \begin{figure}[htbp]
-\begin{center} 
-\includegraphics[scale=0.35]{errini.png}
+\begin{center}
+\includegraphics[scale=0.7]{errini.png}
 \end{center}
-\caption{Illustration de l'évolution l'erreur d'un Transformer sur la tâche de génération de séquence de PDW interceptés au court d'un apprentissage. Les séquences sont longues et donc traités sur des fenêtres glissantes. L'analyse principale  réside dans la proximité entre l'erreur du modèle et l'erreur de référence (en noir). (ici c'est compliqué car on n'a pas les éléments pour vraiment faire comprendre la métrique (il faudrait expliquer comment cette métrique est calculée à partir des prédictions du modèle, et même comment ces prédictions sont produites, ce qu'on ne fera pas ici), mais je trouve que la comparaison des courbes restent pertinente)}
+\caption{Illustration de l'évolution de l'erreur d'un modèle Transformer sur la tâche de génération de séquences de PDW au cours de nos premières expérimentations. Sans nécessiter la compréhension détaillée de la métrique ou de l'implémentation à ce stade, la simple proximité entre la courbe d'erreur du réseau et la courbe de référence (en noir) suffit à mettre en évidence l'incapacité de l'architecture à modéliser la logique de transduction.}
 \label{fig:errini}
 \end{figure}
 
-Notre réponse a été de creuser plus en détail le fonctionnement du DCI avec l'ambition de proposer une architecture de Transformer qui s'inspire du fonctionnement du DCI. Simultanément nous avons mis en place des modules permettant d'extraire des caractéristiques que nous considérions pertinentes, comme les fréquences repliés de chaque PDW pour chaque fréquence d'échantillonnage. Finalement, ces efforts n'ont pas portés leurs fruits et ont plutôt apporté de la complexité supplémentaire aux méthodes mise en oeuvre que nous apprenions à maitriser.
+Pour pallier ce manque de performance, notre première réponse a consisté à analyser plus finement le DCI afin de concevoir une architecture Transformer s'inspirant directement de son fonctionnement interne. Simultanément, nous avons enrichi les données en entrée avec des caractéristiques physiques jugées pertinentes, et proposé une régularisation des représentations latentes du modèle (mimant la limitation du nombre de mémoires pour le suivi temporel des impulsions). Finalement, ces tentatives n'ont apporté aucune amélioration significative. Elles ont, en revanche, alourdi la complexité d'une solution dont nous ne maîtrisions pas encore tous les leviers d'optimisation.
 
-C'est donc face à ce constat décevant que nous avons décidé de recentrer nos efforts dans l'objectif d'obtenir une base fonctionnelle sur laquelle travailler. Pour celà, au lieu de complexifier la solution pour correspondre aux besoins que nous supposions connaitre du DCI, nous avons décider de simplifier le problème (reproduction du fonctionnement du DCI) pour qu'il corresponde à nos capacités, pour enfin faire évoluer en parallèle la complexité du modèle et la complexité du problème et pouvoir identifier et suivre les modifications qu'il faut apporter lors de cette complexification.
+Face à ce constat décevant, une réorientation s'est avérée indispensable pour établir une base de travail fonctionnelle. Plutôt que de complexifier l'architecture neuronale pour tenter de correspondre aux besoins supposés du DCI, nous avons décidé simplifier le problème lui-même. L'objectif était d'avoir un environnement de complexité maîtrisée, permettant d'obtenir une première solution fonctionnelle qui évoluerait conjointement, et de manière traçable, avec la complexité de l'environnement (et donc la difficulté de la tâche d'apprentissage).
 
-\section{Contexte et motivations}
-Lors de nos travaux sur l'évaluation de l'approche sequence-to-sequence (Seq2Seq) pour reproduire les données du DCI, constituant la problématique initiale de ces travaux (Chapitre \ref{chap:prob}), nous nous sommes heurtés à deux obstacles structurels.\\
+Dans ce contexte, ce chapitre présente l'aboutissement principal de cette démarche de simplification : le Module de Détection et de Caractérisation des Impulsions Simplifié (DCIS). Nous avons décidé d'aller au-delà de la simple altération du traitement des données pour redéfinir fondamentalement le problème d'apprentissage, en modifiant notamment la structure et la temporalité des PDW du scénario.
 
-Le premier réside dans la complexité du traitement opéré par le DCI. Les phénomènes de masquage fréquentiel par repliement de spectre, de saturation des voies d'acquisition, d'intermodulation ou encore la présence d'harmoniques induisent une multitude de facteurs dans la création des artéfacts (illustrés figure \ref{fig:IOex}). Du point de vue de l'apprentissage automatique, cette intrication rend opaque l'identification des causes d'erreur du modèle. Or, la capacité d'isoler la source d'une difficulté, comme diagnostiquer l'incapacité d'une architecture neuronale à modéliser une intermodulation spécifique, est une véritable nécessité méthodologique.\\
-
-Le second obstacle est inhérent à l'exigence de reproductibilité de la recherche scientifique. L'utilisation d'un simulateur industriel impose des contraintes de confidentialité, limitant la diffusion des jeux de données et empêchant la validation indépendante des résultats.  \\
-
-Pour pallier ces limitations, nous proposons un environnement de simulation simplifié, désigné par le terme Module DCIS (Module de Détection et de Caractérisation des Impulsions Simplifié) voir simplement DCIS. Cet outil offre des leviers de contrôle sur les mécanismes générateurs d'artéfacts, facilitant la conception des réseaux de neurones, tout en assouplissant les contraintes liées à la diffusion de données. 
+Cet outil offre ainsi des leviers de contrôle sur les mécanismes générateurs d'artéfacts (illustrés précédemment en figure \ref{fig:IOex}), ce qui facilite grandement l'identification des causes d'erreur des modèles entraînés. De plus, contrairement au DCI qui impose des procédures d'extraction et de vérification systématiques avant toute exploitation des données, le DCIS constitue un environnement logiciel local. Il s'affranchit de ces lourdeurs opérationnelles, permettant ainsi la génération massive et rapide des jeux de données indispensables à l'apprentissage profond. Enfin, il apporte une réponse à nos propres besoins de reproductibilité des expériences.
 
 
-\section{Modélisation systémique du DCIS}
-L'architecture du DCIS repose sur deux modules séquentiels aux rôles complémentaires :
+\section{Architecture et modélisation algorithmique du DCIS}
+Comme nous venons de le dire, le DCIS n'est pas seulement un module qui calcule des impulsions interceptés à partir d'impulsions incidentes : il redéfinit entièrement un problème d'apprentissage, dont la structure des entrées (les impulsions incidentes) est aussi modifiée. Ainsi, ce nouveau problème est définit à travers des données générées par trois modules aux rôles complémentaires :
 \begin{itemize}
-\item \textbf{Le générateur stochastique d'environnement :} Ce module régit la succession et la densité des impulsions physiques dans \textbf{le scénario} au fil du temps.
-\item \textbf{Le modèle de réception et de suivi:} Ce module simule la dynamique d'acquisition \textbf{du capteur}. Il maintient un état interne (la mémoire de suivi temporel), évalue les détections non-ambiguës (DNA) à chaque instant, et associe ces détections à des pistes.
+\item \textbf{Le générateur d'impulsions :} Ce module régit la succession et la densité des impulsions physiques dans \textbf{le scénario} au fil du temps.
+\item \textbf{La détection d'impulsions:} Ce module simule la détection des DNA par le capteur.
+\item \textbf{Le suivi d'impulsions:} Ce module simule la dynamique de suivi du capteur. Il maintient un état interne (la mémoire de suivi temporel) et associe les DNA à des pistes (mémoire du capteur).
 \end{itemize}  
 \; \\
 
-Le cœur de cette modélisation réside dans l'approximation des règles d'extraction des DNA, qui régit l'apparition des artéfacts de masquage. Nous formalisons cette étape avant de détailler la génération de l'environnement et le processus de suivi.  
+Chacun de ces trois modules joue un rôle dans la simplification du problème. Le générateur d'impulsion simplifie la temporalité des évènements : le rythme est dicté par un pas de temps régulier, où pour chaque pas de temps une impulsion se termine et une impulsion commence. Cela rend aussi constant le nombre d'impulsions présentes simultanément au cours du scénario, mis à part au début à et la fin du scénario. La détection d'impulsions est une simplification des règles d'extraction des DNA, qui régit l'apparition des artéfacts de masquage. Le suivi d'impulsion réadapte le mécanisme de suivi du DCI. Nous détaillons dans la suite ces trois modules.  
+
+\subsection{Génération de l'environnement : la séquence d'impulsions incidentes}
+La première étape de la simulation consiste à synthétiser l'environnement électromagnétique du scénario, c'est-à-dire l'ordre d'arrivée et les caractéristiques des impulsions émises. L'algorithme maintient une densité d'impulsions, définie par le nombre d'impulsions par palier, constante au cours du scénario. Le choix de suppression d'une impulsion du palier actif est aléatoire, régi par une loi de probabilité favorisant la disparition des signaux les plus anciens. Ce processus, détaillé dans l'Algorithme \ref{algo:generation_sequence_scenario}, génère la séquence ordonnée des impulsions émises du scénario, qui sera fournie au deuxième module : la simulation de l'acquisition et du suivi temporel du capteur.  
+
+\begin{algorithm}[htbp]
+\DontPrintSemicolon
+\SetAlgoLined
+\KwIn{Nombre total d'événements $N$, Densité par palier $n$}
+\KwOut{Séquence chronologique des paliers $\mathcal{V}_{tot}$, Liste des impulsions incidentes $\mathcal{L}$}
+\textbf{Initialisation :} $\mathcal{L} \leftarrow [\,]$, Palier courant $\mathcal{V} \leftarrow [\,]$, Âges $\mathcal{A} \leftarrow [\,]$, $T \leftarrow 0$\;
+\vspace{2mm}\tcp*[l]{Générateur stochastique de l'environnement}
+\While{$T < N$}{
+Générer une nouvelle impulsion $v_{new}$\;
+Ajouter $v_{new}$ à la fin de $\mathcal{L}$ et $\mathcal{V}$ \; 
+Ajouter l'âge $0$ à la fin de $\mathcal{A}$\;
+\If{$T > n$}{
+Soit $m$ la taille de $\mathcal{V}$\;
+Sélectionner un indice $k \in [1, m]$ avec probabilité $P(k) = \frac{\mathcal{A}_k + 1}{\sum_{i=1}^{m} \mathcal{A}_i + m}$\;
+Extraire $v_k$ de $\mathcal{V}$ et $\mathcal{A}_k$ de $\mathcal{A}$\;
+Concaténer $(\mathcal{A}_k + 1)$ aux infos de $v_k$ se trouvant dans $\mathcal{L}$
+}
+$T \leftarrow T + 1$\;
+Incrémenter tous les éléments de $\mathcal{A}$ de 1\;
+}
+\Return $\mathcal{L}$
+
+\caption{Génération stochastique de la séquence d'impulsions incidentes}
+\label{algo:generation_sequence_scenario}
+\end{algorithm}
 
 
 \subsection{Filtre de Détection Non-Ambiguë (DNA)}
@@ -68,35 +94,6 @@ Finalement, une impulsion est promue au statut de DNA si elle n'est masquée par
 \end{cases}
 \end{equation}
 Nous noterons cette fonction de filtrage $\mathcal{F}_{\text{DNA}}(\cdot)$ dans la suite de l'étude.
-
-\subsection{Génération de l'environnement : la séquence d'impulsions incidentes}
-La première étape de la simulation consiste à synthétiser l'environnement électromagnétique du scénario, c'est-à-dire l'ordre d'arrivée et les caractéristiques des impulsions émises. L'algorithme maintient une densité d'impulsions, définie par le nombre d'impulsions par palier, constante au cours du scénario. Le choix de suppression d'une impulsion du palier actif est aléatoire, régi par une loi de probabilité favorisant la disparition des signaux les plus anciens. Ce processus, détaillé dans l'Algorithme \ref{algo:generation_sequence_scenario}, génère la séquence ordonnée des impulsions émises du scénario, qui sera fournie au deuxième module : la simulation de l'acquisition et du suivi temporel du capteur.  
-
-\begin{algorithm}[htbp]
-\DontPrintSemicolon
-\SetAlgoLined
-\KwIn{Nombre total d'événements $N$, Densité par palier $n$}
-\KwOut{Séquence chronologique des paliers $\mathcal{V}_{tot}$, Liste des impulsions incidentes $\mathcal{L}$}
-\textbf{Initialisation :} $\mathcal{L} \leftarrow [\,]$, Palier courant $\mathcal{V} \leftarrow [\,]$, Âges $\mathcal{A} \leftarrow [\,]$, $T \leftarrow 0$\;
-\vspace{2mm}\tcp*[l]{Générateur stochastique de l'environnement}
-\While{$T < N$}{
-Générer une nouvelle impulsion $v_{new}$\;
-Ajouter $v_{new}$ à la fin de $\mathcal{L}$ et $\mathcal{V}$ \; 
-Ajouter l'âge $0$ à la fin de $\mathcal{A}$\;
-\If{$T > n$}{
-Soit $m$ la taille de $\mathcal{V}$\;
-Sélectionner un indice $k \in [1, m]$ avec probabilité $P(k) = \frac{\mathcal{A}_k + 1}{\sum_{i=1}^{m} \mathcal{A}_i + m}$\;
-Extraire $v_k$ de $\mathcal{V}$ et $\mathcal{A}_k$ de $\mathcal{A}$\;
-Concaténer $(\mathcal{A}_k + 1)$ aux infos de $v_k$ se trouvant dans $\mathcal{L}$
-}
-$T \leftarrow T + 1$\;
-Incrémenter tous les éléments de $\mathcal{A}$ de 1\;
-}
-\Return $\mathcal{L}$
-
-\caption{Génération stochastique de la séquence d'impulsions incidentes}
-\label{algo:generation_sequence_scenario}
-\end{algorithm}
 
 
 \subsection{Simulation de l'acquisition et du suivi temporel}
@@ -149,7 +146,7 @@ Retirer $p$ de $\mathcal{P}$ et $t_p$ de $\mathcal{T}$\;
 \label{algo:capteur_process}
 \end{algorithm}
 
-\section{Pertinence de la simulation simplifiée}
+\section{Validation de la modélisation}
 Le développement de cet environnement contrôlé répond aux exigences de notre étude (Section \ref{seq:FormaPb}). Bien que structurellement simplifiée, cette modélisation n'entrave pas l'étude des capacités d'apprentissage des réseaux de neurones. La dynamique de transformation opérée par le DCIS reste homologue à celle du capteur réel.\\
 
 La Figure \ref{fig:IOsimple} illustre les séquences incidentes et interceptées  dans des plan temps-fréquence. Elle fait apparaitre que le DCIS émerger des artéfacts (fusions de signaux, disparitions, scissions artificielles, troncatures), identiques à ceux observés sur le DCI (Figure \ref{fig:IOex}).\\

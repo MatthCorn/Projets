@@ -7367,6 +7367,53 @@
       \verb https://proceedings.neurips.cc/paper/2021/hash/7f489f642a0ddb10272b5c31057f0663-Abstract.html
       \endverb
     \endentry
+    \entry{cornu_learning_2025}{article}{}{}
+      \name{author}{3}{}{%
+        {{hash=d629c7443f7af3eb07cc5182071b8f39}{%
+           family={Cornu},
+           familyi={C\bibinitperiod},
+           given={Matthieu},
+           giveni={M\bibinitperiod}}}%
+        {{hash=4d7c5d3ffd3dc469eddebc80c8a77553}{%
+           family={Enderli},
+           familyi={E\bibinitperiod},
+           given={Cyrille},
+           giveni={C\bibinitperiod}}}%
+        {{hash=fb9b215966b9465e1f9d1735213ded6a}{%
+           family={Rodet},
+           familyi={R\bibinitperiod},
+           given={Thomas},
+           giveni={T\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Palermo, Italy}%
+      }
+      \strng{namehash}{2f695b25813ef8a9fe179287c081d785}
+      \strng{fullhash}{2f695b25813ef8a9fe179287c081d785}
+      \strng{fullhashraw}{2f695b25813ef8a9fe179287c081d785}
+      \strng{bibnamehash}{2f695b25813ef8a9fe179287c081d785}
+      \strng{authorbibnamehash}{2f695b25813ef8a9fe179287c081d785}
+      \strng{authornamehash}{2f695b25813ef8a9fe179287c081d785}
+      \strng{authorfullhash}{2f695b25813ef8a9fe179287c081d785}
+      \strng{authorfullhashraw}{2f695b25813ef8a9fe179287c081d785}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Proceedings of the 2025 33rd European Signal Processing Conference ({EUSIPCO})}
+      \field{title}{Learning to Sort in Continuous Spaces: Neural Architectures and Iterative Training Strategies}
+      \field{volume}{{SiG}-{DML}-P5.2}
+      \field{year}{2025}
+      \field{dateera}{ce}
+      \field{pages}{1902}
+      \range{pages}{1}
+      \verb{urlraw}
+      \verb https://eusipco2025.org/wp-content/uploads/pdfs/0001902.pdf
+      \endverb
+      \verb{url}
+      \verb https://eusipco2025.org/wp-content/uploads/pdfs/0001902.pdf
+      \endverb
+    \endentry
     \entry{kraska_case_2018}{inproceedings}{}{}
       \name{author}{5}{}{%
         {{hash=06236ad5a15ffd4505a97a20555a384b}{%
@@ -7770,53 +7817,6 @@
       \endverb
       \verb{url}
       \verb https://matthewbaggins.itch.io/one-attention-head-is-all-you-need-for-sorting-fixed-length-lists
-      \endverb
-    \endentry
-    \entry{cornu_learning_2025}{article}{}{}
-      \name{author}{3}{}{%
-        {{hash=d629c7443f7af3eb07cc5182071b8f39}{%
-           family={Cornu},
-           familyi={C\bibinitperiod},
-           given={Matthieu},
-           giveni={M\bibinitperiod}}}%
-        {{hash=4d7c5d3ffd3dc469eddebc80c8a77553}{%
-           family={Enderli},
-           familyi={E\bibinitperiod},
-           given={Cyrille},
-           giveni={C\bibinitperiod}}}%
-        {{hash=fb9b215966b9465e1f9d1735213ded6a}{%
-           family={Rodet},
-           familyi={R\bibinitperiod},
-           given={Thomas},
-           giveni={T\bibinitperiod}}}%
-      }
-      \list{location}{1}{%
-        {Palermo, Italy}%
-      }
-      \strng{namehash}{2f695b25813ef8a9fe179287c081d785}
-      \strng{fullhash}{2f695b25813ef8a9fe179287c081d785}
-      \strng{fullhashraw}{2f695b25813ef8a9fe179287c081d785}
-      \strng{bibnamehash}{2f695b25813ef8a9fe179287c081d785}
-      \strng{authorbibnamehash}{2f695b25813ef8a9fe179287c081d785}
-      \strng{authornamehash}{2f695b25813ef8a9fe179287c081d785}
-      \strng{authorfullhash}{2f695b25813ef8a9fe179287c081d785}
-      \strng{authorfullhashraw}{2f695b25813ef8a9fe179287c081d785}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{journaltitle}{Proceedings of the 2025 33rd European Signal Processing Conference ({EUSIPCO})}
-      \field{title}{Learning to Sort in Continuous Spaces: Neural Architectures and Iterative Training Strategies}
-      \field{volume}{{SiG}-{DML}-P5.2}
-      \field{year}{2025}
-      \field{dateera}{ce}
-      \field{pages}{1902}
-      \range{pages}{1}
-      \verb{urlraw}
-      \verb https://eusipco2025.org/wp-content/uploads/pdfs/0001902.pdf
-      \endverb
-      \verb{url}
-      \verb https://eusipco2025.org/wp-content/uploads/pdfs/0001902.pdf
       \endverb
     \endentry
     \entry{berndt_using_1994}{inproceedings}{}{}
