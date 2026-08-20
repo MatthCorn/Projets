@@ -22,17 +22,35 @@ class MHCA(nn.Module):
 
         # self.ResetParam()
 
-    def forward(self, x_target, x_source, RoPE_Q=lambda u: u, RoPE_K=lambda u: u):
+    def forward(self, x_target, x_source, RoPE_Q=lambda u: u, RoPE_K=lambda u: u, past_kv=None):
         # x_source.shape = (batch_size, len_source, d_input)
         batch_size, len_source, _ = x_source.shape
         # x_target.shape = (batch_size, len_target, d_latent)
         # OR
         # x_target.shape = (1, len_target, d_latent)
         _, len_target, d_latent = x_target.shape
-        Kt = RoPE_K(self.key(x_source).reshape(batch_size, len_source, self.n_heads, -1).transpose(1, 2)).transpose(2, 3)
-        # Kt.shape = (batch_size, n_heads, d_head, len_source)
-        V = self.value(x_source).reshape(batch_size, len_source, self.n_heads, -1).transpose(1, 2)
-        # V.shape = (batch_size, n_heads, len_source, d_head)
+
+        if past_kv is not None:
+            if past_kv == []:
+                K = self.key(x_source).reshape(batch_size, -1, self.n_heads, self.d_head)
+                past_kv.append(K)
+                V = self.value(x_source).reshape(batch_size, -1, self.n_heads, self.d_head).transpose(1, 2)
+                past_kv.append(V)
+
+            past_k, past_v = past_kv
+
+            batch_size, *_ = past_k.shape
+
+            Kt = RoPE_K(past_k.transpose(1, 2)).transpose(2, 3)
+            # Kt.shape = (batch_size, n_heads, d_head, len_seq)
+            V = past_v
+            # V.shape = (batch_size, n_heads, len_seq, d_head)
+
+        else:
+            Kt = RoPE_K(self.key(x_source).reshape(batch_size, len_source, self.n_heads, -1).transpose(1, 2)).transpose(2, 3)
+            # Kt.shape = (batch_size, n_heads, d_head, len_source)
+            V = self.value(x_source).reshape(batch_size, len_source, self.n_heads, -1).transpose(1, 2)
+            # V.shape = (batch_size, n_heads, len_source, d_head)
         Q = RoPE_Q(self.query(x_target).reshape(-1, len_target, self.n_heads, self.d_head).transpose(1, 2))
         # Q.shape = (batch_size, n_heads, len_target, d_head)
         # OR

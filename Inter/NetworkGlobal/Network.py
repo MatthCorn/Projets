@@ -15,6 +15,8 @@ class TransformerTranslator(nn.Module):
         self.d_in = d_in
         self.d_out = d_out
         self.d_att = d_att
+        self.n_heads = n_heads
+        self.d_head = d_att // n_heads
 
         self.enc_embedding = FeedForward(d_in=d_in, d_out=d_att, widths=widths_embedding, dropout=dropout)
         self.dec_embedding = FeedForward(d_in=d_out, d_out=d_att, widths=widths_embedding, dropout=dropout)
@@ -37,6 +39,7 @@ class TransformerTranslator(nn.Module):
         self.register_buffer("mask_decoder", torch.tril(torch.ones(len_out + 1, len_out + 1)).unsqueeze(0).unsqueeze(0), persistent=False)
 
         self.last_decoder = FeedForward(d_in=d_att, d_out=d_out, widths=[16], dropout=0)
+        self.past_kv = None
 
 
     def forward(self, source, target, target_mask=None):
@@ -101,3 +104,56 @@ class TransformerTranslator(nn.Module):
         trg = self.last_decoder(trg)
 
         return trg, is_end
+
+    def step(self, source, target, offset=0):
+        """
+        Mode Inférence Pas-à-Pas (Bufferisé).
+        buffer: contient l'historique brut des embeddings [Batch, Hidden, T_history]
+        """
+        # 1. Gestion du Buffer
+        if self.past_kv is None:
+            batch_size, *_ = source.shape
+            self.past_kv = [[[],
+                             [torch.zeros(batch_size, 0, self.n_heads, self.d_head, device=source.device),
+                             torch.zeros(batch_size, self.n_heads, 0, self.d_head, device=source.device)].copy()]
+                            for _ in range(len(self.decoders))]
+
+        # 2. Calcul de la sortie de l'encodeur
+        src = self.enc_embedding(source)
+        src = self.enc_pos_encoding(src)
+        for encoder in self.encoders:
+            src = encoder(src)
+
+        # 3. Embeddings de l'instant t
+        if target.shape[1] == 0:
+            trg = self.start_token().expand(target.size(0), 1, -1)
+        else:
+            trg = self.dec_embedding(target)
+            trg = self.dec_pos_encoding(trg, offset=offset)
+        # trg.shape = (batch_size, 1, d_att)
+
+        for i, decoder in enumerate(self.decoders):
+            trg = decoder(target=trg, source=src, mask=self.mask_decoder, past_kv=self.past_kv[i])
+
+        trg = self.last_decoder(trg)
+        return trg
+
+    def reset_cache(self):
+        self.past_kv = None
+
+if __name__ == '__main__':
+    N = TransformerTranslator(10, 11, len_in=37, len_out=41)
+    X = torch.normal(0, 1, (1000, 37, 10))
+    Y = torch.normal(0, 1, (1000, 41, 11))
+
+    Z1 = N(X, Y)[:, 1:]
+
+    y_list = []
+    y = torch.zeros(1000, 0, 11)
+    for k in range(Y.shape[1]):
+        y = N.step(X, y, offset=k)
+        y_list.append(y)
+        y = Y[:, k:k+1]
+    Z2 = torch.cat(y_list, dim=1)
+
+    print('Résultats faux mais temps  de calcul réaliste')

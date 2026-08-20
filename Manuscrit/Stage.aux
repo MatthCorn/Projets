@@ -1,46 +1,46 @@
 \relax 
 \providecommand\zref@newlabel[2]{}
 \providecommand\hyper@newdestlabel[2]{}
-\@writefile{toc}{\contentsline {chapter}{\numberline {7}Sérialisation du problème : une approche évènementielle}{109}{chapter.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {7}Sérialisation du problème : une approche évènementielle}{113}{chapter.7}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
 \@writefile{loa}{\addvspace {10\p@ }}
-\@writefile{toc}{\contentsline {section}{\numberline {7.1}Contexte et motivations : du traitement de séquence au traitement de flux}{109}{section.7.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7.2}Formalisation du problème "Flux-à-flux"}{110}{section.7.2}\protected@file@percent }
-\newlabel{seq:serialisation}{{7.2}{110}{Formalisation du problème "Flux-à-flux"}{section.7.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2.1}Contraintes de l'approche et choix de conception}{110}{subsection.7.2.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.2.1.1}Rappel : rupture avec l'approche séquentielle}{110}{subsubsection.7.2.1.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.2.1.2}Passage à la suite}{110}{subsubsection.7.2.1.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.2.1.3}Cohérence des données}{110}{subsubsection.7.2.1.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.2.1.4}Conclusion sur la formalisation}{111}{subsubsection.7.2.1.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2.2}Sérialisation : transformation et préparation des données}{111}{subsection.7.2.2}\protected@file@percent }
-\newlabel{eq:seqfusion}{{7.1}{111}{Sérialisation : transformation et préparation des données}{equation.7.1}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {7.1}{\ignorespaces Tableau récapitulatif de la séquence des premières entrées du modèle (Input 1), la séquence des deuxièmes entrées du modèle (Input 2) et la séquence des cibles des prédictions du modèle. Ces séquences sont obtenues grâce à l'algorithme \ref {algo:serialize_data} à partir de la séquence sérialisée \ref {seq:serialisation}.}}{112}{table.caption.51}\protected@file@percent }
-\newlabel{tab:seqfusion}{{7.1}{112}{Tableau récapitulatif de la séquence des premières entrées du modèle (Input 1), la séquence des deuxièmes entrées du modèle (Input 2) et la séquence des cibles des prédictions du modèle. Ces séquences sont obtenues grâce à l'algorithme \ref {algo:serialize_data} à partir de la séquence sérialisée \ref {seq:serialisation}}{table.caption.51}{}}
-\@writefile{loa}{\contentsline {algocf}{\numberline {7}{\ignorespaces Création des triplets d'entraînement par sérialisation événementielle}}{112}{algocf.7}\protected@file@percent }
-\newlabel{algo:serialize_data}{{7}{112}{Sérialisation : transformation et préparation des données}{algocf.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2.3}Encodage local du temps}{112}{subsection.7.2.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2.4}Création des données d'entrainement}{113}{subsection.7.2.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7.3}Validation de l'approche sur architectures récurrentes}{113}{section.7.3}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {7.2}{\ignorespaces Compilation de l'ensemble des données (entrées, sortie, masques) qui permettent de superviser l'entrainement d'un modèle. Dans cet exemple, la séquence sérialisée \ref {eq:seqfusion} est de longueur 8 mais est prolongée jusqu'à 10, ce qui correspond à l'étape d'uniformisation des longueurs des séquences permettant un entrainement en parallèle de nos modèles.}}{114}{table.caption.53}\protected@file@percent }
-\newlabel{tab:seqfusion2}{{7.2}{114}{Compilation de l'ensemble des données (entrées, sortie, masques) qui permettent de superviser l'entrainement d'un modèle. Dans cet exemple, la séquence sérialisée \ref {eq:seqfusion} est de longueur 8 mais est prolongée jusqu'à 10, ce qui correspond à l'étape d'uniformisation des longueurs des séquences permettant un entrainement en parallèle de nos modèles}{table.caption.53}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3.1}Configurations architecturales}{114}{subsection.7.3.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3.2}La métrique}{114}{subsection.7.3.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {7.1}{\ignorespaces Représentation du cœur des trois principales architectures comparées. Chaque architecure dispose d'une mémoire latente $h_t$ qu'elle met à jour à partir d'une entrée courante $x_t$ et qu'elle peut exploiter pour produire une prédiction. source : \textit  {https://colah.github.io/posts/2015-08-Understanding-LSTMs/}}}{115}{figure.caption.54}\protected@file@percent }
-\newlabel{fig:compareRNN}{{7.1}{115}{Représentation du cœur des trois principales architectures comparées. Chaque architecure dispose d'une mémoire latente $h_t$ qu'elle met à jour à partir d'une entrée courante $x_t$ et qu'elle peut exploiter pour produire une prédiction. source : \textit {https://colah.github.io/posts/2015-08-Understanding-LSTMs/}}{figure.caption.54}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7.2}{\ignorespaces Illustration d'un réseau récurrent adapté au traitement de flux. Il est constitué de $L=3$ couches. La matrice $W_2$ est la matrice de projection vers l’espace latent. Les matrices $W_1^1$, $W_1^2$ et $W_1^3$ sont la matrice de persistance de la mémoire pour les 3 couches du modèle. La matrice $W_3$ est une matrice de projection dans l’espace des prédiction.}}{115}{figure.caption.55}\protected@file@percent }
-\newlabel{fig:fluxaflux}{{7.2}{115}{Illustration d'un réseau récurrent adapté au traitement de flux. Il est constitué de $L=3$ couches. La matrice $W_2$ est la matrice de projection vers l’espace latent. Les matrices $W_1^1$, $W_1^2$ et $W_1^3$ sont la matrice de persistance de la mémoire pour les 3 couches du modèle. La matrice $W_3$ est une matrice de projection dans l’espace des prédiction}{figure.caption.55}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {7.3}{\ignorespaces Configurations optimales des architectures récurrentes évaluées.}}{116}{table.caption.56}\protected@file@percent }
-\newlabel{tab:hypRNN}{{7.3}{116}{Configurations optimales des architectures récurrentes évaluées}{table.caption.56}{}}
-\newlabel{eq:ssmloss}{{7.4}{116}{La métrique}{equation.7.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3.3}Résultats expérimentaux}{116}{subsection.7.3.3}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {7.4}{\ignorespaces Comparaison des performances en fonction du volume d'impulsions traitées.}}{117}{table.caption.57}\protected@file@percent }
-\newlabel{tab:resRNN}{{7.4}{117}{Comparaison des performances en fonction du volume d'impulsions traitées}{table.caption.57}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7.3}{\ignorespaces Comparaison qualitative de séquences incidentes (gauche), cible (milieu), prédite par le modèle (droite). La séquence source est composée de 50 PDW. Le modèle utilisé pour prédire la séquence est le LSTMAT-L. Les encadrés verts permettent d'observer la capacité de notre modèle à reproduire les artefacts propre au traitement du DCI \ref {fig:IOex}}}{117}{figure.caption.58}\protected@file@percent }
-\newlabel{fig:RNNgen}{{7.3}{117}{Comparaison qualitative de séquences incidentes (gauche), cible (milieu), prédite par le modèle (droite). La séquence source est composée de 50 PDW. Le modèle utilisé pour prédire la séquence est le LSTMAT-L. Les encadrés verts permettent d'observer la capacité de notre modèle à reproduire les artefacts propre au traitement du DCI \ref {fig:IOex}}{figure.caption.58}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {7.4}Discussion et Perspectives}{118}{section.7.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7.1}Contexte et motivations : du traitement de séquence au traitement de flux}{113}{section.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7.2}Formalisation du problème "Flux-à-flux"}{114}{section.7.2}\protected@file@percent }
+\newlabel{seq:serialisation}{{7.2}{114}{Formalisation du problème "Flux-à-flux"}{section.7.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2.1}Contraintes de l'approche et choix de conception}{114}{subsection.7.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.2.1.1}Rappel : rupture avec l'approche séquentielle}{114}{subsubsection.7.2.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.2.1.2}Passage à la suite}{114}{subsubsection.7.2.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.2.1.3}Cohérence des données}{114}{subsubsection.7.2.1.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.2.1.4}Conclusion sur la formalisation}{115}{subsubsection.7.2.1.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2.2}Sérialisation : transformation et préparation des données}{115}{subsection.7.2.2}\protected@file@percent }
+\newlabel{eq:seqfusion}{{7.1}{115}{Sérialisation : transformation et préparation des données}{equation.7.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {7.1}{\ignorespaces Tableau récapitulatif de la séquence des premières entrées du modèle (Input 1), la séquence des deuxièmes entrées du modèle (Input 2) et la séquence des cibles des prédictions du modèle. Ces séquences sont obtenues grâce à l'algorithme \ref {algo:serialize_data} à partir de la séquence sérialisée \ref {seq:serialisation}.}}{116}{table.caption.53}\protected@file@percent }
+\newlabel{tab:seqfusion}{{7.1}{116}{Tableau récapitulatif de la séquence des premières entrées du modèle (Input 1), la séquence des deuxièmes entrées du modèle (Input 2) et la séquence des cibles des prédictions du modèle. Ces séquences sont obtenues grâce à l'algorithme \ref {algo:serialize_data} à partir de la séquence sérialisée \ref {seq:serialisation}}{table.caption.53}{}}
+\@writefile{loa}{\contentsline {algocf}{\numberline {8}{\ignorespaces Création des triplets d'entraînement par sérialisation événementielle}}{116}{algocf.8}\protected@file@percent }
+\newlabel{algo:serialize_data}{{8}{116}{Sérialisation : transformation et préparation des données}{algocf.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2.3}Encodage local du temps}{116}{subsection.7.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2.4}Création des données d'entrainement}{117}{subsection.7.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7.3}Validation de l'approche sur architectures récurrentes}{117}{section.7.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {7.2}{\ignorespaces Compilation de l'ensemble des données (entrées, sortie, masques) qui permettent de superviser l'entrainement d'un modèle. Dans cet exemple, la séquence sérialisée \eqref  {eq:seqfusion} est de longueur 8 mais est prolongée jusqu'à 10, ce qui correspond à l'étape d'uniformisation des longueurs des séquences permettant un entrainement en parallèle de nos modèles.}}{118}{table.caption.55}\protected@file@percent }
+\newlabel{tab:seqfusion2}{{7.2}{118}{Compilation de l'ensemble des données (entrées, sortie, masques) qui permettent de superviser l'entrainement d'un modèle. Dans cet exemple, la séquence sérialisée \eqref {eq:seqfusion} est de longueur 8 mais est prolongée jusqu'à 10, ce qui correspond à l'étape d'uniformisation des longueurs des séquences permettant un entrainement en parallèle de nos modèles}{table.caption.55}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3.1}Configurations architecturales}{118}{subsection.7.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3.2}La métrique}{118}{subsection.7.3.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7.1}{\ignorespaces Représentation du cœur des trois principales architectures comparées. Chaque architecure dispose d'une mémoire latente $h_t$ qu'elle met à jour à partir d'une entrée courante $x_t$ et qu'elle peut exploiter pour produire une prédiction. source : \textit  {https://colah.github.io/posts/2015-08-Understanding-LSTMs/}}}{119}{figure.caption.56}\protected@file@percent }
+\newlabel{fig:compareRNN}{{7.1}{119}{Représentation du cœur des trois principales architectures comparées. Chaque architecure dispose d'une mémoire latente $h_t$ qu'elle met à jour à partir d'une entrée courante $x_t$ et qu'elle peut exploiter pour produire une prédiction. source : \textit {https://colah.github.io/posts/2015-08-Understanding-LSTMs/}}{figure.caption.56}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7.2}{\ignorespaces Illustration d'un réseau récurrent adapté au traitement de flux. Il est constitué de $L=3$ couches. La matrice $W_2$ est la matrice de projection vers l’espace latent. Les matrices $W_1^1$, $W_1^2$ et $W_1^3$ sont la matrice de persistance de la mémoire pour les 3 couches du modèle. La matrice $W_3$ est une matrice de projection dans l’espace des prédiction.}}{119}{figure.caption.57}\protected@file@percent }
+\newlabel{fig:fluxaflux}{{7.2}{119}{Illustration d'un réseau récurrent adapté au traitement de flux. Il est constitué de $L=3$ couches. La matrice $W_2$ est la matrice de projection vers l’espace latent. Les matrices $W_1^1$, $W_1^2$ et $W_1^3$ sont la matrice de persistance de la mémoire pour les 3 couches du modèle. La matrice $W_3$ est une matrice de projection dans l’espace des prédiction}{figure.caption.57}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {7.3}{\ignorespaces Configurations optimales des architectures récurrentes évaluées.}}{120}{table.caption.58}\protected@file@percent }
+\newlabel{tab:hypRNN}{{7.3}{120}{Configurations optimales des architectures récurrentes évaluées}{table.caption.58}{}}
+\newlabel{eq:ssmloss}{{7.4}{120}{La métrique}{equation.7.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3.3}Résultats expérimentaux}{120}{subsection.7.3.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {7.4}{\ignorespaces Comparaison des performances en fonction du volume d'impulsions traitées.}}{121}{table.caption.59}\protected@file@percent }
+\newlabel{tab:resRNN}{{7.4}{121}{Comparaison des performances en fonction du volume d'impulsions traitées}{table.caption.59}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7.3}{\ignorespaces Comparaison qualitative de séquences incidentes (gauche), cible (milieu), prédite par le modèle (droite). La séquence source est composée de 50 PDW. Le modèle utilisé pour prédire la séquence est le LSTMAT-L. Les encadrés verts permettent d'observer la capacité de notre modèle à reproduire les artefacts propre au traitement du DCI \ref {fig:IOex}}}{121}{figure.caption.60}\protected@file@percent }
+\newlabel{fig:RNNgen}{{7.3}{121}{Comparaison qualitative de séquences incidentes (gauche), cible (milieu), prédite par le modèle (droite). La séquence source est composée de 50 PDW. Le modèle utilisé pour prédire la séquence est le LSTMAT-L. Les encadrés verts permettent d'observer la capacité de notre modèle à reproduire les artefacts propre au traitement du DCI \ref {fig:IOex}}{figure.caption.60}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7.4}Discussion et Perspectives}{122}{section.7.4}\protected@file@percent }
 \@setckpt{Stage}{
-\setcounter{page}{119}
+\setcounter{page}{123}
 \setcounter{equation}{4}
 \setcounter{enumi}{0}
 \setcounter{enumii}{0}
@@ -59,9 +59,9 @@
 \setcounter{table}{4}
 \setcounter{parentequation}{0}
 \setcounter{AlgoLine}{0}
-\setcounter{algocfline}{7}
-\setcounter{algocfproc}{7}
-\setcounter{algocf}{7}
+\setcounter{algocfline}{8}
+\setcounter{algocfproc}{8}
+\setcounter{algocf}{8}
 \setcounter{caption@flags}{2}
 \setcounter{continuedfloat}{0}
 \setcounter{mdf@globalstyle@cnt}{0}
@@ -82,7 +82,7 @@
 \setcounter{citetotal}{0}
 \setcounter{multicitecount}{0}
 \setcounter{multicitetotal}{0}
-\setcounter{instcount}{141}
+\setcounter{instcount}{142}
 \setcounter{maxnames}{3}
 \setcounter{minnames}{1}
 \setcounter{maxitems}{3}

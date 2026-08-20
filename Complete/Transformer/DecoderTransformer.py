@@ -16,18 +16,22 @@ class DecoderLayer(nn.Module):
         self.cross_attention = MHCA(d_att, n_heads, dropout=dropout_A)
         self.feed_forward = FeedForward(d_att, d_att, widths=width_FF, dropout=dropout_FF)
 
-    def forward(self, target, source, mask=None, RoPE_source=lambda u: u, RoPE_target=lambda u: u):
+    def forward(self, target, source, mask=None, RoPE_source=lambda u: u, RoPE_target=lambda u: u, past_kv=None):
+        if past_kv is not None:
+            past_kv_source, past_kv_cible = past_kv
+        else:
+            past_kv_source, past_kv_cible = None, None
         if self.norm == 'pre':
-            y = self.self_attention(self.first_layer_norm(target), mask=mask, RoPE=RoPE_target) + target
-            y = self.cross_attention(x_target=self.second_layer_norm(y), x_source=self.second_layer_norm(source), RoPE_Q=RoPE_target, RoPE_K=RoPE_source) + y
+            y = self.self_attention(self.first_layer_norm(target), mask=mask, RoPE=RoPE_target, past_kv=past_kv_cible) + target
+            y = self.cross_attention(x_target=self.second_layer_norm(y), x_source=self.second_layer_norm(source), RoPE_Q=RoPE_target, RoPE_K=RoPE_source, past_kv=past_kv_source) + y
             y = self.feed_forward(self.third_layer_norm(y)) + y
         elif self.norm == 'post':
-            y = self.first_layer_norm(self.self_attention(target, mask=mask, RoPE=RoPE_target) + target)
-            y = self.second_layer_norm(self.cross_attention(x_target=y, x_source=source, RoPE_Q=RoPE_target, RoPE_K=RoPE_source) + y)
+            y = self.first_layer_norm(self.self_attention(target, mask=mask, RoPE=RoPE_target, past_kv=past_kv_cible) + target)
+            y = self.second_layer_norm(self.cross_attention(x_target=y, x_source=source, RoPE_Q=RoPE_target, RoPE_K=RoPE_source, past_kv=past_kv_source) + y)
             y = self.third_layer_norm(self.feed_forward(y) + y)
         else:
-            y = self.self_attention(target, mask=mask, RoPE=RoPE_target) + target
-            y = self.cross_attention(x_target=y, x_source=source, RoPE_Q=RoPE_target, RoPE_K=RoPE_source) + y
+            y = self.self_attention(target, mask=mask, RoPE=RoPE_target, past_kv=past_kv_cible) + target
+            y = self.cross_attention(x_target=y, x_source=source, RoPE_Q=RoPE_target, RoPE_K=RoPE_source, past_kv=past_kv_source) + y
             y = self.feed_forward(y) + y
         return y
 

@@ -41,7 +41,7 @@ Considérons par exemple une séquence de PDW incidents $[I_1, I_2, I_3]$ et la 
 \text{Séquence sérialisée} : [I_1, O_1, O_2, O_3, I_2, I_3, O_4, O_5]
 \end{equation}
 
-C'est à partir de cette séquence que la logique de traitement que nous avons décrite précédemment s'applique. Ainsi, nous faisons apparaître dans le tableau \ref{tab:seqfusion}, pour chacun des 8 évènements que compose la séquence sérialisée \ref{eq:seqfusion} (8 premiers pas de temps), à quoi correspond le couple d'entrée dun modèle et à quoi doit correspondre la sortie du modèle. Ces données que composent l'exemple du tableau \ref{tab:seqfusion} sont en fait obtenues à partir de l'algorithme \ref{algo:serialize_data}. Il transforme une séquence sérialisée en trois séquences : la séquence des premiers éléments du couple donné au modèle (l'évènement d'entrée), la séquence des deuxièmes éléments du couple donné au modèle (le dernier évènement prédit) et la  séquence des évènements cibles que le modèle doit prédire (les évènements de sortie). Ses séquences permettent de définir un problème d'apprentissage supervisé.
+C'est à partir de cette séquence que la logique de traitement que nous avons décrite précédemment s'applique. Ainsi, nous faisons apparaître dans le tableau \ref{tab:seqfusion}, pour chacun des 8 évènements que compose la séquence sérialisée \eqref{eq:seqfusion} (8 premiers pas de temps), à quoi correspond le couple d'entrée dun modèle et à quoi doit correspondre la sortie du modèle. Ces données que composent l'exemple du tableau \ref{tab:seqfusion} sont en fait obtenues à partir de l'algorithme \ref{algo:serialize_data}. Il transforme une séquence sérialisée en trois séquences : la séquence des premiers éléments du couple donné au modèle (l'évènement d'entrée), la séquence des deuxièmes éléments du couple donné au modèle (le dernier évènement prédit) et la  séquence des évènements cibles que le modèle doit prédire (les évènements de sortie). Ses séquences permettent de définir un problème d'apprentissage supervisé.
 
 \begin{table}[htbp]
 \centering
@@ -129,7 +129,7 @@ Le tableau \ref{tab:seqfusion2} présente ces valeurs pour l'exemple de séquenc
 \textbf{MP} (Valid) & 1 & 1 & 1 & 1 & 1& 1& 1& 1& 0&0\\
 \hline
 \end{tabular}
-\caption{Compilation de l'ensemble des données (entrées, sortie, masques) qui permettent de superviser l'entrainement d'un modèle. Dans cet exemple, la séquence sérialisée \ref{eq:seqfusion} est de longueur 8 mais est prolongée jusqu'à 10, ce qui correspond à l'étape d'uniformisation des longueurs des séquences permettant un entrainement en parallèle de nos modèles.}
+\caption{Compilation de l'ensemble des données (entrées, sortie, masques) qui permettent de superviser l'entrainement d'un modèle. Dans cet exemple, la séquence sérialisée \eqref{eq:seqfusion} est de longueur 8 mais est prolongée jusqu'à 10, ce qui correspond à l'étape d'uniformisation des longueurs des séquences permettant un entrainement en parallèle de nos modèles.}
 \label{tab:seqfusion2}
 \end{table}
 
@@ -139,7 +139,7 @@ Cette procédure permet de constituer des ensembles d'entrainement dont nous éc
 Le problème d'apprentissage comme nous venons de le définir a été approché avec des réseaux de neurones récurrents, et nos résultats ont été publié dans le conférence CAID \cite{lagarde_surrogates_2025}. Cette section présente ces résultats, où l'on évalue la capacité des architectures récurrentes canoniques à capturer cette dynamique événementielle qui représente le fonctionnement du DCIS. L'étude couvre non-seulement les architectures récurrentes "classiques", c'est à dire RNN, LSTM et GRU, mais aussi des architectures de LSTM augmentées par des mécanismes d'attention \cite{luong_effective_2015}, \cite{bahdanau_neural_2014}. Nous ne présenterons pas les résultats des architectures augmentées qui exploitent un traitement séquentiel de leurs mémoires passées, approche avec laquelle nous souhaitons rompre dans cette section.
 
 \subsection{Configurations architecturales}
-La nature événementiel du DCIS s'aligne naturellement avec l'équation de mise à jour de l'état caché $h_t = f(h_{t-1}, x_t)$ des réseaux récurrents \ref{eq:recurrent}. Nous avons comparé trois architectures : RNN standard, GRU et LSTM. Quelque soit le modèle, son architecture général est identique et reprend l'architecture canonique des réseaux de neurones récurrents \ref{RNN base} présentée dans le chapitre \ref{chap:SOTA}. C'est le bloc réalisant la propagation de la mémoire et sa mise-à-jour qui distinguera les modèles. La figure \ref{fig:compareRNN} propose une comparaison de ces trois blocs élémentaires.\\
+La nature événementiel du DCIS s'aligne naturellement avec l'équation de mise à jour de l'état caché $h_t = f(h_{t-1}, x_t)$ des réseaux récurrents \eqref{eq:recurrent}. Nous avons comparé trois architectures : RNN standard, GRU et LSTM. Quelque soit le modèle, son architecture général est identique et reprend l'architecture canonique des réseaux de neurones récurrents \ref{RNN base} présentée dans le chapitre \ref{chap:SOTA}. C'est le bloc réalisant la propagation de la mémoire et sa mise-à-jour qui distinguera les modèles. La figure \ref{fig:compareRNN} propose une comparaison de ces trois blocs élémentaires.\\
 
 \begin{figure}[htbp]
 \begin{center} 
@@ -177,17 +177,17 @@ LSTM & 768 & 4 \\
 \end{table}
 
 \subsection{La métrique}
-La métrique utilisé pour l'entrainement est une pondération de deux métriques, l'une qui mesure la qualité de reconstruction et l'autre qui mesure la qualité de la classification (pour le passage à l'impulsion suivante avec le jeton \texttt{NEXT}). Cette métrique pondérée est très semblable à celle introduite dans le chapitre \ref{chap:seq2seq} (équation \ref{eq:Ltot}) dans l'approche en bloc. \\
+La métrique utilisé pour l'entrainement est une pondération de deux métriques, l'une qui mesure la qualité de reconstruction et l'autre qui mesure la qualité de la classification (pour le passage à l'impulsion suivante avec le jeton \texttt{NEXT}). Cette métrique pondérée est très semblable à celle introduite dans le chapitre \ref{chap:seq2seq} (équation \eqref{eq:Ltot}) dans l'approche en bloc. \\
 
-Considérons un lot (batch) de $B$ séquences de longueur maximale $T$, où chaque impulsion est un vecteur de dimension $D$. L'ensemble des séquences cibles $\mathbf{Y}$ comme l'ensemble des séquences prédites $\hat{\mathbf{Y}}$ peuvent être considéré comme des tenseurs de dimension $B \times T \times D$. Les masques peuvent eux être associés à des tenseurs de dimensions $B \times T$, naturellement étendu en tenseur de taille $B \times T \times D$ pour les opérations élément par élément tel que la multiplication de Hadamard $\odot$. On définit alors, de manière semblable à l'équation \ref{eq:Eraw}, l'erreur brute du lot de prédictions, normalisée par le nombre total d'éléments scalaires à la fois valides, défini par $MP_k$, et à la fois ne devant pas être un jeton \texttt{NEXT}, défini par $1 - MO_k$. Elle s'écrit :
+Considérons un lot (batch) de $B$ séquences de longueur maximale $T$, où chaque impulsion est un vecteur de dimension $D$. L'ensemble des séquences cibles $\mathbf{Y}$ comme l'ensemble des séquences prédites $\hat{\mathbf{Y}}$ peuvent être considéré comme des tenseurs de dimension $B \times T \times D$. Les masques peuvent eux être associés à des tenseurs de dimensions $B \times T$, naturellement étendu en tenseur de taille $B \times T \times D$ pour les opérations élément par élément tel que la multiplication de Hadamard $\odot$. On définit alors, de manière semblable à l'équation \eqref{eq:Eraw}, l'erreur brute du lot de prédictions, normalisée par le nombre total d'éléments scalaires à la fois valides, défini par $MP_k$, et à la fois ne devant pas être un jeton \texttt{NEXT}, défini par $1 - MO_k$. Elle s'écrit :
 
 \begin{equation}
 \mathcal{E}{raw}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k) = \frac{\| (\hat{\mathbf{Y}}_k - \mathbf{Y}_k) \odot (1 - \mathbf{MO}_k) \odot \mathbf{MP_k} \|_2}{\| ((1 - \mathbf{MO}_k) \odot \mathbf{MP}_k \|_2\sqrt{D}}
 \end{equation}
 
-Ensuite, nous injectons ce terme dans les équations \ref{eq:Eref}, \ref{eq:Ewei} et \ref{eq:Lrec} pour obtenir (de manière tout à fait identique à ce que nous avions fait en \ref{seq:metseq2seq}) l'erreur de régression $\mathcal{L}_{rec}$.\\
+Ensuite, nous injectons ce terme dans les équations \eqref{eq:Eref}, \eqref{eq:Ewei} et \eqref{eq:Lrec} pour obtenir (de manière tout à fait identique à ce que nous avions fait en \ref{seq:metseq2seq}) l'erreur de régression $\mathcal{L}_{rec}$.\\
 
-L'erreur de classification du jeton \texttt{NEXT} identique à l'équation \ref{eq:termine}, si nous désignons par $\texttt{N}$ la représentation latent du jeton \texttt{NEXT} :
+L'erreur de classification du jeton \texttt{NEXT} identique à l'équation \eqref{eq:termine}, si nous désignons par $\texttt{N}$ la représentation latent du jeton \texttt{NEXT} :
 \begin{equation}
 \mathcal{L}_{fin}(\hat{\mathbf{Y}}, \mathbf{Y}) = \frac{\|(\hat{\mathbf{Y}} - \texttt{N}) \odot \mathbf{MO} \odot \mathbf{MP_k} \|_2}{\| \mathbf{MO}_k \odot \mathbf{MP}_k \|_2\sqrt{D}}
 \end{equation}
@@ -199,7 +199,7 @@ La fonction de coût finale $\mathcal{L}_{total}$ minimisée lors de l'entraîne
 \end{equation}
 
 \subsection{Résultats expérimentaux}
-Le Tableau \ref{tab:resRNN} synthétise l'erreur totale obtenue, où $1.0$ représente un prédicteur constant naïf. Les résultats ont été obtenus après un entraînement réalisé sur un ensemble de 500 000 séquences et mesurent la performances des différents modèles par l'erreur de reconstruction normalisée \ref{eq:ssmloss} sur des séquences de taille croissante (10, 20 et 50 impulsions). Avant d'observer ces résultats résumés dans le tableau \ref{tab:resRNN}, nous faisons un court rappel permettant d'appréhender le sens des valeurs numériques présentes dans le tableau.\\
+Le Tableau \ref{tab:resRNN} synthétise l'erreur totale obtenue, où $1.0$ représente un prédicteur constant naïf. Les résultats ont été obtenus après un entraînement réalisé sur un ensemble de 500 000 séquences et mesurent la performances des différents modèles par l'erreur de reconstruction normalisée \eqref{eq:ssmloss} sur des séquences de taille croissante (10, 20 et 50 impulsions). Avant d'observer ces résultats résumés dans le tableau \ref{tab:resRNN}, nous faisons un court rappel permettant d'appréhender le sens des valeurs numériques présentes dans le tableau.\\
 
 \begin{table}[htbp] 
 \centering 

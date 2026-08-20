@@ -40,7 +40,7 @@ La première étape de la simulation consiste à synthétiser l'environnement é
 \begin{algorithm}[htbp]
 \DontPrintSemicolon
 \SetAlgoLined
-\KwIn{Nombre total d'événements $N$, Densité par palier $n$}
+\KwIn{Nombre total d'événements $N$, Nombre d'impulsions par palier $n$}
 \KwOut{Séquence chronologique des paliers $\mathcal{V}_{tot}$, Liste des impulsions incidentes $\mathcal{L}$}
 \textbf{Initialisation :} $\mathcal{L} \leftarrow [\,]$, Palier courant $\mathcal{V} \leftarrow [\,]$, Âges $\mathcal{A} \leftarrow [\,]$, $T \leftarrow 0$\;
 \vspace{2mm}\tcp*[l]{Générateur stochastique de l'environnement}
@@ -63,12 +63,27 @@ Incrémenter tous les éléments de $\mathcal{A}$ de 1\;
 \label{algo:generation_sequence_scenario}
 \end{algorithm}
 
+La génération de l'environnement au sein du DCIS s'accompagne de deux simplifications structurelles par rapport au flux de données du système réel.
+
+Premièrement, cette modélisation induit une simplification de la temporalité, illustrée par la figure \ref{fig:compPalier}. Dans le système réel, les impulsions surviennent de manière asynchrone dans un temps continu. Dans le DCIS, l'environnement est discrétisé en paliers constants, délimités par l'arrivée \textbf{et} la disparition d'une impulsion. Dès lors, la chronologie des événements est entièrement définie par la position séquentielle des impulsions d'entrée. Cette abstraction permet d'exclure la variable "date d'arrivée" des PDW, soulageant ainsi le modèle de l'interprétation d'une grandeur supplémentaire, tout en préservant la logique du traitement.
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[scale=0.32]{comparaisonPalier.png}
+\end{center}
+\caption{Comparaison de la structuration temporelle entre un scénario classique (gauche) et la modélisation DCIS (droite). Les fenêtres temporelles successives (paliers), délimitées en pointillés noirs, mettent en évidence la discrétisation événementielle du flux.}
+\label{fig:compPalier}
+\end{figure}
+
+Deuxièmement, chaque caractéristique encodant chaque impulsion est générée aléatoirement. Concrètement, lors de la création d'une impulsion, les composantes du vecteur le décrivant sont tirées indépendamment selon une loi normale standard N(0,1) : les grandeurs manipulées s'abstraient de toute réalité physique. Ainsi, la présence de fréquences négatives n'implique ici aucune interprétation telle qu'un spectre complexe, et n'implique aucun illogisme dans le traitement car les notions de repliement de vecteur et de canaux aveugle sont abandonnées dans le DCIS. Cette abstraction est justifiée par le fait que le but est d'évaluer la capacité du modèle d'apprentissage à extraire des règles mathématiques d'interaction (seuils, distances relatives) plutôt que de modéliser des phénomènes matériels.
+
+
 
 \subsection{Filtre de Détection Non-Ambiguë (DNA)}
 \label{seq:DNA_DCIS}
 Dans le système réel, une DNA résulte d'un processus complexe de corrélation de pics d'énergie repliés spectralement sur plusieurs voies. Le DCIS s'abstrait de la notion de repliement matériel pour se concentrer sur un phénomène de masquage par proximité fréquentielle pure. En ajoutant la représentation des contraintes matérielles dans le traitement algorithmique, le DCIS suffit à engendrer des dynamiques d'artéfacts complexes. \\
 
-Considérons un palier temporel contenant $n$ impulsions incidentes $I_1, \dots, I_n$, caractérisées par leurs fréquences $F_1, \dots, F_n$ et leurs niveaux d'énergie $N_1, \dots, N_n$. Nous définissons la matrice de proximité fréquentielle $\mathbf{F} \in \mathbb{R}^{n \times n}$ modélisant la résolution de l'analyse spectrale par un seuil $\delta F$ :
+Considérons un palier contenant $n$ impulsions incidentes $I_1, \dots, I_n$ (par exemple les paliers à droite de l'illustration \ref{fig:compPalier} disposent de $n=7$ impulsions), caractérisées par leurs fréquences $F_1, \dots, F_n$ et leurs niveaux d'énergie $N_1, \dots, N_n$. Nous définissons la matrice de proximité fréquentielle $\mathbf{F} \in \mathbb{R}^{n \times n}$ modélisant la résolution de l'analyse spectrale par un seuil $\delta F$ :
 \begin{equation}
 \mathbf{F}_{i,j} = \begin{cases}
 1 & \text{si } |F_i - F_j| \le \delta F \\
@@ -114,30 +129,35 @@ Ce processus global intègre les contraintes matérielles du capteur, tel que le
 \SetAlgoLined
 \KwIn{Séquence d'impulsions incidentes $\mathcal{L}$, Seuil d'association $\delta f$, Maintien $T_{maintien}$}
 \KwOut{Séquence des PDW interceptés $\mathcal{R}$}
-\textbf{Initialisation :} Temps $t \leftarrow 0$, Pistes actives $\mathcal{P} \leftarrow \emptyset$, Dates de mise à jour $\mathcal{T} \leftarrow \emptyset$, $\mathcal{R} \leftarrow [\,]$\;
+\textbf{Initialisation :} Temps $t \leftarrow 0$, Pistes actives $\mathcal{P} \leftarrow \emptyset$, Dates de mise à jour des pistes actives $\mathcal{T} \leftarrow \emptyset$, Liste des PDW émises $\mathcal{R} \leftarrow [\,]$, Ages des pistes actives $\mathcal{R} \leftarrow [\,]$\;
 \vspace{2mm}\tcp*[l]{Traitement du flux événementiel par le capteur}
 \For{$t \leftarrow 1$ \KwTo $T_{\mathrm{max}}$}{
+\tcp*[l]{Calcul des interactions pour ignorer les impulsions masquées}
 Extraire les DNA : $\mathcal{D} \leftarrow \mathcal{F}_{\text{DNA}}(\mathcal{F}_{\mathcal{V}}(\mathcal{L}, t))$ (Triée par énergie décroissante)\;
-\tcp*[l]{1. Association des DNA aux pistes ou création}
-\ForEach{impulsion $\mathcal{I} \in \mathcal{D}$ dans l'ordre}{
+\tcp*[l]{Association des DNA aux pistes ou création}
+\ForEach{impulsion $I \in \mathcal{D}$ dans l'ordre}{
 Chercher la piste active $p \in \mathcal{P}$ vérifiant $\|F_\mathcal{I} - F_{p}\| \le \delta f$ avec la plus haute énergie\;
 \eIf{Une piste $p$ valide est trouvée}{
-Associer $\mathcal{I}$ à $p$ (mise à jour)\;
-$t_p \leftarrow t$ \tcp*{L'âge associé à $p$ est mise à jour}
+Associer $I$ à $p$ (mise à jour)\;
+$a_p \leftarrow a_p + (t - t_p)$ \tcp*{L'âge associé à $p$ est mise à jour}
+$t_p \leftarrow t$ \tcp*{Date de dernière mise-à-jour changée}
 }{
-\If{$|\mathcal{P}| < N_{max}$}{
-Créer une nouvelle piste $p_{new}$ à partir de $\mathcal{I}$ \tcp*{l'énergie de $p_{new}$ est fixée ici}
-Ajouter $p_{new}$ à $\mathcal{P}$ et la date $t$ à $\mathcal{T}$\;
+\eIf{$|\mathcal{P}| < N_{max}$}{
+\tcp*[l]{l'énergie de $p_{new}$ est fixée lors de sa création}
+Créer une nouvelle piste $p_{new}$ à partir de $I$\; 
+Ajouter $p_{new}$ à $\mathcal{P}$, l'âge $0$ à $\mathcal{A}$ et la date $t$ à $\mathcal{T}$\;
+}{\tcp*[l]{Sur ce palier, l'information est perdue par saturation des pistes}
 }
 }
 }
 \vspace{1mm}
-\tcp*[l]{2. Purge de la mémoire et publication}
+\tcp*[l]{Purge de la mémoire et publication}
 \ForEach{piste $p \in \mathcal{P}$ par ordre d'énergie décroissant}{
-\If{$t - t_p \ge T_{maintien}$}{
-Construire le PDW intercepté final à partir de $p$ et $t_p$\;
+\If{$t - t_p \ge T_{maintien}$ }{
+\tcp*[l]{On libère la piste inactive}
+Construire le PDW intercepté final à partir de $p$, $a_p$ et $t_p$\;
 Ajouter le PDW à la fin de $\mathcal{R}$\;
-Retirer $p$ de $\mathcal{P}$ et $t_p$ de $\mathcal{T}$\;
+Retirer $p$ de $\mathcal{P}$, $a_p$ de $\mathcal{A}$ et $t_p$ de $\mathcal{T}$\;
 }
 }
 }

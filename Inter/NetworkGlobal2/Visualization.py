@@ -137,7 +137,7 @@ def value_to_rgb(value, min_val=0, max_val=2, colormap='plasma'):
     return rgb
 
 def RecursiveGeneration(save_path):
-    from Inter.Model.DataMaker import GetData
+    from Inter.NetworkGlobal2.Utils import GetData
     import torch
 
     param = loadXmlAsObj(os.path.join(save_path, 'param'))
@@ -163,12 +163,11 @@ def RecursiveGeneration(save_path):
         weight_f=weight_f,
         weight_l=weight_l,
         plot=False,
-        type='complete',
         parallel=True
     )
 
     from Inter.NetworkGlobal2.Network import TransformerTranslator
-    N = TransformerTranslator(param['d_in'], param['d_in'] + 1, d_att=param['d_att'], n_heads=param['n_heads'],
+    N = TransformerTranslator(param['d_in'] + 1, param['d_in'] + 1, d_att=param['d_att'], n_heads=param['n_heads'],
                               n_encoders=param['n_encoder'],
                               n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'],
                               width_FF=param['width_FF'], len_in=param['len_in'],
@@ -222,7 +221,7 @@ def RecursiveGeneration(save_path):
 
     R = Output[0][:Masks[0][0, :, 0].tolist().index(1.)].tolist()
     for i, vector in enumerate(R):
-        T1 = i - vector[-1]
+        T1 = vector[-1]
         T2 = T1 + vector[-2]
         F = vector[0]
         N = 0.5 * np.tanh(vector[1] / l_std) + 1
@@ -240,7 +239,7 @@ def RecursiveGeneration(save_path):
     n_pulse_predicted = [x > 0.1 for x in end_list].index(False)
     L = Prediction[0][:n_pulse_predicted].tolist()
     for i, vector in enumerate(L):
-        T1 = i - vector[-1]
+        T1 = vector[-1]
         T2 = T1 + vector[-2]
         F = vector[0]
         N = 0.5 * np.tanh(vector[1] / l_std) + 1
@@ -257,7 +256,7 @@ def RecursiveGeneration(save_path):
 
     L = GuidedPrediction[0][:Masks[0][0, :, 0].tolist().index(1.)].tolist()
     for i, vector in enumerate(L):
-        T1 = i - vector[-1]
+        T1 = vector[-1]
         T2 = T1 + vector[-2]
         F = vector[0]
         N = 0.5 * np.tanh(vector[1]/l_std) + 1
@@ -302,7 +301,7 @@ def RecursiveGeneration(save_path):
 
 
 def VisualizeScenario(save_path):
-    from Inter.Model.DataMaker import GetData
+    from Inter.NetworkGlobal2.Utils import GetData
     import torch
 
     param = loadXmlAsObj(os.path.join(save_path, 'param'))
@@ -328,12 +327,11 @@ def VisualizeScenario(save_path):
         weight_f=weight_f,
         weight_l=weight_l,
         plot=False,
-        type='complete',
         parallel=True
     )
 
     from Inter.NetworkGlobal2.Network import TransformerTranslator
-    N = TransformerTranslator(param['d_in'], param['d_in'] + 1, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
+    N = TransformerTranslator(param['d_in'] + 1, param['d_in'] + 1, d_att=param['d_att'], n_heads=param['n_heads'], n_encoders=param['n_encoder'],
                               n_decoders=param['n_decoder'], widths_embedding=param['widths_embedding'], width_FF=param['width_FF'], len_in=param['len_in'],
                               len_out=param['len_out'], norm=param['norm'], dropout=param['dropout'])
     N.load_state_dict(torch.load(os.path.join(save_path, 'Last_network')))
@@ -485,10 +483,10 @@ def VisualizeScenario(save_path):
     plt.show()
 
 if __name__ == '__main__':
-    save_path = r'C:\Users\matth\Documents\Python\Projets\Inter\NetworkGlobal2\Save\2026-06-28__01-38'
+    save_path = r'C:\Users\matth\Documents\Python\Projets\Inter\NetworkGlobal2\Save\2026-08-17__16-03'
 
-    # RecursiveGeneration(save_path)
+    VisualizeScenario(save_path)
 
-    PlotError(save_path)
+    # PlotError(save_path)
 
     # PathToGIF(save_path)

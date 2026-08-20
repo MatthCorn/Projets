@@ -286,7 +286,7 @@ Cette formulation met en évidence une différence importante avec la convolutio
 \begin{center} 
 \includegraphics[scale=0.35]{BasicRNN.png}
 \end{center}
-\caption{Illustration du mécanisme de la récurrence et propagation de l'état mémoire. $W_1$ joue le rôle de contrôleur la persistance de la mémoire $h$, noté $W_{hh}$ dans l'équation \ref{eq:RNN}. $W_2$ joue le rôle de projeteur des éléments de la séquence d'entrée $x$ dans l'espace latent, noté $W_{ih}$ dans l'équation \ref{eq:RNN}. Le cône bleu représente le champ récepteur de $h_3$, qui va de $x_1$ à $x_3$. En arrière plan, le cône bleu pâle représente le champ récepteur de $h_9$, s'étendant de $x_1$ à $x_9$.}
+\caption{Illustration du mécanisme de la récurrence et propagation de l'état mémoire. $W_1$ joue le rôle de contrôleur la persistance de la mémoire $h$, noté $W_{hh}$ dans l'équation \eqref{eq:RNN}. $W_2$ joue le rôle de projeteur des éléments de la séquence d'entrée $x$ dans l'espace latent, noté $W_{ih}$ dans l'équation \eqref{eq:RNN}. Le cône bleu représente le champ récepteur de $h_3$, qui va de $x_1$ à $x_3$. En arrière plan, le cône bleu pâle représente le champ récepteur de $h_9$, s'étendant de $x_1$ à $x_9$.}
 \label{RNN base}
 \end{figure}
 
@@ -296,7 +296,7 @@ En fonction de la fonction accomplie par l'architecture récurrente, les états 
 \begin{center} 
 \includegraphics[scale=0.4]{ComparaisonRNN.png}
 \end{center}
-\caption{Topologies d'application des architectures récurrentes : traitement de flux (gauche) et traduction globale (droite). Les matrices $W_1$ et $W_4$ sont les matrices de persistance de la mémoire (notées $W_{hh}$ dans \ref{eq:RNN}). Les matrices $W_2$ et $W_5$ sont les matrices de projections vers l'espace latent (notées $W_{ih}$ dans \ref{eq:RNN}) . La matrice $W_3$ est une matrice de projection dans l'espace des prédiction.}
+\caption{Topologies d'application des architectures récurrentes : traitement de flux (gauche) et traduction globale (droite). Les matrices $W_1$ et $W_4$ sont les matrices de persistance de la mémoire (notées $W_{hh}$ dans \eqref{eq:RNN}). Les matrices $W_2$ et $W_5$ sont les matrices de projections vers l'espace latent (notées $W_{ih}$ dans \eqref{eq:RNN}) . La matrice $W_3$ est une matrice de projection dans l'espace des prédiction.}
 \label{RNN comparaison}
 \end{figure}
 
@@ -348,7 +348,7 @@ Cette structure macroscopique ne décrit pas un simple passage de couches, mais 
 
 \subsubsection{L'Encodeur}
 \label{seq:Enc}
-L'illustration \ref{encoder transformer} détaille l'architecture interne d'un bloc d'encodage. Chaque bloc est conçu pour transformer les représentations vectorielles entrantes en une version plus contextualisée. Il s'articule autour de deux sous-modules séquentiels. Le premier est l'Attention Multi-Têtes, où les rôles de Requête, Clé et Valeur ($Q, K, V$) sont tous issus de la sortie du bloc précédent. Cela permet à chaque position de capturer des relations avec toutes les autres positions de la séquence, quelque soit leur distance relative et en se basant uniquement sur le contenue des éléments à ces positions. Nous verrons que cette opération est invariante par permutation, en \ref{seq:PE}. Le second est un réseau de neurones dense (Feed-Forward Network - FFN) appliqué indépendamment à chaque position. Pour permettre l'entraînement de réseaux profonds, chaque sous-module est encapsulé par une connexion résiduelle \cite{he_deep_2016} suivie d'une normalisation de couche (Layer Norm) \cite{ba_layer_2016}, assurant stabilité et une bonne propagation du gradient dans toutes les couches. Enfin, l'architecture étant invariante par permutation, l'ajout dès l'entrée d'un Encodage Positionnel est indispensable pour injecter la topologie temporelle ou spatiale dans les représentations vectorielles, dont une implémentation est proposée dans l'équation \ref{eq:PE}.\\
+L'illustration \ref{encoder transformer} détaille l'architecture interne d'un bloc d'encodage. Chaque bloc est conçu pour transformer les représentations vectorielles entrantes en une version plus contextualisée. Il s'articule autour de deux sous-modules séquentiels. Le premier est l'Attention Multi-Têtes, où les rôles de Requête, Clé et Valeur ($Q, K, V$) sont tous issus de la sortie du bloc précédent. Cela permet à chaque position de capturer des relations avec toutes les autres positions de la séquence, quelque soit leur distance relative et en se basant uniquement sur le contenue des éléments à ces positions. Nous verrons que cette opération est invariante par permutation, en \ref{seq:PE}. Le second est un réseau de neurones dense (Feed-Forward Network - FFN) appliqué indépendamment à chaque position. Pour permettre l'entraînement de réseaux profonds, chaque sous-module est encapsulé par une connexion résiduelle \cite{he_deep_2016} suivie d'une normalisation de couche (Layer Norm) \cite{ba_layer_2016}, assurant stabilité et une bonne propagation du gradient dans toutes les couches. Enfin, l'architecture étant invariante par permutation, l'ajout dès l'entrée d'un Encodage Positionnel est indispensable pour injecter la topologie temporelle ou spatiale dans les représentations vectorielles, dont une implémentation est proposée dans l'équation \eqref{eq:PE}.\\
 
 \begin{figure}
 \begin{center}
@@ -408,7 +408,7 @@ En pratique, on dispose donc de $h$ triplets de séquences $(\mathcal{Q}_l,\math
 Le calcul de chaque tête d'attention est réalisé en appliquant, pour $l$ variant de $1$ à $h$, l'opérateur d'attention \ref{attentionoperator} aux séquences $\mathcal{Q}_l$, $\mathcal{K}_l$ et $\mathcal{V}_l$.
 $$ \mathsf{A}(q, \mathcal{KV}_l) = \sum_{(k, v) \in \mathcal{KV}_l} \frac{\exp(a(q, k))}{\sum_{k’ \in \mathcal{K}_l}\exp(a(q,k’))} v $$
 
-Enfin, les sorties des $h$ têtes sont concaténées (opérateur $\oplus$) pour former un vecteur de dimension $h \times d_{att}$. Ce vecteur est reprojeté par une fonction $O$, dans l'espace $\mathbb{R}^{d_{att}}$, définissant ainsi l'opérateur d'attention multi-tête ($\mathsf{MHA}$ – Multi-Head Attention) applicable à tout élément $x$ de la séquence formant les requêtes \ref{queryeq}.
+Enfin, les sorties des $h$ têtes sont concaténées (opérateur $\oplus$) pour former un vecteur de dimension $h \times d_{att}$. Ce vecteur est reprojeté par une fonction $O$, dans l'espace $\mathbb{R}^{d_{att}}$, définissant ainsi l'opérateur d'attention multi-tête ($\mathsf{MHA}$ – Multi-Head Attention) applicable à tout élément $x$ de la séquence formant les requêtes \eqref{queryeq}.
 \begin{equation}
 \mathsf{MHA}(x) = O( A(Q_1(x), \mathcal{KV}_1) \oplus A(Q_2(x), \mathcal{KV}_2) \oplus \dots \oplus A(Q_h(x), \mathcal{KV}_h))
 \label{MHAeq}
@@ -417,7 +417,7 @@ Enfin, les sorties des $h$ têtes sont concaténées (opérateur $\oplus$) pour 
 
 Cette formulation générique connaît plusieurs variantes qui se distinguent par la nature des interactions qu'elles sont sensées capturer.\\
 
-Premièrement, lorsque l'objectif est d'enrichir une séquence cible $(x_i)_{i \in \mathbb{I}}$ par le contexte d'une séquence source distincte $(y_j)_{j \in \mathbb{J}}$, comme dans le module \textit{Multi-Head Cross Attention} d'un bloc décodeur \ref{seq:Dec}, on assigne les rôles de manière asymétrique. Pour toute tête $l \in \{1, \dots, h\}$, l'ensemble des requêtes est généré par la cible, soit $\mathcal{Q}_l = \{Q_l(x_i)\}_{i \in \mathbb{I}}$, tandis que l'ensemble des paires clé-valeur est généré par la source, soit $\mathcal{KV}_l = \{(K_l(y_j), V_l(y_j))\}_{j \in \mathbb{J}}$. La sortie est calculé en appliquant directement l'opération $\mathsf{MHA}$ \ref{MHAeq} à ces séquences de requêtes, clés et valeur, définissant ainsi l'opérateur d'attention croisée multi-tête ($\mathsf{MHCA}$ - Multi-Head Cross-Attention). Une schématisation de ce mécanisme sur une unique tête est représenté dans la figure \ref{fig:cross_att}. \\
+Premièrement, lorsque l'objectif est d'enrichir une séquence cible $(x_i)_{i \in \mathbb{I}}$ par le contexte d'une séquence source distincte $(y_j)_{j \in \mathbb{J}}$, comme dans le module \textit{Multi-Head Cross Attention} d'un bloc décodeur \ref{seq:Dec}, on assigne les rôles de manière asymétrique. Pour toute tête $l \in \{1, \dots, h\}$, l'ensemble des requêtes est généré par la cible, soit $\mathcal{Q}_l = \{Q_l(x_i)\}_{i \in \mathbb{I}}$, tandis que l'ensemble des paires clé-valeur est généré par la source, soit $\mathcal{KV}_l = \{(K_l(y_j), V_l(y_j))\}_{j \in \mathbb{J}}$. La sortie est calculé en appliquant directement l'opération $\mathsf{MHA}$ \eqref{MHAeq} à ces séquences de requêtes, clés et valeur, définissant ainsi l'opérateur d'attention croisée multi-tête ($\mathsf{MHCA}$ - Multi-Head Cross-Attention). Une schématisation de ce mécanisme sur une unique tête est représenté dans la figure \ref{fig:cross_att}. \\
 
 \begin{figure}[htbp]
 \begin{center} 
@@ -427,7 +427,7 @@ Premièrement, lorsque l'objectif est d'enrichir une séquence cible $(x_i)_{i \
 \label{fig:cross_att}
 \end{figure}
 
-Deuxièmement, lorsque l'objectif est d'enrichir une séquence $(x_i)_{i \in \mathbb{I}}$ par son propre contexte, comme dans le module \textit{Multi-Head Attention} d'un bloc encodeur \ref{seq:Enc}, la même séquence est utilisée pour tous les rôles. Pour toute tête $l$, on définit $\mathcal{Q}_l = \{Q_l(x_i)\}_{i \in \mathbb{I}}$ et $\mathcal{KV}_l = \{(K_l(x_i), V_l(x_i))\}_{i \in \mathbb{I}}$. L'application de l'opérateur $\mathsf{MHA}$ \ref{MHAeq} à ces séquences de requêtes, clés et valeurs définit alors l'opérateur d'auto-attention multi-tête ($\mathsf{MHSA}$ - Multi-Head Self-Attention). Une schématisation de ce mécanisme sur une unique tête est représenté à gauche de la figure \ref{fig:compare_att}. \\
+Deuxièmement, lorsque l'objectif est d'enrichir une séquence $(x_i)_{i \in \mathbb{I}}$ par son propre contexte, comme dans le module \textit{Multi-Head Attention} d'un bloc encodeur \ref{seq:Enc}, la même séquence est utilisée pour tous les rôles. Pour toute tête $l$, on définit $\mathcal{Q}_l = \{Q_l(x_i)\}_{i \in \mathbb{I}}$ et $\mathcal{KV}_l = \{(K_l(x_i), V_l(x_i))\}_{i \in \mathbb{I}}$. L'application de l'opérateur $\mathsf{MHA}$ \eqref{MHAeq} à ces séquences de requêtes, clés et valeurs définit alors l'opérateur d'auto-attention multi-tête ($\mathsf{MHSA}$ - Multi-Head Self-Attention). Une schématisation de ce mécanisme sur une unique tête est représenté à gauche de la figure \ref{fig:compare_att}. \\
 
 Enfin, la génération autorégressive impose un respect strict de la causalité. Dans l'objectif est d'enrichir une séquence $(x_i)_{i \in \mathbb{I}}$ par son propre contexte de manière causale, comme dans un module \textit{Masked Multi-Head Attention} d'un bloc décodeur \ref{seq:Dec}, les rôles sont encore assignés de manière symétrique, mais le calcul du score d’attention est modifié.
 Soient $x_i$ et $x_j$ deux éléments de la séquence, générant respectivement une requête $q_i$ et une clé $k_j$ dans la tête $l$. Le score d'attention est redéfini ainsi:
@@ -441,7 +441,7 @@ a(q_i, k_j) = \begin{cases}
 \: \\
 
 Cette condition assure que pour tout $j > i$, le poids $p$ associé est nul, empêchant toute fuite d'information du futur vers le passé.
-L'attention masquée \ref{maskedattention} est réinjectée dans le calcul de pondération \ref{pondatt} et l'agrégation suit ensuite la mécanique de calcul standard, de l'équation \ref{attentionoperator} jusqu'à l'équation \ref{MHAeq}, définissant ainsi l'opérateur d'auto-attention masquée multi-tête ($\mathsf{MMHSA}$ - Masked Multi-Head Self-Attention). Une schématisation de ce mécanisme sur une unique tête est représenté à droite de la figure \ref{fig:compare_att}. 
+L'attention masquée \eqref{maskedattention} est réinjectée dans le calcul de pondération \eqref{pondatt} et l'agrégation suit ensuite la mécanique de calcul standard, de l'équation \ref{attentionoperator} jusqu'à l'équation \eqref{MHAeq}, définissant ainsi l'opérateur d'auto-attention masquée multi-tête ($\mathsf{MMHSA}$ - Masked Multi-Head Self-Attention). Une schématisation de ce mécanisme sur une unique tête est représenté à droite de la figure \ref{fig:compare_att}. 
 
 \begin{figure}[htbp]
 \begin{center} 
@@ -453,7 +453,7 @@ L'attention masquée \ref{maskedattention} est réinjectée dans le calcul de po
 
 \subsubsection{Invariance par permutation et Encodage Positionnel}
 \label{seq:PE}
-L'analyse de l'opérateur d'attention (équation \ref{attentionoperator}) révèle une propriété mathématique stricte : il s'agit d'une somme pondérée. Cette opération est invariante par permutation. Si l'on modifie l'ordre des éléments de la séquence d'entrée, la représentation de sortie subira une permutation identique, sans altération des valeurs calculées. Contrairement aux réseaux récurrents (traitement séquentiel) ou convolutionnels (fenêtre glissante locale), le mécanisme d'attention ne possède aucun biais topologique permettant d'interpréter l'ordre des éléments.
+L'analyse de l'opérateur d'attention (équation \eqref{attentionoperator}) révèle une propriété mathématique stricte : il s'agit d'une somme pondérée. Cette opération est invariante par permutation. Si l'on modifie l'ordre des éléments de la séquence d'entrée, la représentation de sortie subira une permutation identique, sans altération des valeurs calculées. Contrairement aux réseaux récurrents (traitement séquentiel) ou convolutionnels (fenêtre glissante locale), le mécanisme d'attention ne possède aucun biais topologique permettant d'interpréter l'ordre des éléments.
 
 Pour rétablir la topologie de la donnée, l'information d'ordre doit être injectée explicitement via l'Encodage Positionnel, introduit à l'entrée de l'encodeur et du décodeur. Un vecteur de position $PE$ (\textit{Positional Encoding}), dépendant uniquement de l'indice de position $i$, est additionné à la représentation de l'élément $x_i$. Dans l'architecture originelle \cite{vaswani_attention_2017}, ces vecteurs sont déterministes et construits par l'entrelacement de fonctions sinusoïdales de différentes fréquences. Pour une position $i$ et une dimension $j \in \{0, \dots, \lfloor d/2 \rfloor - 1 \}$, les composantes du vecteur s'expriment selon :
 \begin{equation}
@@ -465,7 +465,7 @@ PE(i, 2j+1) &= \cos\left(\frac{i}{10000^{2j/d}}\right)
 \end{equation}
 où $d$ est la dimension de l'espace de représentation.
 
-Le mécanisme d'attention apprend alors à corréler ses calculs d'attention \ref{attentionscore} non seulement avec le contenu sémantique des vecteurs, mais également avec la phase relative de ces composantes sinusoïdales, traduisant la distance temporelle ou spatiale entre les éléments.
+Le mécanisme d'attention apprend alors à corréler ses calculs d'attention \eqref{attentionscore} non seulement avec le contenu sémantique des vecteurs, mais également avec la phase relative de ces composantes sinusoïdales, traduisant la distance temporelle ou spatiale entre les éléments.
 
 
 \subsubsection{Application au traitement du langage naturel}
@@ -489,6 +489,7 @@ Enfin, dans le domaine du contrôle et de la simulation, le Decision Transformer
 
 
 \subsection{Ancrage dans la problématique}
+\label{seq:discRNN}
 L'exploration des architectures de traitement de séquence met en lumière un éventail de mécanismes complémentaires pour la modélisation de notre simulateur de capteur, dont la pertinence doit être pondérée par les contraintes spécifiques des signaux radar. Les réseaux convolutionnels, par leur restriction à interagir uniquement localement, offrent une approche adaptée pour modéliser les interactions à courte portée, telles que les interférences immédiates entre impulsions proches au sein d'un même train. Cependant, leur architecture à fenêtre glissante impose une limitation structurelle majeure : la difficulté à maintenir un état mémoire persistant sur des horizons temporels arbitrairement longs, ce qui peut s'avérer insuffisant pour reproduire fidèlement les processus de pistage temporel qui nécessitent de lier des événements très distants.
 
 De leur côté, les architectures récurrentes (RNN) et les modèles d'espaces d'états (SSM) présentent une affinité naturelle avec la causalité physique du capteur, mimant le comportement des algorithmes de traitement du signal qui mettent à jour des pistes au gré des réceptions. Néanmoins, leur usage impliquerait un changement de paradigme par rapport à notre approche orientée "traduction". Ces modèles excellent dans le traitement séquentiel flux à flux, mais leur application à une tâche de transformation globale de séquence (Seq2Seq) sur de très longs scénarios est complexe. Le goulot d'étranglement du vecteur de contexte, censé compresser toute l'information de la séquence d'entrée avant la génération, devient rapidement prohibitif face à la densité des données radar, limitant leur capacité à reconstruire fidèlement l'ensemble du scénario en une seule passe.

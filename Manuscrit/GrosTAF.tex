@@ -1,40 +1,43 @@
 \chapter{L'approche séquence vers séquence}
 \label{chap:seq2seq}
-\section{Contexte et motivations}
-Malgré le premier essai infructueux mentionné au chapitre \ref{chap:newfocus}, les travaux introduits au chapitre précédent sur les capacités de discernement du Transformer nous permettent d'aborder la modélisation avec l'assurance que l'architecture possède des prérequis structurels. Il est temps de se rapprocher du cœur du problème : la transduction de la séquence de PDW incidents vers la séquence de PDW interceptés. Alors que les deux chapitres précédents (chapitre \ref{chap:newfocus} et \ref{chap:eusipco}) s'inscrivaient dans une démarche de simplification croissante, ce chapitre marque le début de la remontée en complexité.
 
-L'objectif de ce chapitre est d'étudier la transduction opérée par le DCIS. La première section maintient encore une simplification : les scénarios étudiés sont courts et traités en un seul bloc. Cette restriction permet d'évacuer temporairement le besoin de fenêtrage, une difficulté inhérente au traitement des séquences longues qui risquerait de s'ajouter à la difficulté de l'apprentissage de la transduction, entravant ainsi l'obtention et l'analyse de nos premiers résultats. Une fois la capacité du modèle validée sur ce périmètre restreint, la seconde section se concentrera sur le traitement des séquences longues, réintroduisant la problématique du fenêtrage temporel glissant.
+\section{Contexte et motivations}
+Malgré le premier essai infructueux mentionné au chapitre \ref{chap:newfocus}, les travaux introduits au chapitre précédent sur les capacités de discernement du Transformer nous permettent d'aborder la modélisation avec l'assurance que l'architecture possède des pré-requis structurels. Il est temps de se rapprocher du cœur du problème : la transduction de la séquence de PDW incidents vers la séquence de PDW interceptés. Alors que les deux chapitres précédents (chapitres \ref{chap:newfocus} et \ref{chap:eusipco}) s'inscrivaient dans une démarche de simplification grandissante, ce chapitre marque le début de la remontée en complexité.
+
+L'objectif de ce chapitre est d'étudier la transduction opérée par le DCIS. La première section maintient encore une simplification par rapport à l'objectif final : les scénarios étudiés sont courts et traités en un seul bloc. Cette restriction permet d'évacuer temporairement le besoin de fenêtrage, une difficulté inhérente au traitement des séquences longues qui risquerait de s'ajouter à la difficulté de l'apprentissage de la transduction, entravant ainsi l'obtention et l'analyse de nos premiers résultats. Une fois la capacité du modèle validée sur ce périmètre restreint, la seconde section se concentrera sur le traitement des séquences longues, réintroduisant la problématique du fenêtrage temporel glissant.
+
+Il convient de rappeler que, bien que nous manipulions ici un environnement simplifié (le DCIS), une question importante de ces travaux de thèse demeure l'accélération numérique de la simulation du capteur. Tout au long de la conception de notre modèle d'apprentissage, une attention particulière sera portée à la préservation des capacités de parallélisation des calculs, qui constituent la clé de l'accélération matérielle par intelligence artificielle (utilisation des GPU). Ces considérations de performance et de passage à l'échelle feront l'objet d'une discussion en fin de chapitre.
 
 \section{Positionnement scientifique}
 \label{seq:posscie}
-L'architecture Transformer \cite{vaswani_attention_2017} a redéfini le traitement séquentiel. Initialement conçue pour la traduction automatique, elle s'est imposée en traitement du langage naturel (NLP) avant d'être déployée dans d'autres domaines, tels que la vision par ordinateur avec le Vision Transformer \cite{dosovitskiy_image_2020} ou la biologie structurale \cite{jumper_highly_2021}. Bien que notre objectif diffère d'une traduction linguistique, ce qui implique des modifications dans la procédure d'apprentissage des modèles, l'étude du Transformer constitue un axe central de ces travaux, amorcé au chapitre \ref{chap:eusipco}. L'effort de recherche s'est concentré sur la compréhension et l'adaptation de l'architecture canonique à notre problème, sans recourir aux multiples variantes algorithmiques développées ultérieurement par la communauté.\\
 
-Aborder la modélisation du DCI par une transduction de la séquence de PDW incidents vers la séquence de PDW reconstruits constitue la démarche la plus directe. Du point de vue de l'environnement virtuel, le module DCI génère les impulsions interceptées en un seul bloc avant de les transmettre aux étages de traitement aval. Toutefois, l'architecture Transformer présente une complexité spatiale et temporelle quadratique $\mathcal{O}(N^2)$ par rapport à la longueur de la séquence $N$. Cette propriété rend matériellement impossible le traitement direct de scénarios comportant plusieurs millions d'impulsions (une volumétrie courante en simulation). Pour lever cette réserve quant à la viabilité du modèle sur des flux étendus, nous proposerons un mécanisme de fenêtrage autorisant un traitement par sous-séquences.
+Aborder la modélisation du DCI par une transduction de la séquence de PDW incidents vers la séquence de PDW reconstruits constitue la démarche la plus directe. Conceptuellement, cette tâche s'apparente fortement au domaine de la traduction automatique en Traitement du Langage Naturel (NLP) : un modèle doit ingérer une séquence d'entrée complète pour en extraire le sens global, avant de générer une nouvelle séquence de sortie, dont la longueur et l'organisation diffèrent de la source, comme explicité lors de la formalisation du problème au chapitre \ref{chap:prob}. Cependant, une séquence d'impulsion n'ayant pas de structure interne particulière, contrairement à une phrase,  nous sommes privé du puissant outil qu'est le Pré-Training (ayant fait le succès des modèles de langage \cite{radford_improving_2018}). De plus, la prédiction de d'impulsions, dont les caractéristiques évoluent dans un espace continue, transforme le paradigme du NLP de la classification à la régression. En fin de compte, la similarité entre notre problème, une transduction entre séquences d'impulsions, et la traduction, réside plus dans la structure des données (séquences) qu'ailleurs.
 
+Avant d'aborder la modélisation de cette transduction par l'architecture Transformer, il convient de justifier ce choix face aux architectures historiques de traitement Séquence-vers-Séquence (Seq2Seq). Ce paradigme a longtemps reposé sur des réseaux de neurones récurrents (RNN, LSTM, GRU). Toutefois, ces architectures souffrent d'un goulot d'étranglement informationnel : toute la complexité de la séquence source doit être compressée dans un unique vecteur de contexte avant d'initier la prédiction \ref{seq:discRNN}.
 
-(Je veux introduire les résultats de ce tableau. En gros, on a fait, en différé que les études de ce chapitre, des tests avec des réseaux de neurone récurrent. Ces testes sont réalisés sur des architectures classiques (RNN, GRU, LSTM) mais aussi des architectures "augmentées" avec des formes primitives d'attention (ce qui permet d'exploiter à un temps t les mémoires des temps précédents t-1, t-2, etc, donc ça fait une sorte de super mémoire du passé, ce qui augmente grandement les capacités de traitement de séquences longues). Ce que les tests montrent, c'est que quelque soit l'architecture, l'erreur augmente dragstiquement lorsqu'on traite des séquences plus longues (même pour les architectures récurrentes augmentées...) et ce dès 10 impulsions, ce qui est très très peu ! En gros c'est un peu l'argument qui dit pourquoi on a pas d'étude approfondie présentée sur les réseaux récurrents pour la transduction. Concernant le tableau, le lecteur doit se concentrer sur l'augmentation de la métrique et n'a pas vraiment besoin de comprendre sa signification, mais on peut quand même dire que c'est une erreur de régression RMSE normalisée. C'est le même genre d'analyse que le lecteur doit avoir que pour la courbe d'apprentissage de \ref{fig:errini} où on disait "Illustration de l'évolution de l'erreur d'un modèle Transformer sur la tâche de génération de séquences de PDW au cours de nos premières expérimentations. Sans nécessiter la compréhension détaillée de la métrique ou de l'implémentation à ce stade, la simple proximité entre la courbe d'erreur du réseau et la courbe de référence (en noir) suffit à mettre en évidence l'incapacité de l'architecture à modéliser la logique de transduction."
+Pour évaluer la viabilité de ces modèles récurrents sur nos données continues de haute précision, nous avons réalisé des essais préliminaires sur une tâche de transduction dites globale, c'est à dire traiter d'un seul bloc sans besoin de découpage. Le tableau \ref{tab:RNNseq2seq} synthétise les performances de différentes architectures récurrentes, incluant des variantes dotées de mécanismes d'attention primitifs (attention de Luong et de Bahdanau, autorisant l'interrogation des états latents passés des  modèles). Les valeurs présentées correspondent à une erreur de régression normalisée. Sans nécessiter une analyse détaillée de cette métrique mathématique, l'observation pertinente réside dans la dynamique de l'erreur qui augmente drastiquement avec la taille de la séquence.
 
-Est-ce que tu peux me dire comment introduire ça dans le chapitre 6 ? on le fait dès le début ? pcq c'est une sorte de non question qui n'est plus abordée après donc ça mérite peut-être une explication initiale. Aide moi stp
-
-\begin{table}[htbp] 
-\centering 
-\begin{tabular}{l c c c} 
+\begin{table}[htbp]
+\centering
+\begin{tabular}{l c c c}
 \toprule
-\textbf{Modèle} & \textbf{5 impulsions} & \textbf{10 impulsions} & \textbf{20 impulsions} \\ 
+\textbf{Modèle} & \textbf{5 impulsions} & \textbf{10 impulsions} & \textbf{20 impulsions} \\
 \midrule
 RNN & 0.663 & 0.665 & - \\
-RNN + Luong attention & 0.381 & 0.5685 & - \\
-GRU & 0.528 & 0.681 & - \\ 
-LSTM & 0.471 & 0.684 & - \\ 
-LSTM + Bahdanau attention & 0.356 & 0.543 & - \\ 
-LSTM + Luong attention & 0.118 & 0.181 & 0.296 \\ 
+RNN + Luong attention & 0.381 & 0.568 & - \\
+GRU & 0.528 & 0.681 & - \\
+LSTM & 0.471 & 0.684 & - \\
+LSTM + Bahdanau attention & 0.356 & 0.543 & - \\
+LSTM + Luong attention & 0.118 & 0.181 & 0.296 \\
 \bottomrule
-\end{tabular} 
-\caption{Comparaison des performances en fonction du volume d'impulsions traitées.} 
+\end{tabular}
+\caption{Comparaison de l'erreur de reconstruction en approche globale pour différentes architectures récurrentes (adapté de \cite{manon_eusip}). L'absence de valeur (-) indique l'asbence de résultat, les dégradations étant déjà forte pour les séquences plus courtes. La dérive rapide de l'erreur met en évidence l'incapacité des modèles récurrents à traiter des séquences longues pour la transduction.}
 \label{tab:RNNseq2seq}
 \end{table}
 
-)
+Les résultats montrent que l'erreur augmente drastiquement avec la longueur de la séquence. Dès 10 impulsions, la majorité des modèles peinent à produire la séquence cible tant la mémoire (le goulot d'étranglement des RNN) est saturée. À 20 impulsions, mêmes les RNN augmentés à l'attention ne parviennent pas à maintenir l'erreur  qu'ils faisant sur des séquences courtes. C'est ce constat expérimental qui motive l'adoption de l'architecture Transformer \cite{vaswani_attention_2017}. En remplaçant la récurrence par un mécanisme d'attention globale, cette architecture s'est imposée en traitement du langage naturel (NLP) avant d'être déployée dans d'autres domaines, tels que la vision par ordinateur avec le Vision Transformer \cite{dosovitskiy_image_2020} ou la biologie structurale \cite{jumper_highly_2021}. Bien que notre objectif diffère d'une traduction linguistique, l'étude du Transformer constitue l'axe central de ces travaux, amorcé au chapitre \ref{chap:eusipco}. L'effort de recherche s'est concentré sur l'adaptation de l'architecture canonique à notre problème, sans recourir aux multiples variantes algorithmiques développées ultérieurement par la communauté.
+
+Toutefois, le bénéfice de l'attention à l'architecture Transformer s'accompagne d'une complexité quadratique $O(N^2)$ par rapport à la longueur de la séquence $N$. Cette propriété rend matériellement difficile le traitement de scénarios complets comportant plusieurs millions d'impulsions (une volumétrie courante en simulation). Pour lever cette réserve quant à la viabilité du modèle sur des flux étendus, nous proposerons, après avoir validé le traitement sur des séquences courtes, un mécanisme de fenêtrage autorisant un traitement par sous-séquences.
 
 \section{Séquence vers séquence en bloc}
 \label{seq:seq2seqblock}
@@ -47,14 +50,17 @@ La formalisation mathématique de notre problème diverge de celle de la traduct
 
 En NLP, les éléments manipulés sont des mots (ou \textit{tokens}) appartenant à un dictionnaire fini $\mathfrak{D}$. Le processus de traduction auto-régressive consiste à retrouver la probabilité d'apparition du prochain mot $y_k$, conditionnée par la séquence source $x = (x_1, \dots, x_N)$ et le préfixe de la traduction $y_{<k} = (y_1, \dots, y_{k-1})$. Cette probabilité d'apparition est propre à la langue de traduction et peut se formaliser sous la forme d'une densité :
 $$\mathbb{P}_{y_k}(\cdot | x, y_{<k}) \in [0; 1]^{\mathfrak{D}}$$
-Le support du vocabulaire étant fini, les modèles neuronaux $f_\theta$ ont quasiment toujours comme objectif non pas de prédire le prochain mot exact, mais d'estimer une loi de probabilité sur un support fini de même taille, comme nous l'illustrons dans l'équation \ref{eq:trad}.
+Le support du vocabulaire étant fini, les modèles neuronaux $f_\theta$ ont quasiment toujours comme objectif non pas de prédire le prochain mot exact, mais d'estimer une loi de probabilité sur un support fini de même taille, comme nous l'illustrons dans l'équation \eqref{eq:trad}.
 \begin{equation}
 \label{eq:trad}
 f_{\theta}:(\mathbf{x},\mathbf{y}_{<k})\mapsto P \in [0; 1]^{|\mathfrak{D}|}    
 \end{equation}
 Cette formulation réduit la génération à une tâche de classification. Le maximum de la distribution $$\hat{y_k} = \argmax{f_{\theta}(\mathbf{x},\,\mathbf{y}_{<k})}$$ est alors un bon candidat pour la prédiction du prochain mot. Cette approche autorise l'utilisation de l'entropie croisée comme fonction de perte, une métrique standard de la communauté offrant de fortes garanties de convergence et de stabilité lors de l'apprentissage.\\
 
-Dans le cas du DCI, les éléments manipulés sont des PDW caractérisés par des grandeurs physiques (fréquence, date, amplitude). Ils appartiennent à un espace continu multidimensionnel assimilable à un intervalle de $\mathbb{R}^d$. Pour conserver les avantages de l'entropie croisée, nous devrions discrétiser le support de la densité de probabilité $$\mathbb{P}_{y_k}(\cdot | x, y_{<k}) \in \mathbb{(R^+)}^{\mathbb{R}^d}$$ pour le modéliser par apprentissage, nous exposant à \textit{la malédiction de la dimensionnalité}. En effet, la simple création d'une grille de résolution fine de 100 points pour les 5 dimensions (cf. \ref{seq:descPDW}) créer 10 milliards de points, impossibles à traiter en pratique.\\
+Dans le cas du DCI, les éléments manipulés sont des PDW caractérisés par des grandeurs physiques (fréquence, date, amplitude). Ils appartiennent à un espace continu multidimensionnel assimilable à un intervalle de $\mathbb{R}^d$. Pour conserver la formulation d'une classification discrète optimisée par entropie croisée, nous devrions discrétiser le support de la densité de probabilité
+$$\mathbb{P}_{y_k}(\cdot \vert{} x, y_{<k}) \in \mathbb{(R^+)}^{\mathbb{R}^d}$$
+nous exposant ainsi à \textit{la malédiction de la dimensionnalité}. En effet, la simple création d'une grille de résolution fine de 100 points pour les 5 dimensions (cf. \ref{seq:descPDW}) créerait 10 milliards de classes, impossibles à traiter en pratique. Si l'estimation directe d'une densité de probabilité continue (par exemple via l'optimisation d'une divergence de Kullback-Leibler ou par des approximations bayésiennes) permettrait de s'affranchir de cette discrétisation, ces approches probabilistes introduisent une instabilité d'optimisation et une complexité architecturale allant à l'encontre de notre volonté de simplification.\\
+
 
 Le problème de transduction de séquences de PDW doit par conséquent être formulé comme une tâche de régression. L'objectif du réseau n'est plus d'estimer une distribution, mais bien de prédire directement le prochain PDW intercepté $\hat{y_k}$ :
 
@@ -98,7 +104,7 @@ Nous intégrons ainsi une étape de post-traitement au processus de génération
 \label{algo:post}
 \end{algorithm}
 
-L'intervalle $[\mu_{min}, \mu_{max}]$ définit la plage de variation des fréquences observables, tandis que $\sigma$ définit la dispersion des fréquences au sein d'une même séquence. Plus le rapport \ref{eq:comp} entre la dispersion des fréquences dans une séquence et la plage de variation possible est faible et plus la séquence est complexe. Cette notion est similaire à la notion de ratio de séparabilité introduit dans l'équation \ref{eq:sep} du chapitre \ref{chap:eusipco}.
+L'intervalle $[\mu_{min}, \mu_{max}]$ définit la plage de variation des fréquences observables, tandis que $\sigma$ définit la dispersion des fréquences au sein d'une même séquence. Plus le rapport \eqref{eq:comp} entre la dispersion des fréquences dans une séquence et la plage de variation possible est faible et plus la séquence est complexe. Cette notion est similaire à la notion de ratio de séparabilité introduit dans l'équation \eqref{eq:sep} du chapitre \ref{chap:eusipco}.
 \begin{equation}
 \label{eq:comp}
 r = \frac{\sigma}{\mu_{max} - \mu_{min}}
@@ -126,7 +132,7 @@ Cette sous-section justifie le choix de l'architecture neuronale et détaille la
 
 \subsubsection{Choix et fonctionnement du Transformer}
 \label{seq:Transfonc}
-Dans le cadre du paradigme séquence vers séquence (\textit{seq2seq}) traitant des longueurs variables, les architectures récurrentes (RNN et variantes) et le Transformer constituent les deux options de référence. Pour une approche globale de transduction, les modèles récurrents doivent impérativement compresser l'intégralité de l'information de la séquence source dans un unique vecteur de contexte latent avant d'initier le décodage, comme expliqué en \ref{seq:RNNPrincipe}. Cette spécificité structurelle constitue dans notre cas un goulot d'étranglement qui entraîne une déperdition d'information, entravant les capacités du réseau dès que les séquences dépassent une dizaine de PDW.
+Dans le cadre du paradigme séquence vers séquence (\textit{seq2seq}) traitant des longueurs variables, les architectures récurrentes (RNN et variantes) et le Transformer constituent les deux options de référence. Pour une approche globale de transduction, les modèles récurrents doivent impérativement compresser l'intégralité de l'information de la séquence source dans un unique vecteur de contexte latent avant d'initier le décodage. Comme expliqué en \ref{seq:RNNPrincipe} et illustré dans le tableau \ref{tab:RNNseq2seq}, cette spécificité structurelle constitue dans notre cas un goulot d'étranglement qui entraîne une déperdition d'information, entravant les capacités du réseau dès que les séquences dépassent une dizaine de PDW.
 
 Face à cette limite, nous retenons l'architecture Transformer. En s'affranchissant de la compression temporelle, elle préserve une représentation explicite de la séquence d'entrée et autorise une comparaison directe entre tous ses éléments via l'attention croisée. L'architecture déployée, illustrée par la figure \ref{fig:GTAFTrans}, s'appuie sur les fondements détaillés en section \ref{seq:Transformer}. Afin de nous conformer à la nomenclature standard du traitement du langage naturel dont cette architecture est issue, nous adopterons désormais les termes de \textit{séquence source} et \textit{séquence cible} pour désigner respectivement le flux des PDW incidents en entrée, et le flux des PDW interceptés en sortie. Par extension, cette nomenclature s'appliquera également aux ensembles de données (ensemble source et ensemble cible).\\
 
@@ -147,21 +153,26 @@ Le traitement de l'information s'articule autour de deux flux distincts. À gauc
 \end{equation} 
 
 \subsubsection{Mise en œuvre et gestion des masques de séquences}
-Comme mentionné en \ref{seq:structuredonnées}, l'ensemble de sortie est composé de séquences complétées artificiellement pour atteindre une longueur fixe $M$. Si une séquence de sortie contient un nombre de PDW valides $K \le M$, la séquence cible d'entrée du décodeur, illustré figure \ref{fig:GTAFTrans}, se structure ainsi : 
-$$\mathbf{y} = ( \texttt{S}, y_1, \cdots, y_M) = (\texttt{S}, \texttt{PDW}_1, \dots, \texttt{PDW}_K, \underbrace{\texttt{PAD}, \dots, \texttt{PAD}}_{M-K \text{ fois}})$$
-Le jeton $\texttt{PAD}$, comme le jeton $\texttt{S}$, est un vecteur appris par le réseau de neurone pour représenter une position complétée artificiellement.\\
+Comme mentionné en \ref{seq:structuredonnées}, l'ensemble de sortie est composé de séquences complétées artificiellement pour atteindre une longueur fixe M. Par convention pour la suite de cette modélisation, nous redéfinissons la variable y pour désigner spécifiquement la séquence cible formatée fournie en entrée du décodeur (illustrée figure \ref{fig:GTAFTrans}).
 
-La prédiction du réseau de neurone, $\hat{\mathbf{y}} = (\hat{y}_1, \dots, \hat{y}_{M+1})$, est partitionnée en trois parties:
+Si la vérité terrain contient un nombre de signaux physiques valides $K \le M$, cette séquence d'entrée $y$, de dimension $M+1$, se structure ainsi :
+
+$$\mathbf{y} = (y_1, y_2, \cdots, y_{M+1}) = (\texttt{S}, \texttt{PDW}_1, \dots, \texttt{PDW}_K, \underbrace{\texttt{PAD}, \dots, \texttt{PAD}}_{M-K \text{ fois}})$$
+
+Le jeton $\texttt{PAD}$, tout comme le jeton $\texttt{S}$, est un vecteur de l'espace latent appris par le réseau de neurones pour représenter une position complétée artificiellement.
+
+La prédiction générée par le modèle, notée $\hat{\mathbf{y}} = (\hat{y}_1, \dots, \hat{y}_{M+1})$, s'aligne mathématiquement sur une version décalée de cette entrée. Elle est partitionnée en trois parties distinctes :
+
 \begin{itemize}
-    \item \textbf{Le signal physique ($1 \leq i \leq K$)} : La prédiction $\hat{y}_i$ est contrainte d'approximer les caractéristiques continues du PDW cible $\texttt{PDW}_i = y_{i+1}$.
-    \item \textbf{La terminaison ($i = K+1$)} : La prédiction $\hat{y}_{K+1}$ est contrainte d'approximer les caractéristiques de la représentation latente du jeton de fin \texttt{E}.
-    \item \textbf{Le remplissage neutre ($K+2 \leq i \leq M+1$)} : La prédiction $\hat{y}_i$ ne subit pas de contrainte et sa valeur n'apparait pas dans le calcul de l'erreur d'apprentissage.
+\item \textbf{Le signal physique ($1 \leq i \leq K$)} : La prédiction $\hat{y}_i$ est contrainte d'approximer les caractéristiques continues du signal physique suivant, soit la cible $\texttt{PDW}_i = y_{i+1}$.
+\item \textbf{La terminaison ($i = K+1$)} : La prédiction $\hat{y}_{K+1}$ est contrainte d'approximer les caractéristiques de la représentation latente du jeton de fin \texttt{E}.
+\item \textbf{Le remplissage neutre ($K+2 \leq i \leq M+1$)} : La prédiction $\hat{y}_i$ ne subit aucune contrainte et sa valeur n'intervient pas dans le calcul de l'erreur d'apprentissage.
 \end{itemize}
 \; \\
 
-Pour aligner la prédiction $\hat{\mathbf{y}}$ et la cible $\mathbf{y}$, nous appliquons une permutation circulaire vers la gauche, notée $\sigma$, telle que 
-$$\sigma(\mathbf{y}) = (y_1, \dots, y_M, \texttt{S})$$
-et ainsi pour les indices $1 \leq i \leq K$, $\hat{y}_i$ devra correspondre à $y_i$.\\
+Pour formaliser l'alignement exact entre la prédiction $\hat{\mathbf{y}}$ et ses cibles, nous appliquons à l'entrée $\mathbf{y}$ une permutation circulaire vers la gauche, notée $\sigma$, telle que :
+$$\sigma(\mathbf{y}) = (y_1, \dots, y_M, \texttt{S}) = (\texttt{PDW}_1, \dots, \texttt{PDW}_K, \underbrace{\texttt{PAD}, \dots, \texttt{PAD},}_{M-K \text{ fois}} \texttt{S})$$
+Cette opération garantit que, pour les indices $1 \leq i \leq K$, la prédiction $\hat{y}_i$ correspond à la cible attendue $y_{i+1} = \texttt{PDW}_i$. L'effet et la nécessité de cet alignement peut être visualisé en observant la figure \ref{fig:GTAFTrans}.\\
 
 Pour représenter mathématiquement ces partitions, nous définissions deux masques binaires de longueur $M+1$, notés $\mathbf{m}^{(sig)}$ et $\mathbf{m}^{(fin)}$, isolant respectivement dans $\sigma(\mathbf{y})$ les positions des PDW et de la position du premier jeton $\texttt{PAD}$.
 
@@ -185,10 +196,8 @@ L'application du masque de signal $\mathbf{m}^{(sig)}$, au moyen d'un produit te
 L'équation de l'erreur brute s'écrit de la façon suivante :\\
 \begin{equation}
 \label{eq:Eraw}
-E_{raw}(\hat{\mathbf{y}}, \mathbf{y}) = \frac{\|(\hat{\mathbf{y}} - \sigma(\mathbf{y})) \odot \mathbf{m}^{(sig)}\|_2}{\sqrt{\|\mathbf{m}^{(sig)}\|_1 \times d_{\text{out}}}}
+E_{raw}(\hat{\mathbf{y}}, \mathbf{y}) = \frac{\|(\hat{\mathbf{y}} - \sigma(\mathbf{y})) \odot \mathbf{m}^{(sig)}\|_2}{\|\mathbf{m}^{(sig)}\|_2 \sqrt{d_{\text{out}}}}
 \end{equation}
-
-Afin d'uniformiser la contribution de chaque séquence indépendamment de sa variance physique, nous utilisons l'erreur d'un prédicteur naïf \ref{eq:Eref} comme facteur de normalisation. Ce prédicteur génère une séquence constante, constituée de la répétition de $\bar{\mathbf{y}}$, le vecteur moyen de la séquence $\mathbf{y}$ calculé exclusivement sur les $K$ éléments valides de la cible. \\
 
 Afin d'uniformiser la contribution de chaque séquence, nous utilisons l'erreur d'un prédicteur naïf comme facteur de normalisation. Ce prédicteur génère une séquence constituée de la répétition de $\bar{\mathbf{y}}$, le vecteur moyen calculé exclusivement sur les $K$ éléments valides de la séquence cible $\mathbf{y}$.\\
 
@@ -204,7 +213,7 @@ L'erreur pondérée pour la séquence s'écrit alors :
 E_{weighted}(\hat{\mathbf{y}}, \mathbf{y}) = \frac{E_{raw}(\hat{\mathbf{y}}, \mathbf{y})}{E_{ref}(\mathbf{y})}
 \end{equation}
 
-Sans cette normalisation, un scénario composé d'impulsions physiquement très similaires induirait une erreur brute artificiellement basse pour une prédiction naïve. Cette propriété ralentirait l'apprentissage des véritables règles de traitement du DCI pour ce genre de scénario. Comme établi en section \ref{seq:errnorm} (équations \ref{eq:raweusipco} et \ref{eq:weighteusipco}), cette pondération garantit que toutes les séquences contribuent de manière équitable à la mise à jour des poids du réseau. Une valeur $E_{weighted} < 1$ certifie que le modèle produit une prédiction plus représentative des variations du signal qu'une simple répétition d'un unique PDW.\\
+Comme abordé à travers les expérimentations de la section \ref{seq:errnorm}, l'absence de cette normalisation engendre une illusion de convergence : le réseau minimise mécaniquement l'erreur sur les séquences présentant une faible dispersion physique, sans pour autant en apprendre la logique sous-jacente. L'intégration de cette pondération pallie ce défaut en garantissant que tous les scénarios contribuent de manière équitable à la mise à jour des poids du réseau, quelle que soit leur amplitude d'origine. Une valeur $E_{weighted} < 1$ signifie que le modèle produit une prédiction plus représentative des variations du signal qu'une simple répétition d'un unique PDW.\\
 
 La fonction de coût de reconstruction $\mathcal{L}_{rec}$ correspond à la moyenne quadratique de ces erreurs pondérées sur l'ensemble du lot de $B$ séquences de sortie $\mathbf{Y} = (\mathbf{y}_k)_{1 \leq K \leq B}$ et des séquences prédites correspondantes $\hat{\mathbf{Y}} = (\mathbf{\hat{y}}_k)_{1 \leq K \leq B}$.\\
 
@@ -213,13 +222,13 @@ La fonction de coût de reconstruction $\mathcal{L}_{rec}$ correspond à la moye
 \mathcal{L}_{rec}(\hat{\mathbf{Y}}, \mathbf{Y}) = \sqrt{\frac{1}{B} \sum_{k=1}^B E_{weighted}(\hat{\mathbf{y}}_k, \mathbf{y}_k)^2}
 \end{equation}
 
-Parallèlement, l'erreur de terminaison $\mathcal{L}_{fin}$ évalue la distance euclidienne entre la prédiction isolée par le masque de fin et la représentation latent du jeton de fin $\texttt{E}$. Cette erreur est calculée par l'équation \ref{eq:termine}, appliquée directement sur le lot de prédictions $\hat{\mathbf{Y}}$ et de sorties $\mathbf{Y}$.
+Parallèlement, l'erreur de terminaison $\mathcal{L}_{fin}$ évalue la distance euclidienne entre la prédiction isolée par le masque de fin et la représentation latent du jeton de fin $\texttt{E}$. Cette erreur est calculée par l'équation \eqref{eq:termine}, appliquée directement sur le lot de prédictions $\hat{\mathbf{Y}}$ et de sorties $\mathbf{Y}$.
 \begin{equation}
 \label{eq:termine}
 \mathcal{L}_{fin}(\hat{\mathbf{Y}}, \mathbf{Y}) = \frac{\|(\hat{\mathbf{Y}} - \texttt{E}) \odot \mathbf{M}^{(fin)} \|_2}{\sqrt{B \times d_{\text{out}}}}
 \end{equation}
 
-La fonction de coût finale $\mathcal{L}_{total}$ minimisée lors de l'entraînement combine l'erreur de reconstruction et l'erreur de terminaison, équilibrées par un hyperparamètre $\lambda$ :
+La fonction de coût finale $\mathcal{L}_{total}$ minimisée lors de l'entraînement combine l'erreur de reconstruction et l'erreur de terminaison, équilibrées par un hyperparamètre $\lambda$  (expérimentalement réglé à 0.1):
 \begin{equation}
 \label{eq:Ltot}
 \mathcal{L}_{total}(\hat{\mathbf{Y}}, \mathbf{Y}) = \mathcal{L}_{rec}(\hat{\mathbf{Y}}, \mathbf{Y}) + \lambda \mathcal{L}_{fin}(\hat{\mathbf{Y}}, \mathbf{Y})
@@ -228,19 +237,6 @@ La fonction de coût finale $\mathcal{L}_{total}$ minimisée lors de l'entraîne
 \subsubsection{Inférence de la prédiction d'une séquence}
 \label{seq:infglob}
 Lors de la phase d'inférence, qui correspond à l'utilisation opérationnelle du modèle, le modèle procède à une génération auto-régressive : le décodeur s'alimente itérativement de ses propres prédictions pour construire entièrement une séquence. L'Algorithme \ref{algo:genglobal} formalise cette procédure de bout en bout. Nous faisons référence à $f_{\theta}$, qui désigne notre modèle, ainsi qu'à un seuil $\epsilon$ permettant de détecté la prédiction de la fin de la séquence.\\
-
-$\epsilon$ est choisi pour maximiser le Coefficient de Corrélation de Matthews (MCC), qui permet d'évaluer les performances d'un modèle de classification binaire (robuste lors d'un déséquilibre dans la représentation des classes). Ce coefficient repose sur les notions de vrai/faux positif et de vrai/faux négatif. Pour se faire, une séquence est prédite par forçage de l'enseignement (teacher forcing) $\hat{\mathbf{y}} = f_{\theta}(\mathbf{x}, \mathbf{y})$, puis ses $K + 1 = \|\mathbf{m}^{(sig)}\|_1 + 1$ premiers éléments sont évalués tels que :
-\begin{itemize}
-\item Si $1 \leq k \leq K$ et $\frac{\|\hat{y}_{k} - \texttt{E}\|_2}{\sqrt{d_{out}}} < \epsilon$, c'est un vrai positif \texttt{TP}
-\item Si $1 \leq k \leq K$ et $\frac{\|\hat{y}_{k} - \texttt{E}\|_2}{\sqrt{d_{out}}} \geq \epsilon$, c'est un faux négatif \texttt{FN}
-\item Si $k = K+1$ et $\frac{\|\hat{y}_{k} - \texttt{E}\|_2}{\sqrt{d_{out}}} \geq \epsilon$, c'est un vrai négatif \texttt{TN}
-\item Si $k = K+1$ et $\frac{\|\hat{y}_{k} - \texttt{E}\|_2}{\sqrt{d_{out}}} < \epsilon$, c'est un faux positif \texttt{FP}
-\end{itemize}
-Calculé sur un grand nombre de séquences, le MCC s'exprime ainsi :
-\begin{equation}
-\label{eq:MCCinf}
- MCC = \frac{\texttt{TP}\times \texttt{TN} - \texttt{FP} \times \texttt{FN}}{\sqrt{(\texttt{TP} + \texttt{FP})(\texttt{TP} + \texttt{FN})(\texttt{TN} + \texttt{FP})(\texttt{TN} + \texttt{FN})}}
-\end{equation}
 
 \begin{algorithm}[htbp]
 \DontPrintSemicolon
@@ -268,13 +264,26 @@ $\hat{\mathbf{y}} \leftarrow (\hat{y}_1, \cdots, \hat{y}_m)$
 \label{algo:genglobal}
 \end{algorithm}
 
+$\epsilon$ est choisi pour maximiser le Coefficient de Corrélation de Matthews (MCC), qui permet d'évaluer les performances d'un modèle de classification binaire (robuste lors d'un déséquilibre dans la représentation des classes). Ce coefficient repose sur les notions de vrai/faux positif et de vrai/faux négatif. Pour se faire, une séquence est prédite par forçage de l'enseignement (teacher forcing) $\hat{\mathbf{y}} = f_{\theta}(\mathbf{x}, \mathbf{y})$, puis ses $K + 1 = \|\mathbf{m}^{(sig)}\|_1 + 1$ premiers éléments sont évalués tels que :
+\begin{itemize}
+\item Si $1 \leq k \leq K$ et $\frac{\|\hat{y}_{k} - \texttt{E}\|_2}{\sqrt{d_{out}}} < \epsilon$, c'est un vrai positif \texttt{TP}
+\item Si $1 \leq k \leq K$ et $\frac{\|\hat{y}_{k} - \texttt{E}\|_2}{\sqrt{d_{out}}} \geq \epsilon$, c'est un faux négatif \texttt{FN}
+\item Si $k = K+1$ et $\frac{\|\hat{y}_{k} - \texttt{E}\|_2}{\sqrt{d_{out}}} \geq \epsilon$, c'est un vrai négatif \texttt{TN}
+\item Si $k = K+1$ et $\frac{\|\hat{y}_{k} - \texttt{E}\|_2}{\sqrt{d_{out}}} < \epsilon$, c'est un faux positif \texttt{FP}
+\end{itemize}
+Calculé sur un grand nombre de séquences, le MCC s'exprime ainsi :
+\begin{equation}
+\label{eq:MCCinf}
+ MCC = \frac{\texttt{TP}\times \texttt{TN} - \texttt{FP} \times \texttt{FN}}{\sqrt{(\texttt{TP} + \texttt{FP})(\texttt{TP} + \texttt{FN})(\texttt{TN} + \texttt{FP})(\texttt{TN} + \texttt{FN})}}
+\end{equation}
 
 \subsection{Résultats expérimentaux}
 \label{seq:blocresu}
 Dans cette section, nous présentons les résultats expérimentaux obtenus avec l'approche de traitement en bloc sur des séquences entières.
 
 \subsubsection{Configuration}
-Les conditions expérimentales se déclinent selon trois axes : la structure des données, le dimensionnement du réseau et la stratégie d'optimisation. Ses conditions sont résumées dans le \ref{tab:params_bloc}. L'ensemble des paramètres de l'architecture et de l'optimisation sont issus d'un processus d'optimisation global, assurant qu'un défaut de performance ne puisse être attribué à de mauvais choix.\\
+\label{seq:configglobal}
+Les conditions expérimentales se déclinent selon quatre axes : la configuration du simulateur DCIS, la structure des données, le dimensionnement de l'architecture et la stratégie d'optimisation. Ses conditions sont résumées dans le \ref{tab:params_bloc}. L'ensemble des paramètres de l'architecture et de l'optimisation sont issus d'un processus d'optimisation global, assurant qu'un défaut de performance ne puisse être attribué à de mauvais choix.\\
 
 \begin{table}[htbp]
 \centering
@@ -282,12 +291,20 @@ Les conditions expérimentales se déclinent selon trois axes : la structure des
 \toprule
 \textbf{Paramètre} & \textbf{Valeur} \\
 \midrule
+\multicolumn{2}{c}{\textit{DCIS}} \\
+\midrule
+Nombre d'impulsions incidentes ($N$) & 28 \\
+Nombre d'impulsions par palier ($n$) & $6$ \\
+Nombre de mémoires max ($N_{max}$) & $6$ \\
+Sensibilité capteur ($\delta F$) & $0.1$\\
+Sensibilité corrélation mémoire ($\delta f$) & $0.1$\\
+Délais libération mémoire ($T_{maintien}$) & $2$\\
+\midrule
 \multicolumn{2}{c}{\textit{Jeux de données}} \\
 \midrule
 Taille de l'ensemble d'entraînement & $2 \cdot 10^6$ scénarios \\
 Taille de l'ensemble de validation & $1000$ scénarios \\
-Nombre d'impulsions incidentes ($N$) & 28 \\
-Nombre maximal d'impulsions interceptées ($M$) & 35 \\
+Longueur des séquences cibles ($M$) & 35 \\
 Plage des moyennes fréquentielles ($\mu$) & $[-5 ; 5]$ \\
 Plage des écarts-types ($\sigma$) & $[0.2 ; 5]$ \\
 \midrule
@@ -310,11 +327,17 @@ Nombre d'époques & 100 \\
 \label{tab:params_bloc}
 \end{table}
 
-Voici en retour en détails sur les différents paramètres.\\
-\textbf{Les paramètres du jeu de données} décrivent les dimensions et contraintes appliquées à la création des ensembles de données. Pour l'entrainement, nous avons travaillé avec $B = 2000000$ de scénarios, composés de $N=28$ impulsions incidentes. Ces scénarios sont contraints (cf \ref{seq:gencontr} et \ref{algo:post}) selon des intervalles $[-5; 5] \times [0.2; 5]$. Les séquences d'impulsions interceptées sont complétées jusqu'à $M = 35$ éléments. Concernant la validation, nous avons utilisé $B = 1000$ séquences avec des dimensions et des contraintes identiques.\\
-\textbf{Les hyperparamètres du modèle} régisse la forme du modèle, qui est un Transformer dont l'architecture est présenté en \ref{seq:Transfonc}. Le modèle dispose de 11 encodeurs, 3 décodeurs, une dimension latente (dimension d'attention) de 256 et 16 têtes d'attention. Ces hyperparamètres ont été sélectionnés par un processus d'optimisation.
-\textbf{Les paramètres de l'optimisation} décrivent les conditions dans lesquelles l'entrainement est réalisé.\\
-L'optimisation du modèle est réalisé avec l'optimiseur \texttt{ADAM} sur l'ensemble des poids du modèle. L'entrainement est réalisé par $100$ itération sur l'ensemble des données d'entrainement, avec une moyenne du gradient réalisée sur des lots de $500$ séquences. Ainsi, $400 000$ mise-à-jour de l'ensemble des poids du modèle sont réalisé au total, par un optimiseur ADAM ayant un taux d'apprentissage de $1.5e^{-4}$.
+\noindent \textbf{Paramétrage de l'environnement (DCIS) :}\\
+Ces valeurs régissent la dynamique d'apparition des artéfacts d'interception (préalablement illustrés en figure \ref{fig:IOex}). Elles ont été calibrées de manière à forcer l'occurrence de phénomènes non-linéaires complexes. Le choix d'une densité de $n=6$ impulsions par palier, couplé à des seuils étroits de résolution et d'association ($\delta F = 0.1$, $\delta f = 0.1$), assurent la possibilité de masquage fréquentiel (que nous garantirons en choisissant judicieusement la densité fréquentielle $\sigma$). De même, limiter le nombre de pistes simultanées à $N_{max} = 6$ fait apparaitre les artefacts (en cas saturation) liées au priorité d'assignation des DNA de haute amplitude. Enfin, le délai de libération mémoire ($T_{maintien}=2$) paramètre le seuil de tolérance temporel : une valeur trop faible scinderait excessivement les impulsions en trains discontinus, tandis qu'une valeur excessive fusionnerait artificiellement des signaux temporellement éloignés.\\
+
+\noindent \textbf{Dimensionnement du jeu de données :}\\
+Le volume d'entraînement ($B = 2000000$ scénarios) a été fixé empiriquement après avoir constaté qu'il offrait un taux de convergence suffisant pour illustrer les capacités du modèle. Ces scénarios sont générés sous contrainte fréquentielle (cf. section \ref{seq:gencontr} et algorithme \ref{algo:post}). L'écart-type des fréquences $\sigma \in [0.2; 5]$ agit comme un levier de difficulté : un faible écart-type congestionne le spectre et multiplie les interactions. Les séquences d'impulsions interceptées sont complétées jusqu'à $M = 35$ éléments, respectant la marge de sécurité $M \approx 1.2N$ établie pour anticiper les phénomènes de scission d'impulsions. L'ensemble de validation ($B = 1000$) respecte strictement les mêmes contraintes de distribution.\\
+
+\noindent \textbf{Topologie de l'architecture Transformer:}\\
+La topologie sélectionnée révèle une asymétrie notable : une forte capacité d'encodage ($N_{enc}=11$) opposée à un décodage léger ($N_{dec}=3$). Ce déséquilibre s'explique par la nature asymétrique de notre problème de transduction. L'hypothèse soutenue est que les couches d'encodage assument la charge cognitive principale, à savoir modéliser la dynamique causale des interactions et construire une représentation latente simulant l'état des mémoires du capteur à chaque pas de temps. Dans cette configuration, le rôle du décodeur se limite à opérer une transcription directe de cet état latent vers les variables physiques du PDW intercepté. Cette hypothèse est renforcée par d'autres itérations d'optimisation qui ont parfois convergé vers un unique bloc de décodage ($N_{dec}=1$), soulignant le rôle prépondérant de l'encodeur. La dimension latente globale est fixée à $256$, scindée par $16$ têtes d'attention.\\
+
+\noindent \textbf{Stratégie d'optimisation :}\\
+La stratégie repose sur l'optimiseur \texttt{ADAM}. L'entrainement est réalisé par $100$ itération sur l'ensemble des données d'entrainement (époques), avec une moyenne du gradient réalisée sur des lots de $500$ séquences. Ainsi, $400 000$ mise-à-jour de l'ensemble des poids du modèle sont réalisé au total, par un optimiseur ADAM ayant un taux d'apprentissage de $1.5e^{-4}$.
 
 
 \subsubsection{Convergence de l'apprentissage}
@@ -328,12 +351,19 @@ La figure \ref{fig:loss_short} illustre l'évolution de la fonction de coût de 
 \label{fig:loss_short}
 \end{figure}
 
-L'erreur de validation converge rapidement et se stabilise autour de $0.097$. Ce résultat, situé très en dessous de la valeur critique de $1.0$ (caractérisant les performances du prédicteur naïf de référence), confirme la pertinence du modèle pour apprendre à reproduire le traitement complexe du DCIS. 
+L'erreur de validation converge rapidement et se stabilise autour de $0.097$. Ce résultat, situé très en dessous de la valeur critique de $1.0$ (caractérisant les performances du prédicteur naïf de référence), confirme la pertinence du modèle pour apprendre à reproduire le traitement complexe du DCIS.
+
+
+
+
 
 \subsubsection{Analyse qualitative}
 Bien que la métrique $\mathcal{L}_{tot}$ quantifie l'erreur de reconstruction globale, elle ne permet pas de se rendre compte de la qualité des prédictions du point de vue physique, prédictions qui pourraient être victimes d'un effet de lissage des détails par exemple. En revanche, la bonne reproduction des règles expertes du capteur peut être qualifié à travers une analyse morphologique dans le plan temps-fréquence des séquences d'impulsions produites par notre modèle.\\
 
-La figure \ref{fig:gen_short_dense} illustre les séquences prédites sur un scénario dense, caractérisé par une forte proximité des impulsions (écart-type fréquentiel contraint à $\sigma \approx 0.5$). Elle met en perspective la séquence générée en régime de forçage de l'enseignant (\textit{Teacher Forcing}), correspondant aux conditions d'apprentissage guidées par l'équation \ref{eq:predforce}, et celle produite en régime auto-régressif pur (utilisation opérationnelle guidée par l'algorithme \ref{algo:genglobal}). La figure \ref{fig:gen_short_light} présente une analyse analogue pour un scénario plus clairsemé ($\sigma \approx 2$).\\
+La figure \ref{fig:gen_short_dense} illustre les séquences prédites sur un scénario dense, caractérisé par une forte proximité des impulsions (écart-type fréquentiel contraint à $\sigma \approx 0.5$). Elle met en perspective la séquence générée en régime de forçage de l'enseignant (\textit{Teacher Forcing}), correspondant aux conditions d'apprentissage guidées par l'équation \eqref{eq:predforce}, et celle produite en régime auto-régressif pur (utilisation opérationnelle guidée par l'algorithme \ref{algo:genglobal}). La figure \ref{fig:gen_short_light} présente une analyse analogue pour un scénario plus clairsemé ($\sigma \approx 2$).\\
+
+La figure \ref{fig:gen_short_dense} illustre les séquences prédites sur un scénario dense, caractérisé par une forte proximité des impulsions (écart-type fréquentiel contraint à $\sigma \approx 0.5$). Pour évaluer la robustesse du modèle, la figure met en perspective deux modes de génération. En bas à droite, le modèle prédit en régime de forçage de l'enseignant (\textit{Teacher Forcing}, introduit en section \ref{seq:metseq2seq}). Chaque prédictions $\hat{y_k}$ est calculée par le modèle à partir de la vérité terrain composée de la séquence incidente $\mathbb{x}$ et du début de la séquence intercepté cible $\mathbb{y}_{< k}$ : il s'agit de la configuration de prédiction utilisée pendant l'apprentissage. En bas à gauche, le modèle prédit en régime auto-régressif (Algorithme \ref{algo:genglobal}), correspondant à l'utilisation opérationnelle. Chaque prédictions $\hat{y_k}$ est calculée par le modèle à partir de la séquence incidente $\mathbb{x}$ et de ses prédictions passées $\mathbb{\hat{y}}_{< k}$ : ce n'est pas la vérité terrain et la séquence comporte des erreurs pouvant s'accumuler. La figure \ref{fig:gen_short_light} présente une analyse analogue pour un scénario plus clairsemé ($\sigma \approx 2$).
+Ces deux séquences prédites peuvent alors être comparées à la séquence cible, figurant au haut à droite.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -351,23 +381,55 @@ La figure \ref{fig:gen_short_dense} illustre les séquences prédites sur un sc�
 \label{fig:gen_short_light}
 \end{figure}
 
-Dans les deux configurations de densité, le modèle reproduit fidèlement la dynamique d'interception du DCIS. Au-delà d'une simple "copie" des PDW dans l'espace des descripteurs, le réseau génère de lui-même les artéfacts complexes inhérents à la logique du capteur (fusions, disparition, scissions, troncatures), identifiés initialement en section \ref{seq:CapFonc} et qui constituent le cœur de la difficulté de la simulation.\\
+Dans les deux configurations de densité, le modèle reproduit fidèlement la dynamique d'interception du DCIS. Au-delà d'une simple "copie" des PDW dans l'espace des descripteurs, le réseau génère de lui-même les artéfacts complexes inhérents à la logique du capteur (fusions, disparition, scissions, troncatures), identifiés initialement en section \ref{seq:CapFonc} et qui constituent le cœur de la difficulté de la simulation. La juste présence de ces artéfacts dans les prédictions de notre modèle nous permet de considérer ces résultats comme une base très solide sur laquelle construire.
 
-Enfin, l'analyse comparative entre l'inférence guidée et l'inférence auto-régressive ne révèle aucune dérive de la prédiction. Malgré l'accumulation potentielle des erreurs lors de la réinjection des PDW prédits, la séquence générée reste stable. Cette preuve de concept valide l'aptitude de l'architecture Transformer à modéliser le traitement du DCIS sur des séquences courtes.
-
-
+Enfin, l'analyse comparative entre l'inférence guidée et l'inférence auto-régressive ne révèle aucune dérive : malgré l'accumulation potentielle des erreurs lors de la réinjection des PDW prédits, la séquence générée reste stable. Ce succès visuel et quantitatif constitue une avancée majeure par rapport à l'état de l'art du traitement de séquences. En effet, comme démontré lors de notre étude comparative initiale (Tableau \ref{tab:RNNseq2seq}), les architectures de transduction historiques (RNN, LSTM) se sont avérées incapables d'apprendre cette dynamique au-delà d'une dizaine d'impulsions. Cette preuve de concept valide donc définitivement la supériorité structurelle du Transformer pour surmonter le goulot d'étranglement de la mémoire et modéliser fidèlement la logique du DCIS sur des séquences courtes. 
 
 \section{Séquence vers séquence par fenêtrage}
 \label{seq:winseq2seq}
 L'approche globale présentée dans la section précédente valide la capacité structurelle du Transformer à modéliser les traitements réalisés par le DCIS. Toutefois, la complexité spatiale et temporelle de l'attention $\mathcal{O}(N^2)$ limite cette approche à des fenêtres d'observation restreintes. Pour traiter un scénario de longueur arbitraire, il est impératif de segmenter le flux de données.\\
 
-La motivation de cette segmentation repose sur une observation de la physique du système : la décroissance de l'influence temporelle. Le traitement d'une impulsion à l'instant $t$ dépend fortement de l'état des mémoires du capteur, lui-même conditionné par les impulsions passées. Cependant, comme observé sur la figure \ref{fig:ResetEnv}, une purge complète de la mémoire du DCIS n'engendre que des erreurs transitoires. Le système retrouve son régime permanent après l'assimilation de quelques dizaines d'impulsions.\\
+La motivation de cette segmentation repose sur une expérience de la physique du système : la décroissance de l'influence temporelle. Pour réaliser cette expérience, nous reprenons l'algorithme de traitement du DCIS \ref{algo:capteur_process}, en ajoutant une condition de publication des informations des mesureurs atteinte périodiquement. Ainsi, nous créons les conditions d'une discontinuité périodique. L'algorithme modifié \ref{algo:capteur_process_modif} reprend exactement les blocs de l'algo \ref{algo:capteur_process}(que l'on ne réécrit pas par soucis de simplicité et de place), à l'exception du critère atteint périodiquement (de période $T_{disc}$) dans la boucle principale.
+
+\begin{algorithm}[httb]
+\DontPrintSemicolon
+\SetAlgoLined
+\KwIn{Séquence d'impulsions incidentes $\mathcal{L}$, Seuil d'association $\delta f$, Maintien $T_{maintien}$, Période de discontinuité $T_{disc}$}
+\KwOut{Séquence des PDW interceptés $\mathcal{R}$}
+\textbf{Initialisation :} Temps $t \leftarrow 0$, Pistes actives $\mathcal{P} \leftarrow \emptyset$, Dates de mise à jour des pistes actives $\mathcal{T} \leftarrow \emptyset$, Liste des PDW émises $\mathcal{R} \leftarrow [\,]$, Ages des pistes actives $\mathcal{R} \leftarrow [\,]$\;
+\vspace{2mm}\tcp*[l]{Traitement du flux événementiel par le capteur}
+\For{$t \leftarrow 1$ \KwTo $T_{\mathrm{max}}$}{
+\tcp*[l]{Calcul des interactions pour ignorer les impulsions masquées}
+$\vdots$\\
+$\vdots$\\
+\tcp*[l]{Association des DNA aux pistes ou création}
+$\vdots$\\
+$\vdots$\\
+\tcp*[l]{Purge de la mémoire et publication}
+$\vdots$\\
+$\vdots$\\
+\tcp*[l]{Purge de la mémoire et publication \textbf{périodique}}
+\If{$T_{disc}$ divise $t$}{
+\ForEach{piste $p \in \mathcal{P}$}{
+\tcp*[l]{On libère la piste}
+Construire le PDW intercepté final à partir de $p$, $a_p$ et $t_p$\;
+Ajouter le PDW à la fin de $\mathcal{R}$\;
+Retirer $p$ de $\mathcal{P}$, $a_p$ de $\mathcal{A}$ et $t_p$ de $\mathcal{T}$\;
+}
+}
+}
+\Return $\mathcal{R}$
+\caption{Algorithme d'acquisition, de suivi et de publication des PDW modifié, permettant de faire apparaitre des discontinuités dans le suivi.}
+\label{algo:capteur_process_modif}
+\end{algorithm}
+
+La figure \ref{fig:ResetEnv} illustre, pour une périodicité $T_{disc} = 100$ et un scénario de taille $T_{max}$ la différence entre, à gauche la séquence générée par l'algorithme conventionnel \ref{algo:capteur_process} et au milieu la séquence générée par l'algorithme modifié \ref{algo:capteur_process_modif}. A droite, la différence symétrique entre les ensembles de rectangles représentant les impulsions fait apparaitre que les séquences d'impulsions interceptés sont similaires, mise-à-part localement au niveau des discontinuité (tous les 100 pas de temps). Bien que le traitement d'une impulsion à l'instant $t$ dépende fortement de l'état des mémoires du capteur, lui-même conditionné par les impulsions passées, cette figure met en avant que ce conditionnement aux impulsions passées est limité dans le temps. Une purge complète de la mémoire du DCIS n'engendre que des erreurs transitoires. Le système retrouve son régime permanent après l'assimilation de quelques dizaines d'impulsions.\\
 
 \begin{figure}[htbp]
 \begin{center} 
-\includegraphics[scale=0.3]{ResetEnv.png} 
+\includegraphics[scale=0.5]{ResetEnv.png} 
 \end{center}
-\caption{Évaluation de la résilience du DCIS face à des pertes de mémoire. À gauche, la séquence de PDW interceptés sans perturbation est visualisée dans un plan temps-fréquence. Au milieu, la séquence de PDW est interceptés alors que les mémoires sont purgés tous les 100 pas de temps. À droite, on représente la différence entre la séquence d'origine et la séquence perturbée (rouge pour manquante, vert pour rajoutée). Le vidage des mémoires provoque des perturbations locales de la séquence d'impulsions interceptées, qui s'estompent rapidement, suggérant que la mémoire retrouve son régime permanent.}
+\caption{Évaluation de la résilience du DCIS face à des pertes de mémoire. À gauche, la séquence de PDW interceptés sans perturbation est visualisée dans un plan temps-fréquence. Au milieu, la séquence de PDW est interceptés alors que les mémoires sont purgés tous les 100 pas de temps. À droite, on représente la différence entre la séquence d'origine et la séquence perturbée (différence symétrique sur les ensembles de rectangles représentant les impulsions). Le vidage des mémoires provoque des perturbations locales de la séquence d'impulsions interceptées, qui s'estompent rapidement, suggérant que la mémoire retrouve son régime permanent.}
 \label{fig:ResetEnv}
 \end{figure}
 
@@ -377,7 +439,7 @@ Cette résilience justifie l'utilisation d'une méthode de fenêtrage glissant a
 La génération des données suit le protocole établi pour l'approche globale en \ref{seq:gencontr}. La différence se fait dans la longueur des scénarios, typiquement fixés à $N=500$ PDW incidents, générant des ensembles d'entrée de dimension $B \times N \times d_{in}$ et de sortie $B \times M \times d_{out}$. L'usage de scénarios de 500 PDW, bien plus court que les cas d'usage réels, génère un nombre restreint de fenêtres (environ une dizaine des fenêtres de taille $N_f = 50$). Néanmoins, comme le traitement de chaque fenêtre est identique, ce nombre est suffisant pour extrapoler les performances à des milliers de fenêtres en situation réelle.
 
 \subsubsection{Découpage structurel et Algorithme}
-Afin de formaliser cette restructuration en fenêtre, notons $\mathbf{x} = (x_1, \dots, x_N)$ la séquence incidente et $\mathbf{y} = (y_1, \dots, y_K)$ la séquence interceptée réduite à ses $K \leq M$ réels PDW. On désignera l'instant d'arrivée d'une impulsion $v$ par $ToA(v)$, sa durée par $LI(v)$, et sa date de publication $ToE(v) = ToA(v) + LI(v) + T_{maintien}$ si c'est une impulsion interceptée. Le passage des séquences entières aux séquences fenêtrées est défini dans l'algorithme \ref{algo:windowing}. Le paramètre $N_f$ définit le nombre d'impulsion incidente par fenêtre, $M_f$ majore le nombre d'impulsion intercepté par fenêtre. Les paramètres $N_c$ et $M_c$ (typiquement $M_c = 1.2N_c$) définissent la taille des contextes passés ajoutés à la source et à la cible. Par convention, tout appel à un indice négatif $i$ pour $x_i$ ou $y_i$ renvoie un vecteur associé au jeton \texttt{PAD}. La valeur de $ToA(\texttt{E})$ vaudra $ToA(x_N)$ pour la séquence incidente. La valeur de $ToE(\texttt{E})$ vaudra $ToE(y_K)$ pour la séquence interceptée.\\
+Afin de formaliser cette restructuration en fenêtre, notons $\mathbf{x} = (x_1, \dots, x_N)$ la séquence incidente et $\mathbf{y} = (y_1, \dots, y_K)$ la séquence interceptée réduite à ses $K \leq M$ réels PDW. On désignera l'instant d'arrivée d'une impulsion $v$ par $ToA(v)$, sa durée par $LI(v)$, et sa date de publication $ToE(v) = ToA(v) + LI(v) + T_{maintien}$ si c'est une impulsion interceptée. Le passage des séquences entières aux séquences fenêtrées est défini dans l'algorithme \ref{algo:windowing}. Le paramètre $N_f$ définit le nombre d'impulsion incidente par fenêtre, $M_f$ majore le nombre d'impulsion intercepté par fenêtre. Ainsi, le nombre de fenêtre nécessaire pour découper la séquence est $n_f = \lfloor N / N_f \rfloor + 1$. Les paramètres $N_c$ et $M_c$ (typiquement $M_c = 1.2N_c$) définissent la taille des contextes passés ajoutés à la source et à la cible. Par convention, tout appel à un indice négatif $i$ pour $x_i$ ou $y_i$ renvoie un vecteur associé au jeton \texttt{PAD}. La valeur de $ToA(\texttt{E})$ vaudra $ToA(x_N)$ pour la séquence incidente. La valeur de $ToE(\texttt{E})$ vaudra $ToE(y_K)$ pour la séquence interceptée.\\
 
 \begin{algorithm}[htbp]
 \DontPrintSemicolon
@@ -407,14 +469,14 @@ $k_2^{(in)} \leftarrow 0 \; k_2^{(out)} \leftarrow 0$\;
     Ajouter $\mathbf{x}^{(i)}$ à $\mathbf{X}_{win}$ et $\mathbf{y}^{(i)}$ à $\mathbf{Y}_{win}$\;
 }
 \Return{$\mathbf{X}_{win}, \mathbf{Y}_{win}$}
-\caption{Génération des sous-séquences fenêtrées}
+\caption{Génération des sous-séquences fenêtrées. La méthode traitant de manière indépendant $\mathbf{x}$ et $\mathbf{y}$, elle peut être appelée avec uniquement l'un des arguments en entrée, retournant en sortie l'ensemble de sous-séquences fenêtrées correspondant (les étapes relatives à la séquence non-renseignée sont simplement ignorées).}
 \label{algo:windowing}
 \end{algorithm}
 
 L'agrégation de ces partitions $\mathbf{X}_{win}$ et $\mathbf{Y}_{win}$ pour chaque séquence $\mathbf{x}$ et $\mathbf{y}$ des ensembles initiaux aboutit à deux nouveaux tenseurs d'entrée et de sortie que l'on notera $\mathbf{X}$ et $\mathbf{Y}$, dont les dimensions respectives sont $B \cdot n_f \times (N_c + N_f) \times d_{in}$ et $B \cdot n_f \times (M_c + M_f) \times d_{out}$. 
 
 \subsubsection{Encodage du temps}
-Le principe de l'approche est de traiter chaque fenêtre de manière identique, uniquement à partir des informations présentes à l'échelle locale (nouveaux PDW incidents et contexte). Or, l'encodage du temps des PDW interceptés introduit en \ref{eq:timeencodingout} exploite l'indice global du PDW dans la séquence entière, ce qui va à l'encontre de la philosophie de l'approche. Ainsi, l'encodage du temps des PDW interceptés nécessite une révision.\\
+Le principe de l'approche est de traiter chaque fenêtre de manière identique, uniquement à partir des informations présentes à l'échelle locale (nouveaux PDW incidents et contexte). Or, l'encodage du temps des PDW interceptés introduit en \eqref{eq:timeencodingout} exploite l'indice global du PDW dans la séquence entière, ce qui va à l'encontre de la philosophie de l'approche. Ainsi, l'encodage du temps des PDW interceptés nécessite une révision.\\
 
 Dans une fenêtre $i$, nous proposons de déplacer l'origine des temps au premier PDW incident de la fenêtre, $ToA(x_{N_c + 1})$. Pour contrer la croissance des temps d'arrivée, ce qui était l'objectif de l'encodage proposé pour les séquences entières \ref{seq:timeencoding}, nous réintégrons une soustraction de l'indice local du PDW intercepté, translaté par l'indice du premier PDW intercepté de la fenêtre (indice $M_c$).\\
 
@@ -460,20 +522,23 @@ alors la prédiction générée $\hat{\mathbf{y}} = (\hat{y}_1, \dots, \hat{y}_{
 \end{itemize}
 \; \\
 
-Pour aligner la prédiction $\hat{\mathbf{y}}$ avec la cible $\mathbf{y}$, nous appliquons la permutation circulaire vers la gauche, notée $\sigma$. La restriction de l'évaluation aux $K$ nouvelles impulsions se formalise par le masque binaire $\mathbf{m}^{(sig)}$, isolant la zone d'intérêt dans la séquence réalignée $\sigma(\mathbf{y})$ :
+Pour aligner la prédiction $\hat{\mathbf{y}}$ avec la cible $\mathbf{y}$, nous appliquons la permutation circulaire vers la gauche, notée $\sigma$, telle que 
+$$\sigma(\mathbf{y}) =  \underbrace{(\texttt{PDW}, \dots, \texttt{PDW}}_{M_c - 1 \text{ fois}}, \texttt{S}, \underbrace{\texttt{PDW}, \dots, \texttt{PDW}}_{K \text{ fois}}, \underbrace{\texttt{PAD}, \dots, \texttt{PAD},}_{M_f - K \text{ fois}} \texttt{PDW})$$
+La restriction de l'évaluation aux $K$ nouvelles impulsions se formalise par le masque binaire $\mathbf{m}^{(sig)}$, isolant la zone d'intérêt de $\sigma(\mathbf{y})$ :
 \begin{equation}
 \mathbf{m}^{(sig)} = \underbrace{(0, \dots, 0}_{M_c \text{ fois}}, \underbrace{1, \dots, 1}_{K \text{ fois}}, \underbrace{0, \dots, 0)}_{M_f + 1 - K \text{ fois}}
 \end{equation}
 
 Lors du traitement par lots, ces vecteurs sont agrégés dans un tenseur $\mathbf{M}^{(sig)}$. 
 
-\subsubsection{Métrique d'entrainement}
-L'optimisation du modèle s'effectue en réinvestissant à l'identique la métrique de régression pondérée introduite à la section précédente. Les calculs formels décrits par les équations \ref{eq:Eraw}, \ref{eq:Eref}, \ref{eq:Ewei} et \ref{eq:Lrec} sont appliqués entre les séquences cibles $\mathbf{Y}$ et les prédictions $\hat{\mathbf{Y}}$ du lot courant, en utilisant le nouveau tenseur de masquage $\mathbf{M}^{(sig)}$.
+\subsubsection{Métrique d'entraînement}
+L'optimisation du modèle s'effectue en réinvestissant à l'identique la métrique de régression pondérée introduite à la section précédente. Les calculs formels décrits par les équations \eqref{eq:Eraw}, \eqref{eq:Eref}, \eqref{eq:Ewei} et \eqref{eq:Lrec} sont appliqués entre les séquences cibles $\mathbf{Y}$ et les prédictions $\hat{\mathbf{Y}}$ du lot courant, en utilisant le nouveau tenseur de masquage $\mathbf{M}^{(sig)}$.
 
-Le jeton de fin \texttt{E} étant considéré comme le dernier PDW de chaque séquence entière, l'erreur de terminaison $\mathcal{L}_{fin}$ n'est plus nécessaire. La fonction de coût totale régissant l'apprentissage se réduit donc à l'erreur de reconstruction :
-\begin{equation}
-\mathcal{L}_{total} = \mathcal{L}_{rec}
-\end{equation}
+Dans l'approche par fenêtrage (Algorithme \ref{algo:windowing}), le jeton de fin \texttt{E} est explicitement ajouté à la fin de la séquence globale $\mathbf{y}$. Par conséquent, lors de l'extraction de la toute dernière fenêtre d'un scénario, ce jeton \texttt{E} constitue le $K$-ième et dernier élément valide de la sous-séquence cible.
+
+Il se trouve donc naturellement englobé par le masque de signal $\mathbf{m}^{(sig)}$ défini à la section précédente. Lors du calcul de l'erreur brute $E_{raw}$ (Équation \eqref{eq:Eraw}), la distance entre la prédiction et la représentation latente du jeton \texttt{E} est implicitement évaluée via le terme $(\hat{\mathbf{y}} - \sigma(\mathbf{y})) \odot \mathbf{m}^{(sig)}$.
+
+L'erreur de terminaison distincte $\mathcal{L}_{fin}$ et son masque associé $\mathbf{M}^{(fin)}$, utilisés dans l'approche en bloc, deviennent de fait redondants. La fonction de coût totale régissant l'apprentissage se réduit à l'erreur de reconstruction :\begin{equation}\mathcal{L}{total} = \mathcal{L}{rec}\end{equation}
 
 \subsubsection{Inférence de la prédiction d'une séquence entière}
 Dans l'approche de traitement en bloc des séquences entières présenté en \ref{seq:seq2seqblock}, la fin de l'inférence d'une séquence était détecté par la prédiction du jeton \texttt{E}. Dans l'approche fenêtré, le modèle alignera avec le dernier PDW intercepté de la fenêtre $\mathbf{y_K}$ une prédiction $\mathbf{\hat{y}_{K+1}}$ qui ne subit aucune contrainte pendant l'apprentissage, comme nous l'avons mentionné plus tôt \ref{seq:masquewin}.\\
@@ -489,7 +554,7 @@ Comme pour en \ref{seq:infglob}, $\epsilon$ est choisi pour maximiser le Coeffic
 \item Si $k = M_c + K + 1$ et $\text{ToE}_{loc} \geq N_f + \epsilon$, c'est un vrai négatif \texttt{TN}
 \item Si $k = M_c + K + 1$ et $\text{ToE}_{loc} < N_f + \epsilon$, c'est un faux positif \texttt{FP}
 \end{itemize}
-Calculé sur un grand nombre de séquences, le MCC toujours d'après l'équation établie précédemment \ref{eq:MCCinf}.
+Calculé sur un grand nombre de séquences, le MCC toujours d'après l'équation établie précédemment \eqref{eq:MCCinf}.
 
 \begin{algorithm}[htbp]
 \DontPrintSemicolon
@@ -504,7 +569,7 @@ $K \leftarrow 0$
 	\tcp{Conservation du contexte passé}
     $K_{prev} \leftarrow \min(K, M_c)$ 
     $\mathbf{y}^{(i)} \leftarrow \underbrace{(\texttt{PAD}, \cdots, \texttt{PAD}}_{M_c - K_{prev}}, \underbrace{\hat{y}_{K_i - K_{prev} + 1}, \dots, \hat{y}_{K_i}}_{K_{prev} \text{ termes du contexte}}, \texttt{S}, \underbrace{\texttt{PAD}, \cdots, \texttt{PAD})}_{M_f \text{ fois}}$\;
-    Encoder les ToA de $\mathbf{y}^{(i)}$ via l'équation \ref{eq:timeencodingoutwin}\;
+    Encoder les ToA de $\mathbf{y}^{(i)}$ via l'équation \eqref{eq:timeencodingoutwin}\;
     $j \leftarrow 0$
     $continue \leftarrow \text{Vrai}$\;
     \tcp{Boucle pour la prédiction des interceptions de la fenêtre}
@@ -520,7 +585,7 @@ $K \leftarrow 0$
         }
     }
     $K \leftarrow j$\;
-    Décoder les ToA de $\hat{\mathbf{y}}^{(i)}$ en inversant l'équation \ref{eq:timeencodingoutwin}\;
+    Décoder les ToA de $\hat{\mathbf{y}}^{(i)}$ en inversant l'équation \eqref{eq:timeencodingoutwin}\;
     \tcp{Ajout des prédictions de la fenêtre à la séquence globale}
     $\hat{\mathbf{y}} \leftarrow \hat{\mathbf{y}} \oplus (\hat{y}^{(i)}_{M_c + 1}, \dots, \hat{y}^{(i)}_{M_c + K})$
 }
@@ -542,13 +607,21 @@ Les paramètres expérimentaux, synthétisés dans le tableau \ref{tab:params_wi
 \toprule
 \textbf{Paramètre} & \textbf{Valeur} \\
 \midrule
+\multicolumn{2}{c}{\textit{DCIS}} \\
+\midrule
+Nombre d'impulsions incidentes ($N$) & $500$ \\
+Nombre d'impulsions par palier ($n$) & $6$ \\
+Nombre de mémoires max ($N_{max}$) & $6$ \\
+Sensibilité capteur ($\delta F$) & $0.1$\\
+Sensibilité corrélation mémoire ($\delta f$) & $0.1$\\
+Délais libération mémoire ($T_{maintien}$) & $2$\\
+\midrule
 \multicolumn{2}{c}{\textit{Jeux de données}} \\
 \midrule
 Taille de l'ensemble d'entraînement & $112 \cdot 10^3$ scénarios \\
 Taille de l'ensemble de validation & $50$ scénarios \\
-Nombre d'impulsions incidentes globales ($N$) & 500 \\
-Nombre maximal d'impulsions interceptées globales ($M$) & 700 \\
-Plages de distribution fréquentielle ($\mu$ et $\sigma$) & $[-5 ; 5]$ et $[0.2 ; 5]$ \\
+Plage des moyennes fréquentielles ($\mu$) & $[-5 ; 5]$ \\
+Plage des écarts-types ($\sigma$) & $[0.2 ; 5]$ \\
 \midrule
 \multicolumn{2}{c}{\textit{Dimensionnement du Fenêtrage}} \\
 \midrule
@@ -583,7 +656,7 @@ La figure \ref{fig:loss_win} retrace l'évolution de la fonction de coût de rec
 
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[scale=0.28]{ErreurWin.png}
+\includegraphics[scale=0.70]{ErreurWin.png}
 \end{center}
 \caption{Évolution de l'erreur pondérée en entrainement et en validation pour l'approche par fenêtrage. La barre horizontale noire symbolise l'erreur d'un prédicteur naïf (valeur 1.0). L'erreur de validation converge vers un plateau situé autour de $0.25$.}
 \label{fig:loss_win}
@@ -591,10 +664,9 @@ La figure \ref{fig:loss_win} retrace l'évolution de la fonction de coût de rec
 
 La convergence de l'erreur à $0.25$, bien en dessous de la valeur critique de $1.0$ (caractérisant les performances du prédicteur naïf de référence), renforce encore notre croyance en la pertinence de l'approche reproduire le traitement du DCIS. En revanche, le plateau asymptotique atteint (environ $0.25$) est significativement supérieur à celui de l'approche globale en bloc ($\sim 0.1$), ce qui suggère que la segmentation induit une perte dans les capacités de prédiction.
 
-\subsubsection{Analyse qualitative}
-L'analyse des représentations temps-fréquence des séquences d'impulsions produites par notre modèle permet de qualifier l'impact de cette dégradation sur le signal physique.\\
 
-La figure \ref{fig:gen_win_full} présente un scénario complet généré par la succession des fenêtres, tandis que la figure \ref{fig:gen_win_zoom} isole une section spécifique pour une observation microscopique.
+\subsubsection{Analyse qualitative}
+L'analyse des représentations temps-fréquence des séquences d'impulsions produites par notre modèle permet de qualifier l'impact de ce fenêtrage sur le signal physique. La figure \ref{fig:gen_win_full} présente un scénario complet généré par la succession des fenêtres, tandis que la figure \ref{fig:gen_win_zoom} isole une section spécifique pour une observation microscopique.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -608,20 +680,21 @@ La figure \ref{fig:gen_win_full} présente un scénario complet généré par la
 \begin{center}
 \includegraphics[scale=0.28]{VisuWinZoom.png}
 \end{center}
-\caption{Zoom dans l'illustration \ref{fig:gen_win_full} sur la fenêtre temporelle $[180; 265]$. Nous pouvons y observer des défauts dans les prédictions (encerclés en rouge), particulièrement pour l'inférence auto-régressive (en bas à gauche) qui s'accumule au niveau des frontières entre les différentes fenêtres (symbolisées par les traits verticaux noirs)}
+\caption{Zoom de l'illustration \ref{fig:gen_win_full} sur la fenêtre temporelle $[180; 265]$. Des défauts de prédiction (encerclés en rouge) sont visibles, particulièrement pour l'inférence auto-régressive (en bas à gauche) où les erreurs s'accumulent au niveau des frontières entre les fenêtres (symbolisées par les traits verticaux noirs).}
 \label{fig:gen_win_zoom}
 \end{figure}
 
-À l'échelle macroscopique, le modèle restitue fidèlement la distribution globale des impulsions : le réseau génère encore de lui-même les artéfacts complexes inhérents à la logique du capteur. Toutefois, l'observation à une échelle plus petite (85 pas de temps) révèle les limites. Les erreurs de reconstruction apparaissent aux interfaces entres les fenêtres, signe de la faiblesse du modèle à reconstruire l'état des mémoires du DCIS à partir du contexte passé fourni. 
+À l'échelle macroscopique, le modèle restitue fidèlement la distribution globale des impulsions : le réseau génère les artéfacts complexes inhérents à la logique du capteur. Toutefois, l'observation à une échelle plus fine (85 pas de temps) révèle des limites de reconstruction aux interfaces entre les fenêtres. Ces erreurs surviennent malgré le contexte de recouvrement fourni au modèle, traduisant une difficulté structurelle à restaurer l'état des mémoires du DCIS lors de l'initialisation d'une nouvelle fenêtre.
+Aussi, on constate sur la figure \ref{fig:gen_win_zoom} que le modèle fait plus d'erreur aux interfaces lorsqu'il prédit de manière auto-régressive, ce qui était attendu. En effet, le recouvrement d'un régime stationnaire des mémoires, que nous illustrons dans la figure \ref{fig:ResetEnv}, se fait par la réduction progressive des erreurs dans les impulsions interceptées fournies au décodeur. La prédiction par forçage de l'enseignement étant réalisé avec des impulsions interceptées parfaites, ce recouvrement est bien plus rapide que dans la configuration de prédiction auto-régressive.
 
 \section{Discussion et Perspectives}
 \label{seq:discseq}
-L'étude de la transduction Séquence-vers-Séquence pour la modélisation du DCIS conduit à un bilan contrasté. D'une part, l'approche globale a mise en lumière la pertinence de l'architecture Transformer : le mécanisme d'attention croisée est intrinsèquement capable de capturer et de reproduire les effets des mécanismes du capteur (fusions, troncatures, disparitions) sur des fenêtres d'observation restreintes. D'autre part, le passage à l'échelle via un mécanisme de fenêtrage temporel n'est pas encore mature et a mis en lumière des vulnérabilités structurelles liées à la perte de l'état latent.
+L'étude de la transduction Séquence-vers-Séquence pour la modélisation du DCIS conduit à un bilan contrasté. D'une part, l'approche globale a mis en lumière la pertinence de l'architecture Transformer : le mécanisme d'attention croisée est capable de capturer et de reproduire les effets matériels du capteur sur des fenêtres d'observation restreintes. D'autre part, le passage à l'échelle via un mécanisme de fenêtrage temporel auto-régressif révèle des vulnérabilités liées à la perte du contexte : l'état des mémoires du DCIS.
 
 \subsection{Analyse de la perte du contexte dynamique}
-La dégradation des performances observée (erreur de $0.25$ contre $0.1$) s'explique par la nature du DCIS. Il s'agit d'un système dynamique dont la réponse à l'instant $t$ dépend de l'état complet de sa mémoire. Dans l'approche par fenêtrage, cet état mémoire initial est inconnu. Le modèle tente de l'inférer de manière implicite à partir du contexte restreint fourni en entrée ($N_c$ derniers PDW incidents et $M_c$ derniers PDW interceptés).\\
+La dégradation des performances observée s'explique par la nature fondamentalement dynamique du DCIS : sa réponse dépend de l'état interne de sa mémoire. Dans l'approche par fenêtrage, cet état initial est inconnu. Le modèle tente de l'inférer de manière implicite à partir du contexte fourni ($N_c$ PDW incidents passés et $M_c$ PDW interceptés passés).
 
-Pour quantifier cette faiblesse, nous avons isolé l'erreur de reconstruction en fonction de la position relative $k$ du PDW prédit au sein de la fenêtre (zone d'observation $M_c \le k \le M_f + M_c$). La figure \ref{fig:image66} illustre cette erreur en fonction de la position, évaluée en forçage de l'enseignant sur 200 scénarios (soit 3600 sous-séquences). La courbe illustre une asymétrie dans l'erreur, qui culmine jusqu'à $0.5$ sur les premières prédictions avant de tomber à $0.1$, niveau d'erreur comparable à celui obtenue avec l'approche en bloc. Cette observation confirme que le réseau échoue à reconstruire parfaitement l'état des mémoires du capteur à la frontière de la fenêtre. À mesure que l'inférence progresse, le modèle ingère de nouvelles impulsions, met à jour sa dynamique latente interne, et l'influence de l'état initial erroné s'estompe : l'erreur chute et se stabilise. 
+Pour quantifier cette faiblesse, nous avons isolé l'erreur de reconstruction en fonction de la position relative $k$ du PDW prédit au sein de la fenêtre (zone d'observation $M_c \le k \le M_f + M_c$). La figure \ref{fig:image66} illustre cette erreur en fonction de la position, évaluée en forçage de l'enseignant sur 3600 sous-séquences. L'erreur est fortement asymétrique : elle culmine à plus de $0.5$ sur les premières prédictions avant de chuter vers $0.1$ (le niveau de l'approche en bloc). Cette observation confirme que le réseau échoue à reconstruire parfaitement l'état des mémoires du capteur à la frontière de la fenêtre, malgré un recouvrement de $M_c = 15$ impulsions, ce qui devrait suffire d'après la figure \ref{fig:ResetEnv}. À mesure que l'inférence progresse, le modèle ingère de nouvelles impulsions, met à jour sa dynamique latente interne, et l'influence de l'état initial erroné s'estompe : l'erreur chute et se stabilise.\\
 
 \begin{figure}[htbp]
 \begin{center}
@@ -631,6 +704,9 @@ Pour quantifier cette faiblesse, nous avons isolé l'erreur de reconstruction en
 \label{fig:image66}
 \end{figure}
 
+Nous supposons que cette défaillance aux interfaces repose sur deux inadéquations architecturales. Premièrement, l'architecture optimisée pour l'approche globale (11 encodeurs, 3 décodeurs) présuppose que l'encodeur construit la dynamique mémoire, laissant au décodeur un simple rôle de transcription \ref{seq:configglobal}. Or, dans le fenêtrage, le contexte des interceptions passées ($M_c$) est fourni directement au décodeur. Ce dernier devrait alors jouer un rôle bien plus important que dans l'approche en bloc, participant à reconstruire l'état des mémoires. Deuxièmement, l'intercalation de jetons de contrôle (\texttt{S}, \texttt{E}, \texttt{PAD}) dans des séquences de grandeurs physiques continues complexifie l'interprétation que le modèle doit réalisé. A l'inverse, en traitement du langage naturel, l'espace latent cartographie un dictionnaire de classes discrètes ; un jeton supplémentaire n'est qu'une classe de plus. Dans notre contexte, forcer le réseau à associer des jetons discrets sans réalité physique au sein d'un espace continu de variables (fréquences, temps) perturbe la topologie de l'espace latent.
+
+Ces observations suggèrent que le fenêtrage strict, couplé à l'insertion de jetons de contrôle dans un cadre auto-régressif, constitue une piste sous-optimale pour le traitement de grandeurs physiques continues
 
 \subsection{Modélisation explicite de l'état mémoire}
 Face à cette limitation, une piste d'amélioration exploratoire a été modélisée. Plutôt que de forcer le réseau à deviner l'état du système à partir des derniers PDW de la fenêtre précédente, nous avons envisagé de directement le lui fournir et de lui demander de le mettre à jour. L'architecture (illustrée schématiquement par la figure \ref{fig:modelSSM}) fait état de la modification de la structure des données transmise à l'encodeur du Transformer : il reçoit en plus des PDW incidents le vecteur d'état des mémoires du DCIS à l'instant initial de la fenêtre ($m_k$). La sortie de l'encodeur est exploité pour prédire l'état des mémoires à la fin de la fenêtre ($\widehat{m_{k+1}}$), qui pourra être transmis à l'itération de la fenêtre suivante.\\
