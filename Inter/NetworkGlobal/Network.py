@@ -118,11 +118,11 @@ class TransformerTranslator(nn.Module):
                              torch.zeros(batch_size, self.n_heads, 0, self.d_head, device=source.device)].copy()]
                             for _ in range(len(self.decoders))]
 
-        # 2. Calcul de la sortie de l'encodeur
-        src = self.enc_embedding(source)
-        src = self.enc_pos_encoding(src)
-        for encoder in self.encoders:
-            src = encoder(src)
+            # 2. Calcul de la sortie de l'encodeur
+            src = self.enc_embedding(source)
+            src = self.enc_pos_encoding(src)
+            for encoder in self.encoders:
+                src = encoder(src)
 
         # 3. Embeddings de l'instant t
         if target.shape[1] == 0:
