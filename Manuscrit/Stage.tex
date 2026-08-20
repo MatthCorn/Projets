@@ -11,7 +11,7 @@ Dans cette configuration, le modèle reçoit les impulsions une par une et produ
 
 Au-delà de la résolution d'un problème d'optimisation calculatoire, cette réduction de la fenêtre d'observation résout un second obstacle, de nature physique. Modéliser le DCIS par une fonction globale créant une représentation latente d'une séquence entière revenait à ignorer la réalité matérielle du capteur. Le DCIS est un système dynamique réactif : il est mis à jour par l'occurrence d'événements temporels locaux (l'apparition d'une impulsion, sa disparition, ou la libération d'une mémoire suite à une publication). L'approche flux-à-flux permet de reproduire une logique algorithmique similaire.
 
-Pour formaliser ce traitement, cette nouvelle méthodologie s'appuie sur le concept de \textit{sérialisation événementielle}, une démarche consistant à réorganiser les flux asynchrones d'entrée (impulsions incidentes) et de sortie (PDW publiés) sur une ligne temporelle unique. Ce concept, qui contraint le modèle à opérer de manière causale à l'échelle du PDW, constitue le cœur de ce chapitre et sera détaillé dans la sous-section \ref{seq:serialisation}.
+Pour formaliser ce traitement, cette nouvelle méthodologie, qui a fait l'objet d'une publication \cite{lagarde_surrogates_2025}, s'appuie sur le concept de \textit{sérialisation événementielle}, une démarche consistant à réorganiser les flux asynchrones d'entrée (impulsions incidentes) et de sortie (PDW publiés) sur une ligne temporelle unique. Ce concept, qui contraint le modèle à opérer de manière causale à l'échelle du PDW, constitue le cœur de ce chapitre et sera détaillé dans la sous-section \ref{seq:serialisation}.
 
 
 \section{Formalisation du problème "Flux-à-flux"}
@@ -136,7 +136,7 @@ Le tableau \ref{tab:seqfusion2} présente ces valeurs pour l'exemple de séquenc
 Cette procédure permet de constituer des ensembles d'entrainement dont nous écrirons les dimensions $B \times L \times d_{in}$ pour l'entrée \textbf{Input 1}, et $B \times L \times d_{out}$ pour l'entrée \textbf{Input 2} et la cible \textbf{Cible}. Les masques sont, quand-à-eux, des tenseurs de dimension $B \times L$.
 
 \section{Validation de l'approche sur architectures récurrentes}
-Le problème d'apprentissage comme nous venons de le définir a été approché avec des réseaux de neurones récurrents, et nos résultats ont été publié dans le conférence CAID \cite{lagarde_surrogates_2025}. Cette section présente ces résultats, où l'on évalue la capacité des architectures récurrentes canoniques à capturer cette dynamique événementielle qui représente le fonctionnement du DCIS. L'étude couvre non-seulement les architectures récurrentes "classiques", c'est à dire RNN, LSTM et GRU, mais aussi des architectures de LSTM augmentées par des mécanismes d'attention \cite{luong_effective_2015}, \cite{bahdanau_neural_2014}. Nous ne présenterons pas les résultats des architectures augmentées qui exploitent un traitement séquentiel de leurs mémoires passées, approche avec laquelle nous souhaitons rompre dans cette section.
+Le problème d'apprentissage comme nous venons de le définir a été approché avec des réseaux de neurones récurrents, et nos résultats ont été publié dans le conférence CAID \cite{lagarde_surrogates_2025}. Cette section présente ces résultats, où l'on évalue la capacité des architectures récurrentes canoniques à capturer cette dynamique événementielle qui représente le fonctionnement du DCIS. L'étude couvre non-seulement les architectures récurrentes "classiques", c'est à dire RNN, LSTM et GRU, mais aussi des architectures de LSTM augmentées par des mécanismes d'attention \cite{luong_effective_2015}, \cite{bahdanau_neural_2014}.
 
 \subsection{Configurations architecturales}
 La nature événementiel du DCIS s'aligne naturellement avec l'équation de mise à jour de l'état caché $h_t = f(h_{t-1}, x_t)$ des réseaux récurrents \eqref{eq:recurrent}. Nous avons comparé trois architectures : RNN standard, GRU et LSTM. Quelque soit le modèle, son architecture général est identique et reprend l'architecture canonique des réseaux de neurones récurrents \ref{RNN base} présentée dans le chapitre \ref{chap:SOTA}. C'est le bloc réalisant la propagation de la mémoire et sa mise-à-jour qui distinguera les modèles. La figure \ref{fig:compareRNN} propose une comparaison de ces trois blocs élémentaires.\\
@@ -212,7 +212,7 @@ GRU & 0.1260 & 0.1981 & 0.1945 \\
 LSTM & 0.1146 & 0.2192 & 0.2001 \\ 
 \bottomrule
 \end{tabular} 
-\caption{Comparaison des performances en fonction du volume d'impulsions traitées.} 
+\caption{Comparaison des performances en fonction du volume d'impulsions traitées. L'erreur fait référence à l'équation \ref{eq:ssmloss}.} 
 \label{tab:resRNN}
 \end{table}
 

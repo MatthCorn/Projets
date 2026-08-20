@@ -141,7 +141,7 @@ class TransformerTranslator(nn.Module):
         return trg
 
     def reset_cache(self):
-        self.past_kv = None
+        self.cache = None
 
 if __name__ == '__main__':
     N = TransformerTranslator(10, 11, len_in=37, len_out=41)
