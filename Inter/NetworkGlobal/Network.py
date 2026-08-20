@@ -39,7 +39,7 @@ class TransformerTranslator(nn.Module):
         self.register_buffer("mask_decoder", torch.tril(torch.ones(len_out + 1, len_out + 1)).unsqueeze(0).unsqueeze(0), persistent=False)
 
         self.last_decoder = FeedForward(d_in=d_att, d_out=d_out, widths=[16], dropout=0)
-        self.past_kv = None
+        self.cache = None
 
 
     def forward(self, source, target, target_mask=None):
@@ -111,9 +111,9 @@ class TransformerTranslator(nn.Module):
         buffer: contient l'historique brut des embeddings [Batch, Hidden, T_history]
         """
         # 1. Gestion du Buffer
-        if self.past_kv is None:
+        if self.cache is None:
             batch_size, *_ = source.shape
-            self.past_kv = [[[],
+            self.cache = [[[],
                              [torch.zeros(batch_size, 0, self.n_heads, self.d_head, device=source.device),
                              torch.zeros(batch_size, self.n_heads, 0, self.d_head, device=source.device)].copy()]
                             for _ in range(len(self.decoders))]
@@ -124,6 +124,8 @@ class TransformerTranslator(nn.Module):
             for encoder in self.encoders:
                 src = encoder(src)
 
+            self.cache.append(src)
+
         # 3. Embeddings de l'instant t
         if target.shape[1] == 0:
             trg = self.start_token().expand(target.size(0), 1, -1)
@@ -133,7 +135,7 @@ class TransformerTranslator(nn.Module):
         # trg.shape = (batch_size, 1, d_att)
 
         for i, decoder in enumerate(self.decoders):
-            trg = decoder(target=trg, source=src, mask=self.mask_decoder, past_kv=self.past_kv[i])
+            trg = decoder(target=trg, source=self.cache[-1], mask=self.mask_decoder, past_kv=self.cache[i])
 
         trg = self.last_decoder(trg)
         return trg
