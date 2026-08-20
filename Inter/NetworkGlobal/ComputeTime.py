@@ -67,7 +67,7 @@ def test_vitesse(batch_size=50):
         f"Vitesse : {total_pdw_incidents_per_run / avg_time_per_run:.2f} PDW incidents/seconde.")
 
 if __name__ == '__main__':
-    batch_size = 1000
+    batch_size = 100
     while batch_size < 100000:
         batch_size = int(batch_size * 1.5)
         test_vitesse(batch_size)
