@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.11.20)  20 AUG 2026 23:35
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.11.20)  21 AUG 2026 18:22
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -2846,17 +2846,17 @@ s-TOsF/m/sc/10.95 . Alors consi-dé-rées comme deux sé-quences d'évè-
 Underfull \vbox (badness 2253) has occurred while \output is active []
 
  [116]
-Underfull \hbox (badness 10000) in paragraph at lines 107--108
+Underfull \hbox (badness 10000) in paragraph at lines 108--109
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 110--111
+Underfull \hbox (badness 10000) in paragraph at lines 111--112
 
  []
 
 
-Overfull \hbox (1.12756pt too wide) in paragraph at lines 114--132
+Overfull \hbox (1.12756pt too wide) in paragraph at lines 115--133
  [][] 
  []
 
@@ -2864,82 +2864,91 @@ Overfull \hbox (1.12756pt too wide) in paragraph at lines 114--132
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 
-Overfull \hbox (22.70714pt too wide) in paragraph at lines 138--138
+Overfull \hbox (22.70714pt too wide) in paragraph at lines 139--139
 |[]\T1/opensans-TOsF/b/n/17.28 Validation de l'ap-proche sur ar-chi-tec-tures r
 é-cur-rentes| 
  []
 
 [117]
-Underfull \hbox (badness 10000) in paragraph at lines 142--143
+Underfull \hbox (badness 10000) in paragraph at lines 145--146
 
  []
 
 <compareRNN.png, id=1746, 1199.23032pt x 385.44pt>
 File: compareRNN.png Graphic file (type png)
 <use compareRNN.png>
-Package pdftex.def Info: compareRNN.png  used on input line 146.
+Package pdftex.def Info: compareRNN.png  used on input line 149.
 (pdftex.def)             Requested size: 419.73691pt x 134.90602pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 152--153
+Underfull \hbox (badness 10000) in paragraph at lines 155--156
 
  []
 
 <fluxaflux.png, id=1750, 770.88pt x 612.48825pt>
 File: fluxaflux.png Graphic file (type png)
 <use fluxaflux.png>
-Package pdftex.def Info: fluxaflux.png  used on input line 156.
+Package pdftex.def Info: fluxaflux.png  used on input line 159.
 (pdftex.def)             Requested size: 269.81204pt x 214.3741pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 180--181
+Underfull \hbox (badness 10000) in paragraph at lines 185--186
 
  []
 
 [118] [119 <./compareRNN.png> <./fluxaflux.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 188--189
 
- []
+LaTeX Warning: Command \` invalid in math mode on input line 187.
 
+Missing character: There is no è in font cmr8!
 
-Underfull \hbox (badness 10000) in paragraph at lines 202--203
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 219--220
+Underfull \hbox (badness 10000) in paragraph at lines 193--194
 
  []
 
 [120]
-Underfull \hbox (badness 10000) in paragraph at lines 222--223
+Underfull \hbox (badness 10000) in paragraph at lines 208--209
 
  []
 
-<genRNN.png, id=1788, 886.81313pt x 316.18124pt>
+
+Underfull \hbox (badness 10000) in paragraph at lines 230--231
+
+ []
+
+[121]
+Underfull \hbox (badness 10000) in paragraph at lines 232--233
+
+ []
+
+<genRNN.png, id=1800, 886.81313pt x 316.18124pt>
 File: genRNN.png Graphic file (type png)
 <use genRNN.png>
-Package pdftex.def Info: genRNN.png  used on input line 226.
+Package pdftex.def Info: genRNN.png  used on input line 236.
 (pdftex.def)             Requested size: 443.40547pt x 158.09023pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 233--234
-
- []
-
-[121 <./genRNN.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 235--236
+Underfull \hbox (badness 10000) in paragraph at lines 243--244
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 237--238
+Underfull \hbox (badness 10000) in paragraph at lines 245--246
+
+ []
+
+[122 <./genRNN.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 247--248
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 239--240
+Underfull \hbox (badness 10000) in paragraph at lines 249--250
 
  []
 
-) [122]
+) [123] [124
+
+
+
+]
 Overfull \hbox (3.5296pt too wide) in paragraph at lines 275--275
 \T1/opensans-TOsF/m/sc/12 Ar-tech, 2001. url : [][]$\T1/cmtt/m/n/12 https : / /
  ieeexplore . ieee . org / abstract / document / 9101100/$[][]
@@ -2957,17 +2966,13 @@ Overfull \hbox (26.7801pt too wide) in paragraph at lines 275--275
 oE$[][] \T1/opensans-TOsF/m/sc/12 (vi-sité le 26/11/2025). 
  []
 
-[123
-
-
-
-]
+[125]
 Overfull \hbox (8.75963pt too wide) in paragraph at lines 275--275
 \T1/cmtt/m/n/12 20for % 20Real -[] Time % 20Radiance % 20Field % 20Rendering . 
 pdf$[][] \T1/opensans-TOsF/m/sc/12 (vi-sité le 26/11/2025). 
  []
 
-[124]
+[126]
 Overfull \hbox (38.53647pt too wide) in paragraph at lines 275--275
 \T1/cmtt/m/n/12 / / proceedings . neurips . cc / paper / 2019 / hash / 26cd8eca
 dce0d4efd6cc8a8725cbd1f8 -[]
@@ -2979,7 +2984,7 @@ Overfull \hbox (236.08823pt too wide) in paragraph at lines 275--275
 8nsu5zAdIGdvnCQ2HUA0cQqPyuGJEWgDg4MSMrH4DvTYUcfmSITqw$[][]
  []
 
-[125]
+[127]
 Overfull \hbox (131.8595pt too wide) in paragraph at lines 275--275
 \T1/opensans-TOsF/m/sc/12 (2019). url : [][]$\T1/cmtt/m/n/12 https : / / procee
 dings . neurips . cc / paper / 2019 / hash / 5f8e2fa1718d1bbcadf1cd9c7a54fb8c -
@@ -2992,7 +2997,7 @@ Overfull \hbox (8.59756pt too wide) in paragraph at lines 275--275
 -dels''. In : \T1/opensans-TOsF/m/it/12 arXiv pre-print arXiv :1803.10122
  []
 
-[126]
+[128]
 Overfull \hbox (125.87567pt too wide) in paragraph at lines 275--275
 \T1/opensans-TOsF/m/sc/12 6851. url : [][]$\T1/cmtt/m/n/12 https : / / proceedi
 ngs . neurips . cc / paper / 2020 / hash / 4c5bcfec8584af0d967f1ab10179ca4b -[]
@@ -3005,7 +3010,7 @@ Overfull \hbox (9.38358pt too wide) in paragraph at lines 275--275
 ders-tan-ding by ge-ne-ra-tive pre-training''.
  []
 
-[127]
+[129]
 Overfull \hbox (2.58614pt too wide) in paragraph at lines 275--275
 \T1/cmtt/m/n/12 hash / c399862d3b9d6b76c8436e924a68c45b -[] Abstract . html$[][
 ] \T1/opensans-TOsF/m/sc/12 (vi-sité le 26/11/2025). 
@@ -3017,7 +3022,7 @@ Overfull \hbox (4.18068pt too wide) in paragraph at lines 275--275
 ensans-TOsF/m/it/12 Very Deep Convo-lu-tio-nal Net-works for Large-
  []
 
-[128]
+[130]
 Overfull \hbox (3.4385pt too wide) in paragraph at lines 275--275
 []\T1/opensans-TOsF/m/sc/12 Du []Tran []et al. ``Lear-ning spa-tio-tem-po-ral f
 ea-tures with 3d convo-lu-tio-nal net-works''.
@@ -3030,13 +3035,13 @@ EEE in-ter-na-tio-nal confe-rence on com-pu-ter vi-sion\T1/opensans-TOsF/m/sc/1
 2 . 2015, p. 4489-
  []
 
-[129]
+[131]
 Overfull \hbox (75.57742pt too wide) in paragraph at lines 275--275
 [][]$\T1/cmtt/m/n/12 https : / / proceedings . neurips . cc / paper / 2017 / ha
 sh / 5dd9db5e033da9c6fb5ba83c7a7ebea9 -[]
  []
 
-[130]
+[132]
 Overfull \hbox (26.18948pt too wide) in paragraph at lines 275--275
 \T1/cmtt/m/n/12 neurips . cc / paper _ files / paper / 2015 / hash / 29921001f2
 f04bd3baee84a12e98098f -[]
@@ -3055,7 +3060,7 @@ Overfull \hbox (186.70029pt too wide) in paragraph at lines 275--275
 52rKpifVNjL4fvJ85uqggrXsWDBTB7YooFLJeNXHWqhvOyC$[][]
  []
 
-[131]
+[133]
 Overfull \hbox (1.2874pt too wide) in paragraph at lines 275--275
 \T1/opensans-TOsF/m/it/12 in-for-ma-tion pro-ces-sing sys-tems \T1/opensans-TOs
 F/m/sc/12 33 (2020), p. 1877-1901. url : [][]$\T1/cmtt/m/n/12 https : / / proce
@@ -3068,7 +3073,7 @@ Overfull \hbox (26.18948pt too wide) in paragraph at lines 275--275
 cb4967418bfb8ac142f64a -[]
  []
 
-[132]
+[134]
 Overfull \hbox (132.3383pt too wide) in paragraph at lines 275--275
 \T1/opensans-TOsF/m/sc/12 15097. url : [][]$\T1/cmtt/m/n/12 https : / / proceed
 ings . neurips . cc / paper / 2021 / hash / 7f489f642a0ddb10272b5c31057f0663 -[
@@ -3081,7 +3086,7 @@ Overfull \hbox (8.09929pt too wide) in paragraph at lines 275--275
 ieeexplore . ieee . org / abstract / document / 10825633/$[][]
  []
 
-[133] [134] (Modele_These_UParisSaclay_2022.aux (Introduction.aux)
+[135] [136] (Modele_These_UParisSaclay_2022.aux (Introduction.aux)
 (Problematique.aux) (Etat de l art.aux) (NouveauFocus.aux) (EUSIPCO.aux)
 (GrosTAF.aux) (Stage.aux))
  ***********
@@ -3092,19 +3097,27 @@ L3 programming layer <2025-10-24>
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
+
+LaTeX Warning: There were undefined references.
+
 Package rerunfilecheck Info: File `Modele_These_UParisSaclay_2022.out' has not 
 changed.
 (rerunfilecheck)             Checksum: ED5B21298471B999EB87ADB6D2CECBF2;29876.
+
+Package biblatex Warning: Please (re)run Biber on the file:
+(biblatex)                Modele_These_UParisSaclay_2022
+(biblatex)                and rerun LaTeX afterwards.
+
 Package logreq Info: Writing requests to 'Modele_These_UParisSaclay_2022.run.xm
 l'.
 \openout1 = `Modele_These_UParisSaclay_2022.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 36924 strings out of 467871
- 713360 string characters out of 5418375
- 1618135 words of memory out of 5000000
- 64644 multiletter control sequences out of 15000+600000
+ 36928 strings out of 467871
+ 713403 string characters out of 5418375
+ 1617285 words of memory out of 5000000
+ 64646 multiletter control sequences out of 15000+600000
  659315 words of font info for 138 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  102i,23n,117p,2351b,2269s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -3141,10 +3154,10 @@ lestroke/dsrom10.pfb><C:/Users/matth/AppData/Local/Programs/MiKTeX/fonts/type1/
 public/amsfonts/euler/eufm10.pfb><C:/Users/matth/AppData/Local/Programs/MiKTeX/
 fonts/type1/public/amsfonts/symbols/msbm10.pfb><C:/Users/matth/AppData/Local/Pr
 ograms/MiKTeX/fonts/type1/public/hoekwater/stmary10.pfb>
-Output written on Modele_These_UParisSaclay_2022.pdf (134 pages, 9127395 bytes)
+Output written on Modele_These_UParisSaclay_2022.pdf (136 pages, 9132714 bytes)
 .
 PDF statistics:
- 2462 PDF objects out of 2487 (max. 8388607)
- 531 named destinations out of 1000 (max. 500000)
+ 2477 PDF objects out of 2487 (max. 8388607)
+ 533 named destinations out of 1000 (max. 500000)
  1067 words of extra memory for PDF output out of 10000 (max. 10000000)
 

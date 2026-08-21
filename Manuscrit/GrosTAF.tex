@@ -545,16 +545,8 @@ Dans l'approche de traitement en bloc des séquences entières présenté en \re
 
 Néanmoins, nous parvenons à déterminer à quel moment le modèle a terminé l'inférence des impulsions interceptées de la fenêtre : si le modèle parvient à reproduire fidèlement l'interception des impulsions, alors la prédiction $\mathbf{\hat{y}_{K+1}}$ devrait correspondre à une impulsion publiée en dehors de la fenêtre traitée.\\
 
-Ainsi, nous intégrons ce principe dans la procédure de prédiction, que nous décrivons dans l'algorithme \ref{algo:genwin}. Cet algorithme présente de bout-en-bout le processus de prédiction d'une séquence entière, avec l'approche par fenêtrage. Nous y faisons référence à $f_{\theta}$ qui représente notre modèle, ainsi qu'à $\epsilon$ qui est un seuil séparant les impulsions interceptés dans la fenêtre de celles interceptés en dehors.\\
+Ainsi, nous intégrons ce principe dans la procédure de prédiction, que nous décrivons dans l'algorithme \ref{algo:genwin}. Cet algorithme présente de bout-en-bout le processus de prédiction d'une séquence entière, avec l'approche par fenêtrage. Dans l'algorithme, nous mentionnons la tâche d'encoder ou de décoder les $ToA$ : ces opérations sont étroitement liées à l'équation \eqref{eq:timeencodingoutwin}. Encoder une $ToA$, désignée par $\text{ToA}(y_k)$ correspond à la substituer par la valeur $\Delta\text{ToA}(y_k) = \text{ToA}(y_k) - ToA(x_{N_c + 1}) - (k - M_c)$ (l'indice $k$ et l'impulsion incidente $x_{N_c + 1}$ étant dépendants du contexte de la transformation), qui est sa valeur encodée d'après l'équation \eqref{eq:timeencodingoutwin}. À l'inverse, décoder une valeur $\Delta\text{ToA}(y_k)$ revient à la substituer par la valeur $\text{ToA}(y_k) = \Delta\text{ToA}(y_k) + ToA(x_{N_c + 1}) - (k - M_c)$ (l'indice $k$ et l'impulsion incidente $x_{N_c + 1}$ étant dépendants du contexte de la transformation), qui est la véritable $ToA$ obtenue en inversant l'équation \eqref{eq:timeencodingoutwin}. Nous faisons aussi référence à $f_{\theta}$ qui représente notre modèle, ainsi qu'à $\epsilon$ qui est un seuil séparant les impulsions interceptés dans la fenêtre de celles interceptés en dehors.\\
 
-Comme pour en \ref{seq:infglob}, $\epsilon$ est choisi pour maximiser le Coefficient de Corrélation de Matthews (MCC), dont les vrai/faux positifs et de vrai/faux négatifs obéissent à la règle suivante. Une séquence est prédite sur une fenêtre par forçage de l'enseignement (teacher forcing) $\hat{\mathbf{y}} = f_{\theta}(\mathbf{x}, \mathbf{y})$, puis les éléments aux positions $k \in  \llbracket M_c + 1; M_c + K + 1 \rrbracket$ où $K= \|\mathbf{m}^{(sig)}\|_1$ sont observés ($\text{ToE}_{loc}$ comme calculé dans l'algorithme \ref{algo:genwin}) tels que :
-\begin{itemize}
-\item Si $M_c + 1 \leq k \leq M_c + K$ et $\text{ToE}_{loc} < N_f + \epsilon$, c'est un vrai positif \texttt{TP}
-\item Si $M_c + 1 \leq k \leq M_c + K$ et $\text{ToE}_{loc} \geq N_f + \epsilon$, c'est un faux négatif \texttt{FN}
-\item Si $k = M_c + K + 1$ et $\text{ToE}_{loc} \geq N_f + \epsilon$, c'est un vrai négatif \texttt{TN}
-\item Si $k = M_c + K + 1$ et $\text{ToE}_{loc} < N_f + \epsilon$, c'est un faux positif \texttt{FP}
-\end{itemize}
-Calculé sur un grand nombre de séquences, le MCC toujours d'après l'équation établie précédemment \eqref{eq:MCCinf}.
 
 \begin{algorithm}[htbp]
 \DontPrintSemicolon
@@ -593,6 +585,15 @@ $K \leftarrow 0$
 \caption{Inférence auto-régressive d'un scénario complet par fenêtrage}
 \label{algo:genwin}
 \end{algorithm}
+
+Comme pour en \ref{seq:infglob}, $\epsilon$ est choisi pour maximiser le Coefficient de Corrélation de Matthews (MCC), dont les vrai/faux positifs et de vrai/faux négatifs obéissent à la règle suivante. Une séquence est prédite sur une fenêtre par forçage de l'enseignement (teacher forcing) $\hat{\mathbf{y}} = f_{\theta}(\mathbf{x}, \mathbf{y})$, puis les éléments aux positions $k \in  \llbracket M_c + 1; M_c + K + 1 \rrbracket$ où $K= \|\mathbf{m}^{(sig)}\|_1$ sont observés ($\text{ToE}_{loc}$ comme calculé dans l'algorithme \ref{algo:genwin}) tels que :
+\begin{itemize}
+\item Si $M_c + 1 \leq k \leq M_c + K$ et $\text{ToE}_{loc} < N_f + \epsilon$, c'est un vrai positif \texttt{TP}
+\item Si $M_c + 1 \leq k \leq M_c + K$ et $\text{ToE}_{loc} \geq N_f + \epsilon$, c'est un faux négatif \texttt{FN}
+\item Si $k = M_c + K + 1$ et $\text{ToE}_{loc} \geq N_f + \epsilon$, c'est un vrai négatif \texttt{TN}
+\item Si $k = M_c + K + 1$ et $\text{ToE}_{loc} < N_f + \epsilon$, c'est un faux positif \texttt{FP}
+\end{itemize}
+Calculé sur un grand nombre de séquences, le MCC toujours d'après l'équation établie précédemment \eqref{eq:MCCinf}.
 
 
 \subsection{Résultats expérimentaux}

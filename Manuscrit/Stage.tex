@@ -11,7 +11,7 @@ Dans cette configuration, le modèle reçoit les impulsions une par une et produ
 
 Au-delà de la résolution d'un problème d'optimisation calculatoire, cette réduction de la fenêtre d'observation résout un second obstacle, de nature physique. Modéliser le DCIS par une fonction globale créant une représentation latente d'une séquence entière revenait à ignorer la réalité matérielle du capteur. Le DCIS est un système dynamique réactif : il est mis à jour par l'occurrence d'événements temporels locaux (l'apparition d'une impulsion, sa disparition, ou la libération d'une mémoire suite à une publication). L'approche flux-à-flux permet de reproduire une logique algorithmique similaire.
 
-Pour formaliser ce traitement, cette nouvelle méthodologie, qui a fait l'objet d'une publication \cite{lagarde_surrogates_2025}, s'appuie sur le concept de \textit{sérialisation événementielle}, une démarche consistant à réorganiser les flux asynchrones d'entrée (impulsions incidentes) et de sortie (PDW publiés) sur une ligne temporelle unique. Ce concept, qui contraint le modèle à opérer de manière causale à l'échelle du PDW, constitue le cœur de ce chapitre et sera détaillé dans la sous-section \ref{seq:serialisation}.
+Pour formaliser ce traitement, cette nouvelle méthodologie s'appuie sur le concept de \textit{sérialisation événementielle}, une démarche consistant à réorganiser les flux asynchrones d'entrée (impulsions incidentes) et de sortie (PDW publiés) sur une ligne temporelle unique. Ces travaux, et en particulier les résultats présentés dans la section \ref{seq:validSSM}, ont fait l'objet d'une publication dans la conférence CAID \cite{lagarde_surrogates_2025}. Ce concept, qui contraint le modèle à opérer de manière causale à l'échelle du PDW, constitue le cœur de ce chapitre et sera détaillé dans la section \ref{seq:serialisation}.
 
 
 \section{Formalisation du problème "Flux-à-flux"}
@@ -94,6 +94,7 @@ Si $I_n$ est le dernier PDW incidents, on remplace $\Delta T_n$ par une valeur t
 \end{itemize}
 
 \subsection{Création des données d'entrainement}
+\label{seq:fafmask}
 Les données d'entrainement proviennent du DCIS décrit dans le chapitre \ref{chap:newfocus}. Voici la procédure de création des données pour l'apprentissage supervisé de l'approche événementielle de ce chapitre :
 
 \begin{itemize}
@@ -136,10 +137,12 @@ Le tableau \ref{tab:seqfusion2} présente ces valeurs pour l'exemple de séquenc
 Cette procédure permet de constituer des ensembles d'entrainement dont nous écrirons les dimensions $B \times L \times d_{in}$ pour l'entrée \textbf{Input 1}, et $B \times L \times d_{out}$ pour l'entrée \textbf{Input 2} et la cible \textbf{Cible}. Les masques sont, quand-à-eux, des tenseurs de dimension $B \times L$.
 
 \section{Validation de l'approche sur architectures récurrentes}
-Le problème d'apprentissage comme nous venons de le définir a été approché avec des réseaux de neurones récurrents, et nos résultats ont été publié dans le conférence CAID \cite{lagarde_surrogates_2025}. Cette section présente ces résultats, où l'on évalue la capacité des architectures récurrentes canoniques à capturer cette dynamique événementielle qui représente le fonctionnement du DCIS. L'étude couvre non-seulement les architectures récurrentes "classiques", c'est à dire RNN, LSTM et GRU, mais aussi des architectures de LSTM augmentées par des mécanismes d'attention \cite{luong_effective_2015}, \cite{bahdanau_neural_2014}.
+\label{seq:validSSM}
+Cette section évalue la capacité des architectures récurrentes canoniques à capturer la dynamique événementielle du DCIS. L'étude couvre les réseaux classiques (RNN, LSTM, GRU) mais intègre également des architectures LSTM augmentées par des mécanismes d'attention (Bahdanau \cite{bahdanau_neural_2014} et Luong \cite{luong_effective_2015}). L'intégration de ces modèles augmentés dans notre plan d'expérience vise à fournir un point de comparaison afin d'estimer à quel point les architectures récurrentes sont adaptés au traitement flux-à-flux. En effet, si l'augmentation par attention des architectures récurrentes, spécialement fait pour combattre le goulot d'étranglement mémoriel, ne permet pas de performances significativement meilleures, cela signifiera que le goulot d'étranglement n'est pas une faiblesse à combattre dans la configuration flux-à-flux.
+
 
 \subsection{Configurations architecturales}
-La nature événementiel du DCIS s'aligne naturellement avec l'équation de mise à jour de l'état caché $h_t = f(h_{t-1}, x_t)$ des réseaux récurrents \eqref{eq:recurrent}. Nous avons comparé trois architectures : RNN standard, GRU et LSTM. Quelque soit le modèle, son architecture général est identique et reprend l'architecture canonique des réseaux de neurones récurrents \ref{RNN base} présentée dans le chapitre \ref{chap:SOTA}. C'est le bloc réalisant la propagation de la mémoire et sa mise-à-jour qui distinguera les modèles. La figure \ref{fig:compareRNN} propose une comparaison de ces trois blocs élémentaires.\\
+La nature événementiel du DCIS s'aligne naturellement avec l'équation de mise à jour de l'état caché $h_t = f(h_{t-1}, x_t)$ des réseaux récurrents \eqref{eq:recurrent}. Nous avons comparé trois architectures : RNN standard, GRU et LSTM. Quelque soit le modèle, son architecture général est identique et reprend l'architecture canonique des réseaux de neurones récurrents \ref{RNN base} présentée dans le chapitre \ref{chap:SOTA}. C'est le bloc réalisant la propagation de la mémoire et sa mise-à-jour qui distinguera les modèles. La figure \ref{fig:compareRNN} propose une comparaison de ces trois blocs élémentaires. \\
 
 \begin{figure}[htbp]
 \begin{center} 
@@ -159,7 +162,7 @@ L'architecture, pensée pour le flux-à-flux, est illustré dans le figure \ref{
 \label{fig:fluxaflux}
 \end{figure}
 
-L'optimisation des hyper-paramètres des modèles a abouti aux configurations du Tableau \ref{tab:hypRNN}.
+Afin d'évaluer l'impact de l'attention dans un contexte de flux, le modèle LSTM a été décliné en deux variantes augmentées. La première (LSTM + BAT) intègre une attention additive de Bahdanau \cite{bahdanau_neural_2014}, permettant au LSTM de conserver et interroger les états passés de sa mémoire. La seconde (LSTM + LAT) utilise l'attention de Luong \cite{luong_effective_2015}, dont le mécanisme d'attention basé sur un produit scalaire est généralement plus stable pour les séquences longues. L'optimisation des hyper-paramètres de l'ensemble de ces modèles a abouti aux configurations présentées dans le Tableau \ref{tab:hypRNN}.
 
 \begin{table}[htbp]
 \centering
@@ -170,6 +173,8 @@ L'optimisation des hyper-paramètres des modèles a abouti aux configurations du
 RNN & 640 & 4 \\
 GRU & 640 & 5 \\
 LSTM & 768 & 4 \\
+LSTM + BAT & 768 & 4 \\
+LSTM + LAT & 768 & 6 \\
 \bottomrule
 \end{tabular}
 \caption{Configurations optimales des architectures récurrentes évaluées.}
@@ -179,7 +184,7 @@ LSTM & 768 & 4 \\
 \subsection{La métrique}
 La métrique utilisé pour l'entrainement est une pondération de deux métriques, l'une qui mesure la qualité de reconstruction et l'autre qui mesure la qualité de la classification (pour le passage à l'impulsion suivante avec le jeton \texttt{NEXT}). Cette métrique pondérée est très semblable à celle introduite dans le chapitre \ref{chap:seq2seq} (équation \eqref{eq:Ltot}) dans l'approche en bloc. \\
 
-Considérons un lot (batch) de $B$ séquences de longueur maximale $T$, où chaque impulsion est un vecteur de dimension $D$. L'ensemble des séquences cibles $\mathbf{Y}$ comme l'ensemble des séquences prédites $\hat{\mathbf{Y}}$ peuvent être considéré comme des tenseurs de dimension $B \times T \times D$. Les masques peuvent eux être associés à des tenseurs de dimensions $B \times T$, naturellement étendu en tenseur de taille $B \times T \times D$ pour les opérations élément par élément tel que la multiplication de Hadamard $\odot$. On définit alors, de manière semblable à l'équation \eqref{eq:Eraw}, l'erreur brute du lot de prédictions, normalisée par le nombre total d'éléments scalaires à la fois valides, défini par $MP_k$, et à la fois ne devant pas être un jeton \texttt{NEXT}, défini par $1 - MO_k$. Elle s'écrit :
+Considérons un lot (batch) de $B$ séquences de longueur maximale $T$, où chaque impulsion est un vecteur de dimension $D$. L'ensemble des séquences cibles $\mathbf{Y}$ comme l'ensemble des séquences prédites $\hat{\mathbf{Y}}$ peuvent être considéré comme des tenseurs de dimension $B \times T \times D$. Pour garantir un calcul de l'erreur sur un lot de séquences de tailles variables, nous exploitons les deux masques binaires $\mathbf{MO}_k$ et $\mathbf{MP}_k$, qui correspondent respectivement aux $k_{ième}$ masques des lots de masques $\mathbf{MO}$ et $\mathbf{MP}$ introduit en \ref{seq:fafmask}. Pour rappel, $\mathbf{MO}_k$ isole les positions où la cible attendue est le jeton \texttt{NEXT}, et $\mathbf{MP}_k$ isole les positions valides en excluant le remplissage artificiel (\texttt{PAD}). Ces masques de taille $T$ sont étendus aux dimensions $T \times D$ pour les opérations de multiplication terme à terme ($\odot$). On définit alors, de manière semblable à l'équation \eqref{eq:Eraw}, l'erreur brute du lot de prédictions, normalisée par le nombre total d'éléments scalaires à la fois valides, défini par $MP_k$, et à la fois ne devant pas être un jeton \texttt{NEXT}, défini par $1 - MO_k$. Elle s'écrit :
 
 \begin{equation}
 \mathcal{E}{raw}(\hat{\mathbf{Y}}_k, \mathbf{Y}_k) = \frac{\| (\hat{\mathbf{Y}}_k - \mathbf{Y}_k) \odot (1 - \mathbf{MO}_k) \odot \mathbf{MP_k} \|_2}{\| ((1 - \mathbf{MO}_k) \odot \mathbf{MP}_k \|_2\sqrt{D}}
@@ -187,12 +192,13 @@ Considérons un lot (batch) de $B$ séquences de longueur maximale $T$, où chaq
 
 Ensuite, nous injectons ce terme dans les équations \eqref{eq:Eref}, \eqref{eq:Ewei} et \eqref{eq:Lrec} pour obtenir (de manière tout à fait identique à ce que nous avions fait en \ref{seq:metseq2seq}) l'erreur de régression $\mathcal{L}_{rec}$.\\
 
-L'erreur de classification du jeton \texttt{NEXT} identique à l'équation \eqref{eq:termine}, si nous désignons par $\texttt{N}$ la représentation latent du jeton \texttt{NEXT} :
+L'erreur de classification du jeton \texttt{NEXT} est évaluée similairement à l'équation \eqref{eq:termine}. En notant $\texttt{N}$ le tenseur de dimension $B \times T \times D$ obtenu par la répétition temporelle et spatiale du vecteur latent représentant le jeton \texttt{NEXT}, l'erreur de terminaison s'écrit :
+
 \begin{equation}
-\mathcal{L}_{fin}(\hat{\mathbf{Y}}, \mathbf{Y}) = \frac{\|(\hat{\mathbf{Y}} - \texttt{N}) \odot \mathbf{MO} \odot \mathbf{MP_k} \|_2}{\| \mathbf{MO}_k \odot \mathbf{MP}_k \|_2\sqrt{D}}
+\mathcal{L}_{fin}(\hat{\mathbf{Y}}, \mathbf{Y}) = \frac{\|(\hat{\mathbf{Y}} - \texttt{N}) \odot \mathbf{MO} \odot \mathbf{MP} \|_2}{\| \mathbf{MO} \odot \mathbf{MP} \|_2\sqrt{D}}
 \end{equation}
 
-La fonction de coût finale $\mathcal{L}_{total}$ minimisée lors de l'entraînement combine l'erreur de reconstruction et l'erreur de classification, équilibrées par un hyperparamètre $\lambda$ :
+La fonction de coût finale $\mathcal{L}_{total}$ minimisée lors de l'entraînement combine l'erreur de reconstruction et l'erreur de classification, équilibrées par un hyperparamètre $\lambda$ (optimisé expérimentalement à 0.1):
 \begin{equation}
 \label{eq:ssmloss}
 \mathcal{L}_{total}(\hat{\mathbf{Y}}, \mathbf{Y}) = \mathcal{L}_{rec}(\hat{\mathbf{Y}}, \mathbf{Y}) + \lambda \mathcal{L}_{fin}(\hat{\mathbf{Y}}, \mathbf{Y})
@@ -210,22 +216,26 @@ Le Tableau \ref{tab:resRNN} synthétise l'erreur totale obtenue, où $1.0$ repr�
 RNN & 0.1261 & 0.2109 & 0.2156 \\
 GRU & 0.1260 & 0.1981 & 0.1945 \\ 
 LSTM & 0.1146 & 0.2192 & 0.2001 \\ 
+LSTM + BAT & 0.1053 & 0.1757 & 0.1684 \\ 
+LSTM + LAT & 0.0744 & 0.1566 & 0.1542 \\ 
 \bottomrule
 \end{tabular} 
 \caption{Comparaison des performances en fonction du volume d'impulsions traitées. L'erreur fait référence à l'équation \ref{eq:ssmloss}.} 
 \label{tab:resRNN}
 \end{table}
 
+L'observation du tableau \ref{tab:resRNN} indique une erreur plus basse pour les séquences de 10 impulsions, suivie d'une stabilisation entre 20 et 50 impulsions. Cette différence s'explique par les effets de bord abordés au chapitre précédent (figure \ref{fig:ResetEnv}). Sur une séquence courte (10 PDW), le régime stationnaire des mémoires du DCIS ne s'établit pas. À partir de 20 impulsions, un régime stationnaire est atteint et la prédiction sous ce régime stationnaire constitue la majorité de la tâche du modèle. Pour 50 impulsions, et par extensions pour n'importe quel longueur de séquence supérieur, le traitement d'un régime stationnaire devient LA tâche du modèle. Cette opération restant similaire que la séquence compte 20, 50 ou 1000 impulsions, l'erreur se stabilise donc et n'augmente plus avec la taille du scénario.  
+Par ailleurs, l'écart de performance entre les architectures classiques et celles augmentées par l'attention s'est réduit. Lors de l'étude de la transduction (chapitre \ref{chap:seq2seq}, tableau \ref{tab:RNNseq2seq}), l'erreur du meilleur modèle classique (RNN) sur 10 PDW était supérieure de 267\% à celle du meilleur modèle augmenté (LSTM + Luong). Dans l'approche flux-à-flux sur 50 PDW, cette différence d'erreur entre le modèle classique le plus performant (GRU) et le modèle augmenté (LSTM + LAT) n'est plus que de 19\%. L'usage d'une mémoire récurrente constituait une faiblesse pour la transduction globale, nécessitant l'ajout de mécanismes d'attention. Dans le formalisme flux-à-flux, cette même mémoire reproduit la dynamique de mise-à-jour du DCIS, devenant ainsi un atout pour la modélisation qui n'est plus à combler. 
+
 Toutes les architectures atteignent une erreur structurellement inférieure à 1.0, prouvant leur capacité à modéliser la tâche. Bien plus important, nous constatons que l'erreur ne varie que très peu entre les séquences de 20 et 50 PDW. Ces résultats illustrent la validité de cette approche événementielle : le modèle maintient son régime permanent indépendamment de l'horizon temporel global. Ainsi, le prédiction de très longues séquences n'est numériquement que la répétition d'une tâche que le modèle sait déjà faire.\\
 
-
-En complément de cette évaluation quantitative, la figure \ref{fig:RNNgen} illustre les capacités génératives du modèle de manière qualitative. Cette représentation permet la comparaison des séquences incidente (à gauche), cible (au milieu) et générée par le modèle (à droite). Nous pouvons alors distinguer dans la séquence générée les même artefacts que ceux de la séquence cible (encadrés), confirmant encore la pertinence de cette approche pour l'apprentissage automatique, mais aussi la faculté du modèle à comprendre et reproduire le traitement du DCIS.\\
+En complément de cette évaluation quantitative, la figure \ref{fig:RNNgen} illustre les capacités génératives du modèle de manière qualitative. Cette représentation permet la comparaison des séquences incidente (à gauche), cible (au milieu) et générée par le modèle (à droite). Nous pouvons alors distinguer dans la séquence générée les même artefacts que ceux de la séquence cible (encadrés), confirmant encore la pertinence de cette approche pour l'apprentissage automatique, mais aussi la faculté du modèle à comprendre et reproduire le traitement du DCIS. Il est à noter que les autres modèles évalués, RNN, LSTM, GRU et LSTM+BAT, proposait des capacités de prédictions similaires à travers la présence d'artefact.\\
 
 \begin{figure}
 \begin{center} 
 \includegraphics[scale=0.5]{genRNN.png}
 \end{center}
-\caption{Comparaison qualitative de séquences incidentes (gauche), cible (milieu), prédite par le modèle (droite). La séquence source est composée de 50 PDW. Le modèle utilisé pour prédire la séquence est le LSTMAT-L. Les encadrés verts permettent d'observer la capacité de notre modèle à reproduire les artefacts propre au traitement du DCI \ref{fig:IOex}}
+\caption{Comparaison qualitative de séquences incidentes (gauche), cible (milieu), prédite par le modèle (droite). La séquence source est composée de 50 PDW. Le modèle utilisé pour prédire la séquence est le LSTM+LAT. Les encadrés verts permettent d'observer la capacité de notre modèle à reproduire les artefacts propre au traitement du DCI \ref{fig:IOex}}
 \label{fig:RNNgen}
 \end{figure}
 

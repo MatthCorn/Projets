@@ -1,19 +1,19 @@
 [0] Config.pm:328> INFO - This is Biber 2.21
 [0] Config.pm:331> INFO - Logfile is 'Modele_These_UParisSaclay_2022.blg'
-[80] biber-MSWIN64:342> INFO - === 
-[114] Biber.pm:421> INFO - Reading 'Modele_These_UParisSaclay_2022.bcf'
-[205] Biber.pm:1002> INFO - Found 116 citekeys in bib section 0
-[214] Biber.pm:4487> INFO - Processing section 0
-[222] Biber.pm:4678> INFO - Looking for bibtex file 'Biblio.bib' for section 0
-[287] bibtex.pm:1713> INFO - LaTeX decoding ...
-[410] bibtex.pm:1519> INFO - Found BibTeX data source 'Biblio.bib'
-[1061] UCollate.pm:68> INFO - Overriding locale 'fr-FR' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[1061] UCollate.pm:68> INFO - Overriding locale 'fr-FR' defaults 'variable = shifted' with 'variable = non-ignorable'
-[1061] Biber.pm:4307> INFO - Sorting list 'none/global//global/global/global' of type 'entry' with template 'none' and locale 'fr-FR'
-[1061] Biber.pm:4313> INFO - No sort tailoring available for locale 'fr-FR'
-[1123] bbl.pm:676> INFO - Writing 'Modele_These_UParisSaclay_2022.bbl' with encoding 'UTF-8'
-[1331] bbl.pm:779> INFO - Output to Modele_These_UParisSaclay_2022.bbl
-[1331] Biber.pm:132> WARN - ISBN '978-3-319-24573-7 978-3-319-24574-4' in entry 'navab_u-net_2015' is invalid - run biber with '--validate_datamodel' for details.
-[1331] Biber.pm:132> WARN - ISBN '978-3-031-97528-8 978-3-031-97529-5' in entry 'zgurovsky_linear-time_2026' is invalid - run biber with '--validate_datamodel' for details.
-[1331] Biber.pm:132> WARN - I didn't find a database entry for 'manon_eusip' (section 0)
-[1331] Biber.pm:134> INFO - WARNINGS: 3
+[84] biber-MSWIN64:342> INFO - === 
+[119] Biber.pm:421> INFO - Reading 'Modele_These_UParisSaclay_2022.bcf'
+[212] Biber.pm:1002> INFO - Found 116 citekeys in bib section 0
+[222] Biber.pm:4487> INFO - Processing section 0
+[230] Biber.pm:4678> INFO - Looking for bibtex file 'Biblio.bib' for section 0
+[299] bibtex.pm:1713> INFO - LaTeX decoding ...
+[431] bibtex.pm:1519> INFO - Found BibTeX data source 'Biblio.bib'
+[1097] UCollate.pm:68> INFO - Overriding locale 'fr-FR' defaults 'variable = shifted' with 'variable = non-ignorable'
+[1097] UCollate.pm:68> INFO - Overriding locale 'fr-FR' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[1097] Biber.pm:4307> INFO - Sorting list 'none/global//global/global/global' of type 'entry' with template 'none' and locale 'fr-FR'
+[1097] Biber.pm:4313> INFO - No sort tailoring available for locale 'fr-FR'
+[1158] bbl.pm:676> INFO - Writing 'Modele_These_UParisSaclay_2022.bbl' with encoding 'UTF-8'
+[1373] bbl.pm:779> INFO - Output to Modele_These_UParisSaclay_2022.bbl
+[1373] Biber.pm:132> WARN - ISBN '978-3-319-24573-7 978-3-319-24574-4' in entry 'navab_u-net_2015' is invalid - run biber with '--validate_datamodel' for details.
+[1373] Biber.pm:132> WARN - ISBN '978-3-031-97528-8 978-3-031-97529-5' in entry 'zgurovsky_linear-time_2026' is invalid - run biber with '--validate_datamodel' for details.
+[1373] Biber.pm:132> WARN - I didn't find a database entry for 'manon_eusip' (section 0)
+[1373] Biber.pm:134> INFO - WARNINGS: 3

@@ -21,26 +21,28 @@
 \newlabel{algo:serialize_data}{{8}{116}{Sérialisation : transformation et préparation des données}{algocf.8}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {7.2.3}Encodage local du temps}{116}{subsection.7.2.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {7.2.4}Création des données d'entrainement}{117}{subsection.7.2.4}\protected@file@percent }
+\newlabel{seq:fafmask}{{7.2.4}{117}{Création des données d'entrainement}{subsection.7.2.4}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {7.3}Validation de l'approche sur architectures récurrentes}{117}{section.7.3}\protected@file@percent }
+\newlabel{seq:validSSM}{{7.3}{117}{Validation de l'approche sur architectures récurrentes}{section.7.3}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {7.2}{\ignorespaces Compilation de l'ensemble des données (entrées, sortie, masques) qui permettent de superviser l'entrainement d'un modèle. Dans cet exemple, la séquence sérialisée \eqref  {eq:seqfusion} est de longueur 8 mais est prolongée jusqu'à 10, ce qui correspond à l'étape d'uniformisation des longueurs des séquences permettant un entrainement en parallèle de nos modèles.}}{118}{table.caption.55}\protected@file@percent }
 \newlabel{tab:seqfusion2}{{7.2}{118}{Compilation de l'ensemble des données (entrées, sortie, masques) qui permettent de superviser l'entrainement d'un modèle. Dans cet exemple, la séquence sérialisée \eqref {eq:seqfusion} est de longueur 8 mais est prolongée jusqu'à 10, ce qui correspond à l'étape d'uniformisation des longueurs des séquences permettant un entrainement en parallèle de nos modèles}{table.caption.55}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {7.3.1}Configurations architecturales}{118}{subsection.7.3.1}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {7.3}{\ignorespaces Configurations optimales des architectures récurrentes évaluées.}}{118}{table.caption.58}\protected@file@percent }
-\newlabel{tab:hypRNN}{{7.3}{118}{Configurations optimales des architectures récurrentes évaluées}{table.caption.58}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {7.1}{\ignorespaces Représentation du cœur des trois principales architectures comparées. Chaque architecure dispose d'une mémoire latente $h_t$ qu'elle met à jour à partir d'une entrée courante $x_t$ et qu'elle peut exploiter pour produire une prédiction. source : \textit  {https://colah.github.io/posts/2015-08-Understanding-LSTMs/}}}{119}{figure.caption.56}\protected@file@percent }
 \newlabel{fig:compareRNN}{{7.1}{119}{Représentation du cœur des trois principales architectures comparées. Chaque architecure dispose d'une mémoire latente $h_t$ qu'elle met à jour à partir d'une entrée courante $x_t$ et qu'elle peut exploiter pour produire une prédiction. source : \textit {https://colah.github.io/posts/2015-08-Understanding-LSTMs/}}{figure.caption.56}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {7.2}{\ignorespaces Illustration d'un réseau récurrent adapté au traitement de flux. Il est constitué de $L=3$ couches. La matrice $W_2$ est la matrice de projection vers l’espace latent. Les matrices $W_1^1$, $W_1^2$ et $W_1^3$ sont la matrice de persistance de la mémoire pour les 3 couches du modèle. La matrice $W_3$ est une matrice de projection dans l’espace des prédiction.}}{119}{figure.caption.57}\protected@file@percent }
 \newlabel{fig:fluxaflux}{{7.2}{119}{Illustration d'un réseau récurrent adapté au traitement de flux. Il est constitué de $L=3$ couches. La matrice $W_2$ est la matrice de projection vers l’espace latent. Les matrices $W_1^1$, $W_1^2$ et $W_1^3$ sont la matrice de persistance de la mémoire pour les 3 couches du modèle. La matrice $W_3$ est une matrice de projection dans l’espace des prédiction}{figure.caption.57}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {7.3}{\ignorespaces Configurations optimales des architectures récurrentes évaluées.}}{120}{table.caption.58}\protected@file@percent }
+\newlabel{tab:hypRNN}{{7.3}{120}{Configurations optimales des architectures récurrentes évaluées}{table.caption.58}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {7.3.2}La métrique}{120}{subsection.7.3.2}\protected@file@percent }
-\newlabel{eq:ssmloss}{{7.4}{120}{La métrique}{equation.7.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3.3}Résultats expérimentaux}{120}{subsection.7.3.3}\protected@file@percent }
+\newlabel{eq:ssmloss}{{7.4}{121}{La métrique}{equation.7.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3.3}Résultats expérimentaux}{121}{subsection.7.3.3}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {7.4}{\ignorespaces Comparaison des performances en fonction du volume d'impulsions traitées. L'erreur fait référence à l'équation \ref {eq:ssmloss}.}}{121}{table.caption.59}\protected@file@percent }
 \newlabel{tab:resRNN}{{7.4}{121}{Comparaison des performances en fonction du volume d'impulsions traitées. L'erreur fait référence à l'équation \ref {eq:ssmloss}}{table.caption.59}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7.3}{\ignorespaces Comparaison qualitative de séquences incidentes (gauche), cible (milieu), prédite par le modèle (droite). La séquence source est composée de 50 PDW. Le modèle utilisé pour prédire la séquence est le LSTMAT-L. Les encadrés verts permettent d'observer la capacité de notre modèle à reproduire les artefacts propre au traitement du DCI \ref {fig:IOex}}}{121}{figure.caption.60}\protected@file@percent }
-\newlabel{fig:RNNgen}{{7.3}{121}{Comparaison qualitative de séquences incidentes (gauche), cible (milieu), prédite par le modèle (droite). La séquence source est composée de 50 PDW. Le modèle utilisé pour prédire la séquence est le LSTMAT-L. Les encadrés verts permettent d'observer la capacité de notre modèle à reproduire les artefacts propre au traitement du DCI \ref {fig:IOex}}{figure.caption.60}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {7.4}Discussion et Perspectives}{121}{section.7.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7.3}{\ignorespaces Comparaison qualitative de séquences incidentes (gauche), cible (milieu), prédite par le modèle (droite). La séquence source est composée de 50 PDW. Le modèle utilisé pour prédire la séquence est le LSTM+LAT. Les encadrés verts permettent d'observer la capacité de notre modèle à reproduire les artefacts propre au traitement du DCI \ref {fig:IOex}}}{122}{figure.caption.60}\protected@file@percent }
+\newlabel{fig:RNNgen}{{7.3}{122}{Comparaison qualitative de séquences incidentes (gauche), cible (milieu), prédite par le modèle (droite). La séquence source est composée de 50 PDW. Le modèle utilisé pour prédire la séquence est le LSTM+LAT. Les encadrés verts permettent d'observer la capacité de notre modèle à reproduire les artefacts propre au traitement du DCI \ref {fig:IOex}}{figure.caption.60}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7.4}Discussion et Perspectives}{122}{section.7.4}\protected@file@percent }
 \@setckpt{Stage}{
-\setcounter{page}{123}
+\setcounter{page}{124}
 \setcounter{equation}{4}
 \setcounter{enumi}{0}
 \setcounter{enumii}{0}
@@ -82,7 +84,7 @@
 \setcounter{citetotal}{0}
 \setcounter{multicitecount}{0}
 \setcounter{multicitetotal}{0}
-\setcounter{instcount}{143}
+\setcounter{instcount}{144}
 \setcounter{maxnames}{3}
 \setcounter{minnames}{1}
 \setcounter{maxitems}{3}
