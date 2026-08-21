@@ -81,6 +81,6 @@ if __name__ == '__main__':
     batch_size = 50
     len_in = 50  # On fixe la séquence temporelle pour évaluer le traitement de flux
 
-    while batch_size <= 100000:
+    while batch_size <= 500000:
         test_vitesse(batch_size=batch_size, len_in=len_in)
         batch_size = int(batch_size * 1.5)
