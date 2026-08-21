@@ -17,7 +17,7 @@ N = TransformerTranslator(10, 11, d_att=256, n_encoders=11, n_decoders=3, widths
                           n_heads=16, len_in=len_in, len_out=len_in)
 N.to(device)
 
-def test_vitesse(batch_size=50):
+def test_vitesse(batch_size=50, len_in=len_in):
     X = torch.normal(0, 1, (batch_size, len_in, 10), device=device)
 
     # --- 1. Phase de préchauffage (Warm-up) ---
@@ -67,7 +67,7 @@ def test_vitesse(batch_size=50):
         f"Vitesse : {total_pdw_incidents_per_run / avg_time_per_run:.2f} PDW incidents/seconde.")
 
 if __name__ == '__main__':
-    batch_size = 100
-    while batch_size < 100000:
-        batch_size = int(batch_size * 1.5)
-        test_vitesse(batch_size)
+    len_in = 30
+    while len_in < 500:
+        test_vitesse(batch_size=2000, len_in=len_in)
+        len_in = int(len_in * 1.2)

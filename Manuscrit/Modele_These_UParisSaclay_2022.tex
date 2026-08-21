@@ -74,7 +74,6 @@
 
 \pagestyle{plain} % pour ne garder que les n°de page en milieu-bas et supprimer les indications de chapitre en marge haute
 
-\usepackage{lipsum} % à retirer!!!
 \begin{document}
 
 \begin{titlepage}
@@ -98,13 +97,6 @@
 \end{picture}
  
 %*****************************************************
-%**  LOGO  ÉTABLISSEMENT PARTENAIRE SI COTUTELLE
-%**  CHANGER L'IMAGE PAR DÉFAUT **
-%*****************************************************
-\vspace{-14mm} % à ajuster en fonction de la hauteur du logo
-\flushright \includegraphics[scale=1]{logo2.png}
-
-%*****************************************************
 %******************** TITRE **************************
 %*****************************************************
 
@@ -113,11 +105,11 @@
 \color{Prune}
 
 \fontsize{22}{26}\selectfont
-  \Huge Titre de la thèse (sur plusieurs lignes si nécessaire) \\
+  \Huge Accélération d'un environnement de simulation de mesures de soutien électronique par l'intelligence artificielle \\
 
 \normalsize
 \color{black}
-\Large{\textit{Traduction du titre de la thèse (sur plusieurs lignes si nécessaire)}} \\
+\Large{\textit{Accelerating an electronic support measures simulation environment using artificial intelligence}} \\
 %*****************************************************
 
 
@@ -126,21 +118,21 @@
 \vspace{1.5cm}
 
 \normalsize
-\textbf{Thèse de doctorat de l'université Paris-Saclay et de l'université XXX (si cotutelle - sinon enlever cette seconde partie)} \\
+\textbf{Thèse de doctorat de l'université Paris-Saclay} \\
 
 \vspace{6mm}
 
-\small École doctorale n$^{\circ}$ d'accréditation, dénomination et sigle\\
-\small Spécialité de doctorat: voir annexe\\
-\small Graduate School : voir annexe. Référent : voir annexe \\
+\small École doctorale n° 580, Sciences et technologies de l'information et de la communication (STIC)\\
+\small Spécialité : Sciences du traitement du signal et des images\\
+\small Graduate School : Ecole Graduée Informatique et Sciences du Numérique. Référent : ENS Paris-Saclay \\
 \vspace{6mm}
 
-\footnotesize Thèse préparée dans la (ou les) unité(s) de recherche \textbf{Nom(s)} (voir annexe), sous la direction de \textbf{Prénom NOM}, titre du directeur ou de la directrice de thèse, la co-direction de \textbf{Prénom NOM}, titre du co-directeur ou de la co-directrice de thèse, le co-encadrement de \textbf{Prénom NOM}, titre, du co-encadrant ou de la co-encadrante ou la co-supervision de \textbf{Prénom NOM}, titre, du tuteur ou de la tutrice (en cas de partenariat industriel) \\
+\footnotesize Thèse préparée dans l'unité de recherche Laboratoire SATIE (UMR 8029), sous la direction de Thomas RODET, Professeur des universités, et la co-supervision de Cyrille ENDERLI, Ingénieur de recherche (Thales DMS), tuteur en entreprise. \\
 \vspace{15mm}
 
-\textbf{Thèse soutenue à Paris-Saclay, le JJ mois AAAA, par}\\
+\textbf{Thèse soutenue à Paris-Saclay, le 25 octobre 2026, par Matthieu CORNU}\\
 \bigskip
-\Large {\color{Prune} \textbf{Prénom NOM}} % Changer le Prénom et le NOM
+\Large {\color{Prune} \textbf{Matthieu CORNU}}
 
 %************************************
 \vspace{\fill} % ALIGNER LE TABLEAU EN BAS DE PAGE
@@ -155,16 +147,16 @@
 \scriptsize
 \begin{tabular}{|p{7cm}l}
 \arrayrulecolor{Prune}
-\textbf{Prénom NOM} &   Président ou Présidente\\ 
-Titre, Affiliation & \\
-\textbf{Prénom NOM} &  Rapporteur \& Examinateur / trice \\ 
-Titre, Affiliation   &   \\ 
-\textbf{Prénom NOM} &  Rapporteur \& Examinateur / trice \\ 
-Titre, Affiliation  &   \\ 
-\textbf{Prénom NOM} &  Examinateur ou Examinatrice \\ 
-Titre, Affiliation   &   \\ 
-\textbf{Prénom NOM} &  Examinateur ou Examinatrice \\ 
-Titre, Affiliation   &   \\ 
+\textbf{Michèle GOUIFFES} &   Présidente\\ 
+Professeure des universités, Université Paris-Saclay, IUT ORSAY & \\
+\textbf{Jean Marc LE CAILLEC} &  Rapporteur \\ 
+Professeur des universités, IMT Atlantique Brest   &   \\ 
+\textbf{Bruno SIXOU} &  Rapporteur \\ 
+Maître de conférences, Insa Lyon  &   \\ 
+\textbf{Michèle GOUIFFES} &  Examinatrice \\ 
+Professeure des universités, Université Paris-Saclay, IUT ORSAY &   \\ 
+\textbf{Thomas HOURET} &  Examinateur \\ 
+Ingénieur de recherche, ONERA   &   \\ 
  
 
 \end{tabular} 
@@ -189,27 +181,33 @@ Titre, Affiliation   &   \\
 
 \begin{mdframed}[linecolor=Prune,linewidth=1]
 
-\textbf{Titre:} titre (en français)..................................................................................................................
+\textbf{Titre:} Accélération d'un environnement de simulation de mesures de soutien électronique par l'intelligence artificielle
 
-\noindent \textbf{Mots clés:} 3 à 6 mots clefs (version en français)
+\noindent \textbf{Mots clés:} Guerre électronique, ESM, Simulation, Intelligence Artificielle, Transformer, Traitement de séquences
 
 \vspace{-.5cm}
 \begin{multicols}{2}
-\noindent \textbf{Résumé:}\lipsum[1-2] 
+\noindent \textbf{Résumé:} L'histoire de la guerre moderne est indissociable de la maîtrise du spectre électromagnétique. Dans la guerre électronique aéroportée, le capteur de Mesures de Soutien Électronique (ESM) opère pour intercepter les émissions radar. La validation des algorithmes de post-traitement exploitant ces interceptions s'appuie sur la simulation numérique. Cependant, les environnements virtuels de référence sont limités par la lenteur de leurs modules de Détection et Caractérisation des Impulsions (DCI).
+
+L'objectif de cette thèse est d'accélérer un environnement virtuel de référence en substituant le module DCI par un modèle d'intelligence artificielle. La problématique s'apparente à un défi de modélisation d'un algorithme de traitement de séquences. Pour pallier la complexité du système réel, un environnement d'étude contrôlé (DCIS) est d'abord élaboré. La viabilité de l'approche est évaluée sur un problème d'ordonnancement supervisé, établissant la supériorité de l'architecture Transformer.  
+
+L'approche principale consiste ensuite en une transduction Séquence-vers-Séquence. Bien que l'approche soit validée sur des séquences courtes, le passage à l'échelle via un fenêtrage dynamique révèle des failles. Pour y remédier, une reformulation causale du problème est appliquée par sérialisation événementielle des données. 
 \end{multicols}
 
 \end{mdframed}
 
-\vspace{8mm}
-
 \begin{mdframed}[linecolor=Prune,linewidth=1]
 
-\textbf{Title:} titre (en anglais)..................................................................................................................
+\textbf{Title:} Accelerating an electronic support measures simulation environment using artificial intelligence
 
-\noindent \textbf{Keywords:} 3 à 6 mots clefs (version en anglais)
+\noindent \textbf{Keywords:} Electronic Warfare, ESM, Simulation, Artificial Intelligence, Transformer, Sequence Processing
 
 \begin{multicols}{2}
-\noindent \textbf{Abstract:} \lipsum[1-2]
+\noindent \textbf{Abstract:} The history of modern warfare is inseparable from the mastery of the electromagnetic spectrum. In airborne electronic warfare, the Electronic Support Measures (ESM) sensor operates to intercept radar emissions. The validation of the post-processing algorithms using thoses datas relies on numerical simulation. However, standard virtual environments are limited by the slowness of their Pulse Detection and Characterization (DCI) modules.
+
+The objective of this thesis is to accelerate a standard virtual environment by replacing the DCI module with an artificial intelligence model. The problem is formalized as a challenge of modeling a sequence processing algorithm. To overcome the complexity of the real system, a controlled study environment (DCIS) is first developed. The viability of the approach is evaluated on a supervised sorting problem, establishing the superiority of the Transformer architectur.  
+
+The main approach then consists of a Sequence-to-Sequence transduction. While the approch is validated on short sequences, scaling up via dynamic windowing revealsn some weaknesses. To address this, a causal reformulation of the problem is applied through the event-based serialization of the data. 
 \end{multicols}
 \end{mdframed}
 
