@@ -13,7 +13,6 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def test_vitesse(batch_size=50, len_in=100):
     # Initialisation du modèle
-    len_in = 100
     N = TransformerTranslator(10, 11, d_att=256, n_encoders=11, n_decoders=3, widths_embedding=[40], width_FF=[256],
                               n_heads=16, len_in=len_in, len_out=len_in)
     N.to(device)
